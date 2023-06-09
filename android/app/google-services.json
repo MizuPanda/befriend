@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "513327974218",
+    "project_id": "befriend-b14ca",
+    "storage_bucket": "befriend-b14ca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:513327974218:android:018989ca20e7a04ffd23b3",
+        "android_client_info": {
+          "package_name": "com.befriendapp.befriend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "513327974218-vtjrt7lmnba2travo63156ad4mp66ig0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7k2haC__y8fe3hygsffOYZWbTB6mICfk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "513327974218-vtjrt7lmnba2travo63156ad4mp66ig0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "513327974218-mnqlhvcalbfv60jqu5k38ojr20knvkn0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.befriendapp.befriend"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
