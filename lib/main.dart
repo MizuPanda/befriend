@@ -1,3 +1,4 @@
+import 'package:befriend/utilities/samples.dart';
 import 'package:befriend/views/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,6 +9,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  BubbleSample.initialize();
   runApp(const MyApp());
 }
 
@@ -22,7 +24,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      home: HomePage(bubble: BubbleSample.juniel,),
     );
   }
 }

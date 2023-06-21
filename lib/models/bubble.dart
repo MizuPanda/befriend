@@ -1,37 +1,49 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
+
+import '../utilities/randomizer.dart';
 
 class Bubble {
+  final String username;
   final String name;
-  final double? progress;
-  final double distance;
-  final double size;
-  late double x;
-  late double y;
-  final Bubble? main;
-  final Color? color;
-  final Gradient? gradient;
+  List<Friendship> friendships;
+  late int level;
+  late double size;
+  double x = 0;
+  double y = 0;
+  late ImageProvider avatar;
+  late final Gradient gradient;
 
   Bubble(
-      {required this.name,
-      this.progress,
-      required this.distance,
-      required this.size,
-      this.main,
-      this.color,
-      this.gradient}) {
-    Random rand = Random(); //Distance = 10
-    x = rand.nextDouble() * distance; // x=6
-    y = sqrt(pow(distance, 2) - pow(x, 2)); //100 - 36 = 64, y = 8
-    if (main != null) {
-      x += (main!.size + size / 2) / 2;
-      y += (main!.size + size / 2) / 2;
+      {required this.username,
+        required this.name,
+        required this.friendships,}) {
+    avatar = const NetworkImage('https://picsum.photos/200');
+    gradient = Randomizer.linearGradient();
+    initializeLevel();
+  }
+
+  void initializeLevel() {
+    level = 0;
+    for(Friendship friendship in friendships) {
+      level += friendship.level;
     }
-    if (rand.nextBool()) {
-      x *= -1;
-    }
-    if (rand.nextBool()) {
-      y *= -1;
-    }
+
+    size = 40 + level*55/12;
   }
 }
+
+class Friendship {
+  Bubble friendBubble;
+  int level;
+  double progress;
+  int newPics;
+
+  Friendship({required this.friendBubble, required this.level, required this.progress, required this.newPics});
+
+  double distance() {
+      return 150 / (level + progress / 100);
+  }
+}
+
+
+

@@ -3,42 +3,70 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../models/bubble.dart';
+import '../../models/bubble_user.dart';
+import '../widgets/befriend_widget.dart';
 import '../widgets/bubble_widget.dart';
+import '../widgets/home/search_button.dart';
+import '../widgets/home/picture_button.dart';
+import '../widgets/home/settings_button.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Bubble bubble;
+
+  const HomePage({super.key, required this.bubble});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
-  final Bubble main = Bubble(name: 'You', distance: 0, size: 120);
-
-  late final List<Bubble> bubbles;
+    with TickerProviderStateMixin {
+  late final List<Friendship> _friendships;
   Offset _position = Offset.zero;
 
-  late AnimationController _animationController;
-  late CurvedAnimation _animation;
+  AnimationType _animationType = AnimationType.reset;
+  Offset? _friendPosition;
 
-  Color _randColor() {
-    Random r = Random();
-    int max = 255;
-    return Color.fromRGBO(r.nextInt(max), r.nextInt(max), r.nextInt(max), 1);
+  late AnimationController _animationController;
+  late AnimationController _offsetController;
+
+  late CurvedAnimation _animation;
+  late Animation<Offset> _offsetAnimation;
+
+  void _initializePositions() {
+    Bubble main = widget.bubble;
+
+    for (Friendship friendship in _friendships) {
+      Bubble b = friendship.friendBubble;
+      Random rand = Random(); //Distance = 10
+      b.x = rand.nextDouble() * friendship.distance(); // x=6
+      b.y = sqrt(
+          pow(friendship.distance(), 2) - pow(b.x, 2)); //100 - 36 = 64, y = 8
+
+      b.x += (main.size + b.size / 2) / 2 + BubbleWidget.textHeight;
+      b.y += (main.size + b.size / 2) / 2 + BubbleWidget.textHeight;
+
+      if (rand.nextBool()) {
+        b.x *= -1;
+      }
+      if (rand.nextBool()) {
+        b.y *= -1;
+      }
+    }
+    _avoidOverlapping();
   }
 
   void _avoidOverlapping() {
     bool overlapping = true;
 
-    bubbles.sort((a, b) => a.distance.compareTo(b.distance));
+    _friendships.sort((a, b) => a.distance().compareTo(b.distance()));
     while (overlapping) {
       overlapping = false;
-      for (var i = 0; i < bubbles.length; i++) {
-        final bubble = bubbles[i];
+      for (var i = 0; i < _friendships.length; i++) {
+        final bubble = _friendships[i].friendBubble;
 
-        for (var j = i + 1; j < bubbles.length; j++) {
-          final otherBubble = bubbles[j];
+        for (var j = i + 1; j < _friendships.length; j++) {
+          final otherBubble = _friendships[j].friendBubble;
           final dx = otherBubble.x - bubble.x;
           final dy = otherBubble.y - bubble.y;
           final distance = sqrt(dx * dx + dy * dy);
@@ -55,62 +83,24 @@ class _HomePageState extends State<HomePage>
     }
   }
 
+  void _animateToFriend(Offset friendPosition, AnimationType animationType) {
+      _animationType = animationType;
+      _friendPosition = friendPosition*-1;
+
+      _offsetAnimation = Tween<Offset>(
+        begin: _position,
+        end: _friendPosition!,
+      ).animate(CurvedAnimation(parent: _offsetController, curve: Curves.easeInOut));
+
+      _offsetController.reset();
+      _offsetController.forward();
+
+  }
+
   @override
   void initState() {
-    bubbles = [
-      Bubble(
-        name: 'Friend 1',
-        distance: 40,
-        progress: 0.6,
-        size: 60,
-        main: main,
-        color: _randColor(),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.red, Colors.deepOrange],
-        ),
-      ),
-      Bubble(
-        name: 'Friend 2',
-        distance: 30,
-        progress: 0.2,
-        size: 80,
-        main: main,
-        color: _randColor(),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.pink, Colors.purple],
-        ),
-      ),
-      Bubble(
-        name: 'Friend 3',
-        distance: 50,
-        progress: 0.1,
-        size: 100,
-        main: main,
-        color: _randColor(),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.lightBlueAccent, Colors.blueAccent],
-        ),
-      ),
-      Bubble(
-        name: 'Friend 4',
-        distance: 75,
-        progress: 0.9,
-        size: 75,
-        main: main,
-        color: _randColor(),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.lightGreenAccent, Colors.greenAccent],
-        ),
-      )
-    ];
+    _friendships = widget.bubble.friendships;
+
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -121,11 +111,29 @@ class _HomePageState extends State<HomePage>
         _animationController.reset();
       }
     });
+
+    _offsetController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _offsetController.addListener(() {
+      if (_offsetController.isCompleted) {
+          _position = _friendPosition!;
+          _animationType = AnimationType.reset;
+      }
+    });
+
     _animation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeOut,
     );
-    _avoidOverlapping();
+
+    _offsetAnimation = Tween<Offset>(
+      begin: _position,
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _offsetController, curve: Curves.easeInOut));
+    _initializePositions();
+
     super.initState();
   }
 
@@ -144,7 +152,6 @@ class _HomePageState extends State<HomePage>
             onPanUpdate: (DragUpdateDetails details) {
               setState(() {
                 _position += details.delta;
-                //debugPrint('position: $_position');
               });
             },
             onDoubleTap: () {
@@ -158,53 +165,45 @@ class _HomePageState extends State<HomePage>
               child: AnimatedBuilder(
                 animation: _animation,
                 builder: (BuildContext context, Widget? child) {
-                  return Transform.translate(
-                    offset: _position * (1 - _animation.value),
-                    child: Stack(
-                      children: [
-                        BubbleWidget(
-                          bubble: main,
-                          color: Colors.red,
-                        ),
-                        for (Bubble bubble in bubbles)
-                          Transform.translate(
-                            offset: Offset(bubble.x, bubble.y),
-                            child: BubbleWidget(
-                              bubble: bubble,
+                  return AnimatedBuilder(
+                    animation: _offsetAnimation,
+                    builder: (BuildContext context, Widget? child) {
+                      return Transform.translate( //Position doesn't correlate on screen
+                        offset: _animationType == AnimationType.reset? _position* (1 - _animation.value) : _offsetAnimation.value,
+                        child: Stack(
+                          children: [
+                            BubbleWidget(
+                              user: BubbleUser(
+                                  main: true, mainBubble: widget.bubble),
                             ),
-                          )
-                      ],
-                    ),
+                            for (Friendship friendship in _friendships)
+                              Transform.translate(
+                                offset: Offset(friendship.friendBubble.x,
+                                    friendship.friendBubble.y),
+                                child: BubbleWidget(
+                                    user: BubbleUser(
+                                        main: false, friendship: friendship)),
+                              )
+                          ],
+                        ),
+                      );
+                    },
                   );
                 },
               ),
             ),
           ),
-          const SafeArea(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Text(
-                'Befriend',
-                style: TextStyle(
-                    fontFamily: 'ComingSoon',
-                    fontWeight: FontWeight.bold,
-                    fontSize: 35),
-              ),
-            ),
-          ),
-          SafeArea(
-              child: Align(
-            alignment: Alignment.topRight,
-            child: IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.settings_rounded,
-                  size: 35,
-                  color: Colors.blueGrey,
-                )),
-          ))
+          const BefriendWidget(),
+          const SettingsButton(),
+          SearchButton(bubble: widget.bubble, animate: _animateToFriend,),
+          const PictureButton(),
         ],
       ),
     );
   }
+}
+
+enum AnimationType {
+  reset,
+  friend
 }

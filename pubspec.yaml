@@ -36,7 +36,8 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   firebase_core: ^2.13.1
-  flame: ^1.8.0
+  google_fonts: ^5.0.0
+  anim_search_bar: ^2.0.3
 
 dev_dependencies:
   flutter_test:
@@ -76,20 +77,7 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  fonts:
-    - family: Roboto
-      fonts:
-        - asset: fonts/Roboto-Light.ttf
-        - asset: fonts/Roboto-LightItalic.ttf
-        - asset: fonts/Roboto-Thin.ttf
-        - asset: fonts/Roboto-ThinItalic.ttf
-        - asset: fonts/Roboto-Medium.ttf
-        - asset: fonts/Roboto-MediumItalic.ttf
-          weight: 700
-    - family: ComingSoon
-      fonts:
-        - asset: fonts/ComingSoon-Regular.ttf
-          weight: 700
+
 
 
   # fonts:

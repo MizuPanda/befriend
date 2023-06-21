@@ -1,143 +1,118 @@
-import 'dart:math';
-
+import 'package:befriend/views/pages/profile_page.dart';
+import 'package:befriend/views/widgets/users/profile_photo.dart';
+import 'package:befriend/views/widgets/users/username_text.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../../models/bubble.dart';
+import '../../models/bubble_user.dart';
+import 'bubble_progress_indicator.dart';
 
 class BubbleWidget extends StatelessWidget {
-  final Bubble bubble;
-  final Color? color;
-  final double _strokeWidth = 4.33;
-  final double _textHeight = 25;
-  const BubbleWidget({Key? key, required this.bubble, this.color})
-      : super(key: key);
+  final BubbleUser user;
+  static const double strokeWidth = 4.33;
+  static const double textHeight = 25;
+  static const double levelHeight = 25;
+  const BubbleWidget({Key? key, required this.user}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Builder(builder: (context) {
-        if (bubble.progress != null) {
-          return SizedBox(
-            height: bubble.size + _textHeight,
-            child: Column(
-              children: [
-                Stack(children: [
-                  Container(
-                    width: bubble.size,
-                    height: bubble.size,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: bubble.color ?? color,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => ProfilePage(user: user)));
+      },
+      child: Center(
+        child: Container(
+          color: Colors.red,
+          height: user.bubble().size + textHeight,
+          child: Builder(builder: (context) {
+            if (!user.main && user.friendship != null) {
+              return Badge(
+                label: Text(
+                  user.friendship!.newPics.toString(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                largeSize: 25,
+                offset: const Offset(0, 0),
+                padding: const EdgeInsets.only(left: 7, right: 7),
+                isLabelVisible: user.friendship!.newPics > 0 && !user.main,
+                child: Stack(
+                  children: [
+                    Column(
+                      children: [
+                        Stack(children: [
+                          BubbleContainer(user: user),
+                          if (!user.main)
+                            BubbleProgressIndicator(
+                                friendship: user.friendship!),
+                          BubbleGradientIndicator(friendship: user.friendship!),
+                        ]),
+                        UsernameText(user: user),
+                      ],
                     ),
-                  ),
-                  Positioned.fill(
-                    child: CircularProgressIndicator(
-                      value: bubble.progress,
-                      strokeWidth: _strokeWidth,
-                      valueColor: bubble.gradient != null
-                          ? const AlwaysStoppedAnimation<Color>(
-                              Colors.transparent)
-                          : null,
-                      backgroundColor:
-                          bubble.gradient != null ? null : bubble.color,
-                      color: bubble.gradient != null ? null : Colors.white,
-                    ),
-                  ),
-                  if (bubble.gradient != null)
-                    Positioned.fill(
-                      child: CustomPaint(
-                        painter: _GradientPainter(
-                          gradient: bubble.gradient!,
-                          progress: bubble.progress!,
-                          strokeWidth: _strokeWidth,
+                    if (!user.main)
+                      Container(
+                        width: user.bubble().size,
+                        padding: EdgeInsets.only(
+                            bottom: textHeight - levelHeight + 30 / 2,
+                            left: user.bubble().size / 2),
+                        alignment: Alignment.bottomCenter,
+                        child: Text(
+                          user.friendship!.level.toString(),
+                          style: GoogleFonts.montserrat(
+                              textStyle: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: levelHeight/(1 + user.bubble().size/(user.bubble().size*7)),
+                            shadows: const [
+                              Shadow(
+                                offset: Offset.zero,
+                                blurRadius: 15.0,
+                                color: Colors.black,
+                              ),
+                            ],
+                          )),
                         ),
-                      ),
-                    ),
-                ]),
-                SizedBox(
-                  height: _textHeight,
-                  child: Text(
-                    bubble.name,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'ComingSoon',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 20,
-                    ),
-                  ),
+                      )
+                  ],
                 ),
-              ],
-            ),
-          );
-        } else {
-          return SizedBox(
-            height: bubble.size + _textHeight,
-            child: Column(
-              children: [
-                Container(
-                  width: bubble.size,
-                  height: bubble.size,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: bubble.color ?? color,
-                  ),
-                ),
-                SizedBox(
-                  height: _textHeight,
-                  child: Text(
-                    bubble.name,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'ComingSoon',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 20,
+              );
+            } else if (user.main && user.mainBubble != null) {
+              //Main Bubble
+              return SizedBox(
+                height: user.mainBubble!.size + textHeight,
+                child: Column(
+                  children: [
+                    BubbleContainer(user: user),
+                    UsernameText(
+                      user: user,
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        }
-      }),
+              );
+            } else {
+              return const Center(
+                child: Text('Error - Bubble Widget'),
+              );
+            }
+          }),
+        ),
+      ),
     );
   }
 }
 
-class _GradientPainter extends CustomPainter {
-  final Gradient gradient;
-  final double progress;
-  final double strokeWidth;
+class BubbleContainer extends StatelessWidget {
+  const BubbleContainer({
+    super.key,
+    required this.user,
+  });
 
-  _GradientPainter(
-      {required this.gradient,
-      required this.progress,
-      required this.strokeWidth});
+  final BubbleUser user;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final radius = size.width / 2;
-    final center = Offset(size.width / 2, size.height / 2);
-    const startAngle = -pi / 2;
-    final sweepAngle = 2 * pi * progress;
-    const useCenter = false;
-
-    final paint = Paint()
-      ..shader =
-          gradient.createShader(Rect.fromCircle(center: center, radius: radius))
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      startAngle,
-      sweepAngle,
-      useCenter,
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_GradientPainter oldDelegate) {
-    return oldDelegate.progress != progress;
+  Widget build(BuildContext context) {
+    return ProfilePhoto(user: user);
   }
 }
