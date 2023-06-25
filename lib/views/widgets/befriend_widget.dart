@@ -24,12 +24,9 @@ class BefriendTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      'Befriend',
-      style: GoogleFonts.comingSoon(textStyle: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 35),
-      )
-    );
+    return Text('Befriend',
+        style: GoogleFonts.comingSoon(
+          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 35),
+        ));
   }
 }

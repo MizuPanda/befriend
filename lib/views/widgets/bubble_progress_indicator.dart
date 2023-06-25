@@ -18,8 +18,7 @@ class BubbleProgressIndicator extends StatelessWidget {
       child: CircularProgressIndicator(
         value: friendship.progress / 100,
         strokeWidth: BubbleWidget.strokeWidth,
-        valueColor: const AlwaysStoppedAnimation<Color>(
-            Colors.transparent),
+        valueColor: const AlwaysStoppedAnimation<Color>(Colors.transparent),
       ),
     );
   }

@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/bubble_user.dart';
+import '../../../models/bubble.dart';
 
 class ProfilePhoto extends StatelessWidget {
   final double? radius;
   const ProfilePhoto({
     super.key,
-    this.radius, required this.user,
+    this.radius,
+    required this.user,
   });
 
-  final BubbleUser user;
+  final Bubble user;
 
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-      radius: radius ?? user.bubble().size/2,
-      backgroundImage: user.bubble().avatar,
+      radius: radius ?? user.size / 2,
+      backgroundImage: user.avatar,
     );
   }
 }

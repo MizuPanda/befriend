@@ -38,6 +38,7 @@ dependencies:
   firebase_core: ^2.13.1
   google_fonts: ^5.0.0
   anim_search_bar: ^2.0.3
+  camera: ^0.10.3+2
 
 dev_dependencies:
   flutter_test:

@@ -3,28 +3,29 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../models/bubble.dart';
-import '../../models/bubble_user.dart';
 import '../widgets/befriend_widget.dart';
 import '../widgets/bubble_widget.dart';
+import '../widgets/home/bubble_group.dart';
+import '../widgets/home/home_button.dart';
 import '../widgets/home/search_button.dart';
 import '../widgets/home/picture_button.dart';
 import '../widgets/home/settings_button.dart';
 
 class HomePage extends StatefulWidget {
-  final Bubble bubble;
+  final Bubble user;
+  final bool connectedHome;
 
-  const HomePage({super.key, required this.bubble});
+  const HomePage({super.key, required this.user, required this.connectedHome});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with TickerProviderStateMixin {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final List<Friendship> _friendships;
   Offset _position = Offset.zero;
 
-  AnimationType _animationType = AnimationType.reset;
+  _AnimationType _animationType = _AnimationType.reset;
   Offset? _friendPosition;
 
   late AnimationController _animationController;
@@ -34,11 +35,11 @@ class _HomePageState extends State<HomePage>
   late Animation<Offset> _offsetAnimation;
 
   void _initializePositions() {
-    Bubble main = widget.bubble;
+    Bubble main = widget.user;
+    Random rand = Random();
 
     for (Friendship friendship in _friendships) {
       Bubble b = friendship.friendBubble;
-      Random rand = Random(); //Distance = 10
       b.x = rand.nextDouble() * friendship.distance(); // x=6
       b.y = sqrt(
           pow(friendship.distance(), 2) - pow(b.x, 2)); //100 - 36 = 64, y = 8
@@ -69,7 +70,7 @@ class _HomePageState extends State<HomePage>
           final otherBubble = _friendships[j].friendBubble;
           final dx = otherBubble.x - bubble.x;
           final dy = otherBubble.y - bubble.y;
-          final distance = sqrt(dx * dx + dy * dy);
+          final distance = otherBubble.point().distanceTo(bubble.point());
           final force = bubble.size * otherBubble.size / (distance * distance);
 
           if (distance < bubble.size + otherBubble.size) {
@@ -83,23 +84,23 @@ class _HomePageState extends State<HomePage>
     }
   }
 
-  void _animateToFriend(Offset friendPosition, AnimationType animationType) {
-      _animationType = animationType;
-      _friendPosition = friendPosition*-1;
+  void _animateToFriend(Offset friendPosition) {
+    _animationType = _AnimationType.friend;
+    _friendPosition = friendPosition * -1;
 
-      _offsetAnimation = Tween<Offset>(
-        begin: _position,
-        end: _friendPosition!,
-      ).animate(CurvedAnimation(parent: _offsetController, curve: Curves.easeInOut));
+    _offsetAnimation = Tween<Offset>(
+      begin: _position,
+      end: _friendPosition!,
+    ).animate(
+        CurvedAnimation(parent: _offsetController, curve: Curves.easeInOut));
 
-      _offsetController.reset();
-      _offsetController.forward();
-
+    _offsetController.reset();
+    _offsetController.forward();
   }
 
   @override
   void initState() {
-    _friendships = widget.bubble.friendships;
+    _friendships = widget.user.friendships;
 
     _animationController = AnimationController(
       vsync: this,
@@ -118,8 +119,8 @@ class _HomePageState extends State<HomePage>
     );
     _offsetController.addListener(() {
       if (_offsetController.isCompleted) {
-          _position = _friendPosition!;
-          _animationType = AnimationType.reset;
+        _position = _friendPosition!;
+        _animationType = _AnimationType.reset;
       }
     });
 
@@ -131,7 +132,8 @@ class _HomePageState extends State<HomePage>
     _offsetAnimation = Tween<Offset>(
       begin: _position,
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _offsetController, curve: Curves.easeInOut));
+    ).animate(
+        CurvedAnimation(parent: _offsetController, curve: Curves.easeInOut));
     _initializePositions();
 
     super.initState();
@@ -140,6 +142,7 @@ class _HomePageState extends State<HomePage>
   @override
   void dispose() {
     _animationController.dispose();
+    _offsetController.dispose();
     super.dispose();
   }
 
@@ -168,24 +171,13 @@ class _HomePageState extends State<HomePage>
                   return AnimatedBuilder(
                     animation: _offsetAnimation,
                     builder: (BuildContext context, Widget? child) {
-                      return Transform.translate( //Position doesn't correlate on screen
-                        offset: _animationType == AnimationType.reset? _position* (1 - _animation.value) : _offsetAnimation.value,
-                        child: Stack(
-                          children: [
-                            BubbleWidget(
-                              user: BubbleUser(
-                                  main: true, mainBubble: widget.bubble),
-                            ),
-                            for (Friendship friendship in _friendships)
-                              Transform.translate(
-                                offset: Offset(friendship.friendBubble.x,
-                                    friendship.friendBubble.y),
-                                child: BubbleWidget(
-                                    user: BubbleUser(
-                                        main: false, friendship: friendship)),
-                              )
-                          ],
-                        ),
+                      return Transform.translate(
+                        //Position doesn't correlate on screen
+                        offset: _animationType == _AnimationType.reset
+                            ? _position * (1 - _animation.value)
+                            : _offsetAnimation.value,
+                        child: BubbleGroupWidget(
+                            widget: widget, friendships: _friendships),
                       );
                     },
                   );
@@ -195,15 +187,17 @@ class _HomePageState extends State<HomePage>
           ),
           const BefriendWidget(),
           const SettingsButton(),
-          SearchButton(bubble: widget.bubble, animate: _animateToFriend,),
+          SearchButton(
+            bubble: widget.user,
+            animate: _animateToFriend,
+          ),
           const PictureButton(),
+          if(!widget.connectedHome)
+            const HomeButton()
         ],
       ),
     );
   }
 }
 
-enum AnimationType {
-  reset,
-  friend
-}
+enum _AnimationType { reset, friend }

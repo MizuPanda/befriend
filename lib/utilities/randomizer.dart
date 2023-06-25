@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 
 class Randomizer {
+  static final Random _random = Random();
+
   static LinearGradient linearGradient() {
     return LinearGradient(
       begin: Alignment.topCenter,
@@ -12,8 +14,8 @@ class Randomizer {
   }
 
   static Color _randColor() {
-    Random r = Random();
     int max = 255;
-    return Color.fromRGBO(r.nextInt(max), r.nextInt(max), r.nextInt(max), 1);
+    return Color.fromRGBO(
+        _random.nextInt(max), _random.nextInt(max), _random.nextInt(max), 1);
   }
 }

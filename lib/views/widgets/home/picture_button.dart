@@ -16,11 +16,11 @@ class PictureButton extends StatelessWidget {
             style: ButtonStyle(
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
+                  borderRadius: BorderRadius.circular(15.0),
                 ),
               ),
               backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                    (Set<MaterialState> states) {
+                (Set<MaterialState> states) {
                   if (states.contains(MaterialState.pressed)) {
                     return Colors.white.withOpacity(0.9);
                   } else {
@@ -29,7 +29,7 @@ class PictureButton extends StatelessWidget {
                 },
               ),
               foregroundColor: MaterialStateProperty.resolveWith<Color>(
-                    (Set<MaterialState> states) {
+                (Set<MaterialState> states) {
                   if (states.contains(MaterialState.pressed)) {
                     return Colors.black;
                   } else {
@@ -47,17 +47,32 @@ class PictureButton extends StatelessWidget {
               onPressed: () {
                 // Add your button press logic here
               },
-              child: Text(
-                'Take a picture',
-                style: GoogleFonts.roboto(textStyle: const TextStyle(
-                  fontWeight: FontWeight.w300,
-                  fontSize: 26,
-                )
-                ) ,
+              child: Stack(
+                children: [
+                  Transform.translate(
+                    offset: const Offset(0.5, 0.5),
+                    child: Text(
+                      'Take a picture',
+                      style: GoogleFonts.roboto(
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 26,
+                            color: Colors.black
+                          )),
+                    ),
+                  ),
+                  Text(
+                    'Take a picture',
+                    style: GoogleFonts.roboto(
+                        textStyle: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 26,
+                    )),
+                  ),
+                ],
               ),
             ),
           ),
-        )
-    );
+        ));
   }
 }

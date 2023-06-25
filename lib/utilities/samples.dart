@@ -3,7 +3,7 @@ import 'dart:math';
 import '../models/bubble.dart';
 
 class BubbleSample {
-  static Bubble juniel = Bubble(
+  static Bubble connectedUser = Bubble(
     username: '01juniel',
     name: 'Juniel Djossou',
     friendships: _FriendshipSample.juniel,
@@ -32,13 +32,13 @@ class BubbleSample {
   static initialize() {
     _FriendshipSample.initialize();
 
-    juniel.friendships = _FriendshipSample.juniel;
+    connectedUser.friendships = _FriendshipSample.juniel;
     radu.friendships = _FriendshipSample.radu;
     ramy.friendships = _FriendshipSample.ramy;
     yanis.friendships = _FriendshipSample.yanis;
     mayas.friendships = _FriendshipSample.mayas;
 
-    juniel.initializeLevel();
+    connectedUser.initializeLevel();
     radu.initializeLevel();
     ramy.initializeLevel();
     yanis.initializeLevel();
@@ -47,6 +47,8 @@ class BubbleSample {
 }
 
 class _FriendshipSample {
+  static final Random _random = Random();
+
   static List<Friendship> juniel = [
     Friendship(
       friendBubble: BubbleSample.radu,
@@ -74,15 +76,17 @@ class _FriendshipSample {
     ),
   ];
 
-  static List<Friendship> radu = [];
-  static List<Friendship> ramy = [];
-  static List<Friendship> yanis = [];
-  static List<Friendship> mayas = [];
+  static List<Friendship> emptyList = [];
+
+  static List<Friendship> radu = emptyList;
+  static List<Friendship> ramy = emptyList;
+  static List<Friendship> yanis = emptyList;
+  static List<Friendship> mayas = emptyList;
 
   static initialize() {
     radu = [
       Friendship(
-        friendBubble: BubbleSample.juniel,
+        friendBubble: BubbleSample.connectedUser,
         level: 4,
         progress: 20,
         newPics: _randPics(),
@@ -94,7 +98,7 @@ class _FriendshipSample {
 
     ramy = [
       Friendship(
-        friendBubble: BubbleSample.juniel,
+        friendBubble: BubbleSample.connectedUser,
         level: 4,
         progress: 80,
         newPics: _randPics(),
@@ -106,7 +110,7 @@ class _FriendshipSample {
 
     yanis = [
       Friendship(
-        friendBubble: BubbleSample.juniel,
+        friendBubble: BubbleSample.connectedUser,
         level: 3,
         progress: 50,
         newPics: _randPics(),
@@ -118,7 +122,7 @@ class _FriendshipSample {
 
     mayas = [
       Friendship(
-        friendBubble: BubbleSample.juniel,
+        friendBubble: BubbleSample.connectedUser,
         level: 1,
         progress: 90,
         newPics: _randPics(),
@@ -127,7 +131,6 @@ class _FriendshipSample {
       _randFriendship(BubbleSample.ramy),
       _randFriendship(BubbleSample.yanis)
     ];
-
   }
 
   static _randFriendship(Bubble friendBubble) {
@@ -140,15 +143,14 @@ class _FriendshipSample {
   }
 
   static int _randLevel() {
-    return Random().nextInt(4) ;
+    return _random.nextInt(4);
   }
 
   static double _randProgress() {
-    return Random().nextDouble() * 100;
+    return _random.nextDouble() * 100;
   }
 
   static int _randPics() {
-    return Random().nextInt(9);
+    return _random.nextInt(9);
   }
 }
-

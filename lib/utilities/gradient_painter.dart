@@ -9,20 +9,20 @@ class GradientPainter extends CustomPainter {
 
   GradientPainter(
       {required this.gradient,
-        required this.progress,
-        required this.strokeWidth});
+      required this.progress,
+      required this.strokeWidth});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final radius = size.width / 2;
-    final center = Offset(size.width / 2, size.height / 2);
-    const startAngle = -pi / 2;
-    final sweepAngle = 2 * pi * progress;
-    const useCenter = false;
+    final double radius = size.width / 2;
+    final Offset center = Offset(size.width / 2, size.height / 2);
+    const double startAngle = -pi / 2;
+    final double sweepAngle = 2 * pi * progress;
+    const bool useCenter = false;
 
-    final paint = Paint()
+    final Paint paint = Paint()
       ..shader =
-      gradient.createShader(Rect.fromCircle(center: center, radius: radius))
+          gradient.createShader(Rect.fromCircle(center: center, radius: radius))
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
 
