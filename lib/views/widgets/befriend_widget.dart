@@ -19,14 +19,15 @@ class BefriendWidget extends StatelessWidget {
 
 class BefriendTitle extends StatelessWidget {
   const BefriendTitle({
-    super.key,
+    super.key, this.fontSize
   });
 
+  final double? fontSize;
   @override
   Widget build(BuildContext context) {
     return Text('Befriend',
         style: GoogleFonts.comingSoon(
-          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 35),
+          textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize ?? 35),
         ));
   }
 }
