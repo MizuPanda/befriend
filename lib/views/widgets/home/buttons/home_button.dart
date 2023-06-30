@@ -1,8 +1,8 @@
 import 'package:befriend/utilities/samples.dart';
 import 'package:flutter/material.dart';
 
-import '../../pages/home_page.dart';
-
+import '../../../../models/home.dart';
+import '../../../pages/home_page.dart';
 
 class HomeButton extends StatefulWidget {
   const HomeButton({
@@ -28,10 +28,7 @@ class _HomeButtonState extends State<HomeButton> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black,
-              blurRadius: 0.25,
-              offset: Offset(0.5, 1)
-            )
+                color: Colors.black, blurRadius: 0.25, offset: Offset(0.5, 1))
           ],
           color: Colors.white,
         ),
@@ -41,16 +38,18 @@ class _HomeButtonState extends State<HomeButton> {
               context,
               MaterialPageRoute(
                 builder: (context) => HomePage(
-                  user: BubbleSample.connectedUser,
-                  connectedHome: true,
-                ),
+                    home: Home(
+                        user: BubbleSample.connectedUser, connectedHome: true)),
               ),
             );
           },
-          icon: const Icon(Icons.home_rounded, color: Colors.black, size: _size,),
+          icon: const Icon(
+            Icons.home_rounded,
+            color: Colors.black,
+            size: _size,
+          ),
         ),
       ),
     );
   }
 }
-

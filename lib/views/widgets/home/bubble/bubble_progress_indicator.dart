@@ -1,8 +1,8 @@
-import 'package:befriend/views/widgets/bubble_widget.dart';
+import 'package:befriend/views/widgets/home/bubble/bubble_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/bubble.dart';
-import '../../utilities/gradient_painter.dart';
+import '../../../../models/friendship.dart';
+import '../../../../utilities/gradient_painter.dart';
 
 class BubbleProgressIndicator extends StatelessWidget {
   const BubbleProgressIndicator({

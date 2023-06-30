@@ -55,10 +55,9 @@ class PictureButton extends StatelessWidget {
                       'Take a picture',
                       style: GoogleFonts.roboto(
                           textStyle: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 26,
-                            color: Colors.black
-                          )),
+                              fontWeight: FontWeight.w500,
+                              fontSize: 26,
+                              color: Colors.black)),
                     ),
                   ),
                   Text(

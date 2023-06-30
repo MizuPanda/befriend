@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import '../models/bubble.dart';
+import '../models/friendship.dart';
 
 class BubbleSample {
   static Bubble connectedUser = Bubble(
