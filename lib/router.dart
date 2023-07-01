@@ -4,6 +4,7 @@ import 'package:befriend/views/pages/login_page.dart';
 import 'package:befriend/views/pages/camera_page.dart';
 import 'package:befriend/views/pages/profile_page.dart';
 import 'package:befriend/views/pages/sign_page.dart';
+import 'package:befriend/views/pages/verification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -57,6 +58,12 @@ class MyRouter {
               path: 'camera',
               builder: (BuildContext context, GoRouterState state) {
                 return const CameraPage();
+              },
+            ),
+            GoRoute(
+              path: 'verification',
+              builder: (BuildContext context, GoRouterState state) {
+                return const VerificationPage();
               },
             ),
           ]),

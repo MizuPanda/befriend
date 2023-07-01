@@ -3,31 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../utilities/decorations.dart';
+import 'base_form_field.dart';
+import 'hide_icon.dart';
 
-class LoginPasswordField extends StatelessWidget {
-  const LoginPasswordField({
+class PasswordFormField extends StatelessWidget {
+  const PasswordFormField({
     super.key,
-    required this.labelText,
   });
-
-  final String labelText;
 
   @override
   Widget build(BuildContext context) {
     return Consumer<LoginProvider>(
         builder: (BuildContext context, LoginProvider provider, Widget? child) {
-      return TextFormField(
+      return BaseTextField(
           focusNode: provider.passwordFocusNode,
-          onTapOutside: (_) {
-            FocusScope.of(context).unfocus();
+          onSaved: (String? s) {},
+          validator: (String? s) {
+            return null;
           },
+          keyboardType: provider.keyboardType(),
           obscureText: !provider.passwordVisible,
-          keyboardType: provider.passwordVisible
-              ? TextInputType.visiblePassword
-              : TextInputType.text,
           decoration: Decorations.loginInputDecoration(
-              labelText: labelText,
-              isWidgetFocused: provider.isPasswordFocused));
+            labelText: 'Enter your password',
+            isWidgetFocused: provider.isPasswordFocused,
+            suffixIcon: HideIconButton(
+                hidePassword: provider.hidePassword,
+                passwordVisible: provider.passwordVisible),
+          ));
     });
   }
 }

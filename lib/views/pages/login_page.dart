@@ -4,8 +4,7 @@ import 'package:befriend/views/widgets/login/login_password_field.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/login/login_field.dart';
-import '../widgets/login/password_stack.dart';
+import '../widgets/login/login_email_field.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -52,17 +51,11 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const LoginFormField(
+                      const EmailFormField(
                         labelText: 'Enter your email',
                       ),
                       const SizedBox(height: 20.0),
-                      PasswordStackWidget(
-                        passwordFieldWidget: const LoginPasswordField(
-                          labelText: 'Enter your password',
-                        ),
-                        passwordVisible: _provider.passwordVisible,
-                        hidePassword: _provider.hidePassword,
-                      ),
+                      const PasswordFormField(),
                       const SizedBox(height: 20.0),
                       Row(
                         children: [
@@ -79,8 +72,8 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           const Spacer(),
                           ElevatedButton(
-                            onPressed: () {
-                              _provider.login();
+                            onPressed: () async {
+                              await _provider.login(context);
                             },
                             style: const ButtonStyle(enableFeedback: true),
                             child: const Text('Login'),
@@ -91,9 +84,7 @@ class _LoginPageState extends State<LoginPage> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {
-                            _provider.forgotPassword();
-                          },
+                          onPressed: _provider.forgotPassword,
                           child: const Text('Forgot your password?'),
                         ),
                       ),

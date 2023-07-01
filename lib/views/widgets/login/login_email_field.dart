@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../utilities/decorations.dart';
+import 'base_form_field.dart';
 
-class LoginFormField extends StatelessWidget {
-  const LoginFormField({
+class EmailFormField extends StatelessWidget {
+  const EmailFormField({
     super.key,
     required this.labelText,
   });
@@ -16,13 +17,14 @@ class LoginFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<LoginProvider>(
         builder: (BuildContext context, LoginProvider provider, Widget? child) {
-      return TextFormField(
-        autofocus: false,
-        onTapOutside: (_) {
-          FocusScope.of(context).unfocus();
+      return BaseTextField(
+        focusNode: null,
+        onSaved: (String? s) {},
+        validator: (String? s) {
+          return null;
         },
         keyboardType: TextInputType.emailAddress,
-        focusNode: provider.emailFocusNode,
+        obscureText: false,
         decoration: Decorations.loginInputDecoration(
             labelText: labelText, isWidgetFocused: provider.isEmailFocused),
       );

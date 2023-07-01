@@ -1,32 +1,24 @@
 import 'package:flutter/material.dart';
 
-class HideIconWidget extends StatefulWidget {
-  const HideIconWidget({
+class HideIconButton extends StatelessWidget {
+  const HideIconButton({
     super.key,
-    required bool passwordVisible,
     required this.hidePassword,
-    required this.size,
-  }) : _passwordVisible = passwordVisible;
+    required this.passwordVisible,
+  });
 
-  final bool _passwordVisible;
   final Function hidePassword;
-  final double size;
+  final bool passwordVisible;
 
-  @override
-  State<HideIconWidget> createState() => _HideIconWidgetState();
-}
-
-class _HideIconWidgetState extends State<HideIconWidget> {
   @override
   Widget build(BuildContext context) {
     return IconButton(
         onPressed: () {
-          widget.hidePassword();
+          hidePassword();
         },
         icon: Icon(
-          widget._passwordVisible ? Icons.visibility : Icons.visibility_off,
-          color: widget._passwordVisible ? Colors.black : Colors.grey,
-          size: widget.size,
+          passwordVisible ? Icons.visibility : Icons.visibility_off,
+          color: passwordVisible ? Colors.black : Colors.grey,
         ));
   }
 }
