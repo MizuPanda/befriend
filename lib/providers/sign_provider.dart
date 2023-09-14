@@ -184,7 +184,6 @@ class SignProvider extends ChangeNotifier {
         }
         if (_error != null) {
           _formKey.currentState!.validate();
-          notifyListeners();
         }
       }
     }

@@ -1,3 +1,4 @@
+import 'package:befriend/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -27,17 +28,20 @@ class AuthenticationManager {
       await _registerUserData(name, username);
       await user.sendEmailVerification();
       if (context.mounted) {
-        GoRouter.of(context).push('/verification');
+        GoRouter.of(context).push('/homepage', extra: UserManager.userHome());
       }
+      //GO TO TAKE AVATAR PAGE AND HANDLE ERROR WITH A VARIABLE LIKE SIGNIN
     } on FirebaseAuthException catch (e) {
       debugPrint(e.code);
       return e.code;
     } on FirebaseException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred: ${e.code}'),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('An error occurred: ${e.code}'),
+          ),
+        );
+      }
     }
 
     return null;
@@ -86,6 +90,9 @@ class AuthenticationManager {
       String email, String password, BuildContext context) async {
     try {
       _auth.signInWithEmailAndPassword(email: email, password: password);
+      if (context.mounted) {
+        GoRouter.of(context).push('/homepage', extra: UserManager.userHome());
+      }
     } on FirebaseAuthException catch (e) {
       debugPrint('(Error): ${e.code}');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -93,8 +100,6 @@ class AuthenticationManager {
           content: Text('Error. Incorrect email or password.'),
         ),
       );
-    } on Error catch (e) {
-      debugPrint(e.toString());
     }
   }
 
@@ -105,17 +110,5 @@ class AuthenticationManager {
     } catch (e) {
       debugPrint('Failed to send password reset email: $e');
     }
-  }
-
-  static Future<String?> verifyEmail(String verificationCode) async {
-    try {
-      await _auth.applyActionCode(verificationCode);
-      // Email verified successfully
-      //GO TO TAKE AVATAR PAGE
-    } on FirebaseAuthException catch (e) {
-      // Handle verification errors
-      return e.code;
-    }
-    return null;
   }
 }

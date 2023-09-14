@@ -6,8 +6,8 @@ import '../../models/home.dart';
 import '../widgets/befriend_widget.dart';
 import '../widgets/home/bubble/bubble_group.dart';
 import '../widgets/home/buttons/home_button.dart';
-import '../widgets/home/buttons/search_button.dart';
 import '../widgets/home/buttons/picture_button.dart';
+import '../widgets/home/buttons/search_button.dart';
 import '../widgets/home/buttons/settings_button.dart';
 
 class HomePage extends StatefulWidget {

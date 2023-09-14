@@ -10,6 +10,7 @@ class BaseTextField extends StatelessWidget {
     required this.keyboardType,
     required this.obscureText,
     required this.decoration,
+    required this.action,
   }) : super(key: key);
 
   final FocusNode? focusNode;
@@ -19,10 +20,12 @@ class BaseTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final bool obscureText;
   final InputDecoration decoration;
+  final TextInputAction action;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      textInputAction: action,
       focusNode: focusNode,
       onTapOutside: (_) {
         FocusScope.of(context).unfocus();

@@ -2,8 +2,8 @@ import 'package:befriend/views/pages/camera_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/bubble.dart';
-import 'notification_button.dart';
 import '../users/profile_photo.dart';
+import 'notification_button.dart';
 
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({

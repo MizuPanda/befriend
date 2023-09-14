@@ -1,10 +1,9 @@
 import 'package:befriend/utilities/samples.dart';
+import 'package:befriend/views/pages/camera_page.dart';
 import 'package:befriend/views/pages/home_page.dart';
 import 'package:befriend/views/pages/login_page.dart';
-import 'package:befriend/views/pages/camera_page.dart';
 import 'package:befriend/views/pages/profile_page.dart';
 import 'package:befriend/views/pages/sign_page.dart';
-import 'package:befriend/views/pages/verification_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -34,7 +33,7 @@ class MyRouter {
               },
             ),
             GoRoute(
-              path: 'profile', // Define a parameter named "id"
+              path: 'profile',
               pageBuilder: (context, state) {
                 return MaterialPage(
                     child: ProfilePage(
@@ -58,12 +57,6 @@ class MyRouter {
               path: 'camera',
               builder: (BuildContext context, GoRouterState state) {
                 return const CameraPage();
-              },
-            ),
-            GoRoute(
-              path: 'verification',
-              builder: (BuildContext context, GoRouterState state) {
-                return const VerificationPage();
               },
             ),
           ]),

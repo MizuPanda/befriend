@@ -61,6 +61,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             const SizedBox(height: 20),
                             IconTextField(
+                              textInputAction: TextInputAction.next,
                               iconData: Icons.email,
                               hintText: 'Your email',
                               onSaved: _provider.emailSaved,
@@ -68,6 +69,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             const SizedBox(height: 20),
                             IconTextField(
+                              textInputAction: TextInputAction.next,
                               iconData: Icons.person,
                               hintText: 'Your name',
                               onSaved: _provider.nameSaved,
@@ -75,6 +77,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             const SizedBox(height: 20),
                             IconTextField(
+                              textInputAction: TextInputAction.next,
                               iconData: Icons.account_circle,
                               hintText: 'Your username',
                               onSaved: _provider.usernameSaved,
@@ -82,6 +85,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             const SizedBox(height: 20),
                             IconTextField(
+                              textInputAction: TextInputAction.next,
                               iconData: Icons.lock,
                               hintText: 'Your password',
                               onChanged: _provider.onChanged,
@@ -90,10 +94,10 @@ class _SignUpPageState extends State<SignUpPage> {
                               passwordVisible: _provider.passwordVisible,
                               hidePassword: _provider.hidePassword,
                             ),
-                            const SizedBox(height: 3),
                             const PasswordStrengthIndicator(),
                             const SizedBox(height: 20),
                             IconTextField(
+                              textInputAction: TextInputAction.done,
                               iconData: Icons.lock,
                               hintText: 'Repeat your password',
                               onSaved: (_) {},

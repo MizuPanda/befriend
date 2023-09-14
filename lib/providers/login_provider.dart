@@ -7,6 +7,12 @@ class LoginProvider extends ChangeNotifier {
   final _formKey = GlobalKey<FormState>();
   get formKey => _formKey;
 
+  bool _isEmailError = false;
+  bool _isPassError = false;
+
+  bool get isEmailError => _isEmailError;
+  bool get isPassError => _isPassError;
+
   final FocusNode _emailFocusNode = FocusNode();
   FocusNode get emailFocusNode => _emailFocusNode;
 
@@ -63,22 +69,29 @@ class LoginProvider extends ChangeNotifier {
 
   String? emailValidator(String? email) {
     if (email == null || email.isEmpty) {
+      _isEmailError = true;
+      notifyListeners();
       return 'Please enter your email';
     }
-
+    _isEmailError = false;
+    notifyListeners();
     return null;
   }
 
   String? passwordValidator(String? password) {
     if (password == null || password.isEmpty) {
+      _isPassError = true;
+      notifyListeners();
       return 'Please enter your password';
     }
-
+    _isPassError = false;
+    notifyListeners();
     return null;
   }
 
   Future<void> login(BuildContext context) async {
     _formKey.currentState!.save();
+
     if (_formKey.currentState!.validate()) {
       if (context.mounted) {
         await AuthenticationManager.signIn(_email!, _password!, context);
@@ -86,5 +99,5 @@ class LoginProvider extends ChangeNotifier {
     }
   }
 
-  void forgotPassword() {}
+  void openForgotPasswordPage() async {}
 }

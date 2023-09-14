@@ -4,11 +4,16 @@ class Decorations {
   static InputDecoration loginInputDecoration(
       {required String labelText,
       required bool isWidgetFocused,
+      required bool isError,
       Widget? suffixIcon}) {
     return InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(
-          color: isWidgetFocused ? Colors.blue : Colors.black,
+          color: isError
+              ? Colors.red
+              : isWidgetFocused
+                  ? Colors.blue
+                  : Colors.black,
         ),
         border: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(20)),

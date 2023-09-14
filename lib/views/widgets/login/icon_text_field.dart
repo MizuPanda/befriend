@@ -11,30 +11,32 @@ class IconTextField extends StatefulWidget {
   final Function(String?)? onSaved;
   final String? Function(String?)? validator;
   final Function(String)? onChanged;
+  final TextInputAction textInputAction;
 
-  const IconTextField(
-      {super.key,
-      required this.iconData,
-      required this.hintText,
-      this.passwordVisible,
-      this.hidePassword,
-      required this.onSaved,
-      required this.validator,
-      this.onChanged});
+  const IconTextField({
+    super.key,
+    required this.iconData,
+    required this.hintText,
+    this.passwordVisible,
+    this.hidePassword,
+    required this.onSaved,
+    required this.validator,
+    this.onChanged,
+    required this.textInputAction,
+  });
 
   @override
   State<IconTextField> createState() => _IconTextFieldState();
 }
 
 class _IconTextFieldState extends State<IconTextField> {
-  final FocusNode _focusNode = FocusNode();
   bool _isFocused = false;
-
+  final FocusNode focusNode = FocusNode();
   @override
   void initState() {
-    _focusNode.addListener(() {
+    focusNode.addListener(() {
       setState(() {
-        _isFocused = _focusNode.hasFocus;
+        _isFocused = focusNode.hasFocus;
       });
     });
     super.initState();
@@ -43,12 +45,11 @@ class _IconTextFieldState extends State<IconTextField> {
   @override
   Widget build(BuildContext context) {
     return BaseTextField(
-      focusNode: _focusNode,
+      action: widget.textInputAction,
+      focusNode: focusNode,
       onChanged: widget.onChanged,
-      onSaved: (String? s) {},
-      validator: (String? s) {
-        return null;
-      },
+      onSaved: widget.onSaved,
+      validator: widget.validator,
       keyboardType: widget.passwordVisible == null
           ? TextInputType.text
           : widget.passwordVisible!

@@ -18,15 +18,16 @@ class EmailFormField extends StatelessWidget {
     return Consumer<LoginProvider>(
         builder: (BuildContext context, LoginProvider provider, Widget? child) {
       return BaseTextField(
-        focusNode: null,
-        onSaved: (String? s) {},
-        validator: (String? s) {
-          return null;
-        },
+        action: TextInputAction.next,
+        focusNode: provider.emailFocusNode,
+        onSaved: provider.emailSaved,
+        validator: provider.emailValidator,
         keyboardType: TextInputType.emailAddress,
         obscureText: false,
         decoration: Decorations.loginInputDecoration(
-            labelText: labelText, isWidgetFocused: provider.isEmailFocused),
+            labelText: labelText,
+            isWidgetFocused: provider.isEmailFocused,
+            isError: provider.isEmailError),
       );
     });
   }
