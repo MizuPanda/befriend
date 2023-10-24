@@ -47,6 +47,7 @@ class SignProvider extends ChangeNotifier {
       return "This email is already in use.";
     }
 
+
     return null;
   }
 

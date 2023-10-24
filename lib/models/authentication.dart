@@ -1,3 +1,4 @@
+import 'package:befriend/models/data_management.dart';
 import 'package:befriend/models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,88 +19,91 @@ class AuthenticationManager {
       String name,
       String username,
       BuildContext context) async {
-    try {
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      User? user = result.user;
-      debugPrint("Successfully created user: ${user!.uid}");
-      await _registerUserData(name, username);
-      await user.sendEmailVerification();
-      if (context.mounted) {
-        GoRouter.of(context).push('/homepage', extra: UserManager.userHome());
-      }
-      //GO TO TAKE AVATAR PAGE AND HANDLE ERROR WITH A VARIABLE LIKE SIGNIN
-    } on FirebaseAuthException catch (e) {
-      debugPrint(e.code);
-      return e.code;
-    } on FirebaseException catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('An error occurred: ${e.code}'),
-          ),
-        );
-      }
-    }
+    String? errorCode;
 
-    return null;
+    await _auth
+        .createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    )
+        .then((value) async {
+      User? user = value.user;
+      debugPrint("Successfully created user: ${user!.uid}");
+      await _registerUserData(name, username, user, context);
+    }).onError((FirebaseAuthException error, stackTrace) {
+      //Handle every possible errors
+      debugPrint('(CreateUser) An error occurred: ${error.code}');
+      switch (error.code) {
+        case 'email-already-in-use':
+          errorCode = error.code;
+      }
+    });
+
+    return errorCode;
   }
 
   /// Registers the user data in the database.
   /// The name and username are stored in the database.
   /// The counter is incremented by 1 and stored in the database.
   static Future<void> _registerUserData(
-    String name,
-    String username,
-  ) async {
-    await _store
-        .collection('data')
-        .doc('numbers')
-        .update({'counter': FieldValue.increment(1)});
+      String name, String username, User? user, BuildContext context) async {
+    final DocumentReference numbersDoc =
+        _store.collection("data").doc("numbers");
 
-    DocumentSnapshot docs =
-        await _store.collection('data').doc('numbers').get();
+    _store.runTransaction((transaction) async {
+      final DocumentSnapshot numberSnap = await transaction.get(numbersDoc);
 
-    int counter =
-        docs.data().toString().contains('counter') ? docs.get('counter') : 0;
+      transaction.update(numbersDoc, {'counter': FieldValue.increment(1)});
 
-    final userInfo = <String, dynamic>{
-      "name": name,
-      "username": username,
-      'counter': counter,
-      'avatar': '',
-    };
+      num counter = DataManagement.getNumber(numberSnap, 'counter');
+      final userInfo = <String, dynamic>{
+        "name": name,
+        "username": username,
+        'counter': counter,
+        'avatar': '',
+      };
 
-    _store
-        .collection("users")
-        .doc(_auth.currentUser?.uid)
-        .set(userInfo)
-        .whenComplete(
-            () => debugPrint("Successfully added the data to user: $username"))
-        .onError((e, _) {
-      debugPrint("Error writing document: $e");
-      throw e!;
-      //SHOW ERROR DIALOG
+      final DocumentReference userDoc =
+          _store.collection("users").doc(_auth.currentUser?.uid);
+
+      transaction.set(userDoc, userInfo);
+
+      _auth.currentUser?.updateDisplayName(name);
+    }).then(
+      //IF COMPLETED WITHOUT ERRORS
+      (value) async {
+        await user?.sendEmailVerification();
+        //GO TO TAKE AVATAR PAGE AND HANDLE ERROR WITH A VARIABLE LIKE SIGN IN
+
+        if (context.mounted) {
+          GoRouter.of(context).push('/homepage', extra: UserManager.userHome());
+        }
+        debugPrint("Successfully added the data to user: $username");
+      },
+    ).catchError((error) {
+      // If registration data fails to save, delete the user
+      debugPrint('(RegisterUser) An error occurred: ${error.toString()}');
+      user?.delete();
+      debugPrint("User deleted due to failure in registration data saving");
     });
-    _auth.currentUser?.updateDisplayName(name);
   }
 
   static Future<void> signIn(
       String email, String password, BuildContext context) async {
     try {
-      _auth.signInWithEmailAndPassword(email: email, password: password);
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
       if (context.mounted) {
         GoRouter.of(context).push('/homepage', extra: UserManager.userHome());
       }
     } on FirebaseAuthException catch (e) {
       debugPrint('(Error): ${e.code}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error. Incorrect email or password.'),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error. Incorrect email or password.'),
+          ),
+        );
+      }
     }
   }
 
