@@ -8,17 +8,24 @@ class SignProvider extends ChangeNotifier {
   late NavigatorState _navigator;
 
   bool _passwordVisible = false;
+
   bool get passwordVisible => _passwordVisible;
 
   bool _passwordRepeatVisible = false;
+
   bool get passwordRepeatVisible => _passwordRepeatVisible;
 
   final _formKey = GlobalKey<FormState>();
+
   get formKey => _formKey;
 
   String? _email, _name, _username, _password;
   String? _error;
   static const String _usernameError = 'username-already-in-use';
+
+  bool _loading = false;
+
+  bool get loading => _loading;
 
   double strength() {
     return PasswordStrength.getPasswordStrength(_password);
@@ -46,7 +53,6 @@ class SignProvider extends ChangeNotifier {
       _error = null;
       return "This email is already in use.";
     }
-
 
     return null;
   }
@@ -114,6 +120,7 @@ class SignProvider extends ChangeNotifier {
         ? null
         : 'This password does not match with the first one.';
   }
+
   //#endregion
 
   //#region SAVED FUNCTION
@@ -132,6 +139,7 @@ class SignProvider extends ChangeNotifier {
   void passwordSaved(String? value) {
     _password = value!.trim();
   }
+
   //#endregion
 
   Future<bool> _checkUsernameAvailability(String username) async {
@@ -171,6 +179,8 @@ class SignProvider extends ChangeNotifier {
 
   /// Sign up the user
   Future<void> signUp(BuildContext context) async {
+    _loading = true;
+    notifyListeners();
     _formKey.currentState!.save();
 
     if (_formKey.currentState!.validate()) {
@@ -188,5 +198,7 @@ class SignProvider extends ChangeNotifier {
         }
       }
     }
+    _loading = false;
+    notifyListeners();
   }
 }

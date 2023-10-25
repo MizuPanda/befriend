@@ -1,4 +1,3 @@
-import 'package:befriend/providers/camera_provider.dart';
 import 'package:befriend/router.dart';
 import 'package:befriend/utilities/samples.dart';
 import 'package:befriend/views/pages/home_page.dart';
@@ -16,7 +15,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   BubbleSample.initialize();
-  await CameraProvider.availableCamera();
 
   runApp(const MyApp());
 }
@@ -26,11 +24,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //return const MaterialApp(home: PictureSignPage());
     return MaterialApp.router(
       routerDelegate: MyRouter.router.routerDelegate,
       routeInformationParser: MyRouter.router.routeInformationParser,
       routeInformationProvider: MyRouter.router.routeInformationProvider,
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+          primarySwatch: Colors.blue,
+          scaffoldBackgroundColor: const Color(0xFFF4ECE2)),
     );
   }
 }

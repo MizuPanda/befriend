@@ -14,6 +14,7 @@ class BubbleWidget extends StatelessWidget {
   static const double strokeWidth = 10 / 3;
   static const double textHeight = 25;
   static const double levelHeight = 25;
+
   const BubbleWidget({
     Key? key,
     required this.specificHome,

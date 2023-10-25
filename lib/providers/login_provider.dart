@@ -5,27 +5,34 @@ import '../models/authentication.dart';
 
 class LoginProvider extends ChangeNotifier {
   final _formKey = GlobalKey<FormState>();
+
   get formKey => _formKey;
 
   bool _isEmailError = false;
   bool _isPassError = false;
 
   bool get isEmailError => _isEmailError;
+
   bool get isPassError => _isPassError;
 
   final FocusNode _emailFocusNode = FocusNode();
+
   FocusNode get emailFocusNode => _emailFocusNode;
 
   bool _isEmailFocused = false;
+
   bool get isEmailFocused => _isEmailFocused;
 
   final FocusNode _passwordFocusNode = FocusNode();
+
   FocusNode get passwordFocusNode => _passwordFocusNode;
 
   bool _isPasswordFocused = false;
+
   bool get isPasswordFocused => _isPasswordFocused;
 
   bool _passwordVisible = false;
+
   bool get passwordVisible => _passwordVisible;
 
   String? _email, _password;
@@ -99,5 +106,7 @@ class LoginProvider extends ChangeNotifier {
     }
   }
 
-  void openForgotPasswordPage() async {}
+  void openForgotPasswordPage(BuildContext context) {
+    GoRouter.of(context).push('/forgot');
+  }
 }

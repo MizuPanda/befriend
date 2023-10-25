@@ -15,7 +15,7 @@ class PasswordFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<LoginProvider>(
         builder: (BuildContext context, LoginProvider provider, Widget? child) {
-      return BaseTextField(
+      return BaseFormField(
           action: TextInputAction.done,
           focusNode: provider.passwordFocusNode,
           onSaved: provider.passwordSaved,

@@ -1,4 +1,3 @@
-import 'package:befriend/views/pages/camera_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/bubble.dart';
@@ -17,7 +16,6 @@ class ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        //ERROR - I can't tap anymore on a bubble when I move the screen. Only for those that were outside of the screen. - ERROR
         Stack(
           children: [
             Container(
@@ -40,9 +38,7 @@ class ProfileHeader extends StatelessWidget {
                 child: IconButton(
                   onPressed: user.main()
                       ? () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  const CameraPage()));
+                          //IMPLEMENT CAMERA
                         }
                       : null,
                   icon: const Icon(

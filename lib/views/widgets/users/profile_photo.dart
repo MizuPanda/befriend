@@ -4,6 +4,7 @@ import '../../../models/bubble.dart';
 
 class ProfilePhoto extends StatelessWidget {
   final double? radius;
+
   const ProfilePhoto({
     super.key,
     this.radius,

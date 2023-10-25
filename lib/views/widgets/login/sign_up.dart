@@ -1,6 +1,8 @@
+import 'package:befriend/providers/sign_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class SignUpButton extends StatelessWidget {
+class SignUpButton extends StatefulWidget {
   const SignUpButton({
     super.key,
     required this.onPressed,
@@ -8,6 +10,11 @@ class SignUpButton extends StatelessWidget {
 
   final Function() onPressed;
 
+  @override
+  State<SignUpButton> createState() => _SignUpButtonState();
+}
+
+class _SignUpButtonState extends State<SignUpButton> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -20,10 +27,18 @@ class SignUpButton extends StatelessWidget {
             Radius.circular(20),
           ),
         ))),
-        onPressed: onPressed,
-        child: const Text(
-          'Sign up',
-          style: TextStyle(fontSize: 17),
+        onPressed: widget.onPressed,
+        child: Consumer<SignProvider>(
+          builder:
+              (BuildContext context, SignProvider provider, Widget? child) {
+            if (provider.loading) {
+              return const CircularProgressIndicator();
+            }
+            return const Text(
+              'Sign up',
+              style: TextStyle(fontSize: 17),
+            );
+          },
         ),
       ),
     );

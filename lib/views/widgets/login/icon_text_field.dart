@@ -12,6 +12,7 @@ class IconTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final Function(String)? onChanged;
   final TextInputAction textInputAction;
+  final TextInputType textInputType;
 
   const IconTextField({
     super.key,
@@ -23,6 +24,7 @@ class IconTextField extends StatefulWidget {
     required this.validator,
     this.onChanged,
     required this.textInputAction,
+    required this.textInputType,
   });
 
   @override
@@ -32,6 +34,7 @@ class IconTextField extends StatefulWidget {
 class _IconTextFieldState extends State<IconTextField> {
   bool _isFocused = false;
   final FocusNode focusNode = FocusNode();
+
   @override
   void initState() {
     focusNode.addListener(() {
@@ -44,17 +47,17 @@ class _IconTextFieldState extends State<IconTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseTextField(
+    return BaseFormField(
       action: widget.textInputAction,
       focusNode: focusNode,
       onChanged: widget.onChanged,
       onSaved: widget.onSaved,
       validator: widget.validator,
       keyboardType: widget.passwordVisible == null
-          ? TextInputType.text
+          ? widget.textInputType
           : widget.passwordVisible!
               ? TextInputType.visiblePassword
-              : TextInputType.text,
+              : widget.textInputType,
       obscureText: !(widget.passwordVisible ?? true),
       decoration: InputDecoration(
           labelStyle: const TextStyle(fontSize: 18),

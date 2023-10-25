@@ -21,6 +21,7 @@ class BefriendTitle extends StatelessWidget {
   const BefriendTitle({super.key, this.fontSize});
 
   final double? fontSize;
+
   @override
   Widget build(BuildContext context) {
     return Text('Befriend',

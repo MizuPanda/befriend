@@ -1,5 +1,6 @@
 class PasswordStrength {
   static const double max = 4.5;
+
   static double getPasswordStrength(String? password) {
     if (password == null || password.isEmpty) {
       return 0;

@@ -1,7 +1,8 @@
 import 'package:befriend/utilities/samples.dart';
-import 'package:befriend/views/pages/camera_page.dart';
+import 'package:befriend/views/pages/forgot_pass_page.dart';
 import 'package:befriend/views/pages/home_page.dart';
 import 'package:befriend/views/pages/login_page.dart';
+import 'package:befriend/views/pages/picture_sign_page.dart';
 import 'package:befriend/views/pages/profile_page.dart';
 import 'package:befriend/views/pages/sign_page.dart';
 import 'package:flutter/material.dart';
@@ -54,9 +55,15 @@ class MyRouter {
               },
             ),
             GoRoute(
-              path: 'camera',
+              path: 'forgot',
               builder: (BuildContext context, GoRouterState state) {
-                return const CameraPage();
+                return const ForgotPasswordPage();
+              },
+            ),
+            GoRoute(
+              path: 'picture',
+              builder: (BuildContext context, GoRouterState state) {
+                return const PictureSignPage();
               },
             ),
           ]),

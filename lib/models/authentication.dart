@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class AuthenticationManager {
   static final FirebaseFirestore _store = FirebaseFirestore.instance;
@@ -76,7 +78,7 @@ class AuthenticationManager {
         //GO TO TAKE AVATAR PAGE AND HANDLE ERROR WITH A VARIABLE LIKE SIGN IN
 
         if (context.mounted) {
-          GoRouter.of(context).push('/homepage', extra: UserManager.userHome());
+          GoRouter.of(context).pushReplacement('/picture');
         }
         debugPrint("Successfully added the data to user: $username");
       },
@@ -98,21 +100,14 @@ class AuthenticationManager {
     } on FirebaseAuthException catch (e) {
       debugPrint('(Error): ${e.code}');
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error. Incorrect email or password.'),
-          ),
-        );
+        showTopSnackBar(
+            Overlay.of(context),
+            const CustomSnackBar.error(
+              message:
+                  "Something went wrong. Please check your credentials and try again",
+            ),
+            snackBarPosition: SnackBarPosition.bottom);
       }
-    }
-  }
-
-  static Future<void> sendPasswordResetEmail(String email) async {
-    try {
-      await _auth.sendPasswordResetEmail(email: email);
-      debugPrint('Password reset email sent successfully.');
-    } catch (e) {
-      debugPrint('Failed to send password reset email: $e');
     }
   }
 }

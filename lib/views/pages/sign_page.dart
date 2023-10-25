@@ -17,6 +17,7 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final SignProvider _provider = SignProvider();
+
   @override
   void didChangeDependencies() {
     _provider.changedDependencies(context);
@@ -62,6 +63,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             const SizedBox(height: 20),
                             IconTextField(
                               textInputAction: TextInputAction.next,
+                              textInputType: TextInputType.emailAddress,
                               iconData: Icons.email,
                               hintText: 'Your email',
                               onSaved: _provider.emailSaved,
@@ -69,6 +71,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             const SizedBox(height: 20),
                             IconTextField(
+                              textInputType: TextInputType.name,
                               textInputAction: TextInputAction.next,
                               iconData: Icons.person,
                               hintText: 'Your name',
@@ -77,6 +80,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             const SizedBox(height: 20),
                             IconTextField(
+                              textInputType: TextInputType.text,
                               textInputAction: TextInputAction.next,
                               iconData: Icons.account_circle,
                               hintText: 'Your username',
@@ -85,6 +89,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                             const SizedBox(height: 20),
                             IconTextField(
+                              textInputType: TextInputType.visiblePassword,
                               textInputAction: TextInputAction.next,
                               iconData: Icons.lock,
                               hintText: 'Your password',
@@ -97,6 +102,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             const PasswordStrengthIndicator(),
                             const SizedBox(height: 20),
                             IconTextField(
+                              textInputType: TextInputType.visiblePassword,
                               textInputAction: TextInputAction.done,
                               iconData: Icons.lock,
                               hintText: 'Repeat your password',

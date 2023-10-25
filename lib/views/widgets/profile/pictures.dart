@@ -7,6 +7,7 @@ class ProfilePictures extends StatelessWidget {
     super.key,
     required this.user,
   });
+
   final Bubble user;
 
   @override

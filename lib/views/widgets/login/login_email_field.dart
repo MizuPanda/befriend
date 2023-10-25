@@ -17,7 +17,7 @@ class EmailFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<LoginProvider>(
         builder: (BuildContext context, LoginProvider provider, Widget? child) {
-      return BaseTextField(
+      return BaseFormField(
         action: TextInputAction.next,
         focusNode: provider.emailFocusNode,
         onSaved: provider.emailSaved,

@@ -20,6 +20,7 @@ class HomeProvider extends ChangeNotifier {
   Home home;
 
   late final Listenable _listenable;
+
   Listenable get listenable => _listenable;
 
   Offset pageOffset() {
