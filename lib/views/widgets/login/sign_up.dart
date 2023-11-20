@@ -32,7 +32,7 @@ class _SignUpButtonState extends State<SignUpButton> {
           builder:
               (BuildContext context, SignProvider provider, Widget? child) {
             if (provider.loading) {
-              return const CircularProgressIndicator();
+              return const CircularProgressIndicator(color: Colors.white,);
             }
             return const Text(
               'Sign up',

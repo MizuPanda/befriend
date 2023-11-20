@@ -1,7 +1,7 @@
+import 'package:befriend/models/friendship.dart';
 import 'package:befriend/views/widgets/home/bubble/bubble_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../models/friendship.dart';
 import '../../../../utilities/gradient_painter.dart';
 
 class BubbleProgressIndicator extends StatelessWidget {
@@ -37,7 +37,7 @@ class BubbleGradientIndicator extends StatelessWidget {
     return Positioned.fill(
       child: CustomPaint(
         painter: GradientPainter(
-          gradient: friendship.friendBubble.gradient,
+          gradient: friendship.friend.gradient,
           progress: friendship.progress / 100,
           strokeWidth: BubbleWidget.strokeWidth,
         ),

@@ -1,5 +1,6 @@
-import 'package:befriend/models/data_management.dart';
-import 'package:befriend/models/user.dart';
+import 'package:befriend/models/data_manager.dart';
+import 'package:befriend/models/user_manager.dart';
+import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,10 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 class AuthenticationManager {
   static final FirebaseFirestore _store = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  static String id() {
+    return _auth.currentUser!.uid;
+  }
 
   /// Creates a new user with email and password.
   /// The name and username are stored in the database.
@@ -55,14 +60,15 @@ class AuthenticationManager {
     _store.runTransaction((transaction) async {
       final DocumentSnapshot numberSnap = await transaction.get(numbersDoc);
 
-      transaction.update(numbersDoc, {'counter': FieldValue.increment(1)});
+      transaction.update(numbersDoc, {Constants.counterDoc: FieldValue.increment(1)});
 
-      num counter = DataManagement.getNumber(numberSnap, 'counter');
+      num counter = DataManager.getNumber(numberSnap, Constants.counterDoc);
       final userInfo = <String, dynamic>{
-        "name": name,
-        "username": username,
-        'counter': counter,
-        'avatar': '',
+        Constants.nameDoc: name,
+        Constants.usernameDoc: username,
+        Constants.counterDoc: counter,
+        Constants.avatarDoc: '',
+        Constants.friendsDoc: List.empty(),
       };
 
       final DocumentReference userDoc =
@@ -95,7 +101,7 @@ class AuthenticationManager {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       if (context.mounted) {
-        GoRouter.of(context).push('/homepage', extra: UserManager.userHome());
+        GoRouter.of(context).push('/homepage', extra: await UserManager.userHome());
       }
     } on FirebaseAuthException catch (e) {
       debugPrint('(Error): ${e.code}');

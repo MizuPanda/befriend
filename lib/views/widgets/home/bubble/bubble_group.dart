@@ -1,9 +1,9 @@
+import 'package:befriend/models/friendship.dart';
 import 'package:befriend/providers/home_provider.dart';
 import 'package:befriend/views/widgets/home/bubble/shakeable_bubble.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../models/friendship.dart';
 import '../../../../models/home.dart';
 
 class BubbleGroupWidget extends StatelessWidget {
@@ -20,14 +20,19 @@ class BubbleGroupWidget extends StatelessWidget {
           ShakeableBubble(
             specificHome: provider.home,
           ),
-          for (Friendship friendship in provider.home.user.friendships)
+          for (Friendship friendship in provider.home.user().friendships)
             Transform.translate(
                 offset: Offset(
-                    friendship.friendBubble.x, friendship.friendBubble.y),
-                child: ShakeableBubble(
-                    specificHome: Home(
-                        user: friendship.friendBubble,
-                        connectedHome: friendship.friendBubble.main())))
+                    friendship.friend.x, friendship.friend.y),
+                child: Builder(
+                  builder: (context) {
+                    if(friendship.friend.main()) {
+                      return ShakeableBubble(specificHome: Home.fromUser(friendship.friend));
+                    }
+                    return ShakeableBubble(
+                        specificHome: Home.fromFriendship(friendship));
+                  }
+                ))
         ],
       );
     });

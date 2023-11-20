@@ -1,8 +1,8 @@
-import 'package:befriend/utilities/samples.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../models/home.dart';
-import '../../../pages/home_page.dart';
+import '../../../../models/user_manager.dart';
 
 class HomeButton extends StatefulWidget {
   const HomeButton({
@@ -33,15 +33,11 @@ class _HomeButtonState extends State<HomeButton> {
           color: Colors.white,
         ),
         child: IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomePage(
-                    home: Home(
-                        user: BubbleSample.connectedUser, connectedHome: true)),
-              ),
-            );
+          onPressed: () async {
+            Home home = await UserManager.userHome();
+            if (context.mounted) {
+              GoRouter.of(context).push('/home',extra: home);
+            }
           },
           icon: const Icon(
             Icons.home_rounded,

@@ -1,4 +1,3 @@
-import 'package:befriend/utilities/samples.dart';
 import 'package:befriend/views/pages/forgot_pass_page.dart';
 import 'package:befriend/views/pages/home_page.dart';
 import 'package:befriend/views/pages/login_page.dart';
@@ -26,11 +25,8 @@ class MyRouter {
               pageBuilder: (context, state) {
                 return MaterialPage(
                     child: HomePage(
-                        home: state.extra as Home? ??
-                            Home(
-                              user: BubbleSample.connectedUser,
-                              connectedHome: true,
-                            )));
+                        home: state.extra as Home));
+                //homepage
               },
             ),
             GoRoute(
@@ -38,8 +34,7 @@ class MyRouter {
               pageBuilder: (context, state) {
                 return MaterialPage(
                     child: ProfilePage(
-                        user: state.extra as Bubble? ??
-                            BubbleSample.connectedUser));
+                        user: state.extra as Bubble));
               },
             ),
             GoRoute(

@@ -63,8 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '513327974218',
     projectId: 'befriend-b14ca',
     storageBucket: 'befriend-b14ca.appspot.com',
-    iosClientId:
-        '513327974218-mnqlhvcalbfv60jqu5k38ojr20knvkn0.apps.googleusercontent.com',
+    iosClientId: '513327974218-mnqlhvcalbfv60jqu5k38ojr20knvkn0.apps.googleusercontent.com',
     iosBundleId: 'com.befriendapp.befriend',
   );
 }

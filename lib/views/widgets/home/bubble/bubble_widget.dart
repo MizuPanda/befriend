@@ -1,10 +1,10 @@
+import 'package:befriend/models/friendship.dart';
 import 'package:befriend/providers/home_provider.dart';
 import 'package:befriend/views/widgets/users/username_text.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../models/friendship.dart';
 import '../../../../models/home.dart';
 import 'bubble_container.dart';
 import 'bubble_progress_indicator.dart';
@@ -26,14 +26,14 @@ class BubbleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        GoRouter.of(context).push('/profile', extra: specificHome.user);
+        GoRouter.of(context).push('/profile', extra: specificHome.main);
       },
       child: Center(
         child: SizedBox(
-          height: specificHome.user.size + textHeight + 2,
+          height: specificHome.user().size + textHeight + 2,
           child: Builder(builder: (context) {
-            if (!specificHome.user.main()) {
-              Friendship friendship = specificHome.user.friendship()!;
+            if (!specificHome.connectedHome) {
+              Friendship friendship = specificHome.friendship!;
               return Badge(
                 label: Text(
                   friendship.newPics.toString(),
@@ -52,11 +52,11 @@ class BubbleWidget extends StatelessWidget {
                         Column(
                           children: [
                             Stack(children: [
-                              BubbleContainer(user: specificHome.user),
+                              BubbleContainer(user: specificHome.user()),
                               BubbleProgressIndicator(friendship: friendship),
                               BubbleGradientIndicator(friendship: friendship),
                             ]),
-                            UsernameText(user: specificHome.user),
+                            UsernameText(user: specificHome.user()),
                           ],
                         ),
                         FriendLevelWidget(
@@ -69,8 +69,8 @@ class BubbleWidget extends StatelessWidget {
                   } else {
                     return Column(
                       children: [
-                        BubbleContainer(user: specificHome.user),
-                        UsernameText(user: specificHome.user),
+                        BubbleContainer(user: specificHome.user()),
+                        UsernameText(user: specificHome.user()),
                       ],
                     );
                   }
@@ -78,12 +78,12 @@ class BubbleWidget extends StatelessWidget {
               );
             } else {
               return SizedBox(
-                height: specificHome.user.size + textHeight,
+                height: specificHome.user().size + textHeight,
                 child: Column(
                   children: [
-                    BubbleContainer(user: specificHome.user),
+                    BubbleContainer(user: specificHome.user()),
                     UsernameText(
-                      user: specificHome.user,
+                      user: specificHome.user(),
                     ),
                   ],
                 ),

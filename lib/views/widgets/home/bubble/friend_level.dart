@@ -21,10 +21,10 @@ class FriendLevelWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: specificHome.user.size,
+      width: specificHome.user().size,
       padding: EdgeInsets.only(
           bottom: textHeight - levelHeight + 30 / 2,
-          left: specificHome.user.size / 2),
+          left: specificHome.user().size / 2),
       alignment: Alignment.bottomCenter,
       child: Text(
         friendship.level.toString(),
@@ -33,7 +33,7 @@ class FriendLevelWidget extends StatelessWidget {
           color: Colors.white,
           fontWeight: FontWeight.bold,
           fontSize: levelHeight /
-              (1 + specificHome.user.size / (specificHome.user.size * 7)),
+              (1 + specificHome.user().size / (specificHome.user().size * 7)),
           shadows: const [
             Shadow(
               offset: Offset.zero,

@@ -1,11 +1,14 @@
-import 'package:befriend/models/friendship.dart';
+import 'package:befriend/models/data_query.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
+import '../models/friendship.dart';
 import '../models/home.dart';
 
 class HomeProvider extends ChangeNotifier {
+  double _scaleFactor = 1.0;
+
   Offset _position = Offset.zero;
 
   _AnimationType _animationType = _AnimationType.reset;
@@ -22,6 +25,26 @@ class HomeProvider extends ChangeNotifier {
   late final Listenable _listenable;
 
   Listenable get listenable => _listenable;
+  double get scaleFactor => _scaleFactor;
+
+  Future<void> _loadAvatar() async {
+      home.user().avatar = await DataQuery.getAvatarImage(home.user().avatarUrl);
+      for(Friendship friendship in home.user().friendships) {
+        friendship.friend.avatar = await DataQuery.getAvatarImage(friendship.friend.avatarUrl);
+      }
+  }
+
+  Future<List<Friendship>> loadFriendships() async {
+    if(home.user().avatar == null) {
+      await _loadAvatar();
+    }
+    if(!home.user().friendshipsLoaded) {
+      home.user().friendships = await DataQuery.friendList(home.user().id, home.user().friendIDs);
+      home.user().friendshipsLoaded = true;
+    }
+
+    return home.user().friendships;
+  }
 
   Offset pageOffset() {
     return _animationType == _AnimationType.reset
@@ -30,7 +53,7 @@ class HomeProvider extends ChangeNotifier {
   }
 
   List<Friendship> friendships() {
-    return home.user.friendships;
+    return home.user().friendships;
   }
 
   HomeProvider({required this.home});
@@ -78,10 +101,14 @@ class HomeProvider extends ChangeNotifier {
     _offsetController.dispose();
   }
 
-  void drag(DragUpdateDetails details) {
-    _position += details.delta;
+  void scale(ScaleUpdateDetails details) {
+    if(details.scale >= 1) {
+      _scaleFactor = details.scale;
+    }
+    _position += details.focalPointDelta;
     notifyListeners();
   }
+
 
   void centerToMiddle() {
     _animationController.reset();

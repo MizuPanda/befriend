@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:befriend/models/picture_query.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../models/user.dart';
+import '../models/user_manager.dart';
 
 class PictureSignProvider extends ChangeNotifier {
   final Color foregroundColor = const Color(0xFF1F465E);
@@ -28,7 +29,7 @@ class PictureSignProvider extends ChangeNotifier {
           title: const Text('Make a choice!'),
           content: SingleChildScrollView(
             child: ListBody(
-              children: <Widget>[
+              children: [
                 GestureDetector(
                   child: const Text("Gallery"),
                   onTap: () async {
@@ -51,7 +52,7 @@ class PictureSignProvider extends ChangeNotifier {
   }
 
   Future<void> _pickImage(ImageSource source, BuildContext context) async {
-    final pickedImage = await ImagePicker().pickImage(source: source);
+    final pickedImage = await ImagePicker().pickImage(source: source, imageQuality: 25);
 
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: pickedImage!.path,
@@ -76,8 +77,17 @@ class PictureSignProvider extends ChangeNotifier {
       GoRouter.of(context).pop();
     }
   }
-
-  void goHome(BuildContext context) {
-    GoRouter.of(context).push('/homepage', extra: UserManager.userHome());
+  
+  Future<void> continueHome(BuildContext context) async {
+    await PictureQuery.uploadAvatar(File(_imagePath!));
+    if(context.mounted) {
+      skipHome(context);
+    }
+  }
+  
+  Future<void> skipHome(BuildContext context) async {
+    if(context.mounted) {
+      GoRouter.of(context).push('/homepage', extra: await UserManager.userHome());
+    }
   }
 }
