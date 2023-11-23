@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'main.dart';
-import 'models/bubble.dart';
-import 'models/home.dart';
+import 'models/objects/bubble.dart';
+import 'models/objects/home.dart';
 
 class MyRouter {
   static final GoRouter router = GoRouter(
@@ -23,9 +23,7 @@ class MyRouter {
             GoRoute(
               path: 'homepage',
               pageBuilder: (context, state) {
-                return MaterialPage(
-                    child: HomePage(
-                        home: state.extra as Home));
+                return MaterialPage(child: HomePage(home: state.extra as Home));
                 //homepage
               },
             ),
@@ -33,8 +31,7 @@ class MyRouter {
               path: 'profile',
               pageBuilder: (context, state) {
                 return MaterialPage(
-                    child: ProfilePage(
-                        user: state.extra as Bubble));
+                    child: ProfilePage(user: state.extra as Bubble));
               },
             ),
             GoRoute(

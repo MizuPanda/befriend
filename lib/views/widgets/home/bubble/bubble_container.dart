@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../models/bubble.dart';
+import '../../../../models/objects/bubble.dart';
 import '../../users/profile_photo.dart';
 
 class BubbleContainer extends StatelessWidget {

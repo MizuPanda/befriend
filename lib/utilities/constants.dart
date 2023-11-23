@@ -8,6 +8,7 @@ class Constants {
   static const String avatarDoc = 'avatar';
   static const String counterDoc = 'counter';
   static const String friendsDoc = 'friends';
+  static const String powerDoc = 'power';
 
   static const String progressDoc = 'progress';
   static const String levelDoc = 'level';
@@ -15,6 +16,8 @@ class Constants {
     return 'newPics$userIndex';
   }
 
-  static final CollectionReference friendshipsCollection = _firestore.collection('friendships');
-  static final CollectionReference usersCollection = _firestore.collection('users');
+  static final CollectionReference friendshipsCollection =
+      _firestore.collection('friendships');
+  static final CollectionReference usersCollection =
+      _firestore.collection('users');
 }

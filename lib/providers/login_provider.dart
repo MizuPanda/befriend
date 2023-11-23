@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
-import '../models/authentication.dart';
+import '../models/authentication/authentication.dart';
 
 class LoginProvider extends ChangeNotifier {
   final _formKey = GlobalKey<FormState>();

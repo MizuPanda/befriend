@@ -8,8 +8,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
-import 'models/home.dart';
-import 'models/user_manager.dart';
+import 'models/objects/home.dart';
+import 'models/data/user_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,12 +46,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     //return const MaterialApp(home: PictureSignPage());
     return MaterialApp.router(
-      routerDelegate: MyRouter.router.routerDelegate,
-      routeInformationParser: MyRouter.router.routeInformationParser,
-      routeInformationProvider: MyRouter.router.routeInformationProvider,
-      theme: ThemeData(
-          primarySwatch: Colors.blue,)
-    );
+        routerDelegate: MyRouter.router.routerDelegate,
+        routeInformationParser: MyRouter.router.routeInformationParser,
+        routeInformationProvider: MyRouter.router.routeInformationProvider,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ));
   }
 }
 
@@ -71,7 +71,7 @@ class _SelectPageState extends State<SelectPage> {
       return FutureBuilder(
         future: UserManager.userHome(),
         builder: (BuildContext context, AsyncSnapshot<Home> snapshot) {
-          if(snapshot.data == null) {
+          if (snapshot.data == null) {
             return const Scaffold(
               body: Center(
                 child: CircularProgressIndicator(),

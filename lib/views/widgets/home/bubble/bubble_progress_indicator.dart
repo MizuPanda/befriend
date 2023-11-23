@@ -1,4 +1,4 @@
-import 'package:befriend/models/friendship.dart';
+import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/views/widgets/home/bubble/bubble_widget.dart';
 import 'package:flutter/material.dart';
 

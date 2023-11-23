@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../models/home.dart';
-import '../../../../models/user_manager.dart';
+import '../../../../models/objects/home.dart';
+import '../../../../models/data/user_manager.dart';
 
 class HomeButton extends StatefulWidget {
   const HomeButton({
@@ -36,7 +36,7 @@ class _HomeButtonState extends State<HomeButton> {
           onPressed: () async {
             Home home = await UserManager.userHome();
             if (context.mounted) {
-              GoRouter.of(context).push('/home',extra: home);
+              GoRouter.of(context).push('/home', extra: home);
             }
           },
           icon: const Icon(

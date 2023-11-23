@@ -1,9 +1,8 @@
-import 'package:befriend/models/authentication.dart';
+import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DataManager {
-
   /// Returns the user data of a certain user.
   /// If the id is given, it returns the user data of the user with the given id.
   /// If the counter is given, it returns the user data of the user with the given counter.
@@ -14,7 +13,9 @@ class DataManager {
     } else if (counter != null) {
       return await _getUserByCounter(counter);
     } else {
-      return await Constants.usersCollection.doc(AuthenticationManager.id()).get();
+      return await Constants.usersCollection
+          .doc(AuthenticationManager.id())
+          .get();
     }
   }
 
@@ -25,8 +26,9 @@ class DataManager {
 
   /// Returns the user data of the user with the given counter.
   static Future<DocumentSnapshot> _getUserByCounter(int counterValue) async {
-    final querySnapshot =
-    await Constants.usersCollection.where(Constants.counterDoc, isEqualTo: counterValue).get();
+    final querySnapshot = await Constants.usersCollection
+        .where(Constants.counterDoc, isEqualTo: counterValue)
+        .get();
 
     final userDoc = querySnapshot.docs.first;
     return userDoc;

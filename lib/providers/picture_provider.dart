@@ -1,15 +1,15 @@
 import 'dart:io';
 
-import 'package:befriend/models/picture_query.dart';
+import 'package:befriend/models/data/picture_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:image_picker/image_picker.dart';
 
-import '../models/user_manager.dart';
+import '../models/data/picture_query.dart';
+import '../models/data/user_manager.dart';
 
 class PictureSignProvider extends ChangeNotifier {
-  final Color foregroundColor = const Color(0xFF1F465E);
+  static const Color foregroundColor = Color(0xFF1F465E);
 
   String? _imagePath;
 
@@ -17,77 +17,33 @@ class PictureSignProvider extends ChangeNotifier {
     return _imagePath == null;
   }
 
-  Image image() {
-    return Image.file(File(_imagePath!));
+  ImageProvider image() {
+    return PictureManager.image(_imagePath).image;
   }
 
-  Future<void> showChoiceDialog(BuildContext context) async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Make a choice!'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: [
-                GestureDetector(
-                  child: const Text("Gallery"),
-                  onTap: () async {
-                    await _pickImage(ImageSource.gallery, context);
-                  },
-                ),
-                const Padding(padding: EdgeInsets.all(8.0)),
-                GestureDetector(
-                  child: const Text("Camera"),
-                  onTap: () async {
-                    await _pickImage(ImageSource.camera, context);
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+  Future<void> retrieveImage(BuildContext context) async {
+      await PictureManager.showChoiceDialog(context, _retrievePath);
+      notifyListeners();
+      if (context.mounted) {
+        GoRouter.of(context).pop();
+      }
   }
 
-  Future<void> _pickImage(ImageSource source, BuildContext context) async {
-    final pickedImage = await ImagePicker().pickImage(source: source, imageQuality: 25);
-
-    CroppedFile? croppedFile = await ImageCropper().cropImage(
-      sourcePath: pickedImage!.path,
-      aspectRatioPresets: [
-        CropAspectRatioPreset.square,
-      ],
-      uiSettings: [
-        AndroidUiSettings(
-            toolbarTitle: 'Cropper',
-            toolbarColor: foregroundColor,
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: false),
-        IOSUiSettings(
-          title: 'Cropper',
-        ),
-      ],
-    );
-    _imagePath = croppedFile!.path;
-    notifyListeners();
-    if (context.mounted) {
-      GoRouter.of(context).pop();
-    }
+  void _retrievePath(CroppedFile? file) async {
+    _imagePath = file!.path;
   }
-  
+
   Future<void> continueHome(BuildContext context) async {
     await PictureQuery.uploadAvatar(File(_imagePath!));
-    if(context.mounted) {
+    if (context.mounted) {
       skipHome(context);
     }
   }
-  
+
   Future<void> skipHome(BuildContext context) async {
-    if(context.mounted) {
-      GoRouter.of(context).push('/homepage', extra: await UserManager.userHome());
+    if (context.mounted) {
+      GoRouter.of(context)
+          .push('/homepage', extra: await UserManager.userHome());
     }
   }
 }

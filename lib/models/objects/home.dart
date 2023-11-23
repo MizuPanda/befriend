@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:befriend/models/friendship.dart';
+import 'package:befriend/models/objects/friendship.dart';
 
-import '../views/widgets/home/bubble/bubble_widget.dart';
+import '../../views/widgets/home/bubble/bubble_widget.dart';
 import 'bubble.dart';
 
 class Home {
@@ -10,7 +10,10 @@ class Home {
   late Friendship? friendship;
   final bool connectedHome;
 
-  Home({required this.connectedHome, required this.main, required this.friendship});
+  Home(
+      {required this.connectedHome,
+      required this.main,
+      required this.friendship});
 
   factory Home.fromUser(Bubble user) {
     return Home(connectedHome: true, main: user, friendship: null);
@@ -20,11 +23,12 @@ class Home {
     return Home(connectedHome: false, main: null, friendship: friendship);
   }
   Bubble user() {
-    if(connectedHome) {
+    if (connectedHome) {
       return main!;
     }
     return friendship!.friend;
   }
+
   void initializePositions() {
     Bubble main = user();
     Random rand = Random();
@@ -32,8 +36,8 @@ class Home {
     for (Friendship friendship in main.friendships) {
       Bubble friend = friendship.friend;
       friend.x = rand.nextDouble() * friendship.distance(); // x=6
-      friend.y = sqrt(
-          pow(friendship.distance(), 2) - pow(friend.x, 2)); //100 - 36 = 64, y = 8
+      friend.y = sqrt(pow(friendship.distance(), 2) -
+          pow(friend.x, 2)); //100 - 36 = 64, y = 8
 
       friend.x += (main.size + friend.size / 2) / 2 + BubbleWidget.textHeight;
       friend.y += (main.size + friend.size / 2) / 2 + BubbleWidget.textHeight;
@@ -51,7 +55,7 @@ class Home {
 
   void _avoidOverlapping() {
     bool overlapping = true;
-    
+
     Bubble homeUser = user();
     homeUser.friendships.sort((a, b) => a.distance().compareTo(b.distance()));
     while (overlapping) {

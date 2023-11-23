@@ -1,10 +1,12 @@
-import 'package:befriend/models/data_query.dart';
+import 'package:background_location/background_location.dart';
+import 'package:befriend/models/data/data_query.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-import '../models/friendship.dart';
-import '../models/home.dart';
+import '../models/objects/friendship.dart';
+import '../models/objects/home.dart';
 
 class HomeProvider extends ChangeNotifier {
   double _scaleFactor = 1.0;
@@ -27,20 +29,39 @@ class HomeProvider extends ChangeNotifier {
   Listenable get listenable => _listenable;
   double get scaleFactor => _scaleFactor;
 
+  Future<void> _requestPermission() async {
+
+    await Permission.locationAlways
+        .onDeniedCallback(() {})
+        .onGrantedCallback(() {})
+        .onPermanentlyDeniedCallback(() {})
+        .onRestrictedCallback(() {})
+        .onLimitedCallback(() {})
+        .onProvisionalCallback(() {})
+        .request();
+  }
+
+
+
   Future<void> _loadAvatar() async {
-      home.user().avatar = await DataQuery.getAvatarImage(home.user().avatarUrl);
-      for(Friendship friendship in home.user().friendships) {
-        friendship.friend.avatar = await DataQuery.getAvatarImage(friendship.friend.avatarUrl);
-      }
+    home.user().avatar = await DataQuery.getAvatarImage(home.user().avatarUrl);
+    for (Friendship friendship in home.user().friendships) {
+      friendship.friend.avatar =
+          await DataQuery.getAvatarImage(friendship.friend.avatarUrl);
+    }
   }
 
   Future<List<Friendship>> loadFriendships() async {
-    if(home.user().avatar == null) {
+    await _requestPermission();
+
+    if (home.user().avatar == null) {
       await _loadAvatar();
     }
-    if(!home.user().friendshipsLoaded) {
-      home.user().friendships = await DataQuery.friendList(home.user().id, home.user().friendIDs);
+    if (!home.user().friendshipsLoaded) {
+      home.user().friendships =
+          await DataQuery.friendList(home.user().id, home.user().friendIDs);
       home.user().friendshipsLoaded = true;
+      home.initializePositions();
     }
 
     return home.user().friendships;
@@ -102,13 +123,12 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void scale(ScaleUpdateDetails details) {
-    if(details.scale >= 1) {
+    if (details.scale >= 1) {
       _scaleFactor = details.scale;
     }
     _position += details.focalPointDelta;
     notifyListeners();
   }
-
 
   void centerToMiddle() {
     _animationController.reset();

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/bubble.dart';
+import '../../../models/objects/bubble.dart';
 
 class ProfilePictures extends StatelessWidget {
   const ProfilePictures({

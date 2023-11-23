@@ -3,8 +3,8 @@ import 'package:befriend/providers/home_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../models/bubble.dart';
-import '../../../../models/friendship.dart';
+import '../../../../models/objects/bubble.dart';
+import '../../../../models/objects/friendship.dart';
 
 class SearchButton extends StatefulWidget {
   const SearchButton({

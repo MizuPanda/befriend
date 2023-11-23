@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../models/friendship.dart';
-import '../../../../models/home.dart';
+import '../../../../models/objects/friendship.dart';
+import '../../../../models/objects/home.dart';
 
 class FriendLevelWidget extends StatelessWidget {
   const FriendLevelWidget({

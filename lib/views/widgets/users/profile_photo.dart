@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/bubble.dart';
+import '../../../models/objects/bubble.dart';
 
 class ProfilePhoto extends StatelessWidget {
   final double? radius;

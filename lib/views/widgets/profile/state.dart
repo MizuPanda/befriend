@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../models/bubble.dart';
+import '../../../models/objects/bubble.dart';
 
 class ProfileState extends StatelessWidget {
   const ProfileState({

@@ -1,7 +1,7 @@
 import 'package:befriend/views/widgets/befriend_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/bubble.dart';
+import '../../models/objects/bubble.dart';
 import '../widgets/profile/header.dart';
 import '../widgets/profile/pictures.dart';
 import '../widgets/profile/state.dart';

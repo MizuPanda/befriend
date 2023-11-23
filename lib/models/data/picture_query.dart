@@ -1,20 +1,20 @@
 import 'dart:io';
 
-import 'package:befriend/models/data_query.dart';
+import 'package:befriend/models/data/data_query.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart' as path;
 
-
 class PictureQuery {
   static Future<void> uploadAvatar(File imageFile) async {
     String? downloadUrl = await _uploadProfilePicture(imageFile);
-    if(downloadUrl != null) {
-      DataQuery.updateAvatar(downloadUrl);
+    if (downloadUrl != null) {
+      await DataQuery.updateAvatar(downloadUrl);
       debugPrint('Avatar updated');
     }
   }
+
   static Future<String?> _uploadProfilePicture(File imageFile) async {
     // Get current user's UID
     User? user = FirebaseAuth.instance.currentUser;

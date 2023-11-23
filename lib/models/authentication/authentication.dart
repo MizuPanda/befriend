@@ -1,5 +1,5 @@
-import 'package:befriend/models/data_manager.dart';
-import 'package:befriend/models/user_manager.dart';
+import 'package:befriend/models/data/data_manager.dart';
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -60,7 +60,8 @@ class AuthenticationManager {
     _store.runTransaction((transaction) async {
       final DocumentSnapshot numberSnap = await transaction.get(numbersDoc);
 
-      transaction.update(numbersDoc, {Constants.counterDoc: FieldValue.increment(1)});
+      transaction
+          .update(numbersDoc, {Constants.counterDoc: FieldValue.increment(1)});
 
       num counter = DataManager.getNumber(numberSnap, Constants.counterDoc);
       final userInfo = <String, dynamic>{
@@ -69,6 +70,7 @@ class AuthenticationManager {
         Constants.counterDoc: counter,
         Constants.avatarDoc: '',
         Constants.friendsDoc: List.empty(),
+        Constants.powerDoc: 0,
       };
 
       final DocumentReference userDoc =
@@ -101,7 +103,8 @@ class AuthenticationManager {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       if (context.mounted) {
-        GoRouter.of(context).push('/homepage', extra: await UserManager.userHome());
+        GoRouter.of(context)
+            .push('/homepage', extra: await UserManager.userHome());
       }
     } on FirebaseAuthException catch (e) {
       debugPrint('(Error): ${e.code}');

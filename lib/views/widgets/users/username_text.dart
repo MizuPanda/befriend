@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../models/bubble.dart';
+import '../../../models/objects/bubble.dart';
 import '../home/bubble/bubble_widget.dart';
 
 class UsernameText extends StatelessWidget {

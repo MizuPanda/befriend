@@ -49,7 +49,16 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
     <string>The app uses camera to take pictures and videos</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>The app uses microphone for videos</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>This app needs access to location.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>This app needs access to location.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app needs access to location.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+    	<string>fetch</string>
+    	<string>location</string>
+    </array>
 </dict>
 </plist>

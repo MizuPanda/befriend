@@ -1,4 +1,4 @@
-import 'package:befriend/models/authentication.dart';
+import 'package:befriend/models/authentication/authentication.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 
@@ -42,7 +42,7 @@ class SignProvider extends ChangeNotifier {
       return 'Please enter an email.';
     }
     final RegExp emailRegex = RegExp(
-        r"^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$");
+        r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$");
     if (!emailRegex.hasMatch(email) || _error == 'invalid-email') {
       if (_error == 'invalid-email') {
         _error = null;

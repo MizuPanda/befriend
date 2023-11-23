@@ -1,11 +1,11 @@
-import 'package:befriend/models/friendship.dart';
+import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/providers/home_provider.dart';
 import 'package:befriend/views/widgets/users/username_text.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../models/home.dart';
+import '../../../../models/objects/home.dart';
 import 'bubble_container.dart';
 import 'bubble_progress_indicator.dart';
 import 'friend_level.dart';

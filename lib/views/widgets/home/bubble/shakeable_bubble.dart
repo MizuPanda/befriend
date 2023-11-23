@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../models/home.dart';
+import '../../../../models/objects/home.dart';
 import 'bubble_widget.dart';
 
 class ShakeableBubble extends StatefulWidget {
