@@ -31,15 +31,15 @@ class UserManager {
       DocumentSnapshot docs = await DataManager.getData();
 
       try {
-        List<String> friendIDs =
-            docs.data().toString().contains(Constants.friendsDoc)
-                ? docs.get(Constants.friendsDoc)
-                : List.empty();
+        List<dynamic> friendIDs = DataManager.getList(docs, Constants.friendsDoc);
+        String avatarUrl = DataManager.getString(docs, Constants.avatarDoc);
         List<Friendship> friendList =
             await DataQuery.friendList(docs.id, friendIDs);
-        _instance = Bubble.fromMapWithFriends(docs, friendList);
+
+        ImageProvider avatar = await DataQuery.getAvatarImage(avatarUrl);
+        _instance = Bubble.fromMapWithFriends(docs, avatar, friendList);
       } catch (e) {
-        debugPrint(e.toString());
+        debugPrint('(UserManager): ${e.toString()}');
       }
     }
 
@@ -55,6 +55,7 @@ class UserManager {
 
   static Future<ImageProvider> refreshAvatar() async {
     _instance!.avatar = await DataQuery.getAvatarImage(_instance!.avatarUrl);
-    return _instance!.avatar!;
+    return _instance!.avatar;
   }
+
 }

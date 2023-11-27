@@ -67,10 +67,11 @@ class AuthenticationManager {
       final userInfo = <String, dynamic>{
         Constants.nameDoc: name,
         Constants.usernameDoc: username,
-        Constants.counterDoc: counter,
+        Constants.counterDoc: counter + 1,
         Constants.avatarDoc: '',
         Constants.friendsDoc: List.empty(),
         Constants.powerDoc: 0,
+        Constants.hostingDoc: List.empty()
       };
 
       final DocumentReference userDoc =

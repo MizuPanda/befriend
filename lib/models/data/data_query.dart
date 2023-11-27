@@ -22,7 +22,9 @@ class DataQuery {
     List<Friendship> friendships = [];
     for (String friendID in friendIDs) {
       DocumentSnapshot friendDocs = await DataManager.getData(id: friendID);
-      Bubble friend = Bubble.fromMapWithoutFriends(friendDocs);
+      ImageProvider avatar = await DataManager.getAvatar(friendDocs);
+
+      Bubble friend = Bubble.fromMapWithoutFriends(friendDocs, avatar);
 
       DocumentSnapshot friendshipDocs =
           await FriendManager.getData(userID, friend.id);
@@ -35,6 +37,8 @@ class DataQuery {
   }
 
   static Future<ImageProvider> getAvatarImage(String downloadUrl) async {
+    //HERE IS WHERE I SHOULD MANAGE AVATAR URL = NULL
+
     final ref = FirebaseStorage.instance.refFromURL(downloadUrl);
     final url = await ref.getDownloadURL();
 

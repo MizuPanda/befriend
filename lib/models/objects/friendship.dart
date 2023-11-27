@@ -1,3 +1,4 @@
+import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -29,12 +30,8 @@ class Friendship {
 
     return Friendship(
         friend: friendBubble,
-        level: data.contains(Constants.levelDoc)
-            ? docs.get(Constants.levelDoc)
-            : -1,
-        progress: data.contains(Constants.progressDoc)
-            ? docs.get(Constants.progressDoc)
-            : -1,
+        level: DataManager.getNumber(docs, Constants.levelDoc).toInt(),
+        progress: DataManager.getNumber(docs, Constants.progressDoc).toDouble(),
         newPics: data.contains(Constants.newPics(userIndex))
             ? docs.get(Constants.newPics(userIndex))
             : -1,

@@ -1,6 +1,8 @@
 import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 
 class DataManager {
   /// Returns the user data of a certain user.
@@ -32,6 +34,12 @@ class DataManager {
 
     final userDoc = querySnapshot.docs.first;
     return userDoc;
+  }
+
+  static Future<ImageProvider> getAvatar(DocumentSnapshot snapshot) async {
+    String avatarUrl = getString(snapshot, Constants.avatarDoc);
+
+    return await DataQuery.getAvatarImage(avatarUrl);
   }
 
   static num getNumber(DocumentSnapshot snapshot, String id) {

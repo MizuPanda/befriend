@@ -22,6 +22,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final HomeProvider _provider = HomeProvider(home: widget.home);
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -40,6 +41,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return ChangeNotifierProvider.value(
       value: _provider,
       child: Scaffold(
+        key: _scaffoldKey,
         body: Consumer<HomeProvider>(builder:
             (BuildContext context, HomeProvider provider, Widget? child) {
           return FutureBuilder(

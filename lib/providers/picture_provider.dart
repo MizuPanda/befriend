@@ -7,6 +7,7 @@ import 'package:image_cropper/image_cropper.dart';
 
 import '../models/data/picture_query.dart';
 import '../models/data/user_manager.dart';
+import '../models/objects/home.dart';
 
 class PictureSignProvider extends ChangeNotifier {
   static const Color foregroundColor = Color(0xFF1F465E);
@@ -41,9 +42,10 @@ class PictureSignProvider extends ChangeNotifier {
   }
 
   Future<void> skipHome(BuildContext context) async {
+    Home user = await UserManager.userHome();
     if (context.mounted) {
       GoRouter.of(context)
-          .push('/homepage', extra: await UserManager.userHome());
+          .push('/homepage', extra: user);
     }
   }
 }

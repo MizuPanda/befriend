@@ -49,16 +49,16 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
     <string>The app uses camera to take pictures and videos</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>This app needs access to location.</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>This app needs access to location.</string>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>This app needs access to location.</string>
-    <key>UIBackgroundModes</key>
-    <array>
-    	<string>fetch</string>
-    	<string>location</string>
-    </array>
+    <dict>
+    	    <key>NSBluetoothAlwaysUsageDescription</key>
+    	    <string>Need BLE permission</string>
+    	    <key>NSBluetoothPeripheralUsageDescription</key>
+    	    <string>Need BLE permission</string>
+    	    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    	    <string>Need Location permission</string>
+    	    <key>NSLocationAlwaysUsageDescription</key>
+    	    <string>Need Location permission</string>
+    	    <key>NSLocationWhenInUseUsageDescription</key>
+    	    <string>Need Location permission</string>
 </dict>
 </plist>

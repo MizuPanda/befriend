@@ -112,8 +112,8 @@ class _PictureSignPageState extends State<PictureSignPage> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 60, vertical: 15),
                     ),
-                    onPressed: () {
-                      _provider.retrieveImage(context);
+                    onPressed: () async {
+                      await _provider.retrieveImage(context);
                     },
                     child: const Text('Capture Photo'),
                   ),
@@ -140,8 +140,8 @@ class _PictureSignPageState extends State<PictureSignPage> {
                         TextButton(
                             onPressed: _provider.imageNull()
                                 ? null
-                                : () {
-                                    _provider.continueHome(context);
+                                : () async {
+                                    await _provider.continueHome(context);
                                   },
                             child: const Text(
                               'Confirm',
