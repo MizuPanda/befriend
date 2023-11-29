@@ -57,8 +57,7 @@ class _PictureSignPageState extends State<PictureSignPage> {
                         );
                       }
                       return CircleAvatar(
-                          radius: 100,
-                          backgroundImage: _provider.image());
+                          radius: 100, backgroundImage: _provider.image());
                     }),
                   ),
                   const SizedBox(height: 30.0),

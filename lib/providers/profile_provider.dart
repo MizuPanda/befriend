@@ -7,23 +7,21 @@ import '../models/objects/bubble.dart';
 import '../models/data/picture_manager.dart';
 
 class ProfileProvider extends ChangeNotifier {
-
   Future<void> changeProfilePicture(BuildContext context, Bubble bubble) async {
     await PictureManager.showChoiceDialog(context, (CroppedFile? file) {
       _loadPictureChange(context, file, bubble);
     });
-
   }
 
-  Future<void> _loadPictureChange(BuildContext context, CroppedFile? file, Bubble bubble) async {
-    if(file == null) {
-      if(context.mounted) {
+  Future<void> _loadPictureChange(
+      BuildContext context, CroppedFile? file, Bubble bubble) async {
+    if (file == null) {
+      if (context.mounted) {
         showTopSnackBar(
             Overlay.of(context),
             const CustomSnackBar.error(
               maxLines: 1,
-              message:
-              "Something went wrong",
+              message: "Something went wrong",
             ),
             snackBarPosition: SnackBarPosition.bottom);
       }

@@ -1,17 +1,17 @@
 import 'dart:async';
 
 import 'package:befriend/models/authentication/authentication.dart';
-import 'package:befriend/models/bluetooth/advertising.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/host.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../models/data/data_manager.dart';
 import '../models/objects/bubble.dart';
+import '../views/widgets/home/picture/rounded_dialog.dart';
 
 class HostingProvider extends ChangeNotifier {
   late Host _host;
@@ -21,15 +21,29 @@ class HostingProvider extends ChangeNotifier {
 
   StreamSubscription<DocumentSnapshot>? _stream;
 
+  void showQRCodeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // Replace 'yourQRCodeData' with the data you want to encode
+        return RoundedDialog(
+          child: QrImageView(
+            data: '${Constants.appID}.${_host.host.id}',
+            version: QrVersions.auto,
+            size: 300.0,
+          ),
+        );
+      },
+    );
+  }
+
   Future<String> startingHost(BuildContext context) async {
     Bubble user = await UserManager.getInstance();
     _host = Host(host: user, joiners: [], user: user);
 
     _users = [user];
-
     if (context.mounted) {
-      debugPrint('(HostingProvider): Starting advertising');
-      await _startAdvertising(context);
+      _initiateListening(context);
     }
 
     return 'Completed';
@@ -81,13 +95,6 @@ class HostingProvider extends ChangeNotifier {
     return _users[index].avatar;
   }
 
-  String power(int index) {
-    String formattedNumber =
-        NumberFormat.compactCurrency(decimalDigits: 1, symbol: '')
-            .format(_users[index].power);
-
-    return 'SP~$formattedNumber';
-  }
   //endregion
 
   static Future<List<Bubble>> _retrieveConnectedJoiners(
@@ -121,7 +128,6 @@ class HostingProvider extends ChangeNotifier {
 
   Future<void> onDispose() async {
     if (_host.main()) {
-      await stopAdvertising();
       debugPrint('(HostingProvider): Stopping advertisement');
       await Constants.usersCollection
           .doc(_host.host.id)
@@ -129,14 +135,7 @@ class HostingProvider extends ChangeNotifier {
     } else {
       await leaveHost();
     }
-  }
-
-  /// Starts listening to the changes of the linked list of the current user.
-  Future<void> _startAdvertising(BuildContext context) async {
-    await BluetoothAdvertising.startAdvertising();
-    if (context.mounted) {
-      _initiateListening(context);
-    }
+    await _stream?.cancel();
   }
 
   /// Deletes the user from the list of the connected users.
@@ -151,12 +150,6 @@ class HostingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Stops advertising.
-  /// Stops listening to the changes of the linked list of the current user.
-  Future<void> stopAdvertising() async {
-    await BluetoothAdvertising.stopAdvertising();
-  }
-
   /// Starts listening to the changes of the hosting document of the host.
   StreamSubscription<DocumentSnapshot> _startListening(BuildContext context) {
     String userId = _host.host.id;
@@ -169,7 +162,7 @@ class HostingProvider extends ChangeNotifier {
       List<dynamic> connectedIds =
           DataManager.getList(snapshot, Constants.hostingDoc);
       if (connectedIds.isEmpty) {
-        if(!main() && context.mounted) {
+        if (!main() && context.mounted) {
           context.pop();
         }
       } else if (connectedIds.toString() == linked.toString()) {
@@ -182,23 +175,28 @@ class HostingProvider extends ChangeNotifier {
           context.pop();
         }
         //POSSIBLY REFRESH
+      } else if (connectedIds.length < _users.length) {
+        List<Bubble> removedBubbles = _users
+            .where((user) =>
+                ((connectedIds.every((id) => (user.id != id))) && !main()))
+            .toList();
+
+        for (Bubble bubble in removedBubbles) {
+          _users.remove(bubble);
+          if (bubble == _host.user) {
+            context.pop();
+          }
+        }
       } else {
         //IF NEW USER IN THE LIST
-        bool hasBeenRemoved = !main() && (connectedIds.every((id) => id != _host.user.id));
+        for (String id in connectedIds) {
+          if (_users.every((user) => user.id != id)) {
+            //IF NOT ALREADY IN IN THE LIST
+            DocumentSnapshot snapshot = await DataManager.getData(id: id);
+            ImageProvider avatar = await DataManager.getAvatar(snapshot);
 
-        if(hasBeenRemoved) {
-          context.pop();
-        } else {
-          for (String id in connectedIds) {
-            if (_users.every((user) => user.id != id)) { //IF NOT ALREADY IN IN THE LIST
-              DocumentSnapshot snapshot = await DataManager.getData(id: id);
-              ImageProvider avatar = await DataManager.getAvatar(snapshot);
-
-              Bubble bubble = Bubble.fromMapWithoutFriends(snapshot, avatar);
-              _users.add(bubble);
-            }
-
-            hasBeenRemoved = id != _host.user.id;
+            Bubble bubble = Bubble.fromMapWithoutFriends(snapshot, avatar);
+            _users.add(bubble);
           }
         }
       }

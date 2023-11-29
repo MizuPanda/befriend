@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-class BluetoothDialog extends StatelessWidget {
-  const BluetoothDialog({
-    super.key, required this.child,
+class RoundedDialog extends StatelessWidget {
+  const RoundedDialog({
+    super.key,
+    required this.child,
   });
 
   final Widget child;

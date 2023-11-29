@@ -35,9 +35,8 @@ class PictureManager {
 
   static Future<void> showChoiceDialog(
       BuildContext context, Function(CroppedFile?) function) async {
-
     await _askCameraPermission();
-    if(context.mounted) {
+    if (context.mounted) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -66,7 +65,6 @@ class PictureManager {
         },
       );
     }
-
   }
 
   static Future<void> _pickImage(ImageSource source, BuildContext context,

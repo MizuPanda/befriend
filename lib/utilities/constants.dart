@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Constants {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  static const String appID = 'befriend';
   static const String nameDoc = 'name';
   static const String usernameDoc = 'username';
   static const String avatarDoc = 'avatar';
@@ -24,5 +25,5 @@ class Constants {
 
   static const double pictureDialogWidth = 350;
   static const double pictureDialogHeight = 450;
-  static const double pictureDialogAvatarSize = 25;
+  static const double pictureDialogAvatarSize = 30;
 }

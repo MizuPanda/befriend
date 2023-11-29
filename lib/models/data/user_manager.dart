@@ -31,7 +31,8 @@ class UserManager {
       DocumentSnapshot docs = await DataManager.getData();
 
       try {
-        List<dynamic> friendIDs = DataManager.getList(docs, Constants.friendsDoc);
+        List<dynamic> friendIDs =
+            DataManager.getList(docs, Constants.friendsDoc);
         String avatarUrl = DataManager.getString(docs, Constants.avatarDoc);
         List<Friendship> friendList =
             await DataQuery.friendList(docs.id, friendIDs);
@@ -57,5 +58,4 @@ class UserManager {
     _instance!.avatar = await DataQuery.getAvatarImage(_instance!.avatarUrl);
     return _instance!.avatar;
   }
-
 }

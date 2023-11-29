@@ -27,7 +27,6 @@ class HomeProvider extends ChangeNotifier {
   Listenable get listenable => _listenable;
   double get scaleFactor => _scaleFactor;
 
-
   Future<List<Friendship>> loadFriendships() async {
     if (!home.user().friendshipsLoaded) {
       home.user().friendships =

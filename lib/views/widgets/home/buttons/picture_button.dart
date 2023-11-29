@@ -3,7 +3,7 @@ import 'package:befriend/views/widgets/home/picture/joining_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../picture/bluetooth_dialog.dart';
+import '../picture/rounded_dialog.dart';
 
 class PictureButton extends StatefulWidget {
   const PictureButton({super.key});
@@ -87,17 +87,16 @@ class _PictureButtonState extends State<PictureButton> {
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
-                            return const BluetoothDialog(child: JoiningWidget());
-
-                          }
-                      );
+                            return const RoundedDialog(child: JoiningWidget());
+                          });
                     } else {
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
-                            return const BluetoothDialog(child: HostingWidget(isHost: true, host: null),);
-                          }
-                      );
+                            return const RoundedDialog(
+                              child: HostingWidget(isHost: true, host: null),
+                            );
+                          });
                     }
                   },
                   child: Stack(
@@ -135,4 +134,3 @@ class _PictureButtonState extends State<PictureButton> {
     );
   }
 }
-

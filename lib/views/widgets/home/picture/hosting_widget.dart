@@ -1,6 +1,5 @@
 import 'package:befriend/providers/hosting_provider.dart';
 import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/views/widgets/home/buttons/bluetooth_general_widget.dart';
 import 'package:befriend/views/widgets/users/profile_photo.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,16 +22,16 @@ class _HostingWidgetState extends State<HostingWidget> {
   final HostingProvider _provider = HostingProvider();
   Future? _hostingFuture;
 
-
   @override
   void initState() {
     BuildContext? myContext;
-    if(widget.key is GlobalKey<ScaffoldState>) {
-      myContext = (widget.key as GlobalKey<ScaffoldState>).currentState?.context;
+    if (widget.key is GlobalKey<ScaffoldState>) {
+      myContext =
+          (widget.key as GlobalKey<ScaffoldState>).currentState?.context;
     }
     _hostingFuture = widget.isHost
-        ? _provider.startingHost(myContext?? context)
-        : _provider.startingJoiner(widget.host!, myContext?? context);
+        ? _provider.startingHost(myContext ?? context)
+        : _provider.startingJoiner(widget.host!, myContext ?? context);
     super.initState();
   }
 
@@ -44,31 +43,38 @@ class _HostingWidgetState extends State<HostingWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BluetoothWidget(
-        child: ChangeNotifierProvider.value(
-            value: _provider,
-            child: Consumer(builder: (BuildContext context,
-                HostingProvider provider, Widget? child) {
-              return SizedBox(
-                width: Constants.pictureDialogWidth,
-                height: Constants.pictureDialogHeight,
-                child: FutureBuilder(
-                    future: _hostingFuture,
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      if (snapshot.hasData) {
-                        return Column(
+    return ChangeNotifierProvider.value(
+        value: _provider,
+        child: Consumer(builder:
+            (BuildContext context, HostingProvider provider, Widget? child) {
+          return SizedBox(
+            width: Constants.pictureDialogWidth,
+            height: Constants.pictureDialogHeight,
+            child: FutureBuilder(
+                future: _hostingFuture,
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData) {
+                    return Stack(
+                      children: [
+                        Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const SizedBox(
                               height: 5,
                             ),
-                            Text(
-                                '${provider.hostUsername()} will take a picture soon',
+                            SizedBox(
+                              width: Constants.pictureDialogWidth - 100,
+                              child: Text(
+                                '${provider.hostUsername()} is taking the picture!',
+                                textAlign: TextAlign.center,
                                 style: GoogleFonts.openSans(
                                     textStyle: const TextStyle(
                                   fontSize: 20,
-                                ))),
+                                )),
+                                maxLines: 2,
+                              ),
+                            ),
                             Expanded(
                                 child: ListView.builder(
                               itemCount: provider.length(),
@@ -77,9 +83,11 @@ class _HostingWidgetState extends State<HostingWidget> {
                                   if (provider.main() &&
                                       provider.indexMain(index)) {
                                     return ListTile(
-                                      leading: CircleAvatar(
-                                          backgroundImage:
-                                              provider.avatar(index)),
+                                      leading: ProfilePhoto(
+                                        user: provider.bubble(index),
+                                        radius:
+                                            Constants.pictureDialogAvatarSize,
+                                      ),
                                       title: Text(provider.name(index)),
                                       subtitle: Text(provider.username(index)),
                                       trailing: IconButton(
@@ -125,14 +133,27 @@ class _HostingWidgetState extends State<HostingWidget> {
                                 ),
                               )
                           ],
-                        );
-                      } else {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                    }),
-              );
-            })));
+                        ),
+                        if (provider.main())
+                          Positioned(
+                            top: 5,
+                            right: 5,
+                            child: IconButton(
+                              icon: const Icon(Icons.qr_code), // QR code icon
+                              onPressed: () {
+                                provider.showQRCodeDialog(context);
+                              },
+                            ),
+                          ),
+                      ],
+                    );
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                }),
+          );
+        }));
   }
 }

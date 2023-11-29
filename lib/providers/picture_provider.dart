@@ -23,11 +23,11 @@ class PictureSignProvider extends ChangeNotifier {
   }
 
   Future<void> retrieveImage(BuildContext context) async {
-      await PictureManager.showChoiceDialog(context, _retrievePath);
-      notifyListeners();
-      if (context.mounted) {
-        GoRouter.of(context).pop();
-      }
+    await PictureManager.showChoiceDialog(context, _retrievePath);
+    notifyListeners();
+    if (context.mounted) {
+      GoRouter.of(context).pop();
+    }
   }
 
   void _retrievePath(CroppedFile? file) async {
@@ -44,8 +44,7 @@ class PictureSignProvider extends ChangeNotifier {
   Future<void> skipHome(BuildContext context) async {
     Home user = await UserManager.userHome();
     if (context.mounted) {
-      GoRouter.of(context)
-          .push('/homepage', extra: user);
+      GoRouter.of(context).push('/homepage', extra: user);
     }
   }
 }

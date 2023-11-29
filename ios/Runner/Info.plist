@@ -49,16 +49,4 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
     <string>The app uses camera to take pictures and videos</string>
-    <dict>
-    	    <key>NSBluetoothAlwaysUsageDescription</key>
-    	    <string>Need BLE permission</string>
-    	    <key>NSBluetoothPeripheralUsageDescription</key>
-    	    <string>Need BLE permission</string>
-    	    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    	    <string>Need Location permission</string>
-    	    <key>NSLocationAlwaysUsageDescription</key>
-    	    <string>Need Location permission</string>
-    	    <key>NSLocationWhenInUseUsageDescription</key>
-    	    <string>Need Location permission</string>
-</dict>
 </plist>

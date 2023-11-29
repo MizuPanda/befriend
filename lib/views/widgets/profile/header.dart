@@ -1,4 +1,3 @@
-
 import 'package:befriend/providers/profile_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,12 +22,12 @@ class _ProfileHeaderState extends State<ProfileHeader> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ProfileProvider>(
-      create: (_) => ProfileProvider(),
-      builder: (BuildContext context, Widget? child) {
-        return Row(
-          children: [
-            Consumer<ProfileProvider>(
-              builder: (BuildContext context, ProfileProvider provider, Widget? child) {
+        create: (_) => ProfileProvider(),
+        builder: (BuildContext context, Widget? child) {
+          return Row(
+            children: [
+              Consumer<ProfileProvider>(builder: (BuildContext context,
+                  ProfileProvider provider, Widget? child) {
                 return Stack(
                   children: [
                     Container(
@@ -51,7 +50,8 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                         child: IconButton(
                           onPressed: widget.user.main()
                               ? () async {
-                            await provider.changeProfilePicture(context, widget.user);
+                                  await provider.changeProfilePicture(
+                                      context, widget.user);
                                 }
                               : null,
                           icon: const Icon(
@@ -63,39 +63,37 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                       ),
                   ],
                 );
-              }
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.user.name,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+              }),
+              const SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.user.name,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '@${widget.user.username}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
+                  const SizedBox(height: 8),
+                  Text(
+                    '@${widget.user.username}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            if (!widget.user.main()) const Spacer(),
-            if (!widget.user.main())
-              Container(
-                  height: 75,
-                  alignment: Alignment.topCenter,
-                  child: const NotificationButton()),
-          ],
-        );
-      }
-    );
+                ],
+              ),
+              if (!widget.user.main()) const Spacer(),
+              if (!widget.user.main())
+                Container(
+                    height: 75,
+                    alignment: Alignment.topCenter,
+                    child: const NotificationButton()),
+            ],
+          );
+        });
   }
 }
