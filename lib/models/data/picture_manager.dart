@@ -34,7 +34,7 @@ class PictureManager {
   }
 
   static Future<void> showChoiceDialog(
-      BuildContext context, Function(CroppedFile?) function) async {
+      BuildContext context, String? imageUrl) async {
     await _askCameraPermission();
     if (context.mounted) {
       showDialog(
@@ -48,14 +48,14 @@ class PictureManager {
                   GestureDetector(
                     child: const Text("Gallery"),
                     onTap: () async {
-                      await _pickImage(ImageSource.gallery, context, function);
+                      await _pickImage(ImageSource.gallery, imageUrl);
                     },
                   ),
                   const Padding(padding: EdgeInsets.all(8.0)),
                   GestureDetector(
                     child: const Text("Camera"),
                     onTap: () async {
-                      await _pickImage(ImageSource.camera, context, function);
+                      await _pickImage(ImageSource.camera, imageUrl);
                     },
                   ),
                 ],
@@ -67,8 +67,11 @@ class PictureManager {
     }
   }
 
-  static Future<void> _pickImage(ImageSource source, BuildContext context,
-      Function(CroppedFile?) function) async {
+  static Future<void> cameraPicture(String? imageUrl) async {
+    await _pickImage(ImageSource.camera, imageUrl);
+  }
+
+  static Future<void> _pickImage(ImageSource source, String? imageUrl) async {
     final pickedImage =
         await ImagePicker().pickImage(source: source, imageQuality: 10);
 
@@ -91,7 +94,7 @@ class PictureManager {
         ],
       );
 
-      await function(croppedFile);
+      imageUrl = croppedFile!.path;
     }
   }
 }

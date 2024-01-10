@@ -27,7 +27,12 @@ class HostListening {
           DataManager.getList(snapshot, Constants.hostingDoc);
       debugPrint('(HostListening): $connectedIds');
 
-      if (_hasHostStoppedHosting(connectedIds, host)) {
+      if (_hasPictureBeenTaken(connectedIds)) {
+        _handlePictureTaken(host, connectedIds);
+      }
+      if (_isHostTakingPicture(connectedIds)) {
+        _handleHostTakingPicture(host);
+      } else if (_hasHostStoppedHosting(connectedIds, host)) {
         _handleHostStoppedHosting(context);
       } else {
         await _updateUsersList(connectedIds, context, host);
@@ -38,8 +43,26 @@ class HostListening {
     }
   }
 
+  static bool _hasPictureBeenTaken(List<dynamic> connectedIds) {
+    return connectedIds.first.toString().startsWith(Constants.pictureMarker);
+  }
+
+  static bool _isHostTakingPicture(List<dynamic> connectedIds) {
+    return connectedIds.first == Constants.pictureState;
+  }
+
+  static void _handleHostTakingPicture(Host host) {
+    host.state = HostState.picture;
+  }
+
   static bool _hasHostStoppedHosting(List<dynamic> connectedIds, Host host) {
     return !host.main() && connectedIds.isEmpty;
+  }
+
+  static void _handlePictureTaken(Host host, List<dynamic> connectedIds) {
+    host.imageUrl = connectedIds.first
+        .toString()
+        .substring('${Constants.pictureMarker}:'.length + 1);
   }
 
   static void _handleHostStoppedHosting(BuildContext context) {

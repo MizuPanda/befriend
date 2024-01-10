@@ -1,20 +1,22 @@
+import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/objects/bubble.dart';
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/data/friend_manager.dart';
 import 'package:befriend/models/objects/friendship.dart';
+import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 
 class DataQuery {
-  static final FirebaseFirestore _fb = FirebaseFirestore.instance;
+  static Future<void> updateDocument(String docId, dynamic data) async {
+    await Constants.usersCollection
+        .doc(AuthenticationManager.id())
+        .update(<String, dynamic>{docId: data});
+  }
 
   static Future<void> updateAvatar(String downloadUrl) async {
-    _fb
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser?.uid)
-        .update(<String, dynamic>{"avatar": downloadUrl});
+    await updateDocument(Constants.avatarDoc, downloadUrl);
   }
 
   static Future<List<Friendship>> friendList(
@@ -36,9 +38,7 @@ class DataQuery {
     return friendships;
   }
 
-  static Future<ImageProvider> getAvatarImage(String downloadUrl) async {
-    //HERE IS WHERE I SHOULD MANAGE AVATAR URL = NULL
-
+  static Future<ImageProvider> getNetworkImage(String downloadUrl) async {
     final ref = FirebaseStorage.instance.refFromURL(downloadUrl);
     final url = await ref.getDownloadURL();
 

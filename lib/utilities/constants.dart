@@ -11,9 +11,11 @@ class Constants {
   static const String friendsDoc = 'friends';
   static const String powerDoc = 'power';
   static const String hostingDoc = 'hosting';
+  static const String sliderDoc = 'sliderValue';
 
   static const String progressDoc = 'progress';
   static const String levelDoc = 'level';
+
   static String newPics(int userIndex) {
     return 'newPics$userIndex';
   }
@@ -26,4 +28,7 @@ class Constants {
   static const double pictureDialogWidth = 350;
   static const double pictureDialogHeight = 450;
   static const double pictureDialogAvatarSize = 30;
+
+  static const String pictureState = 'picture';
+  static const String pictureMarker = 'pic';
 }

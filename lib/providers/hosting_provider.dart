@@ -1,36 +1,32 @@
 import 'dart:async';
 
 import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/models/data/data_query.dart';
+import 'package:befriend/models/data/picture_manager.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/host.dart';
 import 'package:befriend/models/qr/host_listening.dart';
+import 'package:befriend/models/qr/qr.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 import '../models/objects/bubble.dart';
-import '../views/widgets/home/picture/rounded_dialog.dart';
 
 class HostingProvider extends ChangeNotifier {
   late Host _host;
 
   StreamSubscription<DocumentSnapshot>? _stream;
 
-  void showQRCodeDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // Replace 'yourQRCodeData' with the data you want to encode
-        return RoundedDialog(
-          child: QrImageView(
-            data: '${Constants.appID}.${_host.host.id}',
-            version: QrVersions.auto,
-            size: 300.0,
-          ),
-        );
-      },
-    );
+  Image image() {
+    return Image(
+        image: NetworkImage(
+      _host.imageUrl!,
+    ));
+  }
+
+  void showQR(BuildContext context) {
+    QR.showQRCodeDialog(context, '${Constants.appID}.${_host.host.id}');
   }
 
   Future<String> startingHost(BuildContext context) async {
@@ -56,16 +52,37 @@ class HostingProvider extends ChangeNotifier {
   }
 
   //region DATA
-  bool main() {
-    return _host.main();
+  bool imageNull() {
+    return _host.imageUrl == null;
   }
 
-  bool indexMain(int index) {
-    return index != 0;
+  List<String> joinerIDS() {
+    List<String> ids = [];
+    for (Bubble bubble in _host.joiners) {
+      ids.add(bubble.id);
+    }
+
+    return ids;
+  }
+
+  Bubble bubbleFromId(String id) {
+    return _host.joiners.firstWhere((bubble) => bubble.id == id);
+  }
+
+  bool isUser(String id) {
+    return _host.user.id == id;
+  }
+
+  bool isMain() {
+    return _host.main();
   }
 
   Bubble bubble(int index) {
     return _host.joiners[index];
+  }
+
+  HostState state() {
+    return _host.state;
   }
 
   String hostUsername() {
@@ -104,7 +121,7 @@ class HostingProvider extends ChangeNotifier {
           .update({Constants.hostingDoc: List.empty()});
     } else {
       debugPrint('(HostingProvider): Stopping joining');
-      await leaveHost();
+      await _leaveHost();
     }
     await _stream?.cancel();
   }
@@ -122,12 +139,28 @@ class HostingProvider extends ChangeNotifier {
   }
 
   /// JOINER: Removes the user from the list of the connected users.
-  Future<void> leaveHost() async {
+  Future<void> _leaveHost() async {
     if (_host.joiners.contains(_host.user)) {
       await Constants.usersCollection.doc(_host.host.id).update({
         Constants.hostingDoc:
             FieldValue.arrayRemove([AuthenticationManager.id()])
       });
     }
+  }
+
+  Future<void> takePicture() async {
+    await Constants.usersCollection
+        .doc(_host.host.id)
+        .update({Constants.hostingDoc: [Constants.pictureState]});
+
+    await pictureProcess();
+  }
+
+  Future<void> pictureProcess() async {
+    String? imageUrl;
+    await PictureManager.cameraPicture(imageUrl);
+    List<String> pictureUrl = ['${Constants.pictureMarker}:${imageUrl!}'];
+
+    await DataQuery.updateDocument(Constants.hostingDoc, pictureUrl);
   }
 }

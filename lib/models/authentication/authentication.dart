@@ -71,7 +71,8 @@ class AuthenticationManager {
         Constants.avatarDoc: '',
         Constants.friendsDoc: List.empty(),
         Constants.powerDoc: 0,
-        Constants.hostingDoc: List.empty()
+        Constants.hostingDoc: List.empty(),
+        Constants.sliderDoc: 0
       };
 
       final DocumentReference userDoc =

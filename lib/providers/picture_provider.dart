@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:befriend/models/data/picture_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_cropper/image_cropper.dart';
 
 import '../models/data/picture_query.dart';
 import '../models/data/user_manager.dart';
@@ -23,15 +22,11 @@ class PictureSignProvider extends ChangeNotifier {
   }
 
   Future<void> retrieveImage(BuildContext context) async {
-    await PictureManager.showChoiceDialog(context, _retrievePath);
+    await PictureManager.showChoiceDialog(context, _imagePath);
     notifyListeners();
     if (context.mounted) {
       GoRouter.of(context).pop();
     }
-  }
-
-  void _retrievePath(CroppedFile? file) async {
-    _imagePath = file!.path;
   }
 
   Future<void> continueHome(BuildContext context) async {

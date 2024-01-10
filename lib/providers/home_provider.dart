@@ -124,7 +124,7 @@ class HomeProvider extends ChangeNotifier {
     debugPrint('Signing out');
     await FirebaseAuth.instance.signOut();
     if (context.mounted) {
-      GoRouter.of(context).go('/login');
+      GoRouter.of(context).pushReplacement('/login');
     }
   }
 }

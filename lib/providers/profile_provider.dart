@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -7,15 +6,17 @@ import '../models/objects/bubble.dart';
 import '../models/data/picture_manager.dart';
 
 class ProfileProvider extends ChangeNotifier {
+  String? _imageUrl;
   Future<void> changeProfilePicture(BuildContext context, Bubble bubble) async {
-    await PictureManager.showChoiceDialog(context, (CroppedFile? file) {
-      _loadPictureChange(context, file, bubble);
-    });
+    await PictureManager.showChoiceDialog(context, _imageUrl);
+    if (context.mounted) {
+      await _loadPictureChange(context, _imageUrl, bubble);
+    }
   }
 
   Future<void> _loadPictureChange(
-      BuildContext context, CroppedFile? file, Bubble bubble) async {
-    if (file == null) {
+      BuildContext context, String? imageUrl, Bubble bubble) async {
+    if (_imageUrl == null) {
       if (context.mounted) {
         showTopSnackBar(
             Overlay.of(context),
@@ -27,7 +28,7 @@ class ProfileProvider extends ChangeNotifier {
       }
     } else {
       debugPrint('Changing avatar...');
-      bubble.avatar = await PictureManager.changeMainPicture(file.path);
+      bubble.avatar = await PictureManager.changeMainPicture(_imageUrl!);
       notifyListeners();
     }
   }

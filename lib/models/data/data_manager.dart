@@ -39,7 +39,7 @@ class DataManager {
   static Future<ImageProvider> getAvatar(DocumentSnapshot snapshot) async {
     String avatarUrl = getString(snapshot, Constants.avatarDoc);
 
-    return await DataQuery.getAvatarImage(avatarUrl);
+    return await DataQuery.getNetworkImage(avatarUrl);
   }
 
   static num getNumber(DocumentSnapshot snapshot, String id) {

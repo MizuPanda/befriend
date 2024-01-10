@@ -37,7 +37,7 @@ class UserManager {
         List<Friendship> friendList =
             await DataQuery.friendList(docs.id, friendIDs);
 
-        ImageProvider avatar = await DataQuery.getAvatarImage(avatarUrl);
+        ImageProvider avatar = await DataQuery.getNetworkImage(avatarUrl);
         _instance = Bubble.fromMapWithFriends(docs, avatar, friendList);
       } catch (e) {
         debugPrint('(UserManager): ${e.toString()}');
@@ -55,7 +55,7 @@ class UserManager {
   }
 
   static Future<ImageProvider> refreshAvatar() async {
-    _instance!.avatar = await DataQuery.getAvatarImage(_instance!.avatarUrl);
+    _instance!.avatar = await DataQuery.getNetworkImage(_instance!.avatarUrl);
     return _instance!.avatar;
   }
 }

@@ -1,11 +1,12 @@
-import 'package:befriend/providers/hosting_provider.dart';
-import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/views/widgets/users/profile_photo.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../models/objects/bubble.dart';
+import '../../../../models/objects/host.dart';
+import '../../../../providers/hosting_provider.dart';
+import '../../../../utilities/constants.dart';
+import 'columns/hosting.dart';
+import 'columns/picture.dart';
 
 class HostingWidget extends StatefulWidget {
   final bool isHost;
@@ -24,6 +25,8 @@ class _HostingWidgetState extends State<HostingWidget> {
 
   @override
   void initState() {
+    super.initState();
+
     BuildContext? myContext;
     if (widget.key is GlobalKey<ScaffoldState>) {
       myContext =
@@ -32,7 +35,6 @@ class _HostingWidgetState extends State<HostingWidget> {
     _hostingFuture = widget.isHost
         ? _provider.startingHost(myContext ?? context)
         : _provider.startingJoiner(widget.host!, myContext ?? context);
-    super.initState();
   }
 
   @override
@@ -56,92 +58,25 @@ class _HostingWidgetState extends State<HostingWidget> {
                   if (snapshot.hasData) {
                     return Stack(
                       children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            SizedBox(
-                              width: Constants.pictureDialogWidth - 100,
-                              child: Text(
-                                '${provider.hostUsername()} is taking the picture!',
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.openSans(
-                                    textStyle: const TextStyle(
-                                  fontSize: 20,
-                                )),
-                                maxLines: 2,
-                              ),
-                            ),
-                            Expanded(
-                                child: ListView.builder(
-                              itemCount: provider.length(),
-                              itemBuilder: (context, index) {
-                                return Builder(builder: (context) {
-                                  if (provider.main() &&
-                                      provider.indexMain(index)) {
-                                    return ListTile(
-                                      leading: ProfilePhoto(
-                                        user: provider.bubble(index),
-                                        radius:
-                                            Constants.pictureDialogAvatarSize,
-                                      ),
-                                      title: Text(provider.name(index)),
-                                      subtitle: Text(provider.username(index)),
-                                      trailing: IconButton(
-                                        onPressed: () async {
-                                          await provider.deleteUser(index);
-                                        },
-                                        icon: const Icon(
-                                          Icons.delete_rounded,
-                                          color: Colors.red,
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    return ListTile(
-                                      leading: ProfilePhoto(
-                                        user: provider.bubble(index),
-                                        radius:
-                                            Constants.pictureDialogAvatarSize,
-                                      ),
-                                      title: Text(provider.name(index)),
-                                      subtitle: Text(provider.username(index)),
-                                    );
-                                  }
-                                });
-                              },
-                            )),
-                            if (provider.main())
-                              Container(
-                                alignment: Alignment.bottomRight,
-                                padding: const EdgeInsets.all(10),
-                                child: TextButton(
-                                  onPressed: provider.length() >= 2
-                                      ? () {
-                                          //TAKE THE PICTURE
-                                        }
-                                      : null,
-                                  child: Text(
-                                    'Take the picture',
-                                    style: GoogleFonts.openSans(
-                                        textStyle:
-                                            const TextStyle(fontSize: 16)),
-                                  ),
-                                ),
-                              )
-                          ],
-                        ),
-                        if (provider.main())
+                        Builder(builder: (
+                          BuildContext context,
+                        ) {
+                          switch (provider.state()) {
+                            case HostState.hosting:
+                              return const HostingColumn();
+                            case HostState.picture:
+                              return const PictureColumn();
+                          }
+                        }),
+                        if (provider.isMain() &&
+                            provider.state() == HostState.hosting)
                           Positioned(
                             top: 5,
                             right: 5,
                             child: IconButton(
                               icon: const Icon(Icons.qr_code), // QR code icon
                               onPressed: () {
-                                provider.showQRCodeDialog(context);
+                                provider.showQR(context);
                               },
                             ),
                           ),
@@ -157,3 +92,5 @@ class _HostingWidgetState extends State<HostingWidget> {
         }));
   }
 }
+
+//
