@@ -22,11 +22,10 @@ class PictureSignProvider extends ChangeNotifier {
   }
 
   Future<void> retrieveImage(BuildContext context) async {
-    await PictureManager.showChoiceDialog(context, _imagePath);
+    await PictureManager.showChoiceDialog(context, (String? url) {
+      _imagePath = url;
+    });
     notifyListeners();
-    if (context.mounted) {
-      GoRouter.of(context).pop();
-    }
   }
 
   Future<void> continueHome(BuildContext context) async {

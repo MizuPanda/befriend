@@ -6,41 +6,35 @@ import '../../views/widgets/home/bubble/bubble_widget.dart';
 import 'bubble.dart';
 
 class Home {
-  late Bubble? main;
+  late Bubble user;
   late Friendship? friendship;
   final bool connectedHome;
 
   Home(
       {required this.connectedHome,
-      required this.main,
+      required this.user,
       required this.friendship});
 
   factory Home.fromUser(Bubble user) {
-    return Home(connectedHome: true, main: user, friendship: null);
+    return Home(connectedHome: true, user: user, friendship: null);
   }
 
   factory Home.fromFriendship(Friendship friendship) {
-    return Home(connectedHome: false, main: null, friendship: friendship);
-  }
-  Bubble user() {
-    if (connectedHome) {
-      return main!;
-    }
-    return friendship!.friend;
+    return Home(
+        connectedHome: false, user: friendship.friend, friendship: friendship);
   }
 
   void initializePositions() {
-    Bubble main = user();
     Random rand = Random();
 
-    for (Friendship friendship in main.friendships) {
+    for (Friendship friendship in user.friendships) {
       Bubble friend = friendship.friend;
       friend.x = rand.nextDouble() * friendship.distance(); // x=6
       friend.y = sqrt(pow(friendship.distance(), 2) -
           pow(friend.x, 2)); //100 - 36 = 64, y = 8
 
-      friend.x += (main.size + friend.size / 2) / 2 + BubbleWidget.textHeight;
-      friend.y += (main.size + friend.size / 2) / 2 + BubbleWidget.textHeight;
+      friend.x += (user.size + friend.size / 2) / 2 + BubbleWidget.textHeight;
+      friend.y += (user.size + friend.size / 2) / 2 + BubbleWidget.textHeight;
 
       if (rand.nextBool()) {
         friend.x *= -1;
@@ -56,15 +50,14 @@ class Home {
   void _avoidOverlapping() {
     bool overlapping = true;
 
-    Bubble homeUser = user();
-    homeUser.friendships.sort((a, b) => a.distance().compareTo(b.distance()));
+    user.friendships.sort((a, b) => a.distance().compareTo(b.distance()));
     while (overlapping) {
       overlapping = false;
-      for (var i = 0; i < homeUser.friendships.length; i++) {
-        final bubble = homeUser.friendships[i].friend;
+      for (var i = 0; i < user.friendships.length; i++) {
+        final bubble = user.friendships[i].friend;
 
-        for (var j = i + 1; j < homeUser.friendships.length; j++) {
-          final otherBubble = homeUser.friendships[j].friend;
+        for (var j = i + 1; j < user.friendships.length; j++) {
+          final otherBubble = user.friendships[j].friend;
           final dx = otherBubble.x - bubble.x;
           final dy = otherBubble.y - bubble.y;
           final distance = otherBubble.point().distanceTo(bubble.point());

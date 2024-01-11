@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/objects/friendship.dart';
@@ -10,12 +12,6 @@ import '../objects/bubble.dart';
 
 class UserManager {
   static Bubble? _instance;
-
-  static Future<Friendship> findInList(Bubble friend) async {
-    Bubble user = await getInstance();
-    return user.friendships
-        .firstWhere((friendship) => friendship.friend == friend);
-  }
 
   static Future<Home> userHome() async {
     Bubble homeUser = await getInstance();
@@ -51,11 +47,11 @@ class UserManager {
   /// It is necessary to refresh the player object after the player data has been
   /// changed.
   static void refreshPlayer() {
-    _instance == null;
+    _instance = null;
   }
 
-  static Future<ImageProvider> refreshAvatar() async {
-    _instance!.avatar = await DataQuery.getNetworkImage(_instance!.avatarUrl);
+  static Future<ImageProvider> refreshAvatar(File file) async {
+    _instance!.avatar = Image.file(file).image;
     return _instance!.avatar;
   }
 }

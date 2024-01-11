@@ -7,16 +7,13 @@ import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class DataQuery {
   static Future<void> updateDocument(String docId, dynamic data) async {
     await Constants.usersCollection
         .doc(AuthenticationManager.id())
         .update(<String, dynamic>{docId: data});
-  }
-
-  static Future<void> updateAvatar(String downloadUrl) async {
-    await updateDocument(Constants.avatarDoc, downloadUrl);
   }
 
   static Future<List<Friendship>> friendList(
@@ -39,6 +36,9 @@ class DataQuery {
   }
 
   static Future<ImageProvider> getNetworkImage(String downloadUrl) async {
+    if (downloadUrl.isEmpty) {
+      return Image.asset('assets/account_circle.png').image;
+    }
     final ref = FirebaseStorage.instance.refFromURL(downloadUrl);
     final url = await ref.getDownloadURL();
 

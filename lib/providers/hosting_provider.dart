@@ -158,7 +158,9 @@ class HostingProvider extends ChangeNotifier {
 
   Future<void> pictureProcess() async {
     String? imageUrl;
-    await PictureManager.cameraPicture(imageUrl);
+    await PictureManager.cameraPicture((String? url) {
+      imageUrl = url;
+    });
     List<String> pictureUrl = ['${Constants.pictureMarker}:${imageUrl!}'];
 
     await DataQuery.updateDocument(Constants.hostingDoc, pictureUrl);

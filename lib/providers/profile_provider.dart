@@ -7,29 +7,33 @@ import '../models/data/picture_manager.dart';
 
 class ProfileProvider extends ChangeNotifier {
   String? _imageUrl;
-  Future<void> changeProfilePicture(BuildContext context, Bubble bubble) async {
-    await PictureManager.showChoiceDialog(context, _imageUrl);
+  Future<void> changeProfilePicture(
+      BuildContext context, Bubble bubble, Function notifyParent) async {
+    await PictureManager.showChoiceDialog(context, (String? url) {
+      _imageUrl = url;
+    });
     if (context.mounted) {
-      await _loadPictureChange(context, _imageUrl, bubble);
+      await _loadPictureChange(context, _imageUrl, bubble, notifyParent);
     }
   }
 
-  Future<void> _loadPictureChange(
-      BuildContext context, String? imageUrl, Bubble bubble) async {
+  Future<void> _loadPictureChange(BuildContext context, String? imageUrl,
+      Bubble bubble, Function notifyParent) async {
     if (_imageUrl == null) {
       if (context.mounted) {
         showTopSnackBar(
             Overlay.of(context),
             const CustomSnackBar.error(
               maxLines: 1,
-              message: "Something went wrong",
+              message: "Picture change cancelled",
             ),
             snackBarPosition: SnackBarPosition.bottom);
       }
     } else {
       debugPrint('Changing avatar...');
-      bubble.avatar = await PictureManager.changeMainPicture(_imageUrl!);
+      await PictureManager.changeMainPicture(_imageUrl!, bubble);
       notifyListeners();
+      notifyParent();
     }
   }
 }

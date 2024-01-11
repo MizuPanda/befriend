@@ -8,11 +8,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../providers/picture_provider.dart';
+import '../objects/bubble.dart';
 
 class PictureManager {
-  static Future<ImageProvider> changeMainPicture(String path) async {
-    await PictureQuery.uploadAvatar(File(path));
-    return await UserManager.refreshAvatar();
+  static Future<void> changeMainPicture(String path, Bubble bubble) async {
+    File file = File(path);
+
+    String? downloadUrl = await PictureQuery.uploadAvatar(file);
+    if (downloadUrl != null) {
+      bubble.avatar = await UserManager.refreshAvatar(file);
+    }
   }
 
   static Image image(String? imagePath) {
@@ -21,6 +26,7 @@ class PictureManager {
 
   static Future<void> _askCameraPermission() async {
     bool isGranted = await Permission.camera.isGranted;
+
     if (!isGranted) {
       await Permission.camera
           .onDeniedCallback(() {})
@@ -34,10 +40,11 @@ class PictureManager {
   }
 
   static Future<void> showChoiceDialog(
-      BuildContext context, String? imageUrl) async {
+      BuildContext context, Function(String?) onImageSelected) async {
     await _askCameraPermission();
+
     if (context.mounted) {
-      showDialog(
+      await showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -48,14 +55,20 @@ class PictureManager {
                   GestureDetector(
                     child: const Text("Gallery"),
                     onTap: () async {
-                      await _pickImage(ImageSource.gallery, imageUrl);
+                      await _pickImage(ImageSource.gallery, onImageSelected);
+                      if (context.mounted) {
+                        Navigator.of(context).pop(); // Close the dialog
+                      }
                     },
                   ),
                   const Padding(padding: EdgeInsets.all(8.0)),
                   GestureDetector(
                     child: const Text("Camera"),
                     onTap: () async {
-                      await _pickImage(ImageSource.camera, imageUrl);
+                      await _pickImage(ImageSource.camera, onImageSelected);
+                      if (context.mounted) {
+                        Navigator.of(context).pop(); // Close the dialog
+                      }
                     },
                   ),
                 ],
@@ -67,11 +80,12 @@ class PictureManager {
     }
   }
 
-  static Future<void> cameraPicture(String? imageUrl) async {
-    await _pickImage(ImageSource.camera, imageUrl);
+  static Future<void> cameraPicture(Function(String?) onImageSelected) async {
+    await _pickImage(ImageSource.camera, onImageSelected);
   }
 
-  static Future<void> _pickImage(ImageSource source, String? imageUrl) async {
+  static Future<void> _pickImage(
+      ImageSource source, Function(String?) onImageSelected) async {
     final pickedImage =
         await ImagePicker().pickImage(source: source, imageQuality: 10);
 
@@ -94,7 +108,7 @@ class PictureManager {
         ],
       );
 
-      imageUrl = croppedFile!.path;
+      onImageSelected(croppedFile!.path);
     }
   }
 }

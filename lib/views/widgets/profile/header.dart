@@ -2,17 +2,17 @@ import 'package:befriend/providers/profile_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../models/objects/bubble.dart';
+import '../../../models/objects/profile.dart';
 import '../users/profile_photo.dart';
 import 'notification_button.dart';
 
 class ProfileHeader extends StatefulWidget {
   const ProfileHeader({
     super.key,
-    required this.user,
+    required this.profile,
   });
 
-  final Bubble user;
+  final Profile profile;
 
   @override
   State<ProfileHeader> createState() => _ProfileHeaderState();
@@ -40,18 +40,20 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                         ),
                         child: ProfilePhoto(
                           radius: 50,
-                          user: widget.user,
+                          user: widget.profile.user,
                         )),
-                    if (widget.user.main())
+                    if (widget.profile.user.main())
                       Container(
                         alignment: Alignment.topRight,
                         width: 140,
                         height: 100,
                         child: IconButton(
-                          onPressed: widget.user.main()
+                          onPressed: widget.profile.user.main()
                               ? () async {
                                   await provider.changeProfilePicture(
-                                      context, widget.user);
+                                      context,
+                                      widget.profile.user,
+                                      widget.profile.notifyParent);
                                 }
                               : null,
                           icon: const Icon(
@@ -69,7 +71,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.user.name,
+                    widget.profile.user.name,
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 24,
@@ -78,7 +80,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '@${widget.user.username}',
+                    '@${widget.profile.user.username}',
                     style: const TextStyle(
                       fontSize: 16,
                       color: Colors.grey,
@@ -86,8 +88,8 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                   ),
                 ],
               ),
-              if (!widget.user.main()) const Spacer(),
-              if (!widget.user.main())
+              if (!widget.profile.user.main()) const Spacer(),
+              if (!widget.profile.user.main())
                 Container(
                     height: 75,
                     alignment: Alignment.topCenter,

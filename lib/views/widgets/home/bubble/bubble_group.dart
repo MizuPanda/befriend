@@ -20,7 +20,7 @@ class BubbleGroupWidget extends StatelessWidget {
           ShakeableBubble(
             specificHome: provider.home,
           ),
-          for (Friendship friendship in provider.home.user().friendships)
+          for (Friendship friendship in provider.home.user.friendships)
             Transform.translate(
                 offset: Offset(friendship.friend.x, friendship.friend.y),
                 child: Builder(builder: (context) {

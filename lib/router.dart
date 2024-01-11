@@ -1,3 +1,4 @@
+import 'package:befriend/models/objects/profile.dart';
 import 'package:befriend/views/pages/forgot_pass_page.dart';
 import 'package:befriend/views/pages/home_page.dart';
 import 'package:befriend/views/pages/login_page.dart';
@@ -8,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'main.dart';
-import 'models/objects/bubble.dart';
 import 'models/objects/home.dart';
 
 class MyRouter {
@@ -31,7 +31,7 @@ class MyRouter {
               path: 'profile',
               pageBuilder: (context, state) {
                 return MaterialPage(
-                    child: ProfilePage(user: state.extra as Bubble));
+                    child: ProfilePage(profile: state.extra as Profile));
               },
             ),
             GoRoute(

@@ -35,7 +35,7 @@ class _SearchButtonState extends State<SearchButton> {
           },
           textController: _textEditingController,
           onSubmitted: (String username) {
-            for (Friendship friendship in provider.home.user().friendships) {
+            for (Friendship friendship in provider.home.user.friendships) {
               if (friendship.friend.username == username ||
                   friendship.friend.name == username) {
                 Bubble searchedBubble = friendship.friend;

@@ -1,4 +1,5 @@
 import 'package:befriend/models/data/data_query.dart';
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
@@ -27,25 +28,25 @@ class HomeProvider extends ChangeNotifier {
   Listenable get listenable => _listenable;
   double get scaleFactor => _scaleFactor;
 
+  void notify() {
+    notifyListeners();
+  }
+
   Future<List<Friendship>> loadFriendships() async {
-    if (!home.user().friendshipsLoaded) {
-      home.user().friendships =
-          await DataQuery.friendList(home.user().id, home.user().friendIDs);
-      home.user().friendshipsLoaded = true;
+    if (!home.user.friendshipsLoaded) {
+      home.user.friendships =
+          await DataQuery.friendList(home.user.id, home.user.friendIDs);
+      home.user.friendshipsLoaded = true;
       home.initializePositions();
     }
 
-    return home.user().friendships;
+    return home.user.friendships;
   }
 
   Offset pageOffset() {
     return _animationType == _AnimationType.reset
         ? _position * (1 - _animation.value)
         : _offsetAnimation.value;
-  }
-
-  List<Friendship> friendships() {
-    return home.user().friendships;
   }
 
   HomeProvider({required this.home});
@@ -123,6 +124,7 @@ class HomeProvider extends ChangeNotifier {
   Future<void> signOut(BuildContext context) async {
     debugPrint('Signing out');
     await FirebaseAuth.instance.signOut();
+    UserManager.refreshPlayer();
     if (context.mounted) {
       GoRouter.of(context).pushReplacement('/login');
     }

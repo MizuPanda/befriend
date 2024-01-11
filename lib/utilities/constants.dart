@@ -24,6 +24,8 @@ class Constants {
       _firestore.collection('friendships');
   static final CollectionReference usersCollection =
       _firestore.collection('users');
+  static final CollectionReference dataCollection =
+      _firestore.collection('data');
 
   static const double pictureDialogWidth = 350;
   static const double pictureDialogHeight = 450;

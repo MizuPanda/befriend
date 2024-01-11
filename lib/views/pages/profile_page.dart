@@ -1,15 +1,15 @@
 import 'package:befriend/views/widgets/befriend_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/objects/bubble.dart';
+import '../../models/objects/profile.dart';
 import '../widgets/profile/header.dart';
 import '../widgets/profile/pictures.dart';
 import '../widgets/profile/state.dart';
 
 class ProfilePage extends StatelessWidget {
-  final Bubble user;
+  final Profile profile;
 
-  const ProfilePage({super.key, required this.user});
+  const ProfilePage({super.key, required this.profile});
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +27,11 @@ class ProfilePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ProfileHeader(user: user),
+                  ProfileHeader(
+                    profile: profile,
+                  ),
                   const SizedBox(height: 16),
-                  ProfileState(user: user),
+                  ProfileState(user: profile.user),
                 ],
               ),
             ),
@@ -44,7 +46,7 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
             ProfilePictures(
-              user: user,
+              user: profile.user,
             ),
           ],
         ),

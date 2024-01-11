@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //return const MaterialApp(home: PictureSignPage());
+
     return MaterialApp.router(
         routerDelegate: MyRouter.router.routerDelegate,
         routeInformationParser: MyRouter.router.routeInformationParser,

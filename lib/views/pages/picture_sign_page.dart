@@ -11,12 +11,10 @@ class PictureSignPage extends StatefulWidget {
 }
 
 class _PictureSignPageState extends State<PictureSignPage> {
-  final PictureSignProvider _provider = PictureSignProvider();
-
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-        value: _provider,
+    return ChangeNotifierProvider(
+        create: (_) => PictureSignProvider(),
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: PictureSignProvider.foregroundColor,
@@ -39,7 +37,7 @@ class _PictureSignPageState extends State<PictureSignPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: _provider.imageNull()
+                    padding: provider.imageNull()
                         ? const EdgeInsets.all(50)
                         : EdgeInsets.zero,
                     decoration: BoxDecoration(
@@ -49,7 +47,7 @@ class _PictureSignPageState extends State<PictureSignPage> {
                           color: PictureSignProvider.foregroundColor,
                         )),
                     child: Builder(builder: (context) {
-                      if (_provider.imageNull()) {
+                      if (provider.imageNull()) {
                         return const Icon(
                           Icons.camera_alt_outlined,
                           size: 60.0,
@@ -57,7 +55,7 @@ class _PictureSignPageState extends State<PictureSignPage> {
                         );
                       }
                       return CircleAvatar(
-                          radius: 100, backgroundImage: _provider.image());
+                          radius: 100, backgroundImage: provider.image());
                     }),
                   ),
                   const SizedBox(height: 30.0),
@@ -112,7 +110,7 @@ class _PictureSignPageState extends State<PictureSignPage> {
                           horizontal: 60, vertical: 15),
                     ),
                     onPressed: () async {
-                      await _provider.retrieveImage(context);
+                      await provider.retrieveImage(context);
                     },
                     child: const Text('Capture Photo'),
                   ),
@@ -127,7 +125,7 @@ class _PictureSignPageState extends State<PictureSignPage> {
                       children: [
                         TextButton(
                             onPressed: () async {
-                              await _provider.skipHome(context);
+                              await provider.skipHome(context);
                             },
                             child: const Text(
                               'Skip',
@@ -137,15 +135,17 @@ class _PictureSignPageState extends State<PictureSignPage> {
                             )),
                         const Spacer(),
                         TextButton(
-                            onPressed: _provider.imageNull()
+                            onPressed: provider.imageNull()
                                 ? null
                                 : () async {
-                                    await _provider.continueHome(context);
+                                    await provider.continueHome(context);
                                   },
-                            child: const Text(
+                            child: Text(
                               'Confirm',
                               style: TextStyle(
-                                  color: PictureSignProvider.foregroundColor,
+                                  color: provider.imageNull()
+                                      ? Colors.grey
+                                      : PictureSignProvider.foregroundColor,
                                   fontSize: 16),
                             ))
                       ],
