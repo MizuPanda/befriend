@@ -59,12 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 20.0),
                       Row(
                         children: [
-                          OutlinedButton(
-                            style: const ButtonStyle(
-                                shadowColor:
-                                    MaterialStatePropertyAll(Colors.black),
-                                side: MaterialStatePropertyAll(
-                                    BorderSide(width: 1, color: Colors.blue))),
+                          ElevatedButton(
                             onPressed: () {
                               _provider.navigateToSignUp(context);
                             },

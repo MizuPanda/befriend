@@ -93,11 +93,12 @@ class _UserSliderState extends State<UserSlider> {
                 min: 0,
                 max: 100,
                 divisions: 100,
-                onChangeEnd: provider.isUser(bubble.id) ?
-                (newValue) {
-                  widget.userDocument.reference
-                      .update({Constants.sliderDoc: newValue});
-                }: null,
+                onChangeEnd: provider.isUser(bubble.id)
+                    ? (newValue) {
+                        widget.userDocument.reference
+                            .update({Constants.sliderDoc: newValue});
+                      }
+                    : null,
                 onChanged: (double value) {
                   setState(() {
                     sliderValue = value;

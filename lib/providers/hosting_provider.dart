@@ -149,9 +149,9 @@ class HostingProvider extends ChangeNotifier {
   }
 
   Future<void> takePicture() async {
-    await Constants.usersCollection
-        .doc(_host.host.id)
-        .update({Constants.hostingDoc: [Constants.pictureState]});
+    await Constants.usersCollection.doc(_host.host.id).update({
+      Constants.hostingDoc: [Constants.pictureState]
+    });
 
     await pictureProcess();
   }

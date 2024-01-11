@@ -106,7 +106,7 @@ class AuthenticationManager {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       if (context.mounted) {
         GoRouter.of(context)
-            .push('/homepage', extra: await UserManager.userHome());
+            .pushReplacement('/homepage', extra: await UserManager.userHome());
       }
     } on FirebaseAuthException catch (e) {
       debugPrint('(Error): ${e.code}');
