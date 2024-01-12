@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../models/objects/bubble.dart';
-import '../../../../models/objects/host.dart';
 import '../../../../providers/hosting_provider.dart';
 import '../../../../utilities/constants.dart';
-import 'columns/hosting.dart';
-import 'columns/picture.dart';
+import 'hosting.dart';
 
 class HostingWidget extends StatefulWidget {
   final bool isHost;
@@ -58,18 +56,8 @@ class _HostingWidgetState extends State<HostingWidget> {
                   if (snapshot.hasData) {
                     return Stack(
                       children: [
-                        Builder(builder: (
-                          BuildContext context,
-                        ) {
-                          switch (provider.state()) {
-                            case HostState.hosting:
-                              return const HostingColumn();
-                            case HostState.picture:
-                              return const PictureColumn();
-                          }
-                        }),
-                        if (provider.isMain() &&
-                            provider.state() == HostState.hosting)
+                        const HostingColumn(),
+                        if (provider.isMain())
                           Positioned(
                             top: 5,
                             right: 5,

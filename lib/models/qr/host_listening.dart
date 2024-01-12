@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../utilities/constants.dart';
 import '../data/data_manager.dart';
@@ -9,14 +10,18 @@ import '../objects/bubble.dart';
 import '../objects/host.dart';
 
 class HostListening {
+  static bool _isTakingPicture = false;
   static StreamSubscription<DocumentSnapshot> startListening(
       BuildContext context, Host host, Function notifyListeners) {
+    _isTakingPicture = false;
     String hostUserId = host.host.id;
 
     return Constants.usersCollection.doc(hostUserId).snapshots().listen(
           (snapshot) =>
               _processSnapshot(snapshot, context, host, notifyListeners),
-          onError: _handleError,
+          onError: (error) {
+            debugPrint('Error in Firestore subscription: $error');
+          },
         );
   }
 
@@ -29,9 +34,8 @@ class HostListening {
 
       if (_hasPictureBeenTaken(connectedIds)) {
         _handlePictureTaken(host, connectedIds);
-      }
-      if (_isHostTakingPicture(connectedIds)) {
-        _handleHostTakingPicture(host);
+      } else if (_isHostTakingPicture(connectedIds)) {
+        _handleHostTakingPicture(host, context);
       } else if (_hasHostStoppedHosting(connectedIds, host)) {
         _handleHostStoppedHosting(context);
       } else {
@@ -44,29 +48,32 @@ class HostListening {
   }
 
   static bool _hasPictureBeenTaken(List<dynamic> connectedIds) {
-    return connectedIds.first.toString().startsWith(Constants.pictureMarker);
+    return connectedIds.isNotEmpty && connectedIds.first.toString().startsWith(Constants.pictureMarker);
   }
 
   static bool _isHostTakingPicture(List<dynamic> connectedIds) {
-    return connectedIds.first == Constants.pictureState;
-  }
-
-  static void _handleHostTakingPicture(Host host) {
-    host.state = HostState.picture;
+    return connectedIds.isNotEmpty && connectedIds.first.toString() == Constants.pictureState;
   }
 
   static bool _hasHostStoppedHosting(List<dynamic> connectedIds, Host host) {
     return !host.main() && connectedIds.isEmpty;
   }
 
+  static void _handleHostTakingPicture(Host host, BuildContext context) {
+    _isTakingPicture = true;
+    Navigator.of(context).pop();
+
+    GoRouter.of(context).go('/session', extra: host);
+  }
+
   static void _handlePictureTaken(Host host, List<dynamic> connectedIds) {
     host.imageUrl = connectedIds.first
         .toString()
-        .substring('${Constants.pictureMarker}:'.length + 1);
+        .substring(Constants.pictureMarker.length + 1);
   }
 
   static void _handleHostStoppedHosting(BuildContext context) {
-    if (context.mounted) {
+    if (context.mounted && !_isTakingPicture) {
       Navigator.of(context).pop(); // Exiting the picture session
     }
   }
@@ -106,9 +113,5 @@ class HostListening {
         context.mounted) {
       Navigator.of(context).pop(); // Exiting the picture session
     }
-  }
-
-  static void _handleError(Object error) {
-    debugPrint('Error in Firestore subscription: $error');
   }
 }

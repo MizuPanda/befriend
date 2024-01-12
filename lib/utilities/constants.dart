@@ -32,5 +32,5 @@ class Constants {
   static const double pictureDialogAvatarSize = 30;
 
   static const String pictureState = 'picture';
-  static const String pictureMarker = 'pic';
+  static const String pictureMarker = 'pic:';
 }
