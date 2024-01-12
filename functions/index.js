@@ -54,6 +54,10 @@ app.get('/grabAllUsers',async(req,res)=>{
   
 
 
+  res.send({"users":UserList}); 
+});
+
+
 
 
     exports.app = functions.https.onRequest(app);
