@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../../providers/hosting_provider.dart';
-import '../../../../../utilities/constants.dart';
-import '../../../users/profile_photo.dart';
+import '../../../../providers/hosting_provider.dart';
+import '../../../../utilities/constants.dart';
+import '../../users/profile_photo.dart';
 
 class HostingColumn extends StatefulWidget {
   const HostingColumn({super.key});
@@ -80,7 +80,7 @@ class _HostingColumnState extends State<HostingColumn> {
               child: TextButton(
                 onPressed: provider.length() >= 2
                     ? () async {
-                        await provider.takePicture();
+                        await provider.startSession();
                       }
                     : null,
                 child: Text(

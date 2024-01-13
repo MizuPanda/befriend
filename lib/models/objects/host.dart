@@ -4,7 +4,6 @@ class Host {
   Bubble host;
   List<Bubble> joiners;
   Bubble user;
-  HostState state = HostState.hosting;
   String? imageUrl;
 
   Host({required this.host, required this.joiners, required this.user});
@@ -14,7 +13,4 @@ class Host {
   }
 }
 
-enum HostState {
-  hosting,
-  picture,
-}
+
