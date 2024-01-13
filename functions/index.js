@@ -21,8 +21,8 @@ app.use((req, res, next) => {
 
 // url endpoint checks if username is available
 // write links like so:
-// http://127.0.0.1:5001/befriend-b14ca/us-central1/app/checkUsernameAvailability?username="Yassa Taiseer"
-//Node: link will be different.
+// https://us-central1-befriend-b14ca.cloudfunctions.net/app/checkUsernameAvailability?username=01juniel
+//Node: link will be different. Will return either true or false
 app.get('/checkUsernameAvailability',async(req,res)=>{
   
   const username= req.query.username;
@@ -36,7 +36,7 @@ app.get('/checkUsernameAvailability',async(req,res)=>{
   res.send(isUsernameAvailable); 
 });
 
-//
+//grabs all users 
 app.get('/grabAllUsers',async(req,res)=>{
   let UserList = [];
   
