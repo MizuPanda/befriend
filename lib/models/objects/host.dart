@@ -12,5 +12,3 @@ class Host {
     return host == user;
   }
 }
-
-

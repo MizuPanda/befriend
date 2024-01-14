@@ -14,27 +14,33 @@ class UserSlidersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (BuildContext context, SessionProvider provider, Widget? child) {
-        return StreamBuilder(
-            stream: Constants.usersCollection
-                .where(FieldPath.documentId, whereIn: provider.ids)
-                .snapshots(),
-            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (!snapshot.hasData) return const CircularProgressIndicator();
+    return Consumer(builder:
+        (BuildContext context, SessionProvider provider, Widget? child) {
+      return StreamBuilder(
+          stream: Constants.usersCollection
+              .where(FieldPath.documentId, whereIn: provider.ids)
+              .snapshots(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (!snapshot.hasData) return const CircularProgressIndicator();
 
-              return ListView(
-                children: snapshot.data!.docs.map((userDocument) {
-                  return UserSlider(
-                    bubble: provider.bubble(userDocument.id)!,
-                    sliderValue: provider.sliderValue(userDocument),
-                    reference: userDocument.reference,
+            return FutureBuilder(
+                future: provider.processSnapshot(snapshot.data!, context),
+                builder: (
+                  BuildContext context,
+                  _,
+                ) {
+                  return ListView(
+                    children: snapshot.data!.docs.map((userDocument) {
+                      return UserSlider(
+                        bubble: provider.bubble(userDocument.id)!,
+                        sliderValue: provider.sliderValue(userDocument),
+                        reference: userDocument.reference,
+                      );
+                    }).toList(),
                   );
-                }).toList(),
-              );
-            });
-      }
-    );
+                });
+          });
+    });
   }
 }
 
@@ -44,7 +50,10 @@ class UserSlider extends StatefulWidget {
   final DocumentReference reference;
 
   const UserSlider({
-    super.key, required this.bubble, required this.sliderValue, required this.reference,
+    super.key,
+    required this.bubble,
+    required this.sliderValue,
+    required this.reference,
   });
 
   @override
@@ -56,6 +65,7 @@ class _UserSliderState extends State<UserSlider> {
 
   @override
   void initState() {
+    sliderValue = widget.sliderValue;
     super.initState();
   }
 
@@ -63,10 +73,10 @@ class _UserSliderState extends State<UserSlider> {
   Widget build(BuildContext context) {
     return Consumer<SessionProvider>(builder:
         (BuildContext context, SessionProvider provider, Widget? child) {
-      if(!provider.isUser(widget.bubble.id)) {
+      if (!provider.isUser(widget.bubble.id)) {
         sliderValue = widget.sliderValue;
       }
-          return Container(
+      return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
         child: Row(
           children: [
@@ -98,19 +108,19 @@ class _UserSliderState extends State<UserSlider> {
                 divisions: 100,
                 onChanged: provider.isUser(widget.bubble.id)
                     ? (double value) {
-                    setState(() {
-                      sliderValue = value;
-                    });
-                }
+                        setState(() {
+                          sliderValue = value;
+                        });
+                      }
                     : null,
                 onChangeEnd: provider.isUser(widget.bubble.id)
                     ? (double value) async {
-                  // Debounce logic here if needed
-                  await widget.reference.update({Constants.sliderDoc: value});
-                }
+                        // Debounce logic here if needed
+                        await widget.reference
+                            .update({Constants.sliderDoc: value});
+                      }
                     : null,
               ),
-
             )
           ],
         ),

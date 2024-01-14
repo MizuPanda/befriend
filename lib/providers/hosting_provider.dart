@@ -57,6 +57,7 @@ class HostingProvider extends ChangeNotifier {
   String hostUsername() {
     return _host.host.username;
   }
+
   int length() {
     return _host.joiners.length;
   }
@@ -121,8 +122,5 @@ class HostingProvider extends ChangeNotifier {
     await Constants.usersCollection.doc(_host.host.id).update({
       Constants.hostingDoc: [Constants.pictureState]
     });
-
   }
-
-
 }

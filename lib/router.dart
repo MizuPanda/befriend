@@ -61,11 +61,10 @@ class MyRouter {
               },
             ),
             GoRoute(
-                path:  'session',
-              builder: (BuildContext context, GoRouterState state) {
+                path: 'session',
+                builder: (BuildContext context, GoRouterState state) {
                   return PictureSession(host: state.extra as Host);
-              }
-            )
+                })
           ]),
     ],
   );

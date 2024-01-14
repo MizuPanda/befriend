@@ -17,12 +17,11 @@ class HostListening {
     String hostUserId = host.host.id;
 
     return Constants.usersCollection.doc(hostUserId).snapshots().listen(
-          (snapshot) =>
-              _processSnapshot(snapshot, context, host, notifyListeners),
-          onError: (error) {
-            debugPrint('Error in Firestore subscription: $error');
-          },
-        );
+      (snapshot) => _processSnapshot(snapshot, context, host, notifyListeners),
+      onError: (error) {
+        debugPrint('Error in Firestore subscription: $error');
+      },
+    );
   }
 
   static void _processSnapshot(DocumentSnapshot snapshot, BuildContext context,
@@ -32,9 +31,7 @@ class HostListening {
           DataManager.getList(snapshot, Constants.hostingDoc);
       debugPrint('(HostListening): $connectedIds');
 
-      if (_hasPictureBeenTaken(connectedIds)) {
-        _handlePictureTaken(host, connectedIds);
-      } else if (_isHostTakingPicture(connectedIds)) {
+      if (_isHostTakingPicture(connectedIds)) {
         _handleHostTakingPicture(host, context);
       } else if (_hasHostStoppedHosting(connectedIds, host)) {
         _handleHostStoppedHosting(context);
@@ -47,12 +44,9 @@ class HostListening {
     }
   }
 
-  static bool _hasPictureBeenTaken(List<dynamic> connectedIds) {
-    return connectedIds.isNotEmpty && connectedIds.first.toString().startsWith(Constants.pictureMarker);
-  }
-
   static bool _isHostTakingPicture(List<dynamic> connectedIds) {
-    return connectedIds.isNotEmpty && connectedIds.first.toString() == Constants.pictureState;
+    return connectedIds.isNotEmpty &&
+        connectedIds.first.toString() == Constants.pictureState;
   }
 
   static bool _hasHostStoppedHosting(List<dynamic> connectedIds, Host host) {
@@ -64,12 +58,6 @@ class HostListening {
     Navigator.of(context).pop();
 
     GoRouter.of(context).go('/session', extra: host);
-  }
-
-  static void _handlePictureTaken(Host host, List<dynamic> connectedIds) {
-    host.imageUrl = connectedIds.first
-        .toString()
-        .substring(Constants.pictureMarker.length + 1);
   }
 
   static void _handleHostStoppedHosting(BuildContext context) {
@@ -113,5 +101,25 @@ class HostListening {
         context.mounted) {
       Navigator.of(context).pop(); // Exiting the picture session
     }
+  }
+
+  static bool hasPictureBeenTaken(List<dynamic> connectedIds) {
+    return connectedIds.isNotEmpty &&
+        connectedIds.first.toString().startsWith(Constants.pictureMarker);
+  }
+
+  static void handlePictureTaken(Host host, List<dynamic> connectedIds) {
+    host.imageUrl = connectedIds.first
+        .toString()
+        .substring(Constants.pictureMarker.length + 1);
+  }
+
+  static bool isCancelled(List<dynamic> connectedIds) {
+    for (String string in connectedIds) {
+      if (string == Constants.cancelledState) {
+        return true;
+      }
+    }
+    return false;
   }
 }
