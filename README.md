@@ -26,8 +26,8 @@ https://github.com/MizuPanda/befriend/assets/42700556/f1ed77af-1f9b-420b-8acf-ae
 - **Instant Messaging:** Stay connected with friends through in-app messaging.
 
 ## Note on Contributions
-Befriend is a personal project developed by Juniel Djossou with the help of some of his friends. At this stage, we are not seeking external contributions. This project is intended to evolve as a personal endeavor and may, or may not, be commercialized in the future. We appreciate your interest and support, and while we're not open to external contributions right now, we hope you find the project interesting and inspiring.
+Befriend is a personal project developed by Juniel Djossou. At this stage, I am not seeking external contributions. This project is intended to evolve as a personal endeavor and may, or may not, be commercialized in the future. I appreciate the interest and support, and while I'm not open to external contributions right now, I hope you find the project interesting and inspiring.
 
 
 ## Contact
-For any questions or contributions, please contact us at junieldjossou@gmail.com.
+For any questions or contributions, please contact me at junieldjossou@gmail.com.
