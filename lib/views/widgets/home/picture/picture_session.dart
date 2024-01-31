@@ -28,7 +28,7 @@ class _PictureSessionState extends State<PictureSession> {
 
   @override
   void dispose() {
-    _provider.dispose();
+    _provider.disposeSession();
     super.dispose();
   }
 
@@ -75,19 +75,31 @@ class _PictureSessionState extends State<PictureSession> {
                     const SizedBox(
                       height: 5,
                     ),
-                    Container(
-                      width: 250, // for full width
-                      height: 250.0,
-                      decoration: BoxDecoration(
-                        // Add any decoration properties here
-                        borderRadius: BorderRadius.circular(10.0),
-                        border: Border.all(color: Colors.black),
+                    GestureDetector(
+                      onTap: !provider.imageNull()? () async {
+                        await provider.showImageFullScreen(context);
+                      } : null,
+                      onLongPress: provider.host.main()
+                          ? () async {
+                              await provider.pictureProcess();
+                            }
+                          : null,
+                      child: Container(
+                        width: 250, // for full width
+                        height: 250.0,
+                        decoration: BoxDecoration(
+                          // Add any decoration properties here
+                          borderRadius: BorderRadius.circular(10.0),
+                          border: Border.all(color: Colors.black),
+                        ),
+                        child: provider.imageNull()
+                            ? const Center(
+                                child: Icon(Icons.camera),
+                              )
+                            : ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                            child: Image(image: provider.networkImage(), fit: BoxFit.cover,)),
                       ),
-                      child: provider.imageNull()
-                          ? const Center(
-                              child: Icon(Icons.camera),
-                            )
-                          : provider.image(),
                     ),
                     const SizedBox(
                       height: 25,
@@ -98,20 +110,44 @@ class _PictureSessionState extends State<PictureSession> {
                           textStyle: const TextStyle(fontSize: 18)),
                     ),
                     const Expanded(child: UserSlidersScreen()),
-                    if (provider.host.main())
-                      Container(
-                        alignment: Alignment.bottomRight,
-                        padding: const EdgeInsets.all(10),
-                        child: TextButton(
-                          onPressed:
-                              provider.length() >= 2 ? () async {} : null,
-                          child: Text(
-                            'Publish the picture',
-                            style: GoogleFonts.openSans(
-                                textStyle: const TextStyle(fontSize: 16)),
-                          ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(width: 10,),
+                        Icon(Icons.people_rounded, color: Theme.of(context).primaryColor,),
+                        TextButton(
+                          onPressed: () async {
+                            await provider.getFriendshipsMap();
+                            if(context.mounted) {
+                              provider.showFriendList(context);
+                            }
+                          },
+                          child: Text('Who will see the picture',
+                              style: GoogleFonts.openSans(
+                                  textStyle:
+                                  const TextStyle(fontSize: 14))),
                         ),
-                      )
+                        const Spacer(),
+                        if (provider.host.main())
+                          Container(
+                            alignment: Alignment.bottomRight,
+                            padding: const EdgeInsets.all(10),
+                            child: TextButton(
+                              onPressed:
+                              provider.length() >= 2 && !provider.imageNull()
+                                  ? () async {
+                                await provider.publishPicture(context);
+                              }
+                                  : null,
+                              child: Text(
+                                'Publish the picture',
+                                style: GoogleFonts.openSans(
+                                    textStyle: const TextStyle(fontSize: 16)),
+                              ),
+                            ),
+                          )
+                      ],
+                    ),
                   ],
                 ),
               ),

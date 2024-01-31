@@ -41,14 +41,16 @@ class BubbleWidget extends StatelessWidget {
                 Friendship friendship = specificHome.friendship!;
                 return Badge(
                   label: Text(
-                    friendship.newPics.toString(),
+                    friendship.numberOfPicsNotSeen.toString(),
+                    //NEW PICS WILL BE CALCULATED FROM THE NUMBER OF PICTURES WHERE THE USER
+                    //IS STILL IN THE LIST OF UNSEEN
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 16),
                   ),
                   largeSize: 26,
                   offset: const Offset(0, 0),
                   padding: const EdgeInsets.only(left: 8, right: 7),
-                  isLabelVisible: friendship.newPics > 0,
+                  isLabelVisible: friendship.numberOfPicsNotSeen > 0,
                   child: Builder(builder: (
                     BuildContext context,
                   ) {

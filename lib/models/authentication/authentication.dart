@@ -1,7 +1,5 @@
-import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/utilities/constants.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +7,6 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class AuthenticationManager {
-  static final FirebaseFirestore _store = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
   static String id() {
@@ -54,47 +51,30 @@ class AuthenticationManager {
   /// The counter is incremented by 1 and stored in the database.
   static Future<void> _registerUserData(
       String name, String username, User? user, BuildContext context) async {
-    final DocumentReference numbersDoc =
-        _store.collection("data").doc("numbers");
-
-    _store.runTransaction((transaction) async {
-      final DocumentSnapshot numberSnap = await transaction.get(numbersDoc);
-
-      transaction
-          .update(numbersDoc, {Constants.counterDoc: FieldValue.increment(1)});
-
-      num counter = DataManager.getNumber(numberSnap, Constants.counterDoc);
-      final userInfo = <String, dynamic>{
-        Constants.nameDoc: name,
-        Constants.usernameDoc: username,
-        Constants.counterDoc: counter + 1,
-        Constants.avatarDoc: '',
-        Constants.friendsDoc: List.empty(),
-        Constants.powerDoc: 0,
-        Constants.hostingDoc: List.empty(),
-        Constants.sliderDoc: 0
-      };
-
-      final DocumentReference userDoc =
-          _store.collection("users").doc(_auth.currentUser?.uid);
-
-      transaction.set(userDoc, userInfo);
-
-      _auth.currentUser?.updateDisplayName(name);
-    }).then(
+    final userInfo = <String, dynamic>{
+      Constants.nameDoc: name,
+      Constants.usernameDoc: username,
+      Constants.avatarDoc: '',
+      Constants.friendsDoc: List.empty(),
+      Constants.powerDoc: 0,
+      Constants.hostingDoc: List.empty(),
+      Constants.sliderDoc: 0,
+      Constants.hostingFriendships: {}
+    };
+    await Constants.usersCollection.doc(user!.uid).set(userInfo).then(
       //IF COMPLETED WITHOUT ERRORS
       (value) async {
-        await user?.sendEmailVerification();
+        await user.sendEmailVerification();
 
         if (context.mounted) {
           GoRouter.of(context).replace('/picture');
         }
         debugPrint("Successfully added the data to user: $username");
       },
-    ).catchError((error) {
+    ).catchError((error) async {
       // If registration data fails to save, delete the user
       debugPrint('(RegisterUser) An error occurred: ${error.toString()}');
-      user?.delete();
+      await user.delete();
       debugPrint("User deleted due to failure in registration data saving");
     });
   }

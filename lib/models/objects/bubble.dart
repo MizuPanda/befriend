@@ -28,7 +28,7 @@ class Bubble {
     colors: [Colors.green, Colors.lightGreenAccent],
   );
 
-  Bubble({
+  Bubble._({
     required this.id,
     required this.counter,
     required this.username,
@@ -42,7 +42,7 @@ class Bubble {
 
   factory Bubble.fromMapWithFriends(
       DocumentSnapshot docs, ImageProvider avatar, List<Friendship> friends) {
-    Bubble bubble = Bubble(
+    Bubble bubble = Bubble._(
         id: docs.id,
         name: DataManager.getString(docs, Constants.nameDoc),
         username: DataManager.getString(docs, Constants.usernameDoc),
@@ -61,7 +61,7 @@ class Bubble {
 
   factory Bubble.fromMapWithoutFriends(
       DocumentSnapshot docs, ImageProvider avatar) {
-    Bubble bubble = Bubble(
+    Bubble bubble = Bubble._(
         id: docs.id,
         name: DataManager.getString(docs, Constants.nameDoc),
         username: DataManager.getString(docs, Constants.usernameDoc),
@@ -115,6 +115,6 @@ class Bubble {
 
   @override
   String toString() {
-    return 'Bubble{id: $id, username: $username, name: $name, avatarUrl: $avatarUrl, counter: $counter, power: $power, avatar: $avatar, friendships: $friendships, friendIDs: $friendIDs, friendshipsLoaded: $friendshipsLoaded,}';
+    return 'Bubble{id: $id, username: $username, name: $name, avatarUrl: $avatarUrl, counter: $counter, power: $power, avatar: $avatar, friendIDs: $friendIDs, friendshipsLoaded: $friendshipsLoaded,}';
   }
 }

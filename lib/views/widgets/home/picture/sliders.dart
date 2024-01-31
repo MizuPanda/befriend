@@ -1,6 +1,7 @@
 import 'package:befriend/providers/session_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../models/objects/bubble.dart';
@@ -23,22 +24,17 @@ class UserSlidersScreen extends StatelessWidget {
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) return const CircularProgressIndicator();
 
-            return FutureBuilder(
-                future: provider.processSnapshot(snapshot.data!, context),
-                builder: (
-                  BuildContext context,
-                  _,
-                ) {
-                  return ListView(
-                    children: snapshot.data!.docs.map((userDocument) {
-                      return UserSlider(
-                        bubble: provider.bubble(userDocument.id)!,
-                        sliderValue: provider.sliderValue(userDocument),
-                        reference: userDocument.reference,
-                      );
-                    }).toList(),
-                  );
-                });
+            provider.processSnapshot(snapshot.data!, context);
+
+            return ListView(
+              children: snapshot.data!.docs.map((userDocument) {
+                return UserSlider(
+                  bubble: provider.bubble(userDocument.id)!,
+                  sliderValue: provider.sliderValue(userDocument.id),
+                  reference: userDocument.reference,
+                );
+              }).toList(),
+            );
           });
     });
   }
@@ -101,25 +97,39 @@ class _UserSliderState extends State<UserSlider> {
               ],
             ),
             Expanded(
-              child: Slider(
-                value: sliderValue,
-                min: 0,
-                max: 100,
-                divisions: 100,
-                onChanged: provider.isUser(widget.bubble.id)
-                    ? (double value) {
-                        setState(() {
-                          sliderValue = value;
-                        });
-                      }
-                    : null,
-                onChangeEnd: provider.isUser(widget.bubble.id)
-                    ? (double value) async {
-                        // Debounce logic here if needed
-                        await widget.reference
-                            .update({Constants.sliderDoc: value});
-                      }
-                    : null,
+              child: Column(
+                children: [
+                  Slider(
+                    value: sliderValue,
+                    min: 0,
+                    max: 100,
+                    divisions: 100,
+                    onChanged: provider.isUser(widget.bubble.id)
+                        ? (double value) {
+                            setState(() {
+                              sliderValue = value;
+                            });
+                          }
+                        : null,
+                    onChangeEnd: provider.isUser(widget.bubble.id)
+                        ? (double value) async {
+                            // Debounce logic here if needed
+                            await widget.reference
+                                .update({Constants.sliderDoc: value});
+                          }
+                        : null,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, ),
+                    child: Row(
+                      children: [
+                        Text('Public', style: GoogleFonts.openSans(fontSize: 12, fontStyle: FontStyle.italic),),
+                        const Spacer(),
+                        Text('Private', style: GoogleFonts.openSans(fontSize: 12, fontStyle: FontStyle.italic),)
+                      ],
+                    ),
+                  )
+                ],
               ),
             )
           ],

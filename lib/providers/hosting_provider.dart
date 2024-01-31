@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/data/data_query.dart';
+import 'package:befriend/models/data/friend_manager.dart';
 import 'package:befriend/models/data/user_manager.dart';
+import 'package:befriend/models/objects/friendship_progress.dart';
 import 'package:befriend/models/objects/host.dart';
 import 'package:befriend/models/qr/host_listening.dart';
 import 'package:befriend/models/qr/qr.dart';
@@ -18,7 +19,7 @@ class HostingProvider extends ChangeNotifier {
   StreamSubscription<DocumentSnapshot>? _stream;
 
   void showQR(BuildContext context) {
-    QR.showQRCodeDialog(context, '${Constants.appID}.${_host.host.id}');
+    QR.showQRCodeDialog(context, '${Constants.appID}.${_host.host.id}', _host.joiners.length);
   }
 
   Future<String> startingHost(BuildContext context) async {
@@ -83,15 +84,8 @@ class HostingProvider extends ChangeNotifier {
   }
 
   Future<void> onDispose() async {
-    if (_host.main()) {
-      debugPrint('(HostingProvider): Stopping hosting');
-      await Constants.usersCollection
-          .doc(_host.host.id)
-          .update({Constants.hostingDoc: List.empty()});
-    } else {
-      debugPrint('(HostingProvider): Stopping joining');
-      await _leaveHost();
-    }
+    await HostListening.onDispose(_host);
+
     await _stream?.cancel();
     dispose();
   }
@@ -108,19 +102,15 @@ class HostingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// JOINER: Removes the user from the list of the connected users.
-  Future<void> _leaveHost() async {
-    if (_host.joiners.contains(_host.user)) {
-      await Constants.usersCollection.doc(_host.host.id).update({
-        Constants.hostingDoc:
-            FieldValue.arrayRemove([AuthenticationManager.id()])
-      });
-    }
-  }
 
   Future<void> startSession() async {
-    await Constants.usersCollection.doc(_host.host.id).update({
-      Constants.hostingDoc: [Constants.pictureState]
-    });
+    List<dynamic> sessionUsers = [Constants.pictureState];
+    List<String> userIds = _host.joiners.map((e) => e.id).toList();
+    sessionUsers.addAll(userIds);
+    Map<String, List<FriendshipProgress>> idToFriendships = await FriendManager.fetchFriendshipsForUsers(userIds);
+
+    await DataQuery.updateDocument(Constants.hostingDoc, sessionUsers);
+    await DataQuery.updateDocument(Constants.hostingFriendships, idToFriendships);
   }
+
 }

@@ -1,3 +1,4 @@
+import 'package:befriend/models/qr/qr.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/views/widgets/home/picture/rounded_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,6 +20,12 @@ class JoiningWidget extends StatefulWidget {
 
 class _JoiningWidgetState extends State<JoiningWidget> {
   MobileScannerController cameraController = MobileScannerController();
+
+  @override
+  void dispose() {
+    cameraController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,27 +59,35 @@ class _JoiningWidgetState extends State<JoiningWidget> {
                       value.contains(Constants.appID)) {
                     String id = value.substring(Constants.appID.length + 1);
                     DocumentSnapshot data = await DataManager.getData(id: id);
-                    ImageProvider avatar = await DataManager.getAvatar(data);
+                    List<dynamic> joiners =
+                        DataManager.getList(data, Constants.hostingDoc);
+                    if (joiners.length == 10) {
+                      if (context.mounted) {
+                        QR.showLobbyFull(context);
+                      }
+                    } else {
+                      ImageProvider avatar = await DataManager.getAvatar(data);
 
-                    Bubble selectedHost =
-                        Bubble.fromMapWithoutFriends(data, avatar);
+                      Bubble selectedHost =
+                          Bubble.fromMapWithoutFriends(data, avatar);
 
-                    await Constants.usersCollection
-                        .doc(selectedHost.id)
-                        .update({
-                      Constants.hostingDoc:
-                          FieldValue.arrayUnion([AuthenticationManager.id()])
-                    });
+                      await Constants.usersCollection
+                          .doc(selectedHost.id)
+                          .update({
+                        Constants.hostingDoc:
+                            FieldValue.arrayUnion([AuthenticationManager.id()])
+                      });
 
-                    if (context.mounted) {
-                      context.pop();
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return RoundedDialog(
-                                child: HostingWidget(
-                                    isHost: false, host: selectedHost));
-                          });
+                      if (context.mounted) {
+                        context.pop();
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return RoundedDialog(
+                                  child: HostingWidget(
+                                      isHost: false, host: selectedHost));
+                            });
+                      }
                     }
                   }
                 }

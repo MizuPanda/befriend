@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:befriend/models/data/picture_query.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +12,11 @@ import '../objects/host.dart';
 
 class HostListening {
   static bool _isTakingPicture = false;
+
+  static void setPictureToFalse() {
+    _isTakingPicture = false;
+  }
+
   static StreamSubscription<DocumentSnapshot> startListening(
       BuildContext context, Host host, Function notifyListeners) {
     _isTakingPicture = false;
@@ -68,9 +74,11 @@ class HostListening {
 
   static Future<void> _updateUsersList(
       List<dynamic> connectedIds, BuildContext context, Host host) async {
+    debugPrint(connectedIds.toString());
     // Remove users who left
     host.joiners.removeWhere(
         (user) => (user.id != host.host.id && !connectedIds.contains(user.id)));
+
 
     // Check if current user has been removed
     _handleCurrentUserRemoved(connectedIds, context, host);
@@ -103,23 +111,30 @@ class HostListening {
     }
   }
 
-  static bool hasPictureBeenTaken(List<dynamic> connectedIds) {
-    return connectedIds.isNotEmpty &&
-        connectedIds.first.toString().startsWith(Constants.pictureMarker);
-  }
-
-  static void handlePictureTaken(Host host, List<dynamic> connectedIds) {
-    host.imageUrl = connectedIds.first
-        .toString()
-        .substring(Constants.pictureMarker.length + 1);
-  }
-
-  static bool isCancelled(List<dynamic> connectedIds) {
-    for (String string in connectedIds) {
-      if (string == Constants.cancelledState) {
-        return true;
+  static Future<void> onDispose(Host host) async {
+    if(!_isTakingPicture) {
+      if (host.main()) {
+        debugPrint('(HostingProvider): Stopping hosting');
+        await Constants.usersCollection
+            .doc(host.host.id)
+            .update({Constants.hostingDoc: List.empty()});
+        await Constants.usersCollection
+            .doc(host.host.id)
+            .update({Constants.hostingFriendships: {}});
+        await PictureQuery.deleteTemporaryPictures(host);
+        host.clearTemporaryFiles();
+      } else {
+        debugPrint('(HostingProvider): Stopping joining');
+        await _leaveHost(host);
       }
     }
-    return false;
+  }
+
+
+  /// JOINER: Removes the user from the list of the connected users.
+  static Future<void> _leaveHost(Host host) async {
+    if (host.joiners.contains(host.user)) {
+      await host.updateDocument(Constants.hostingDoc, FieldValue.arrayRemove([host.user.id]));
+    }
   }
 }

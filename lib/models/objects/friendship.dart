@@ -1,52 +1,53 @@
-import 'package:befriend/models/data/data_manager.dart';
-import 'package:befriend/utilities/constants.dart';
+import 'package:befriend/models/objects/friendship_progress.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'bubble.dart';
 
-class Friendship {
+class Friendship extends FriendshipProgress{
   Bubble friend;
-  int level;
-  double progress;
-  int newPics;
-  final int userIndex;
-  final List<String> ids;
+  int numberOfPicsNotSeen;
 
-  Friendship(
-      {required this.friend,
-      required this.level,
-      required this.progress,
-      required this.newPics,
-      required this.userIndex,
-      required this.ids});
+  Friendship._(
+      {
+        required super.index,
+        required super.user1ID,
+        required super.user2ID,
+        required super.friendshipID,
+        required super.username1,
+        required super.username2,
+        required super.level,
+        required super.progress,
+        required super.lastSeen,
+        required this.friend,
+        required this.numberOfPicsNotSeen,});
 
-  factory Friendship.fromDocs(
-      String mainID, Bubble friendBubble, DocumentSnapshot docs) {
-    String data = docs.data().toString();
 
-    List<String> ids = [mainID, friendBubble.id];
-    ids.sort();
-    int userIndex = ids.indexOf(mainID);
 
-    return Friendship(
+  factory Friendship.fromDocs(Bubble friendBubble, DocumentSnapshot docs) {
+    FriendshipProgress friendshipProgress = FriendshipProgress.fromDocs(docs);
+
+    return Friendship._(
+      index: friendshipProgress.index,
+      user1ID: friendshipProgress.user1ID,
+      user2ID: friendshipProgress.user2ID,
+        friendshipID: friendshipProgress.friendshipID,
+        username1: friendshipProgress.username1,
+        username2: friendshipProgress.username2,
         friend: friendBubble,
-        level: DataManager.getNumber(docs, Constants.levelDoc).toInt(),
-        progress: DataManager.getNumber(docs, Constants.progressDoc).toDouble(),
-        newPics: data.contains(Constants.newPics(userIndex))
-            ? docs.get(Constants.newPics(userIndex))
-            : -1,
-        userIndex: userIndex,
-        ids: ids);
+        level: friendshipProgress.level,
+        progress: friendshipProgress.progress,
+      lastSeen: friendshipProgress.lastSeen,
+      numberOfPicsNotSeen: setPicsSeen(friendBubble), //CALCULATE FROM BUBBLE (PICTURE SUB COLLECTION)
+    );
   }
 
+
+
+  static int setPicsSeen(Bubble bubble) {
+    return 0;
+  }
   double distance() {
     return 150 / (level.toDouble() + progress / 100);
   }
 
-  /// docId returns the id of the friendship document.
-  /// The id is the concatenation of the two user ids.
-  /// The two user ids are sorted alphabetically.
-  String docId() {
-    return ids.first + ids.last;
-  }
 }
