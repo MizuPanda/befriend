@@ -34,11 +34,11 @@ class DataManager {
   }
 
   static Map<String, dynamic> getMap(DocumentSnapshot snapshot, String id) {
-    return snapshot.data().toString().contains(id)? snapshot.get(id) : {};
+    return snapshot.data().toString().contains(id) ? snapshot.get(id) : {};
   }
 
   static bool getBoolean(DocumentSnapshot snapshot, String id) {
-    return snapshot.data().toString().contains(id)? snapshot.get(id) : false;
+    return snapshot.data().toString().contains(id) ? snapshot.get(id) : false;
   }
 
   static String getString(DocumentSnapshot snapshot, String id) {
@@ -52,8 +52,11 @@ class DataManager {
   }
 
   static DateTime getDateTime(DocumentSnapshot snapshot, String id) {
-    return snapshot.data().toString().contains(id)
-        ? snapshot.get(id)
-        : DateTime.utc(0);
+    if (snapshot.data().toString().contains(id)) {
+      Timestamp timestamp = snapshot.get(id);
+      return timestamp.toDate();
+    }
+
+    return DateTime.utc(0);
   }
 }

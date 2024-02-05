@@ -15,7 +15,6 @@ class Host {
 
   Map<String, List<FriendshipProgress>> friendshipsMap = {};
 
-
   Host({required this.host, required this.joiners, required this.user});
 
   bool main() {
@@ -43,7 +42,7 @@ class Host {
     _imagePath = value;
   }
 
-  bool pathNull () {
+  bool pathNull() {
     return _imagePath == null;
   }
 

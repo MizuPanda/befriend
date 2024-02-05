@@ -3,25 +3,45 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'bubble.dart';
 
-class Friendship extends FriendshipProgress{
+class Friendship extends FriendshipProgress {
   Bubble friend;
   int numberOfPicsNotSeen;
 
-  Friendship._(
-      {
-        required super.index,
-        required super.user1ID,
-        required super.user2ID,
-        required super.friendshipID,
-        required super.username1,
-        required super.username2,
-        required super.level,
-        required super.progress,
-        required super.lastSeen,
-        required this.friend,
-        required this.numberOfPicsNotSeen,});
+  Friendship._({
+    required super.index,
+    required super.user1ID,
+    required super.user2ID,
+    required super.friendshipID,
+    required super.username1,
+    required super.username2,
+    required super.level,
+    required super.progress,
+    required super.lastSeen,
+    required this.friend,
+    required this.numberOfPicsNotSeen,
+  });
 
+   Friendship swap(Bubble friendBubble, String id, Friendship f) {
+    f.switchIndex();
 
+    return switchBubble(friendBubble, f);
+  }
+
+  Friendship switchBubble(Bubble friendBubble, Friendship f) {
+
+    return Friendship._(
+        index: f.index,
+        user1ID: f.user1ID,
+        user2ID: f.user2ID,
+        friendshipID: f.friendshipID,
+        username1: f.username1,
+        username2: f.username2,
+        level: f.level,
+        progress: f.progress,
+        lastSeen: f.lastSeen,
+        friend: friendBubble,
+        numberOfPicsNotSeen: f.numberOfPicsNotSeen);
+  }
 
   factory Friendship.fromDocs(Bubble friendBubble, DocumentSnapshot docs) {
     FriendshipProgress friendshipProgress = FriendshipProgress.fromDocs(docs);
@@ -30,14 +50,15 @@ class Friendship extends FriendshipProgress{
       index: friendshipProgress.index,
       user1ID: friendshipProgress.user1ID,
       user2ID: friendshipProgress.user2ID,
-        friendshipID: friendshipProgress.friendshipID,
-        username1: friendshipProgress.username1,
-        username2: friendshipProgress.username2,
-        friend: friendBubble,
-        level: friendshipProgress.level,
-        progress: friendshipProgress.progress,
+      friendshipID: friendshipProgress.friendshipID,
+      username1: friendshipProgress.username1,
+      username2: friendshipProgress.username2,
+      friend: friendBubble,
+      level: friendshipProgress.level,
+      progress: friendshipProgress.progress,
       lastSeen: friendshipProgress.lastSeen,
-      numberOfPicsNotSeen: setPicsSeen(friendBubble), //CALCULATE FROM BUBBLE (PICTURE SUB COLLECTION)
+      numberOfPicsNotSeen: setPicsSeen(
+          friendBubble), //CALCULATE FROM BUBBLE (PICTURE SUB COLLECTION)
     );
   }
 
@@ -46,8 +67,8 @@ class Friendship extends FriendshipProgress{
   static int setPicsSeen(Bubble bubble) {
     return 0;
   }
+
   double distance() {
     return 150 / (level.toDouble() + progress / 100);
   }
-
 }

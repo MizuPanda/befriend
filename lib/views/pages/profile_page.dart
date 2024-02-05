@@ -1,5 +1,8 @@
+import 'package:befriend/providers/profile_provider.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/objects/profile.dart';
 import '../widgets/profile/header.dart';
@@ -18,38 +21,42 @@ class ProfilePage extends StatelessWidget {
           title: const BefriendTitle(),
           foregroundColor: Colors.black,
           backgroundColor: Colors.white),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SafeArea(
-              minimum: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ProfileHeader(
-                    profile: profile,
-                  ),
-                  const SizedBox(height: 16),
-                  ProfileState(user: profile.user),
-                ],
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Pictures',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+      body: ChangeNotifierProvider(
+        create: (_) => ProfileProvider(),
+        builder: (BuildContext context, Widget? child) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SafeArea(
+                minimum: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ProfileHeader(
+                      profile: profile,
+                    ),
+                    const SizedBox(height: 16),
+                    ProfileState(profile: profile,),
+                  ],
                 ),
               ),
-            ),
-            ProfilePictures(
-              user: profile.user,
-            ),
-          ],
-        ),
+               Padding(
+                padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
+                child: Text(
+                  'Pictures',
+                  style: GoogleFonts.openSans(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                )),
+              ),
+              Expanded(
+                child: ProfilePictures(
+                  user: profile.user,
+                ),
+              ),
+            ],
+          );
+        }
       ),
     );
   }

@@ -63,7 +63,7 @@ class HostListening {
     _isTakingPicture = true;
     Navigator.of(context).pop();
 
-    GoRouter.of(context).go('/session', extra: host);
+    GoRouter.of(context).go(Constants.sessionAddress, extra: host);
   }
 
   static void _handleHostStoppedHosting(BuildContext context) {
@@ -78,7 +78,6 @@ class HostListening {
     // Remove users who left
     host.joiners.removeWhere(
         (user) => (user.id != host.host.id && !connectedIds.contains(user.id)));
-
 
     // Check if current user has been removed
     _handleCurrentUserRemoved(connectedIds, context, host);
@@ -112,7 +111,7 @@ class HostListening {
   }
 
   static Future<void> onDispose(Host host) async {
-    if(!_isTakingPicture) {
+    if (!_isTakingPicture) {
       if (host.main()) {
         debugPrint('(HostingProvider): Stopping hosting');
         await Constants.usersCollection
@@ -130,11 +129,11 @@ class HostListening {
     }
   }
 
-
   /// JOINER: Removes the user from the list of the connected users.
   static Future<void> _leaveHost(Host host) async {
     if (host.joiners.contains(host.user)) {
-      await host.updateDocument(Constants.hostingDoc, FieldValue.arrayRemove([host.user.id]));
+      await host.updateDocument(
+          Constants.hostingDoc, FieldValue.arrayRemove([host.user.id]));
     }
   }
 }

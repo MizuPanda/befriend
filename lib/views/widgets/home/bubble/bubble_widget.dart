@@ -7,12 +7,13 @@ import 'package:provider/provider.dart';
 
 import '../../../../models/objects/home.dart';
 import '../../../../models/objects/profile.dart';
+import '../../../../utilities/constants.dart';
 import 'bubble_container.dart';
 import 'bubble_progress_indicator.dart';
 import 'friend_level.dart';
 
 class BubbleWidget extends StatelessWidget {
-  static const double strokeWidth = 10 / 3;
+  static const double strokeWidth = 16 / 3;
   static const double textHeight = 25;
   static const double levelHeight = 25;
 
@@ -29,9 +30,9 @@ class BubbleWidget extends StatelessWidget {
         builder: (BuildContext context, HomeProvider provider, Widget? child) {
       return GestureDetector(
         onTap: () {
-          GoRouter.of(context).push('/profile',
+          GoRouter.of(context).push(Constants.profileAddress,
               extra: Profile(
-                  user: specificHome.user, notifyParent: provider.notify));
+                  user: specificHome.user, notifyParent: provider.notify, friendship: specificHome.friendship),);
         },
         child: Center(
           child: SizedBox(

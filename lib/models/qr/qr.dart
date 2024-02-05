@@ -4,7 +4,9 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../views/widgets/home/picture/rounded_dialog.dart';
 
 class QR {
-  static void showLobbyFull(BuildContext context,) {
+  static void showLobbyFull(
+    BuildContext context,
+  ) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text("The lobby is full"),
@@ -13,8 +15,8 @@ class QR {
     );
   }
 
-  static void showQRCodeDialog(BuildContext context, String data,
-      int numberOfJoiners) {
+  static void showQRCodeDialog(
+      BuildContext context, String data, int numberOfJoiners) {
     if (numberOfJoiners == 10) {
       showLobbyFull(context);
     } else {

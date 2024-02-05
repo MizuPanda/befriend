@@ -67,7 +67,7 @@ class AuthenticationManager {
         await user.sendEmailVerification();
 
         if (context.mounted) {
-          GoRouter.of(context).replace('/picture');
+          GoRouter.of(context).replace(Constants.pictureAddress);
         }
         debugPrint("Successfully added the data to user: $username");
       },
@@ -85,7 +85,7 @@ class AuthenticationManager {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       if (context.mounted) {
         GoRouter.of(context)
-            .replace('/homepage', extra: await UserManager.userHome());
+            .replace(Constants.homepageAddress, extra: await UserManager.userHome());
       }
     } on FirebaseAuthException catch (e) {
       debugPrint('(Authentication-Error): ${e.code}');

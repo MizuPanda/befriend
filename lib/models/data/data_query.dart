@@ -1,4 +1,6 @@
 import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/models/data/friendship_accumulator.dart';
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/bubble.dart';
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/data/friend_manager.dart';
@@ -18,19 +20,36 @@ class DataQuery {
 
   static Future<List<Friendship>> friendList(
       String userID, List<dynamic> friendIDs) async {
-    List<Friendship> friendships = [];
+    final FriendshipAccumulator accumulator = FriendshipAccumulator();
+    final List<Friendship> friendships = [];
+    final String mainID = AuthenticationManager.id();
+
     for (String friendID in friendIDs) {
-      DocumentSnapshot friendDocs = await DataManager.getData(id: friendID);
-      ImageProvider avatar = await DataManager.getAvatar(friendDocs);
+      Bubble friend;
+      Friendship friendship;
 
-      Bubble friend = Bubble.fromMapWithoutFriends(friendDocs, avatar);
+      if (mainID != userID && friendID == mainID) {
+        friend = await UserManager.getInstance();
+      } else {
+        DocumentSnapshot friendDocs = await DataManager.getData(id: friendID);
+        ImageProvider avatar = await DataManager.getAvatar(friendDocs);
 
-      DocumentSnapshot friendshipDocs =
-          await FriendManager.getData(userID, friend.id);
+        friend = Bubble.fromMapWithoutFriends(friendDocs, avatar);
+      }
 
-      Friendship friendship =
-          Friendship.fromDocs(friend, friendshipDocs);
+      Friendship? f = accumulator.containsFriendship(userID, friendID, friend);
+
+      if (f != null) {
+        friendship = f;
+      } else {
+        DocumentSnapshot friendshipDocs =
+        await FriendManager.getData(userID, friend.id);
+
+        friendship = Friendship.fromDocs(friend, friendshipDocs);
+      }
+
       friendships.add(friendship);
+      accumulator.addFriendship(friendship);
     }
 
     return friendships;

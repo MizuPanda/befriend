@@ -25,112 +25,91 @@ class _PictureButtonState extends State<PictureButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: Container(),
-        ),
-        AnimatedPositioned(
-          //duration: const Duration(milliseconds: 500),
-          right: -dragPosition,
-          left: dragPosition,
-          bottom: 12,
-          duration: const Duration(
-              milliseconds: 300), // Keeps the button at the bottom
-          child: GestureDetector(
-            onHorizontalDragUpdate: (details) {
-              setState(() {
-                dragPosition += details.delta.dx;
-              });
-            },
-            onHorizontalDragEnd: (details) {
-              setState(() {
-                updateMode();
-                dragPosition = 0.0; // Reset position after drag ends
-              });
-            },
-            child: ElevatedButtonTheme(
-              data: ElevatedButtonThemeData(
-                style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                  ),
-                  backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.pressed)) {
-                        return Colors.white.withOpacity(0.9);
-                      } else {
-                        return isJoinMode ? Colors.red : Colors.lightBlueAccent;
-                      }
-                    },
-                  ),
-                  foregroundColor: MaterialStateProperty.resolveWith<Color>(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.pressed)) {
-                        return Colors.black;
-                      } else {
-                        return Colors.white;
-                      }
-                    },
-                  ),
+    return AnimatedPositioned(
+      //duration: const Duration(milliseconds: 500),
+      right: -dragPosition,
+      left: dragPosition,
+      bottom: 12,
+      duration: const Duration(
+          milliseconds: 300), // Keeps the button at the bottom
+      child: GestureDetector(
+        onHorizontalDragUpdate: (details) {
+          setState(() {
+            dragPosition += details.delta.dx;
+          });
+        },
+        onHorizontalDragEnd: (details) {
+          setState(() {
+            updateMode();
+            dragPosition = 0.0; // Reset position after drag ends
+          });
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: 54,
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isJoinMode? const [
+                    Color.fromRGBO(203, 98, 98, 1.0),
+                    Color.fromRGBO(213, 18, 18, 1.0),
+                    Color.fromRGBO(203, 98, 98, 1.0),
+                  ] : const [
+                    Color.fromRGBO(109, 146, 208, 1.0),
+                    Color.fromRGBO(0, 73, 243, 1.0),
+                    Color.fromRGBO(109, 146, 208, 1.0),
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ),
-              ),
-              child: Container(
-                padding: const EdgeInsets.only(left: 18, right: 18),
-                width: MediaQuery.of(context).size.width,
-                height: 45,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (isJoinMode) {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return const RoundedDialog(child: JoiningWidget());
-                          });
-                    } else {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return const RoundedDialog(
-                              child: HostingWidget(isHost: true, host: null),
-                            );
-                          });
-                    }
-                  },
-                  child: Stack(
-                    children: [
-                      Transform.translate(
-                        offset: const Offset(0.5, 0.5),
-                        child: Text(
-                          isJoinMode ? 'Join a picture' : 'Take a picture',
-                          style: GoogleFonts.roboto(
-                            textStyle: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 26,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Text(
-                        isJoinMode ? 'Join a picture' : 'Take a picture',
-                        style: GoogleFonts.roboto(
-                          textStyle: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 26,
-                          ),
-                        ),
-                      ),
-                    ],
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(25.0),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isJoinMode? const Color.fromRGBO(213, 18, 18, 1.0).withOpacity(0.2)
+                    : const Color.fromRGBO(0, 73, 243, 1.0).withOpacity(0.2),
+                    spreadRadius: 4,
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  )
+                ]
+            ),
+            child: GestureDetector(
+              onTap: () {
+                if (isJoinMode) {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return const RoundedDialog(child: JoiningWidget());
+                      });
+                } else {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return const RoundedDialog(
+                          child: HostingWidget(isHost: true, host: null),
+                        );
+                      });
+                }
+              },
+              child: Center(
+                child: Text(
+                  isJoinMode ? 'Join a picture' : 'Take a picture',
+                  style: GoogleFonts.openSans(
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                      fontSize: 26,
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

@@ -76,9 +76,11 @@ class _PictureSessionState extends State<PictureSession> {
                       height: 5,
                     ),
                     GestureDetector(
-                      onTap: !provider.imageNull()? () async {
-                        await provider.showImageFullScreen(context);
-                      } : null,
+                      onTap: !provider.imageNull()
+                          ? () async {
+                              await provider.showImageFullScreen(context);
+                            }
+                          : null,
                       onLongPress: provider.host.main()
                           ? () async {
                               await provider.pictureProcess();
@@ -97,8 +99,11 @@ class _PictureSessionState extends State<PictureSession> {
                                 child: Icon(Icons.camera),
                               )
                             : ClipRRect(
-                          borderRadius: BorderRadius.circular(10.0),
-                            child: Image(image: provider.networkImage(), fit: BoxFit.cover,)),
+                                borderRadius: BorderRadius.circular(10.0),
+                                child: Image(
+                                  image: provider.networkImage(),
+                                  fit: BoxFit.cover,
+                                )),
                       ),
                     ),
                     const SizedBox(
@@ -113,19 +118,23 @@ class _PictureSessionState extends State<PictureSession> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const SizedBox(width: 10,),
-                        Icon(Icons.people_rounded, color: Theme.of(context).primaryColor,),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Icon(
+                          Icons.people_rounded,
+                          color: Theme.of(context).primaryColor,
+                        ),
                         TextButton(
                           onPressed: () async {
                             await provider.getFriendshipsMap();
-                            if(context.mounted) {
+                            if (context.mounted) {
                               provider.showFriendList(context);
                             }
                           },
                           child: Text('Who will see the picture',
                               style: GoogleFonts.openSans(
-                                  textStyle:
-                                  const TextStyle(fontSize: 14))),
+                                  textStyle: const TextStyle(fontSize: 14))),
                         ),
                         const Spacer(),
                         if (provider.host.main())
@@ -133,11 +142,11 @@ class _PictureSessionState extends State<PictureSession> {
                             alignment: Alignment.bottomRight,
                             padding: const EdgeInsets.all(10),
                             child: TextButton(
-                              onPressed:
-                              provider.length() >= 2 && !provider.imageNull()
+                              onPressed: provider.length() >= 2 &&
+                                      !provider.imageNull()
                                   ? () async {
-                                await provider.publishPicture(context);
-                              }
+                                      await provider.publishPicture(context);
+                                    }
                                   : null,
                               child: Text(
                                 'Publish the picture',

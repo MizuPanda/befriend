@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../models/objects/home.dart';
 import '../../../../models/data/user_manager.dart';
+import '../../../../utilities/constants.dart';
 
 class HomeButton extends StatefulWidget {
   const HomeButton({
@@ -14,16 +15,15 @@ class HomeButton extends StatefulWidget {
 }
 
 class _HomeButtonState extends State<HomeButton> {
-  static const double _size = 20;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.bottomLeft,
-      margin: const EdgeInsets.only(bottom: 90, left: 15),
+      margin: const EdgeInsets.only(bottom: 90, left: Constants.homeHorizontalPadding),
       child: Container(
-        width: _size + 25,
-        height: _size + 25,
+        width: Constants.homeButtonSize + Constants.homeButtonAddSize,
+        height: Constants.homeButtonSize + Constants.homeButtonAddSize,
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
           boxShadow: [
@@ -36,13 +36,13 @@ class _HomeButtonState extends State<HomeButton> {
           onPressed: () async {
             Home home = await UserManager.userHome();
             if (context.mounted) {
-              GoRouter.of(context).push('/home', extra: home);
+              GoRouter.of(context).push(Constants.homepageAddress, extra: home);
             }
           },
           icon: const Icon(
             Icons.home_rounded,
             color: Colors.black,
-            size: _size,
+            size: Constants.homeButtonSize,
           ),
         ),
       ),

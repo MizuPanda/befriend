@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../models/data/picture_query.dart';
 import '../models/data/user_manager.dart';
 import '../models/objects/home.dart';
+import '../utilities/constants.dart';
 
 class PictureSignProvider extends ChangeNotifier {
   static const Color foregroundColor = Color(0xFF1F465E);
@@ -38,7 +39,7 @@ class PictureSignProvider extends ChangeNotifier {
   Future<void> skipHome(BuildContext context) async {
     Home user = await UserManager.userHome();
     if (context.mounted) {
-      GoRouter.of(context).push('/homepage', extra: user);
+      GoRouter.of(context).push(Constants.homepageAddress, extra: user);
     }
   }
 }

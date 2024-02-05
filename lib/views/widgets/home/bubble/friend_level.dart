@@ -28,16 +28,16 @@ class FriendLevelWidget extends StatelessWidget {
       alignment: Alignment.bottomCenter,
       child: Text(
         friendship.level.toString(),
-        style: GoogleFonts.montserrat(
+        style: GoogleFonts.openSans(
             textStyle: TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,
           fontSize: levelHeight /
-              (1 + specificHome.user.size / (specificHome.user.size * 7)),
+              (1 + specificHome.user.size / (specificHome.user.size * 8)),
           shadows: const [
             Shadow(
               offset: Offset.zero,
-              blurRadius: 15.0,
+              blurRadius: 8.0,
               color: Colors.black,
             ),
           ],

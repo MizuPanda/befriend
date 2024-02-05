@@ -14,12 +14,16 @@ class BubbleContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.black,
-            width: 1.0,
-          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black,
+              spreadRadius: 0.5,
+              offset: Offset(0, 1),
+              blurRadius: 5,
+            ),
+          ],
         ),
         child: ProfilePhoto(user: user));
   }

@@ -14,6 +14,14 @@ import 'models/objects/home.dart';
 import 'models/objects/host.dart';
 
 class MyRouter {
+  static const String homepage = 'homepage';
+  static const String profile = 'profile';
+  static const String login = 'login';
+  static const String signup = 'signup';
+  static const String forgot = 'forgot';
+  static const String picture = 'picture';
+  static const String session = 'session';
+
   static final GoRouter router = GoRouter(
     routes: <RouteBase>[
       GoRoute(
@@ -23,45 +31,45 @@ class MyRouter {
           },
           routes: <RouteBase>[
             GoRoute(
-              path: 'homepage',
+              path: homepage,
               pageBuilder: (context, state) {
                 return MaterialPage(child: HomePage(home: state.extra as Home));
                 //homepage
               },
             ),
             GoRoute(
-              path: 'profile',
+              path: profile,
               pageBuilder: (BuildContext context, GoRouterState state) {
                 return MaterialPage(
                     child: ProfilePage(profile: state.extra as Profile));
               },
             ),
             GoRoute(
-              path: 'login',
+              path: login,
               builder: (BuildContext context, GoRouterState state) {
                 return const LoginPage();
               },
             ),
             GoRoute(
-              path: 'signup',
+              path: signup,
               builder: (BuildContext context, GoRouterState state) {
                 return const SignUpPage();
               },
             ),
             GoRoute(
-              path: 'forgot',
+              path: forgot,
               builder: (BuildContext context, GoRouterState state) {
                 return const ForgotPasswordPage();
               },
             ),
             GoRoute(
-              path: 'picture',
+              path: picture,
               builder: (BuildContext context, GoRouterState state) {
                 return const PictureSignPage();
               },
             ),
             GoRoute(
-                path: 'session',
+                path: session,
                 builder: (BuildContext context, GoRouterState state) {
                   return PictureSession(host: state.extra as Host);
                 })

@@ -1,10 +1,11 @@
-
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/data/picture_query.dart';
 import 'package:befriend/models/objects/friendship_progress.dart';
 import 'package:befriend/models/qr/host_listening.dart';
 import 'package:befriend/models/qr/privacy.dart';
+import 'package:befriend/models/social/friend_update.dart';
+import 'package:befriend/models/social/friendship_update.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -25,17 +26,17 @@ class SessionProvider extends ChangeNotifier {
   String? _caption;
   final int _characterLimit = 300; // Set your desired character limit
 
-
-
-
-  Future<void> showImageFullScreen(BuildContext context,) async {
+  Future<void> showImageFullScreen(
+    BuildContext context,
+  ) async {
     await showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: Colors.transparent, // Make Dialog background transparent
+        backgroundColor:
+            Colors.transparent, // Make Dialog background transparent
         child: PhotoView(
           tightMode: true,
-          backgroundDecoration:  const BoxDecoration(
+          backgroundDecoration: const BoxDecoration(
             color: Colors.transparent, // Make PhotoView background transparent
           ),
           // You can adjust the min/max scale if needed
@@ -59,9 +60,10 @@ class SessionProvider extends ChangeNotifier {
           title: const Text('Enter a Caption'),
           content: TextField(
             controller: captionController,
-            decoration:  InputDecoration(
-                hintText: "Caption for the picture",
-              counterText: 'Characters limit: ${_characterLimit.toString()}', // Optional: Hide the counter text
+            decoration: InputDecoration(
+              hintText: "Caption for the picture",
+              counterText:
+                  'Characters limit: ${_characterLimit.toString()}', // Optional: Hide the counter text
             ),
             maxLines: null,
             keyboardType: TextInputType.multiline,
@@ -86,12 +88,10 @@ class SessionProvider extends ChangeNotifier {
     );
   }
 
-
-
   ImageProvider networkImage() {
     return NetworkImage(
-          host.imageUrl!,
-        );
+      host.imageUrl!,
+    );
   }
 
   bool imageNull() {
@@ -100,13 +100,12 @@ class SessionProvider extends ChangeNotifier {
 
   Future<void> initPicture() async {
     if (host.main()) {
-
       await pictureProcess();
     }
   }
 
   Future<void> disposeSession() async {
-    if(host.main()) {
+    if (host.main()) {
       HostListening.setPictureToFalse();
     }
     await HostListening.onDispose(host);
@@ -124,98 +123,103 @@ class SessionProvider extends ChangeNotifier {
     }
   }
 
-
-  void processSnapshot(
-      QuerySnapshot snapshot, BuildContext context) {
+  void processSnapshot(QuerySnapshot snapshot, BuildContext context) {
     bool sliderValuesUpdated = false;
     debugPrint('(SessionProvider): Processing snapshot...');
 
-    if(_sliderValues.isEmpty) {
+    if (_sliderValues.isEmpty) {
       for (DocumentSnapshot doc in snapshot.docs) {
-        _sliderValues[doc.id] = DataManager.getNumber(doc, Constants.sliderDoc).toDouble();
+        _sliderValues[doc.id] =
+            DataManager.getNumber(doc, Constants.sliderDoc).toDouble();
       }
       sliderValuesUpdated = true;
     }
 
     // Assuming the host document contains a list of user IDs in the session
     for (DocumentChange docChange in snapshot.docChanges) {
-      if(!sliderValuesUpdated) {
-        _sliderValues[docChange.doc.id] = DataManager.getNumber(docChange.doc, Constants.sliderDoc).toDouble();
+      if (!sliderValuesUpdated) {
+        _sliderValues[docChange.doc.id] =
+            DataManager.getNumber(docChange.doc, Constants.sliderDoc)
+                .toDouble();
       }
       if (docChange.doc.id == host.host.id) {
         List<dynamic> sessionUsers = docChange.doc[Constants.hostingDoc];
         if (sessionUsers.isNotEmpty) {
           String picture = sessionUsers.first.toString();
-        sessionUsers = sessionUsers.skip(1).toList();
-        debugPrint('(SessionProvider): Users: ${sessionUsers.toString()}');
+          sessionUsers = sessionUsers.skip(1).toList();
+          debugPrint('(SessionProvider): Users: ${sessionUsers.toString()}');
 
-        if (!sessionUsers.contains(host.host.id)) {
-          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-            GoRouter.of(context).pop();
-          });
-        } else if (sessionUsers.length != ids.length) {
-          _updateUsersList(sessionUsers);
-        } else if (picture.startsWith(Constants.pictureMarker) &&
-            !picture.contains(host.imageUrl ?? 'potato123456789')) {
-          picture = picture.substring(Constants.pictureMarker.length);
-          host.imageUrl = picture;
+          if (!sessionUsers.contains(host.host.id)) {
+            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+              GoRouter.of(context).pop();
+            });
+          } else if (sessionUsers.length != ids.length) {
+            _updateUsersList(sessionUsers);
+          } else if (picture.startsWith(Constants.pictureMarker) &&
+              !picture.contains(host.imageUrl ?? 'potato123456789')) {
+            picture = picture.substring(Constants.pictureMarker.length);
+            host.imageUrl = picture;
 
-          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-            notifyListeners();
-          });
-        } else if (picture == Constants.publishingState) {
-          // Navigate back
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            GoRouter.of(context).pop();
-          });
+            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+              notifyListeners();
+            });
+          } else if (picture == Constants.publishingState) {
+            // Navigate back
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              GoRouter.of(context).pop();
+            });
+          }
         }
-      }
 
         break;
       }
     }
   }
 
-
   Future<void> getFriendshipsMap() async {
-        if(host.friendshipsMap.isEmpty) {
-          DocumentSnapshot documentSnapshot = await DataManager.getData(id: host.host.id);
+    if (host.friendshipsMap.isEmpty) {
+      DocumentSnapshot documentSnapshot =
+          await DataManager.getData(id: host.host.id);
 
+      Map<String, dynamic> map = documentSnapshot
+              .data()
+              .toString()
+              .contains(Constants.hostingFriendships)
+          ? documentSnapshot.get(Constants.hostingFriendships)
+          : {};
 
-          Map<String, dynamic> map = documentSnapshot.data().toString().contains(Constants.hostingFriendships)
-              ? documentSnapshot.get(Constants.hostingFriendships)
-              : {};
-
-          for (MapEntry<String, dynamic> user in map.entries) {
-            List<FriendshipProgress> friendships = [];
-            for (Map<String, dynamic> friendMap in user.value) {
-              FriendshipProgress friendship = FriendshipProgress.fromMap(friendMap);
-              friendships.add(friendship);
-            }
-            host.friendshipsMap[user.key] = friendships;
-          }
+      for (MapEntry<String, dynamic> user in map.entries) {
+        List<FriendshipProgress> friendships = [];
+        for (Map<String, dynamic> friendMap in user.value) {
+          FriendshipProgress friendship = FriendshipProgress.fromMap(friendMap);
+          friendships.add(friendship);
         }
+        host.friendshipsMap[user.key] = friendships;
+      }
+    }
   }
 
   void showFriendList(BuildContext context) {
-    _privacy.showFriendList(context, host, _sliderValues, (userId) => bubble(userId));
+    _privacy.showFriendList(
+        context, host, _sliderValues, (userId) => bubble(userId));
   }
 
-   void _updateUsersList(
-      List<dynamic> sessionUsers, )  {
-      debugPrint('(SessionProvider): Removing a user. \nList1: ${sessionUsers.toString()}\nList2: ${ids.toString()} ');
-      // Remove users who left
-      ids.removeWhere(
-              (id) => (!sessionUsers.contains(id)));
+  void _updateUsersList(
+    List<dynamic> sessionUsers,
+  ) {
+    debugPrint(
+        '(SessionProvider): Removing a user. \nList1: ${sessionUsers.toString()}\nList2: ${ids.toString()} ');
+    // Remove users who left
+    ids.removeWhere((id) => (!sessionUsers.contains(id)));
 
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        notifyListeners();
-      });
-   }
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      notifyListeners();
+    });
+  }
 
   Future<void> publishPicture(BuildContext context) async {
     _caption = await _promptForCaption(context);
-    if(_caption != null) {
+    if (_caption != null) {
       List<String> sessionUsers = host.joiners.map((e) => e.id).toList();
       final DateTime timestamp = DateTime.timestamp();
 
@@ -235,11 +239,12 @@ class SessionProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> _createOrUpdateFriendships(List<dynamic> sessionUsers, DateTime timestamp) async {
-
+  Future<void> _createOrUpdateFriendships(
+      List<dynamic> sessionUsers, DateTime timestamp) async {
     for (int i = 0; i < sessionUsers.length; i++) {
       for (int j = i + 1; j < sessionUsers.length; j++) {
-        String userID1 = sessionUsers[i]; // Assuming each user has an 'id' field
+        String userID1 =
+            sessionUsers[i]; // Assuming each user has an 'id' field
         String userID2 = sessionUsers[j];
 
         // Ensure the IDs are in alphabetical order for the document ID
@@ -248,48 +253,37 @@ class SessionProvider extends ChangeNotifier {
         String friendshipDocId = ids.join();
 
         // Check if the friendship already exists
-        DocumentSnapshot friendshipDoc = await Constants.friendshipsCollection.doc(friendshipDocId).get();
+        DocumentSnapshot friendshipDoc =
+            await Constants.friendshipsCollection.doc(friendshipDocId).get();
 
         if (friendshipDoc.exists) {
           // Update existing friendship
-          double progress = DataManager.getNumber(friendshipDoc, Constants.progressDoc).toDouble();
-          progress = progress + 0.1;
-          if (progress >= 1) {
-            progress--;
-            await Constants.friendshipsCollection
-                .doc(friendshipDocId)
-                .update({
-              Constants.progressDoc: progress,
-              Constants.levelDoc: (DataManager.getNumber(friendshipDoc, Constants.levelDoc).toInt() + 1)
-                });
-          } else {
-            await Constants.friendshipsCollection
-                .doc(friendshipDocId)
-                .update({
-              Constants.progressDoc: progress,
-            });
-          }
-          // Example: await firestore.collection('friendships').doc(friendshipDocId).update({/* Updated fields */});
+          await FriendshipUpdate.addProgress(userID1, userID2, friendshipDoc, exp: Constants.pictureExpValue);
         } else {
           // Create a new friendship
           String username1 = idToBubbleMap[userID1]!.username;
           String username2 = idToBubbleMap[userID2]!.username;
-          FriendshipProgress newFriendship = FriendshipProgress.newFriendship(
-              userID1,
-              userID2,
-              username1,
-              username2,
-              1,
-              0.05,
-              timestamp);
-          await Constants.friendshipsCollection.doc(friendshipDocId).set(newFriendship.toMap());
+
+          await FriendshipUpdate.createFriendship(
+              userID1: userID1,
+              userID2: userID2,
+              username1: username1,
+              username2: username2,
+              friendshipDocId: friendshipDocId,
+              timestamp: timestamp);
+
+          // Update both users 'friendships document'
+          await FriendUpdate.addFriend(userID2, mainUserId: userID1);
+          await FriendUpdate.addFriend(userID1, mainUserId: userID2);
         }
       }
     }
   }
 
-
-  Future<void> _uploadPicture(List<dynamic> sessionUsers, DateTime timestamp,) async {
+  Future<void> _uploadPicture(
+    List<dynamic> sessionUsers,
+    DateTime timestamp,
+  ) async {
     List<dynamic> usersAllowed = [];
 
     // Three possible states
@@ -303,18 +297,14 @@ class SessionProvider extends ChangeNotifier {
     }
 
     // Move picture to the posted folder
-    String? downloadUrl = await PictureQuery.movePictureToPermanentStorage(host);
+    String? downloadUrl =
+        await PictureQuery.movePictureToPermanentStorage(host);
     host.imageUrl = downloadUrl;
     debugPrint('(SessionProvider): Moved picture to $downloadUrl');
 
     // Create a Picture object
-    PictureData picture = PictureData.newPicture(
-        host.imageUrl!,
-        timestamp,
-        host.tempFile(),
-        _privacy.isPublic,
-        _caption!,
-        usersAllowed);
+    PictureData picture = PictureData.newPicture(host.imageUrl!, host.user.name, timestamp,
+        host.tempFile(), _privacy.isPublic, _caption!, usersAllowed);
 
     for (String userID in sessionUsers) {
       // Save the picture to the user's subcollection
@@ -325,7 +315,6 @@ class SessionProvider extends ChangeNotifier {
     }
   }
 
-
   Future<void> cancelLobby(BuildContext context) async {
     if (host.main()) {
       // If the host quits, clear the list
@@ -334,22 +323,22 @@ class SessionProvider extends ChangeNotifier {
       });
     } else {
       // If a joiner quits, remove their ID
-      await Constants.usersCollection.doc(host.host.id)
-          .update({
+      await Constants.usersCollection.doc(host.host.id).update({
         Constants.hostingDoc: FieldValue.arrayRemove([host.user.id])
       });
 
-      if(context.mounted) {
+      if (context.mounted) {
         GoRouter.of(context).pop();
       }
     }
   }
 
-
   SessionProvider._(
       {required this.host, required this.idToBubbleMap, required this.ids});
 
-  factory SessionProvider.builder(Host host,) {
+  factory SessionProvider.builder(
+    Host host,
+  ) {
     Map<String, Bubble> idToBubbleMap = {
       for (Bubble bubble in host.joiners) bubble.id: bubble
     };
@@ -364,7 +353,7 @@ class SessionProvider extends ChangeNotifier {
   }
 
   double sliderValue(String id) {
-    return _sliderValues[id]?? 0;
+    return _sliderValues[id] ?? 0;
   }
 
   String hostUsername() {

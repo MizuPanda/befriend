@@ -1,3 +1,4 @@
+
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../models/objects/friendship.dart';
 import '../models/objects/home.dart';
+import '../utilities/constants.dart';
 
 class HomeProvider extends ChangeNotifier {
   double _scaleFactor = 1.0;
@@ -33,7 +35,9 @@ class HomeProvider extends ChangeNotifier {
   }
 
   Future<List<Friendship>> loadFriendships() async {
+    debugPrint('(HomeProvider): loadFriendships()');
     if (!home.user.friendshipsLoaded) {
+      debugPrint('(HomeProvider): Starting friendships...');
       home.user.friendships =
           await DataQuery.friendList(home.user.id, home.user.friendIDs);
       home.user.friendshipsLoaded = true;
@@ -86,7 +90,9 @@ class HomeProvider extends ChangeNotifier {
         CurvedAnimation(parent: _offsetController, curve: Curves.easeInOut));
 
     _listenable = Listenable.merge([_animation, _offsetAnimation]);
-    home.initializePositions();
+    if (home.user.friendshipsLoaded) {
+      home.initializePositions();
+    }
   }
 
   void doDispose() {
@@ -126,7 +132,7 @@ class HomeProvider extends ChangeNotifier {
     await FirebaseAuth.instance.signOut();
     UserManager.refreshPlayer();
     if (context.mounted) {
-      GoRouter.of(context).pushReplacement('/login');
+      GoRouter.of(context).pushReplacement(Constants.loginAddress);
     }
   }
 }

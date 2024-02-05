@@ -120,12 +120,22 @@ class _UserSliderState extends State<UserSlider> {
                         : null,
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                    ),
                     child: Row(
                       children: [
-                        Text('Public', style: GoogleFonts.openSans(fontSize: 12, fontStyle: FontStyle.italic),),
+                        Text(
+                          'Public',
+                          style: GoogleFonts.openSans(
+                              fontSize: 12, fontStyle: FontStyle.italic),
+                        ),
                         const Spacer(),
-                        Text('Private', style: GoogleFonts.openSans(fontSize: 12, fontStyle: FontStyle.italic),)
+                        Text(
+                          'Private',
+                          style: GoogleFonts.openSans(
+                              fontSize: 12, fontStyle: FontStyle.italic),
+                        )
                       ],
                     ),
                   )

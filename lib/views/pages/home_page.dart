@@ -44,47 +44,67 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         key: _scaffoldKey,
         body: Consumer<HomeProvider>(builder:
             (BuildContext context, HomeProvider provider, Widget? child) {
-          return FutureBuilder(
-              future: provider.loadFriendships(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<Friendship>> friendships) {
-                if (friendships.hasData) {
-                  return Stack(
-                    children: [
-                      GestureDetector(
-                        onScaleUpdate: _provider.scale,
-                        onDoubleTap: _provider.centerToMiddle,
-                        child: Transform.scale(
-                          scale: provider.scaleFactor,
-                          child: AnimatedBuilder(
-                              animation: _provider.listenable,
-                              builder: (BuildContext context, Widget? child) {
-                                return Container(
-                                  color: Colors.white,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  child: Transform.translate(
-                                    offset: _provider.pageOffset(),
-                                    child: const BubbleGroupWidget(),
-                                  ),
-                                );
-                              }),
-                        ),
-                      ),
-                      const BefriendWidget(),
-                      const SettingsButton(),
-                      const SearchButton(),
-                      const PictureButton(),
-                      if (!widget.home.connectedHome) const HomeButton()
-                    ],
-                  );
-                }
-                return const Center(
-                    child:
-                        CircularProgressIndicator()); //CHANGE THIS WITH SAMPLE SCREEN LATER (LOADING)
-              });
+          if (!provider.home.user.friendshipsLoaded) {
+            return FutureBuilder(
+                future: provider.loadFriendships(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<Friendship>> friendships) {
+                  if (friendships.hasData) {
+                    return HomeStack(provider: provider, widget: widget);
+                  }
+                  return const Center(
+                      child:
+                      CircularProgressIndicator()); //CHANGE THIS WITH SAMPLE SCREEN LATER (LOADING)
+                });
+          } else {
+            return HomeStack(provider: provider, widget: widget);
+          }
         }),
       ),
+    );
+  }
+}
+
+class HomeStack extends StatelessWidget {
+  const HomeStack({
+    super.key,
+    required HomeProvider provider,
+    required this.widget,
+  }) : _provider = provider;
+
+  final HomeProvider _provider;
+  final HomePage widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        GestureDetector(
+          onScaleUpdate: _provider.scale,
+          onDoubleTap: _provider.centerToMiddle,
+          child: Transform.scale(
+            scale: _provider.scaleFactor,
+            child: AnimatedBuilder(
+                animation: _provider.listenable,
+                builder: (BuildContext context, Widget? child) {
+                  return Container(
+                    color: Colors.white,
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: Transform.translate(
+                      offset: _provider.pageOffset(),
+                      child: const BubbleGroupWidget(),
+                    ),
+                  );
+                }),
+          ),
+        ),
+        const BefriendWidget(),
+        const SettingsButton(),
+        const SearchButton(),
+        const PictureButton(),
+        if (!widget.home.connectedHome) const HomeButton()
+      ],
     );
   }
 }

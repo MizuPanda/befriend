@@ -25,7 +25,7 @@ class FriendshipProgress {
     required this.progress,
     required this.lastSeen,
     required this.index,
-});
+  });
 
   String friendId() {
     if (index == 0) {
@@ -35,10 +35,18 @@ class FriendshipProgress {
   }
 
   String friendUsername() {
-    if(index == 0) {
+    if (index == 0) {
       return username2;
     }
     return username1;
+  }
+
+  void switchIndex () {
+    if (index == 0) {
+      index = 1;
+    } else {
+      index = 0;
+    }
   }
 
   factory FriendshipProgress.fromMap(Map<String, dynamic> map) {
@@ -58,15 +66,15 @@ class FriendshipProgress {
       level: map[Constants.levelDoc] as int,
       progress: (map[Constants.progressDoc] as num).toDouble(),
       lastSeen: (map[Constants.lastSeenDoc] as Timestamp).toDate(),
-      friendshipID: (map['${Constants.userDoc}1'] as String) + map['${Constants.userDoc}2'],
+      friendshipID: (map['${Constants.userDoc}1'] as String) +
+          map['${Constants.userDoc}2'],
     );
   }
-
 
   factory FriendshipProgress.fromDocs(DocumentSnapshot docs) {
     String user1ID = DataManager.getString(docs, '${Constants.userDoc}1');
     int index;
-    if(user1ID == AuthenticationManager.id()) {
+    if (user1ID == AuthenticationManager.id()) {
       index = 0;
     } else {
       index = 1;
@@ -84,7 +92,14 @@ class FriendshipProgress {
     );
   }
 
-  factory FriendshipProgress.newFriendship(String id1, String id2, String username1, String username2, int level, double progress, DateTime timestamp) {
+  factory FriendshipProgress.newFriendship(
+      String id1,
+      String id2,
+      String username1,
+      String username2,
+      int level,
+      double progress,
+      DateTime timestamp) {
     final List<String> ids = [id1, id2];
     ids.sort();
     int index;
@@ -95,7 +110,7 @@ class FriendshipProgress {
     }
     String friendshipId = ids.join();
     return FriendshipProgress(
-      index: index,
+        index: index,
         user1ID: id1,
         user2ID: id2,
         username1: username1,

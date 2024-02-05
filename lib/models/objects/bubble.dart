@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/objects/friendship.dart';
+import 'package:befriend/models/objects/profile.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +25,10 @@ class Bubble {
   double x = 0;
   double y = 0;
 
-  final Gradient gradient = const RadialGradient(
-    colors: [Colors.green, Colors.lightGreenAccent],
+  final Gradient gradient =  const LinearGradient(
+    colors: [Color(0xFFFF5F6D), Color(0xFFFFC371)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
   );
 
   Bubble._({
@@ -39,6 +42,7 @@ class Bubble {
     required this.friendIDs,
     required this.friendshipsLoaded,
   });
+
 
   factory Bubble.fromMapWithFriends(
       DocumentSnapshot docs, ImageProvider avatar, List<Friendship> friends) {
@@ -90,23 +94,8 @@ class Bubble {
   @override
   int get hashCode => id.hashCode;
 
-  String levelText() {
-    return main() ? 'Social Level' : 'Relationship Level';
-  }
-
   static double _bubbleSize(Bubble bubble) {
     return 60 + bubble.power * 55 / 12;
-  }
-
-  String levelNumberText() {
-    if (main()) {
-      return power.toString();
-    } else {
-      return friendships
-          .firstWhere((friendship) => friendship.friend.main())
-          .level
-          .toString();
-    }
   }
 
   Point<double> point() {

@@ -9,15 +9,32 @@ import 'package:uuid/uuid.dart';
 
 import '../../utilities/constants.dart';
 
-class Picture extends PictureData{
+class Picture extends PictureData {
   ImageProvider image;
 
+  // Just for testing
+  factory Picture.fromData(PictureData data) {
+    String url = data.fileUrl;
+    ImageProvider img = NetworkImage(url);
+
+    return Picture._(
+        image: img,
+        id: data.id,
+        fileUrl: data.fileUrl,
+        pictureTaker: data.pictureTaker,
+        timestamp: data.timestamp,
+        metadata: data.metadata,
+        public: data.public,
+        caption: data.caption,
+        allowedIDS: data.allowedIDS,
+        usersHavingSeen: data.allowedIDS);
+  }
 
   Picture._(
-      {
-        required this.image,
-        required super.id,
+      {required this.image,
+      required super.id,
       required super.fileUrl,
+        required super.pictureTaker,
       required super.timestamp,
       required super.metadata,
       required super.public,
@@ -25,27 +42,31 @@ class Picture extends PictureData{
       required super.allowedIDS,
       required super.usersHavingSeen});
 
-  factory Picture.fromDocument(DocumentSnapshot docs,) {
+  factory Picture.fromDocument(
+    DocumentSnapshot docs,
+  ) {
     String url = DataManager.getString(docs, Constants.urlDoc);
     ImageProvider img = NetworkImage(url);
 
     return Picture._(
-      image: img,
+        image: img,
         id: docs.id,
         fileUrl: url,
+        pictureTaker: DataManager.getString(docs, Constants.pictureTakerDoc),
         timestamp: DataManager.getDateTime(docs, Constants.timestampDoc),
         metadata: DataManager.getMap(docs, Constants.metadataDoc),
-        public: DataManager.getBoolean(docs,Constants.publicDoc),
+        public: DataManager.getBoolean(docs, Constants.publicDoc),
         caption: DataManager.getString(docs, Constants.captionDoc),
         allowedIDS: DataManager.getList(docs, Constants.allowedUsersDoc),
-        usersHavingSeen: DataManager.getList(docs, Constants.usersHavingSeenDoc));
+        usersHavingSeen:
+            DataManager.getList(docs, Constants.usersHavingSeenDoc));
   }
-
 }
 
 class PictureData {
   String id;
   String fileUrl;
+  String pictureTaker;
   DateTime timestamp;
   Map<String, dynamic> metadata; //String size, String extension
   bool public;
@@ -57,6 +78,7 @@ class PictureData {
       {
         required this.id,
         required this.fileUrl,
+        required this.pictureTaker,
         required this.timestamp,
         required this.metadata,
         required this.public,
@@ -64,20 +86,31 @@ class PictureData {
         required this.allowedIDS,
         required this.usersHavingSeen});
 
-  factory PictureData.fromDocument(DocumentSnapshot docs,) {
+  factory PictureData.fromDocument(
+    DocumentSnapshot docs,
+  ) {
     return PictureData(
         id: docs.id,
+        pictureTaker: DataManager.getString(docs, Constants.pictureTakerDoc),
         fileUrl: DataManager.getString(docs, Constants.urlDoc),
         timestamp: DataManager.getDateTime(docs, Constants.timestampDoc),
         metadata: DataManager.getMap(docs, Constants.metadataDoc),
-        public: DataManager.getBoolean(docs,Constants.publicDoc),
+        public: DataManager.getBoolean(docs, Constants.publicDoc),
         caption: DataManager.getString(docs, Constants.captionDoc),
         allowedIDS: DataManager.getList(docs, Constants.allowedUsersDoc),
-        usersHavingSeen: DataManager.getList(docs, Constants.usersHavingSeenDoc));
+        usersHavingSeen:
+            DataManager.getList(docs, Constants.usersHavingSeenDoc));
   }
 
-  factory PictureData.newPicture(String fileUrl, DateTime timestamp, File file, bool isPublic, String caption, List<dynamic> allowedIDS,) {
-
+  factory PictureData.newPicture(
+    String fileUrl,
+    String pictureTaker,
+    DateTime timestamp,
+    File file,
+    bool isPublic,
+    String caption,
+    List<dynamic> allowedIDS,
+  ) {
     String uuid = const Uuid().v4().toString();
     Map<String, String> metadata = {
       'size': _formatBytes(file.lengthSync(), 0),
@@ -86,6 +119,7 @@ class PictureData {
     return PictureData(
         id: uuid,
         fileUrl: fileUrl,
+        pictureTaker: pictureTaker,
         timestamp: timestamp,
         metadata: metadata,
         public: isPublic,
@@ -97,6 +131,7 @@ class PictureData {
   Map<String, dynamic> toMap() {
     return {
       Constants.urlDoc: fileUrl,
+      Constants.pictureTakerDoc: pictureTaker,
       Constants.timestampDoc: timestamp,
       Constants.metadataDoc: metadata,
       Constants.publicDoc: public,

@@ -16,7 +16,7 @@ class BubbleProgressIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: CircularProgressIndicator(
-        value: friendship.progress / 100,
+        value: friendship.progress,
         strokeWidth: BubbleWidget.strokeWidth,
         valueColor: const AlwaysStoppedAnimation<Color>(Colors.transparent),
       ),
@@ -38,7 +38,7 @@ class BubbleGradientIndicator extends StatelessWidget {
       child: CustomPaint(
         painter: GradientPainter(
           gradient: friendship.friend.gradient,
-          progress: friendship.progress / 100,
+          progress: friendship.progress,
           strokeWidth: BubbleWidget.strokeWidth,
         ),
       ),

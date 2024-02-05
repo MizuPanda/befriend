@@ -16,6 +16,7 @@ class PictureQuery {
         .child(Constants.sessionPictureStorage)
         .child(host.host.id);
   }
+
   static Future<String?> uploadAvatar(File imageFile) async {
     String? downloadUrl = await _uploadProfilePicture(imageFile);
     if (downloadUrl != null) {
@@ -26,10 +27,13 @@ class PictureQuery {
     return downloadUrl;
   }
 
-  static Future<String?> uploadTempPicture(Host host, List<dynamic> sessionUsers) async {
-    String? downloadUrl = await _uploadPictureForSession(host, );
+  static Future<String?> uploadTempPicture(
+      Host host, List<dynamic> sessionUsers) async {
+    String? downloadUrl = await _uploadPictureForSession(
+      host,
+    );
 
-    if(downloadUrl != null) {
+    if (downloadUrl != null) {
       List<dynamic> lst = ['${Constants.pictureMarker}$downloadUrl'];
       lst.addAll(sessionUsers);
 
@@ -39,7 +43,9 @@ class PictureQuery {
     return downloadUrl;
   }
 
-  static Future<String?> _uploadPictureForSession(Host host,) async {
+  static Future<String?> _uploadPictureForSession(
+    Host host,
+  ) async {
     File file = host.tempFile();
     // Get file extension
     String fileExtension = path.extension(file.path);
@@ -96,7 +102,9 @@ class PictureQuery {
     }
   }
 
-  static Future<String?> movePictureToPermanentStorage(Host host,) async {
+  static Future<String?> movePictureToPermanentStorage(
+    Host host,
+  ) async {
     String tempDownloadUrl = host.imageUrl!;
 
     // Extract the file name from the temporary download URL
@@ -118,8 +126,8 @@ class PictureQuery {
   // Function to delete all pictures in the temporary directory
   static Future<void> deleteTemporaryPictures(Host host) async {
     // Get reference to the temp directory
-    Reference tempDirRef = _hostSessionRef(host)
-        .child(Constants.tempPictureStorage);
+    Reference tempDirRef =
+        _hostSessionRef(host).child(Constants.tempPictureStorage);
 
     // List all items (files) within the directory
     ListResult items = await tempDirRef.listAll();

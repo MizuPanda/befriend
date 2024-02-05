@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/authentication/authentication.dart';
+import '../utilities/constants.dart';
 
 class LoginProvider extends ChangeNotifier {
   final _formKey = GlobalKey<FormState>();
@@ -71,7 +72,7 @@ class LoginProvider extends ChangeNotifier {
   }
 
   void navigateToSignUp(BuildContext context) {
-    GoRouter.of(context).push('/signup');
+    GoRouter.of(context).push(Constants.signupAddress);
   }
 
   String? emailValidator(String? email) {
@@ -107,6 +108,6 @@ class LoginProvider extends ChangeNotifier {
   }
 
   void openForgotPasswordPage(BuildContext context) {
-    GoRouter.of(context).push('/forgot');
+    GoRouter.of(context).push(Constants.forgotAddress);
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../models/objects/home.dart';
+import '../../../../utilities/constants.dart';
 import 'bubble_widget.dart';
 
 class ShakeableBubble extends StatefulWidget {
@@ -66,7 +67,7 @@ class _ShakeableBubbleState extends State<ShakeableBubble>
         HapticFeedback.selectionClick(); // Optionally provide haptic feedback
         Future.delayed(const Duration(milliseconds: 275), () {
           if (_isPressed) {
-            GoRouter.of(context).push('/homepage', extra: widget.specificHome);
+            GoRouter.of(context).push(Constants.homepageAddress, extra: widget.specificHome);
             _animationController.reset();
           }
         });

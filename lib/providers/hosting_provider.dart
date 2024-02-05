@@ -19,7 +19,8 @@ class HostingProvider extends ChangeNotifier {
   StreamSubscription<DocumentSnapshot>? _stream;
 
   void showQR(BuildContext context) {
-    QR.showQRCodeDialog(context, '${Constants.appID}.${_host.host.id}', _host.joiners.length);
+    QR.showQRCodeDialog(
+        context, '${Constants.appID}.${_host.host.id}', _host.joiners.length);
   }
 
   Future<String> startingHost(BuildContext context) async {
@@ -102,15 +103,15 @@ class HostingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-
   Future<void> startSession() async {
     List<dynamic> sessionUsers = [Constants.pictureState];
     List<String> userIds = _host.joiners.map((e) => e.id).toList();
     sessionUsers.addAll(userIds);
-    Map<String, List<FriendshipProgress>> idToFriendships = await FriendManager.fetchFriendshipsForUsers(userIds);
+    Map<String, List<FriendshipProgress>> idToFriendships =
+        await FriendManager.fetchFriendshipsForUsers(userIds);
 
     await DataQuery.updateDocument(Constants.hostingDoc, sessionUsers);
-    await DataQuery.updateDocument(Constants.hostingFriendships, idToFriendships);
+    await DataQuery.updateDocument(
+        Constants.hostingFriendships, idToFriendships);
   }
-
 }
