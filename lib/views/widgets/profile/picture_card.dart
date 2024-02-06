@@ -53,7 +53,7 @@ class _PictureCardState extends State<PictureCard> {
                           .red), // Display an error icon or any other widget
                 );
               },
-              image: widget.picture.image, // Fixed height for the image
+              image: widget.picture.image,
               fit: BoxFit.scaleDown, // Ensures the image covers the card area
             ),
             Padding(

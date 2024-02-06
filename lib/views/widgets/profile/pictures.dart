@@ -22,6 +22,7 @@ class ProfilePictures extends StatefulWidget {
 
 class _ProfilePicturesState extends State<ProfilePictures> {
   static const _pageSize = 5;
+  DocumentSnapshot? _lastVisible;
 
   final PagingController<int, Picture> _pagingController =
       PagingController(firstPageKey: 0);
@@ -36,19 +37,43 @@ class _ProfilePicturesState extends State<ProfilePictures> {
 
   Future<void> _fetchPage(int pageKey) async {
     try {
-      // Assuming `userId` is available for fetching the subcollection
       final String userId = widget.user.id;
-      final QuerySnapshot querySnapshot = await Constants.usersCollection
-          .doc(userId)
-          .collection(Constants.pictureSubCollection)
-          .where(Filter.or(
-              Filter(Constants.publicDoc, isEqualTo: true),
-              Filter(Constants.allowedUsersDoc,
-                  arrayContains: AuthenticationManager.id())))
-          .orderBy(Constants.timestampDoc, descending: true)
-          .startAfter([pageKey])
-          .limit(_pageSize)
-          .get();
+      final Future<QuerySnapshot> query;
+      if (pageKey == 0 && _lastVisible == null) {
+
+        query = Constants.usersCollection
+            .doc(userId)
+            .collection(Constants.pictureSubCollection)
+            .where(Filter.or(
+            Filter(Constants.publicDoc, isEqualTo: true),
+            Filter(Constants.allowedUsersDoc,
+                arrayContains: AuthenticationManager.id())))
+            .orderBy(Constants.timestampDoc, descending: true)
+            .limit(_pageSize)
+            .get();
+
+      } else {
+        query = Constants.usersCollection
+            .doc(userId)
+            .collection(Constants.pictureSubCollection)
+            .where(Filter.or(
+            Filter(Constants.publicDoc, isEqualTo: true),
+            Filter(Constants.allowedUsersDoc,
+                arrayContains: AuthenticationManager.id())))
+            .orderBy(Constants.timestampDoc, descending: true)
+            .startAfterDocument(_lastVisible!)
+            .limit(_pageSize)
+            .get();
+      }
+
+      query.then((value)  {
+        int index = value.size - 1;
+        if (index >= 0) {
+          _lastVisible = value.docs[value.size - 1];
+        }
+      }, onError: (e) => debugPrint("(Pictures): Error completing: $e"),);
+
+      final QuerySnapshot querySnapshot = await query;
 
       final List<Picture> newItems =
           querySnapshot.docs.map((doc) => Picture.fromDocument(doc)).toList();
@@ -82,3 +107,4 @@ class _ProfilePicturesState extends State<ProfilePictures> {
     super.dispose();
   }
 }
+
