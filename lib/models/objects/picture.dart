@@ -34,7 +34,7 @@ class Picture extends PictureData {
       {required this.image,
       required super.id,
       required super.fileUrl,
-        required super.pictureTaker,
+      required super.pictureTaker,
       required super.timestamp,
       required super.metadata,
       required super.public,
@@ -75,16 +75,15 @@ class PictureData {
   List<dynamic> usersHavingSeen;
 
   PictureData(
-      {
-        required this.id,
-        required this.fileUrl,
-        required this.pictureTaker,
-        required this.timestamp,
-        required this.metadata,
-        required this.public,
-        required this.caption,
-        required this.allowedIDS,
-        required this.usersHavingSeen});
+      {required this.id,
+      required this.fileUrl,
+      required this.pictureTaker,
+      required this.timestamp,
+      required this.metadata,
+      required this.public,
+      required this.caption,
+      required this.allowedIDS,
+      required this.usersHavingSeen});
 
   factory PictureData.fromDocument(
     DocumentSnapshot docs,

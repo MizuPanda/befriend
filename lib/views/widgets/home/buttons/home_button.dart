@@ -15,12 +15,12 @@ class HomeButton extends StatefulWidget {
 }
 
 class _HomeButtonState extends State<HomeButton> {
-
   @override
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.bottomLeft,
-      margin: const EdgeInsets.only(bottom: 90, left: Constants.homeHorizontalPadding),
+      margin: const EdgeInsets.only(
+          bottom: 90, left: Constants.homeHorizontalPadding),
       child: Container(
         width: Constants.homeButtonSize + Constants.homeButtonAddSize,
         height: Constants.homeButtonSize + Constants.homeButtonAddSize,

@@ -25,7 +25,7 @@ class Bubble {
   double x = 0;
   double y = 0;
 
-  final Gradient gradient =  const LinearGradient(
+  final Gradient gradient = const LinearGradient(
     colors: [Color(0xFFFF5F6D), Color(0xFFFFC371)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -42,7 +42,6 @@ class Bubble {
     required this.friendIDs,
     required this.friendshipsLoaded,
   });
-
 
   factory Bubble.fromMapWithFriends(
       DocumentSnapshot docs, ImageProvider avatar, List<Friendship> friends) {

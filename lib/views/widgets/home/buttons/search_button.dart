@@ -27,11 +27,13 @@ class _SearchButtonState extends State<SearchButton> {
         builder: (BuildContext context, HomeProvider provider, Widget? child) {
       return Container(
         alignment: Alignment.bottomCenter,
-        margin: const EdgeInsets.only(bottom: 60, right: Constants.homeHorizontalPadding),
+        margin: const EdgeInsets.only(
+            bottom: 60, right: Constants.homeHorizontalPadding),
         child: GestureDetector(
           child: AnimSearchBar(
             rtl: true,
-            width: MediaQuery.of(context).size.width - (provider.home.user.main()? normalPadding : friendPadding),
+            width: MediaQuery.of(context).size.width -
+                (provider.home.user.main() ? normalPadding : friendPadding),
             onSuffixTap: () {
               setState(() {
                 _textEditingController.clear();

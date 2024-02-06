@@ -23,7 +23,8 @@ class ProfilePictures extends StatefulWidget {
 class _ProfilePicturesState extends State<ProfilePictures> {
   static const _pageSize = 5;
 
-  final PagingController<int, Picture> _pagingController = PagingController(firstPageKey: 0);
+  final PagingController<int, Picture> _pagingController =
+      PagingController(firstPageKey: 0);
 
   @override
   void initState() {
@@ -40,16 +41,17 @@ class _ProfilePicturesState extends State<ProfilePictures> {
       final QuerySnapshot querySnapshot = await Constants.usersCollection
           .doc(userId)
           .collection(Constants.pictureSubCollection)
-          .orderBy(Constants.timestampDoc) // Ensure you have an index for this in Firestore
+          .where(Filter.or(
+              Filter(Constants.publicDoc, isEqualTo: true),
+              Filter(Constants.allowedUsersDoc,
+                  arrayContains: AuthenticationManager.id())))
+          .orderBy(Constants.timestampDoc, descending: true)
           .startAfter([pageKey])
           .limit(_pageSize)
           .get();
 
-      final List<Picture> allPictures = querySnapshot.docs.map((doc) => Picture.fromDocument(doc)).toList();
-
-      // Filter pictures based on the public field or if the user is in the allowed array
-      final List<Picture> newItems = allPictures.where((picture) =>
-      picture.public || picture.allowedIDS.contains(AuthenticationManager.id())).toList();
+      final List<Picture> newItems =
+          querySnapshot.docs.map((doc) => Picture.fromDocument(doc)).toList();
 
       final bool isLastPage = newItems.length < _pageSize;
       if (isLastPage) {
@@ -59,13 +61,13 @@ class _ProfilePicturesState extends State<ProfilePictures> {
         _pagingController.appendPage(newItems, nextPageKey);
       }
     } catch (error) {
+      debugPrint(error.toString());
       _pagingController.error = error;
     }
   }
 
   @override
-  Widget build(BuildContext context) =>
-      PagedListView<int, Picture>(
+  Widget build(BuildContext context) => PagedListView<int, Picture>(
         pagingController: _pagingController,
         builderDelegate: PagedChildBuilderDelegate<Picture>(
           itemBuilder: (context, item, index) => PictureCard(
@@ -79,5 +81,4 @@ class _ProfilePicturesState extends State<ProfilePictures> {
     _pagingController.dispose();
     super.dispose();
   }
-
 }

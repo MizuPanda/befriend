@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   }
                   return const Center(
                       child:
-                      CircularProgressIndicator()); //CHANGE THIS WITH SAMPLE SCREEN LATER (LOADING)
+                          CircularProgressIndicator()); //CHANGE THIS WITH SAMPLE SCREEN LATER (LOADING)
                 });
           } else {
             return HomeStack(provider: provider, widget: widget);

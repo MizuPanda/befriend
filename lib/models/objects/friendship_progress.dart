@@ -41,7 +41,7 @@ class FriendshipProgress {
     return username1;
   }
 
-  void switchIndex () {
+  void switchIndex() {
     if (index == 0) {
       index = 1;
     } else {

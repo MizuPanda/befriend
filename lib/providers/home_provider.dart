@@ -1,4 +1,3 @@
-
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:firebase_auth/firebase_auth.dart';

@@ -2,7 +2,8 @@ import '../objects/bubble.dart';
 import '../objects/friendship.dart';
 
 class FriendshipAccumulator {
-  static final FriendshipAccumulator _singleton = FriendshipAccumulator._internal();
+  static final FriendshipAccumulator _singleton =
+      FriendshipAccumulator._internal();
   final Set<Friendship> _savedFriendships = {};
 
   factory FriendshipAccumulator() {

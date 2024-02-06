@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../models/objects/picture.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class PictureCard extends StatefulWidget {
   final Picture picture;
@@ -63,23 +64,30 @@ class _PictureCardState extends State<PictureCard> {
                   const SizedBox(
                     height: 10,
                   ),
-                   Text.rich(
-                     TextSpan(
-                         children: [
-                           TextSpan(text: widget.picture.pictureTaker, style: GoogleFonts.openSans(
-                             fontSize: 15,
-                               fontWeight: FontWeight.bold),
-                           ),
-                           TextSpan(text: ' ${widget.picture.caption}', style: GoogleFonts.openSans(
-                             fontSize: 14
-                           )),
-                         ])
-                   ),
+                  Text.rich(TextSpan(children: [
+                    TextSpan(
+                      text: widget.picture.pictureTaker,
+                      style: GoogleFonts.openSans(
+                          fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                        text: ' ${widget.picture.caption}',
+                        style: GoogleFonts.openSans(fontSize: 14)),
+                  ])),
                   const SizedBox(
-                      height: 8), // Adds a small space before the date
+                    height: 4,
+                  ),
+                  Text(
+                    timeago.format(widget.picture.timestamp),
+                    style: GoogleFonts.openSans(
+                        color: Colors.grey, fontSize: 12.5),
+                  ),
+                  const SizedBox(
+                      height: 2), // Adds a small space before the date
                   Text(
                     _formatDate(widget.picture.timestamp),
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    style:
+                        GoogleFonts.openSans(color: Colors.grey, fontSize: 12),
                   ),
                   const SizedBox(
                     height: 5,

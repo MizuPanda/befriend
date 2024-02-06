@@ -2,6 +2,7 @@ import 'package:befriend/models/objects/profile.dart';
 import 'package:befriend/views/pages/forgot_pass_page.dart';
 import 'package:befriend/views/pages/home_page.dart';
 import 'package:befriend/views/pages/login_page.dart';
+import 'package:befriend/views/pages/mutual_page.dart';
 import 'package:befriend/views/pages/picture_sign_page.dart';
 import 'package:befriend/views/pages/profile_page.dart';
 import 'package:befriend/views/pages/sign_page.dart';
@@ -21,6 +22,7 @@ class MyRouter {
   static const String forgot = 'forgot';
   static const String picture = 'picture';
   static const String session = 'session';
+  static const String mutual = 'mutual';
 
   static final GoRouter router = GoRouter(
     routes: <RouteBase>[
@@ -72,7 +74,12 @@ class MyRouter {
                 path: session,
                 builder: (BuildContext context, GoRouterState state) {
                   return PictureSession(host: state.extra as Host);
-                })
+                }),
+            GoRoute(
+                path: mutual,
+                builder: (BuildContext context, GoRouterState state) {
+                  return const MutualPage();
+                }),
           ]),
     ],
   );

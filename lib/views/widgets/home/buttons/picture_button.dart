@@ -30,8 +30,8 @@ class _PictureButtonState extends State<PictureButton> {
       right: -dragPosition,
       left: dragPosition,
       bottom: 12,
-      duration: const Duration(
-          milliseconds: 300), // Keeps the button at the bottom
+      duration:
+          const Duration(milliseconds: 300), // Keeps the button at the bottom
       child: GestureDetector(
         onHorizontalDragUpdate: (details) {
           setState(() {
@@ -51,15 +51,17 @@ class _PictureButtonState extends State<PictureButton> {
             height: 54,
             decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: isJoinMode? const [
-                    Color.fromRGBO(203, 98, 98, 1.0),
-                    Color.fromRGBO(213, 18, 18, 1.0),
-                    Color.fromRGBO(203, 98, 98, 1.0),
-                  ] : const [
-                    Color.fromRGBO(109, 146, 208, 1.0),
-                    Color.fromRGBO(0, 73, 243, 1.0),
-                    Color.fromRGBO(109, 146, 208, 1.0),
-                  ],
+                  colors: isJoinMode
+                      ? const [
+                          Color.fromRGBO(203, 98, 98, 1.0),
+                          Color.fromRGBO(213, 18, 18, 1.0),
+                          Color.fromRGBO(203, 98, 98, 1.0),
+                        ]
+                      : const [
+                          Color.fromRGBO(109, 146, 208, 1.0),
+                          Color.fromRGBO(0, 73, 243, 1.0),
+                          Color.fromRGBO(109, 146, 208, 1.0),
+                        ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
@@ -68,14 +70,16 @@ class _PictureButtonState extends State<PictureButton> {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: isJoinMode? const Color.fromRGBO(213, 18, 18, 1.0).withOpacity(0.2)
-                    : const Color.fromRGBO(0, 73, 243, 1.0).withOpacity(0.2),
+                    color: isJoinMode
+                        ? const Color.fromRGBO(213, 18, 18, 1.0)
+                            .withOpacity(0.2)
+                        : const Color.fromRGBO(0, 73, 243, 1.0)
+                            .withOpacity(0.2),
                     spreadRadius: 4,
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                   )
-                ]
-            ),
+                ]),
             child: GestureDetector(
               onTap: () {
                 if (isJoinMode) {

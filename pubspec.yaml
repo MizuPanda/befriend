@@ -59,6 +59,7 @@ dependencies:
   path: ^1.8.3
   uuid: ^4.3.3
   permission_handler: ^11.1.0
+  timeago: ^3.6.1
 
 dev_dependencies:
   flutter_test:

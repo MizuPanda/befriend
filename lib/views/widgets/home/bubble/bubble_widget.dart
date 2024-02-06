@@ -30,9 +30,13 @@ class BubbleWidget extends StatelessWidget {
         builder: (BuildContext context, HomeProvider provider, Widget? child) {
       return GestureDetector(
         onTap: () {
-          GoRouter.of(context).push(Constants.profileAddress,
-              extra: Profile(
-                  user: specificHome.user, notifyParent: provider.notify, friendship: specificHome.friendship),);
+          GoRouter.of(context).push(
+            Constants.profileAddress,
+            extra: Profile(
+                user: specificHome.user,
+                notifyParent: provider.notify,
+                friendship: specificHome.friendship),
+          );
         },
         child: Center(
           child: SizedBox(

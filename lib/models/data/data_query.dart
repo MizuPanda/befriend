@@ -43,7 +43,7 @@ class DataQuery {
         friendship = f;
       } else {
         DocumentSnapshot friendshipDocs =
-        await FriendManager.getData(userID, friend.id);
+            await FriendManager.getData(userID, friend.id);
 
         friendship = Friendship.fromDocs(friend, friendshipDocs);
       }

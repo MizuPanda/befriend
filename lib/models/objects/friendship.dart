@@ -21,14 +21,13 @@ class Friendship extends FriendshipProgress {
     required this.numberOfPicsNotSeen,
   });
 
-   Friendship swap(Bubble friendBubble, String id, Friendship f) {
+  Friendship swap(Bubble friendBubble, String id, Friendship f) {
     f.switchIndex();
 
     return switchBubble(friendBubble, f);
   }
 
   Friendship switchBubble(Bubble friendBubble, Friendship f) {
-
     return Friendship._(
         index: f.index,
         user1ID: f.user1ID,
@@ -61,8 +60,6 @@ class Friendship extends FriendshipProgress {
           friendBubble), //CALCULATE FROM BUBBLE (PICTURE SUB COLLECTION)
     );
   }
-
-
 
   static int setPicsSeen(Bubble bubble) {
     return 0;

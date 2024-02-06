@@ -67,7 +67,8 @@ class _ShakeableBubbleState extends State<ShakeableBubble>
         HapticFeedback.selectionClick(); // Optionally provide haptic feedback
         Future.delayed(const Duration(milliseconds: 275), () {
           if (_isPressed) {
-            GoRouter.of(context).push(Constants.homepageAddress, extra: widget.specificHome);
+            GoRouter.of(context)
+                .push(Constants.homepageAddress, extra: widget.specificHome);
             _animationController.reset();
           }
         });

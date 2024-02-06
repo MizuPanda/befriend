@@ -7,9 +7,14 @@ class Profile {
   Friendship? friendship;
   Function notifyParent;
 
-  Profile({required this.user, required this.friendship, required this.notifyParent});
+  Profile(
+      {required this.user,
+      required this.friendship,
+      required this.notifyParent});
 
   String levelText() {
-    return user.main() ? 'Social Level: ${user.power}' : 'Relationship Level: ${friendship!.level}';
+    return user.main()
+        ? 'Social Level: ${user.power}'
+        : 'Relationship Level: ${friendship!.level}';
   }
 }

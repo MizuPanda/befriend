@@ -1,5 +1,9 @@
+import 'package:befriend/providers/profile_provider.dart';
+import 'package:befriend/utilities/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../../../models/objects/profile.dart';
 
@@ -13,28 +17,62 @@ class ProfileState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(profile.levelText(),
-                style: GoogleFonts.firaMono(
-                  textStyle: const TextStyle(fontSize: 16, color: Colors.black),
-                )),
+    return Consumer<ProfileProvider>(builder:
+        (BuildContext context, ProfileProvider provider, Widget? child) {
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(profile.levelText(),
+                  style: GoogleFonts.firaMono(
+                    textStyle:
+                        const TextStyle(fontSize: 16, color: Colors.black),
+                  )),
+            ),
           ),
-        ),
-        if (!profile.user.main())
-          const SizedBox(height: 5,),
-        if (!profile.user.main())
-          ProgressBar(progress: profile.friendship!.progress,),
-
-      ],
-    );
+          if (!profile.user.main())
+            Column(
+              children: [
+                const SizedBox(
+                  height: 5,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 5.0),
+                  child: ProgressBar(
+                    progress: profile.friendship!.progress,
+                  ),
+                ),
+                if (!provider.areUsernamesEmpty())
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                        style: ButtonStyle(
+                          overlayColor: MaterialStateProperty.all(
+                              Colors.transparent), // Removes splash effect
+                        ),
+                        onPressed: () {
+                          GoRouter.of(context).push(Constants.mutualAddress);
+                        },
+                        child: Text.rich(TextSpan(
+                            style: GoogleFonts.openSans(
+                                fontSize: 13, color: Colors.black),
+                            children: [
+                              const TextSpan(text: 'Followed by '),
+                              TextSpan(
+                                  text: provider.friendsInCommon(),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold))
+                            ]))),
+                  ),
+              ],
+            ),
+        ],
+      );
+    });
   }
 }
-
 
 class ProgressBar extends StatelessWidget {
   final double progress; // Current progress (0.0 to 1.0)
@@ -58,7 +96,7 @@ class ProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        double width = constraints.maxWidth ; // 80% of the screen width
+        double width = constraints.maxWidth; // 80% of the screen width
         return Container(
           width: width,
           height: height,

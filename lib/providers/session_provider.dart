@@ -258,7 +258,9 @@ class SessionProvider extends ChangeNotifier {
 
         if (friendshipDoc.exists) {
           // Update existing friendship
-          await FriendshipUpdate.addProgress(userID1, userID2, friendshipDoc, exp: Constants.pictureExpValue);
+          await FriendshipUpdate.addProgress(
+              userID1, userID2, friendshipDoc, timestamp,
+              exp: Constants.pictureExpValue);
         } else {
           // Create a new friendship
           String username1 = idToBubbleMap[userID1]!.username;
@@ -303,8 +305,8 @@ class SessionProvider extends ChangeNotifier {
     debugPrint('(SessionProvider): Moved picture to $downloadUrl');
 
     // Create a Picture object
-    PictureData picture = PictureData.newPicture(host.imageUrl!, host.user.name, timestamp,
-        host.tempFile(), _privacy.isPublic, _caption!, usersAllowed);
+    PictureData picture = PictureData.newPicture(host.imageUrl!, host.user.name,
+        timestamp, host.tempFile(), _privacy.isPublic, _caption!, usersAllowed);
 
     for (String userID in sessionUsers) {
       // Save the picture to the user's subcollection
