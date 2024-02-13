@@ -5,7 +5,6 @@ import 'bubble.dart';
 
 class Friendship extends FriendshipProgress {
   Bubble friend;
-  int numberOfPicsNotSeen;
 
   Friendship._({
     required super.index,
@@ -18,7 +17,6 @@ class Friendship extends FriendshipProgress {
     required super.progress,
     required super.lastSeen,
     required this.friend,
-    required this.numberOfPicsNotSeen,
   });
 
   Friendship swap(Bubble friendBubble, String id, Friendship f) {
@@ -29,17 +27,46 @@ class Friendship extends FriendshipProgress {
 
   Friendship switchBubble(Bubble friendBubble, Friendship f) {
     return Friendship._(
-        index: f.index,
-        user1ID: f.user1ID,
-        user2ID: f.user2ID,
-        friendshipID: f.friendshipID,
-        username1: f.username1,
-        username2: f.username2,
-        level: f.level,
-        progress: f.progress,
-        lastSeen: f.lastSeen,
-        friend: friendBubble,
-        numberOfPicsNotSeen: f.numberOfPicsNotSeen);
+      index: f.index,
+      user1ID: f.user1ID,
+      user2ID: f.user2ID,
+      friendshipID: f.friendshipID,
+      username1: f.username1,
+      username2: f.username2,
+      level: f.level,
+      progress: f.progress,
+      lastSeen: f.lastSeen,
+      friend: friendBubble,
+    );
+  }
+
+  factory Friendship.custom(
+    int index,
+    String user1ID,
+    String user2ID,
+    String friendshipID,
+    String username1,
+    String username2,
+    int level,
+    double progress,
+    DateTime lastSeen,
+    int numberOfPicsNotSeen,
+    Bubble friend,
+  ) {
+    Friendship friendship = Friendship._(
+      index: index,
+      user1ID: user1ID,
+      user2ID: user2ID,
+      friendshipID: friendshipID,
+      username1: username1,
+      username2: username2,
+      level: level,
+      progress: progress,
+      lastSeen: lastSeen,
+      friend: friend,
+    );
+
+    return friendship;
   }
 
   factory Friendship.fromDocs(Bubble friendBubble, DocumentSnapshot docs) {
@@ -56,8 +83,6 @@ class Friendship extends FriendshipProgress {
       level: friendshipProgress.level,
       progress: friendshipProgress.progress,
       lastSeen: friendshipProgress.lastSeen,
-      numberOfPicsNotSeen: setPicsSeen(
-          friendBubble), //CALCULATE FROM BUBBLE (PICTURE SUB COLLECTION)
     );
   }
 

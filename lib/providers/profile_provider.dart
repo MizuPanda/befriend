@@ -25,15 +25,9 @@ class ProfileProvider extends ChangeNotifier {
       for (String friendID in profile.user.friendIDs) {
         if (friendID != mainUser.id) {
           for (Friendship friendship in mainUser.friendships) {
-            if (friendship.user1ID == friendID) {
+            if (friendship.friendId() == friendID) {
               friendsInCommon.add(_Friend(
-                  username: friendship.username1,
-                  power: friendship.level + friendship.progress));
-              commonFriends.add(friendship.friend);
-              break;
-            } else if (friendship.user2ID == friendID) {
-              friendsInCommon.add(_Friend(
-                  username: friendship.username2,
+                  username: friendship.friendUsername(),
                   power: friendship.level + friendship.progress));
               commonFriends.add(friendship.friend);
               break;

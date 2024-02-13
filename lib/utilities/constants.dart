@@ -45,6 +45,7 @@ class Constants {
   static final CollectionReference usersCollection =
       _firestore.collection('users');
   // HOME PAGE SIZES
+  static const double viewerSize = 5000;
   static const double homeButtonSize = 20;
   static const double homeButtonAddSize = 25;
   static const double homeHorizontalPadding = 15;

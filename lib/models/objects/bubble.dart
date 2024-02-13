@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/objects/friendship.dart';
-import 'package:befriend/models/objects/profile.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,6 @@ class Bubble {
   final String username;
   final String name;
   final String avatarUrl;
-  final int counter;
   final int power;
   ImageProvider avatar;
 
@@ -33,7 +31,6 @@ class Bubble {
 
   Bubble._({
     required this.id,
-    required this.counter,
     required this.username,
     required this.name,
     required this.power,
@@ -41,7 +38,33 @@ class Bubble {
     required this.avatarUrl,
     required this.friendIDs,
     required this.friendshipsLoaded,
-  });
+  }) {
+    size = _bubbleSize(this);
+  }
+
+  factory Bubble.custom(
+      String id,
+      String username,
+      String name,
+      int power,
+      ImageProvider avatar,
+      String avatarUrl,
+      List<dynamic> friendIDs,
+      bool friendshipsLoaded,
+      List<Friendship> friendships) {
+    Bubble bubble = Bubble._(
+        id: id,
+        username: username,
+        name: name,
+        power: power,
+        avatar: avatar,
+        avatarUrl: avatarUrl,
+        friendIDs: friendIDs,
+        friendshipsLoaded: friendshipsLoaded);
+
+    bubble.friendships = friendships;
+    return bubble;
+  }
 
   factory Bubble.fromMapWithFriends(
       DocumentSnapshot docs, ImageProvider avatar, List<Friendship> friends) {
@@ -49,7 +72,6 @@ class Bubble {
         id: docs.id,
         name: DataManager.getString(docs, Constants.nameDoc),
         username: DataManager.getString(docs, Constants.usernameDoc),
-        counter: DataManager.getNumber(docs, Constants.counterDoc).toInt(),
         power: DataManager.getNumber(docs, Constants.powerDoc).toInt(),
         avatarUrl: DataManager.getString(docs, Constants.avatarDoc),
         friendIDs: DataManager.getList(docs, Constants.friendsDoc),
@@ -57,7 +79,6 @@ class Bubble {
         avatar: avatar);
     bubble.friendships = friends;
 
-    bubble.size = _bubbleSize(bubble);
     //I will have to work on that
     return bubble;
   }
@@ -68,14 +89,12 @@ class Bubble {
         id: docs.id,
         name: DataManager.getString(docs, Constants.nameDoc),
         username: DataManager.getString(docs, Constants.usernameDoc),
-        counter: DataManager.getNumber(docs, Constants.counterDoc).toInt(),
         power: DataManager.getNumber(docs, Constants.powerDoc).toInt(),
         avatarUrl: DataManager.getString(docs, Constants.avatarDoc),
         friendIDs: DataManager.getList(docs, Constants.friendsDoc),
         friendshipsLoaded: false,
         avatar: avatar);
 
-    bubble.size = _bubbleSize(bubble);
     //I will have to work on that
 
     return bubble;
@@ -97,12 +116,20 @@ class Bubble {
     return 60 + bubble.power * 55 / 12;
   }
 
+  double textHeight() {
+    return 5 / 12 * size;
+  }
+
+  double bubbleHeight() {
+    return size + textHeight();
+  }
+
   Point<double> point() {
     return Point(x, y);
   }
 
   @override
   String toString() {
-    return 'Bubble{id: $id, username: $username, name: $name, avatarUrl: $avatarUrl, counter: $counter, power: $power, avatar: $avatar, friendIDs: $friendIDs, friendshipsLoaded: $friendshipsLoaded,}';
+    return 'Bubble{id: $id, username: $username, name: $name, avatarUrl: $avatarUrl, power: $power, avatar: $avatar, friendIDs: $friendIDs, friendshipsLoaded: $friendshipsLoaded,}';
   }
 }

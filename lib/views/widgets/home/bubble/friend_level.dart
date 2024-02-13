@@ -8,13 +8,11 @@ class FriendLevelWidget extends StatelessWidget {
   const FriendLevelWidget({
     super.key,
     required this.specificHome,
-    required this.textHeight,
     required this.levelHeight,
     required this.friendship,
   });
 
   final Home specificHome;
-  final double textHeight;
   final double levelHeight;
   final Friendship friendship;
 
@@ -23,7 +21,7 @@ class FriendLevelWidget extends StatelessWidget {
     return Container(
       width: specificHome.user.size,
       padding: EdgeInsets.only(
-          bottom: textHeight - levelHeight + 30 / 2,
+          bottom: specificHome.user.textHeight() - levelHeight + 30 / 2,
           left: specificHome.user.size / 2),
       alignment: Alignment.bottomCenter,
       child: Text(

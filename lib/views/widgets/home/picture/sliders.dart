@@ -58,6 +58,7 @@ class UserSlider extends StatefulWidget {
 
 class _UserSliderState extends State<UserSlider> {
   double sliderValue = 0;
+  static const _horizontalPadding = 16.0;
 
   @override
   void initState() {
@@ -73,75 +74,94 @@ class _UserSliderState extends State<UserSlider> {
         sliderValue = widget.sliderValue;
       }
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-        child: Row(
+        padding: const EdgeInsets.symmetric(
+            horizontal: _horizontalPadding, vertical: 10.0),
+        child: Column(
           children: [
-            ProfilePhoto(
-              user: widget.bubble,
-              radius: Constants.pictureDialogAvatarSize,
-            ),
-            const SizedBox(
-                width: 16.0), // For spacing between the photo and text
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
-                Text(widget.bubble.name,
-                    style: const TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    )),
+                Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black,
+                        spreadRadius: 0.5,
+                        offset: Offset(0, 1),
+                        blurRadius: 5,
+                      ),
+                    ],
+                  ),
+                  child: ProfilePhoto(
+                    user: widget.bubble,
+                    radius: Constants.pictureDialogAvatarSize,
+                  ),
+                ),
                 const SizedBox(
-                    height: 4.0), // For spacing between the name and username
-                Text(widget.bubble.username,
-                    style: const TextStyle(fontSize: 14.0, color: Colors.grey)),
+                    width: 16.0), // For spacing between the photo and text
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.bubble.name,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        )),
+                    const SizedBox(
+                        height:
+                            4.0), // For spacing between the name and username
+                    Text(widget.bubble.username,
+                        style: const TextStyle(
+                            fontSize: 14.0, color: Colors.grey)),
+                  ],
+                ),
               ],
             ),
-            Expanded(
-              child: Column(
-                children: [
-                  Slider(
-                    value: sliderValue,
-                    min: 0,
-                    max: 100,
-                    divisions: 100,
-                    onChanged: provider.isUser(widget.bubble.id)
-                        ? (double value) {
-                            setState(() {
-                              sliderValue = value;
-                            });
-                          }
-                        : null,
-                    onChangeEnd: provider.isUser(widget.bubble.id)
-                        ? (double value) async {
-                            // Debounce logic here if needed
-                            await widget.reference
-                                .update({Constants.sliderDoc: value});
-                          }
-                        : null,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
+            Column(
+              children: [
+                Slider(
+                  value: sliderValue,
+                  min: 0,
+                  max: 100,
+                  divisions: 100,
+                  onChanged: provider.isUser(widget.bubble.id)
+                      ? (double value) {
+                          setState(() {
+                            sliderValue = value;
+                          });
+                        }
+                      : null,
+                  onChangeEnd: provider.isUser(widget.bubble.id)
+                      ? (double value) async {
+                          // Debounce logic here if needed
+                          await widget.reference
+                              .update({Constants.sliderDoc: value});
+                        }
+                      : null,
+                ),
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: _horizontalPadding),
+                      child: Text(
+                        'Public',
+                        style: GoogleFonts.openSans(
+                            fontSize: 12, fontStyle: FontStyle.italic),
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Public',
-                          style: GoogleFonts.openSans(
-                              fontSize: 12, fontStyle: FontStyle.italic),
-                        ),
-                        const Spacer(),
-                        Text(
-                          'Private',
-                          style: GoogleFonts.openSans(
-                              fontSize: 12, fontStyle: FontStyle.italic),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            )
+                    const Spacer(),
+                    Padding(
+                      padding: const EdgeInsets.only(right: _horizontalPadding),
+                      child: Text(
+                        'Private',
+                        style: GoogleFonts.openSans(
+                            fontSize: 12, fontStyle: FontStyle.italic),
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
           ],
         ),
       );

@@ -42,13 +42,15 @@ class _SearchButtonState extends State<SearchButton> {
             textController: _textEditingController,
             onSubmitted: (String username) {
               // DEVELOP THAT IT GOES TO FRIENDS PROFILE IF NOT IN THE TOP 20 LIST
+              username = username.trim();
+
               for (Friendship friendship in provider.home.user.friendships) {
                 if (friendship.friend.username == username ||
                     friendship.friend.name == username) {
                   Bubble searchedBubble = friendship.friend;
-                  provider.animateToFriend(
-                    Offset(searchedBubble.x, searchedBubble.y),
-                  );
+                  provider.animateToFriend(context,
+                      dx: searchedBubble.x, dy: searchedBubble.y);
+
                   return;
                 }
               }

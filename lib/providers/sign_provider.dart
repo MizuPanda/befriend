@@ -62,7 +62,7 @@ class SignProvider extends ChangeNotifier {
       return 'Please enter your name';
     }
     // Minimum and maximum length requirements
-    if (name.length < 2 || name.length > 30) {
+    if (name.length < 2 || name.length > 35) {
       return 'Please enter a shorter or longer name.';
     }
 
@@ -80,7 +80,7 @@ class SignProvider extends ChangeNotifier {
       return "Please enter a username.";
     }
     // Minimum and maximum length requirements
-    if (username.length < 6 || username.length > 15) {
+    if (username.length < 2 || username.length > 20) {
       return 'This username is too short or too lengthy.';
     }
 

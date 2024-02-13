@@ -1,8 +1,11 @@
-import 'package:flutter/cupertino.dart';
+import 'package:befriend/providers/home_provider.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../models/objects/home.dart';
+import '../../../../models/objects/profile.dart';
 import '../../../../utilities/constants.dart';
 import 'bubble_widget.dart';
 
@@ -58,34 +61,53 @@ class _ShakeableBubbleState extends State<ShakeableBubble>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () {
-        setState(() {
-          _isPressed = true;
-        });
-        _startShakeAnimation();
-        HapticFeedback.selectionClick(); // Optionally provide haptic feedback
-        Future.delayed(const Duration(milliseconds: 275), () {
-          if (_isPressed) {
-            GoRouter.of(context)
-                .push(Constants.homepageAddress, extra: widget.specificHome);
-            _animationController.reset();
-          }
-        });
-      },
-      onLongPressEnd: (LongPressEndDetails details) {
-        setState(() {
-          _isPressed = false;
-        });
-      },
-      child: AnimatedBuilder(
-          animation: _animation,
-          builder: (BuildContext context, Widget? child) {
-            return Transform.rotate(
-              angle: _isPressed ? _animation.value : 0,
-              child: BubbleWidget(specificHome: widget.specificHome),
-            );
-          }),
-    );
+    return Consumer<HomeProvider>(
+        builder: (BuildContext context, HomeProvider provider, Widget? child) {
+      return GestureDetector(
+        onLongPress: () {
+          setState(() {
+            _isPressed = true;
+          });
+          _startShakeAnimation();
+          HapticFeedback.selectionClick(); // Optionally provide haptic feedback
+          Future.delayed(const Duration(milliseconds: 275), () {
+            if (_isPressed) {
+              GoRouter.of(context)
+                  .push(Constants.homepageAddress, extra: widget.specificHome);
+              _animationController.reset();
+            }
+          });
+        },
+        onTap: () {
+          GoRouter.of(context).push(
+            Constants.profileAddress,
+            extra: Profile(
+                user: widget.specificHome.user,
+                notifyParent: provider.notify,
+                friendship: widget.specificHome.friendship),
+          );
+
+          debugPrint(
+              '(ShakeableBubble): ${widget.specificHome.user.username} Tapped');
+        },
+        onLongPressEnd: (LongPressEndDetails details) {
+          setState(() {
+            _isPressed = false;
+          });
+        },
+        child: SizedBox(
+          width: widget.specificHome.user.size,
+          height: widget.specificHome.user.bubbleHeight(),
+          child: AnimatedBuilder(
+              animation: _animation,
+              builder: (BuildContext context, Widget? child) {
+                return Transform.rotate(
+                  angle: _isPressed ? _animation.value : 0,
+                  child: BubbleWidget(specificHome: widget.specificHome),
+                );
+              }),
+        ),
+      );
+    });
   }
 }

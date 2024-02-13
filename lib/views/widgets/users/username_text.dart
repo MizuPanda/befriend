@@ -1,8 +1,8 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../models/objects/bubble.dart';
-import '../home/bubble/bubble_widget.dart';
 
 class UsernameText extends StatelessWidget {
   const UsernameText({
@@ -14,16 +14,19 @@ class UsernameText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: BubbleWidget.textHeight,
-      child: Text(user.main() ? 'You' : user.username,
-          style: GoogleFonts.robotoCondensed(
+    return Container(
+      height: user.textHeight(),
+      width: user.size,
+      alignment: Alignment.center,
+      child: AutoSizeText(user.main() ? 'You' : user.username,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: GoogleFonts.openSans(
             textStyle: TextStyle(
-              color: Colors.black,
-              fontWeight: user.main() ? FontWeight.w300 : FontWeight.w500,
-              fontStyle: user.main() ? FontStyle.italic : FontStyle.normal,
-              fontSize: 20,
-            ),
+                color: Colors.black,
+                fontWeight: user.main() ? FontWeight.w300 : FontWeight.w500,
+                fontStyle: user.main() ? FontStyle.italic : FontStyle.normal,
+                fontSize: 30),
           )),
     );
   }

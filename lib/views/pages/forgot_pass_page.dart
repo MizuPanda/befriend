@@ -3,8 +3,6 @@ import 'package:befriend/views/widgets/befriend_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/general/focus_text_field.dart';
-
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
 
@@ -66,7 +64,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     style: TextStyle(fontSize: 18),
                   ),
                   const SizedBox(height: 20),
-                  FocusTextField(
+                  TextField(
                     controller: _provider.emailController,
                     focusNode: _provider.focusNode,
                     decoration: const InputDecoration(

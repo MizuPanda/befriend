@@ -40,38 +40,39 @@ class _ProfilePicturesState extends State<ProfilePictures> {
       final String userId = widget.user.id;
       final Future<QuerySnapshot> query;
       if (pageKey == 0 && _lastVisible == null) {
-
         query = Constants.usersCollection
             .doc(userId)
             .collection(Constants.pictureSubCollection)
             .where(Filter.or(
-            Filter(Constants.publicDoc, isEqualTo: true),
-            Filter(Constants.allowedUsersDoc,
-                arrayContains: AuthenticationManager.id())))
+                Filter(Constants.publicDoc, isEqualTo: true),
+                Filter(Constants.allowedUsersDoc,
+                    arrayContains: AuthenticationManager.id())))
             .orderBy(Constants.timestampDoc, descending: true)
             .limit(_pageSize)
             .get();
-
       } else {
         query = Constants.usersCollection
             .doc(userId)
             .collection(Constants.pictureSubCollection)
             .where(Filter.or(
-            Filter(Constants.publicDoc, isEqualTo: true),
-            Filter(Constants.allowedUsersDoc,
-                arrayContains: AuthenticationManager.id())))
+                Filter(Constants.publicDoc, isEqualTo: true),
+                Filter(Constants.allowedUsersDoc,
+                    arrayContains: AuthenticationManager.id())))
             .orderBy(Constants.timestampDoc, descending: true)
             .startAfterDocument(_lastVisible!)
             .limit(_pageSize)
             .get();
       }
 
-      query.then((value)  {
-        int index = value.size - 1;
-        if (index >= 0) {
-          _lastVisible = value.docs[value.size - 1];
-        }
-      }, onError: (e) => debugPrint("(Pictures): Error completing: $e"),);
+      query.then(
+        (value) {
+          int index = value.size - 1;
+          if (index >= 0) {
+            _lastVisible = value.docs[value.size - 1];
+          }
+        },
+        onError: (e) => debugPrint("(Pictures): Error completing: $e"),
+      );
 
       final QuerySnapshot querySnapshot = await query;
 
@@ -107,4 +108,3 @@ class _ProfilePicturesState extends State<ProfilePictures> {
     super.dispose();
   }
 }
-

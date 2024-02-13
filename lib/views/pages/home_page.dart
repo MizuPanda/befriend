@@ -1,10 +1,11 @@
 import 'package:befriend/providers/home_provider.dart';
+import 'package:befriend/utilities/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/objects/friendship.dart';
 import '../../models/objects/home.dart';
-import '../widgets/befriend_widget.dart';
 import '../widgets/home/bubble/bubble_group.dart';
 import '../widgets/home/buttons/home_button.dart';
 import '../widgets/home/buttons/picture_button.dart';
@@ -68,42 +69,44 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 class HomeStack extends StatelessWidget {
   const HomeStack({
     super.key,
-    required HomeProvider provider,
     required this.widget,
-  }) : _provider = provider;
+    required this.provider,
+  });
 
-  final HomeProvider _provider;
+  final HomeProvider provider;
+
   final HomePage widget;
 
   @override
   Widget build(BuildContext context) {
     return Stack(
+      clipBehavior: Clip.none,
       children: [
-        GestureDetector(
-          onScaleUpdate: _provider.scale,
-          onDoubleTap: _provider.centerToMiddle,
-          child: Transform.scale(
-            scale: _provider.scaleFactor,
-            child: AnimatedBuilder(
-                animation: _provider.listenable,
-                builder: (BuildContext context, Widget? child) {
-                  return Container(
-                    color: Colors.white,
-                    width: double.infinity,
-                    height: double.infinity,
-                    child: Transform.translate(
-                      offset: _provider.pageOffset(),
-                      child: const BubbleGroupWidget(),
-                    ),
-                  );
-                }),
+        InteractiveViewer(
+          panEnabled: true,
+          scaleEnabled: true,
+          clipBehavior: Clip.none,
+          minScale: 0.5,
+          maxScale: 5.0,
+          onInteractionStart: provider.onInteractionStart,
+          transformationController: provider.transformationController,
+          constrained: false,
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onDoubleTap: () async {
+              provider.centerToMiddle();
+              await HapticFeedback.mediumImpact();
+            },
+            child: const SizedBox(
+                height: Constants.viewerSize,
+                width: Constants.viewerSize,
+                child: BubbleGroupWidget()),
           ),
         ),
-        const BefriendWidget(),
         const SettingsButton(),
         const SearchButton(),
         const PictureButton(),
-        if (!widget.home.connectedHome) const HomeButton()
+        if (!widget.home.connectedHome) const HomeButton(),
       ],
     );
   }

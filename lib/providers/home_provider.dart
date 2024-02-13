@@ -9,25 +9,42 @@ import '../models/objects/home.dart';
 import '../utilities/constants.dart';
 
 class HomeProvider extends ChangeNotifier {
-  double _scaleFactor = 1.0;
-
-  Offset _position = Offset.zero;
-
-  _AnimationType _animationType = _AnimationType.reset;
-  Offset? _friendPosition;
-
-  late AnimationController _animationController;
-  late AnimationController _offsetController;
-
-  late CurvedAnimation _animation;
-  late Animation<Offset> _offsetAnimation;
+  final TransformationController _transformationController =
+      TransformationController();
+  late final AnimationController _animationController;
+  Animation<Matrix4>? _animationCenter;
 
   Home home;
 
-  late final Listenable _listenable;
+  void _onAnimateReset() {
+    _transformationController.value = _animationCenter!.value;
+    if (!_animationController.isAnimating) {
+      _animationCenter!.removeListener(_onAnimateReset);
+      _animationCenter = null;
+      _animationController.reset();
+    }
+  }
 
-  Listenable get listenable => _listenable;
-  double get scaleFactor => _scaleFactor;
+// Stop a running reset to home transform animation.
+  void _animateResetStop() {
+    _animationController.stop();
+    _animationCenter?.removeListener(_onAnimateReset);
+    _animationCenter = null;
+    _animationController.reset();
+  }
+
+  void onInteractionStart(ScaleStartDetails details) {
+    // If the user tries to cause a transformation while the reset animation is
+    // running, cancel the reset animation.
+    if (_animationController.status == AnimationStatus.forward) {
+      _animateResetStop();
+    }
+  }
+
+  TransformationController get transformationController =>
+      _transformationController;
+
+  Animation<Matrix4>? get animation => _animationCenter;
 
   void notify() {
     notifyListeners();
@@ -46,84 +63,61 @@ class HomeProvider extends ChangeNotifier {
     return home.user.friendships;
   }
 
-  Offset pageOffset() {
-    return _animationType == _AnimationType.reset
-        ? _position * (1 - _animation.value)
-        : _offsetAnimation.value;
-  }
-
   HomeProvider({required this.home});
 
   void init(TickerProvider vsync) {
+    // Initializing controller
     _animationController = AnimationController(
       vsync: vsync,
       duration: const Duration(milliseconds: 300),
     );
-    _animationController.addListener(() {
-      if (_animationController.isCompleted) {
-        _position = Offset.zero;
-        _animationController.reset();
-      }
-    });
 
-    _offsetController = AnimationController(
-      vsync: vsync,
-      duration: const Duration(milliseconds: 300),
-    );
-    _offsetController.addListener(() {
-      if (_offsetController.isCompleted) {
-        _position = _friendPosition!;
-        _animationType = _AnimationType.reset;
-      }
-    });
+    _transformationController.value = _middlePos();
 
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
-    );
-
-    _offsetAnimation = Tween<Offset>(
-      begin: _position,
-      end: Offset.zero,
-    ).animate(
-        CurvedAnimation(parent: _offsetController, curve: Curves.easeInOut));
-
-    _listenable = Listenable.merge([_animation, _offsetAnimation]);
     if (home.user.friendshipsLoaded) {
       home.initializePositions();
     }
   }
 
-  void doDispose() {
-    _animationController.dispose();
-    _offsetController.dispose();
+  Matrix4 _middlePos() {
+    // Calculate the initial transformation to center the content
+
+    return Matrix4.identity()
+      ..translate(-Constants.viewerSize / 2, -Constants.viewerSize / 2);
   }
 
-  void scale(ScaleUpdateDetails details) {
-    if (details.scale >= 1) {
-      _scaleFactor = details.scale;
-    }
-    _position += details.focalPointDelta;
-    notifyListeners();
+  void doDispose() {
+    _transformationController.dispose();
+    _animationController.dispose();
   }
 
   void centerToMiddle() {
     _animationController.reset();
+    _animationCenter = Matrix4Tween(
+      begin: _transformationController.value,
+      end: _middlePos(),
+    ).animate(
+        CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
+    _animationCenter!.addListener(_onAnimateReset);
     _animationController.forward();
   }
 
-  void animateToFriend(Offset friendPosition) {
-    _animationType = _AnimationType.friend;
-    _friendPosition = friendPosition * -1;
+  void animateToFriend(BuildContext context,
+      {required double dx, required double dy}) {
+    double width = dx + Constants.viewerSize / 2;
+    double height = dy + Constants.viewerSize / 2;
 
-    _offsetAnimation = Tween<Offset>(
-      begin: _position,
-      end: _friendPosition!,
+    Matrix4 friendPos = Matrix4.identity()..translate(-width, -height);
+    debugPrint('(HomeProvider): FriendPos = $friendPos');
+
+    _animationController.reset();
+    _animationCenter = Matrix4Tween(
+      begin: _transformationController.value,
+      end: friendPos,
     ).animate(
-        CurvedAnimation(parent: _offsetController, curve: Curves.easeInOut));
-
-    _offsetController.reset();
-    _offsetController.forward();
+        CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
+    _animationCenter!.addListener(_onAnimateReset);
+    _animationController.forward();
   }
 
   Future<void> signOut(BuildContext context) async {
@@ -135,5 +129,3 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 }
-
-enum _AnimationType { reset, friend }

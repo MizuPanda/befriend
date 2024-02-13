@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:befriend/models/objects/friendship.dart';
 
-import '../../views/widgets/home/bubble/bubble_widget.dart';
 import 'bubble.dart';
 
 class Home {
@@ -33,8 +32,8 @@ class Home {
       friend.y = sqrt(pow(friendship.distance(), 2) -
           pow(friend.x, 2)); //100 - 36 = 64, y = 8
 
-      friend.x += (user.size + friend.size / 2) / 2 + BubbleWidget.textHeight;
-      friend.y += (user.size + friend.size / 2) / 2 + BubbleWidget.textHeight;
+      friend.x += (user.size + friend.size / 2) / 2;
+      friend.y += (user.size + friend.size / 2) / 2 + user.textHeight();
 
       if (rand.nextBool()) {
         friend.x *= -1;
