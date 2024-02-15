@@ -1,12 +1,11 @@
-import 'package:befriend/models/authentication/authentication.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../utilities/constants.dart';
 import '../data/data_manager.dart';
 
 class FriendshipProgress {
-  String user1ID;
-  String user2ID;
+  String user1;
+  String user2;
   String username1;
   String username2;
   int level;
@@ -16,8 +15,8 @@ class FriendshipProgress {
   int index;
 
   FriendshipProgress({
-    required this.user1ID,
-    required this.user2ID,
+    required this.user1,
+    required this.user2,
     required this.username1,
     required this.username2,
     required this.friendshipID,
@@ -27,14 +26,20 @@ class FriendshipProgress {
     required this.index,
   });
 
+  double strength() {
+    return level + progress;
+  }
+
   String friendId() {
+    // If current user id is 0, then friend index is 1;
     if (index == 0) {
-      return user2ID;
+      return user2;
     }
-    return user1ID;
+    return user1;
   }
 
   String friendUsername() {
+    // If current user id is 0, then friend index is 1;
     if (index == 0) {
       return username2;
     }
@@ -49,9 +54,11 @@ class FriendshipProgress {
     }
   }
 
-  factory FriendshipProgress.fromMap(Map<String, dynamic> map) {
+  factory FriendshipProgress.fromMap(
+      Map<String, dynamic> map, String currentUserID) {
     int index;
-    if (map['${Constants.userDoc}1'] as String == AuthenticationManager.id()) {
+    String user1 = map['${Constants.userDoc}1'];
+    if (user1 == currentUserID) {
       index = 0;
     } else {
       index = 1;
@@ -59,22 +66,25 @@ class FriendshipProgress {
 
     return FriendshipProgress(
       index: index,
-      user1ID: map['${Constants.userDoc}1'] as String,
-      user2ID: map['${Constants.userDoc}2'] as String,
+      user1: user1,
+      user2: map['${Constants.userDoc}2'] as String,
       username1: map['${Constants.usernameDoc}1'] as String,
       username2: map['${Constants.usernameDoc}2'] as String,
       level: map[Constants.levelDoc] as int,
       progress: (map[Constants.progressDoc] as num).toDouble(),
-      lastSeen: (map[Constants.lastSeenDoc] as Timestamp).toDate(),
+      lastSeen: (map.containsKey(Constants.lastSeenDoc)
+          ? (map[Constants.lastSeenDoc] as Timestamp).toDate()
+          : DateTime.utc(0)),
       friendshipID: (map['${Constants.userDoc}1'] as String) +
           map['${Constants.userDoc}2'],
     );
   }
 
-  factory FriendshipProgress.fromDocs(DocumentSnapshot docs) {
-    String user1ID = DataManager.getString(docs, '${Constants.userDoc}1');
+  factory FriendshipProgress.fromDocs(
+      DocumentSnapshot docs, String currentUserId) {
+    String user1 = DataManager.getString(docs, '${Constants.userDoc}1');
     int index;
-    if (user1ID == AuthenticationManager.id()) {
+    if (user1 == currentUserId) {
       index = 0;
     } else {
       index = 1;
@@ -87,8 +97,8 @@ class FriendshipProgress {
       level: DataManager.getNumber(docs, Constants.levelDoc).toInt(),
       progress: DataManager.getNumber(docs, Constants.progressDoc).toDouble(),
       lastSeen: DataManager.getDateTime(docs, Constants.lastSeenDoc),
-      user1ID: DataManager.getString(docs, '${Constants.userDoc}1'),
-      user2ID: DataManager.getString(docs, '${Constants.userDoc}2'),
+      user1: user1,
+      user2: DataManager.getString(docs, '${Constants.userDoc}2'),
     );
   }
 
@@ -102,17 +112,19 @@ class FriendshipProgress {
       DateTime timestamp) {
     final List<String> ids = [id1, id2];
     ids.sort();
-    int index;
-    if (AuthenticationManager.id() == ids.first) {
-      index = 0;
-    } else {
-      index = 1;
+
+    if (id1 != ids.first) {
+      String obj = username1;
+      username1 = username2;
+      username2 = obj;
     }
+
+    // NO NEED TO REALLY SET AN INDEX NOW SINCE IT IS TO UPLOAD ON FIRESTORE
     String friendshipId = ids.join();
     return FriendshipProgress(
-        index: index,
-        user1ID: id1,
-        user2ID: id2,
+        index: 0,
+        user1: ids.first,
+        user2: ids.last,
         username1: username1,
         username2: username2,
         friendshipID: friendshipId,
@@ -122,16 +134,19 @@ class FriendshipProgress {
   }
 
   Map<String, dynamic> toMap() {
-    List<String> ids = [user1ID, user2ID];
-    ids.sort();
     return {
-      '${Constants.userDoc}1': ids.first,
-      '${Constants.userDoc}2': ids.last,
+      '${Constants.userDoc}1': user1,
+      '${Constants.userDoc}2': user2,
       '${Constants.usernameDoc}1': username1,
       '${Constants.usernameDoc}2': username2,
       Constants.levelDoc: level,
       Constants.progressDoc: progress,
       Constants.lastSeenDoc: lastSeen,
     };
+  }
+
+  @override
+  String toString() {
+    return 'FriendshipProgress{user1ID: $user1, user2ID: $user2, username1: $username1, username2: $username2, level: $level, progress: $progress, friendshipID: $friendshipID, lastSeen: $lastSeen, index: $index}';
   }
 }

@@ -19,7 +19,7 @@ class Bubble {
   List<dynamic> friendIDs;
   bool friendshipsLoaded;
   //-----------------------
-  late double size;
+  final double size;
   double x = 0;
   double y = 0;
 
@@ -34,68 +34,44 @@ class Bubble {
     required this.username,
     required this.name,
     required this.power,
+    required this.size,
     required this.avatar,
     required this.avatarUrl,
     required this.friendIDs,
     required this.friendshipsLoaded,
-  }) {
-    size = _bubbleSize(this);
-  }
-
-  factory Bubble.custom(
-      String id,
-      String username,
-      String name,
-      int power,
-      ImageProvider avatar,
-      String avatarUrl,
-      List<dynamic> friendIDs,
-      bool friendshipsLoaded,
-      List<Friendship> friendships) {
-    Bubble bubble = Bubble._(
-        id: id,
-        username: username,
-        name: name,
-        power: power,
-        avatar: avatar,
-        avatarUrl: avatarUrl,
-        friendIDs: friendIDs,
-        friendshipsLoaded: friendshipsLoaded);
-
-    bubble.friendships = friendships;
-    return bubble;
-  }
+  });
 
   factory Bubble.fromMapWithFriends(
       DocumentSnapshot docs, ImageProvider avatar, List<Friendship> friends) {
-    Bubble bubble = Bubble._(
-        id: docs.id,
-        name: DataManager.getString(docs, Constants.nameDoc),
-        username: DataManager.getString(docs, Constants.usernameDoc),
-        power: DataManager.getNumber(docs, Constants.powerDoc).toInt(),
-        avatarUrl: DataManager.getString(docs, Constants.avatarDoc),
-        friendIDs: DataManager.getList(docs, Constants.friendsDoc),
-        friendshipsLoaded: true,
-        avatar: avatar);
+    Bubble bubble = Bubble._fromMap(docs, avatar, true);
     bubble.friendships = friends;
 
-    //I will have to work on that
     return bubble;
   }
 
   factory Bubble.fromMapWithoutFriends(
       DocumentSnapshot docs, ImageProvider avatar) {
+    Bubble bubble = Bubble._fromMap(docs, avatar, false);
+
+    return bubble;
+  }
+
+  factory Bubble._fromMap(
+      DocumentSnapshot docs, ImageProvider avatar, bool friendshipsLoaded) {
+    int pwr = DataManager.getNumber(docs, Constants.powerDoc).toInt();
+
+    double size = 60 + pwr * 55 / 12;
+
     Bubble bubble = Bubble._(
         id: docs.id,
         name: DataManager.getString(docs, Constants.nameDoc),
         username: DataManager.getString(docs, Constants.usernameDoc),
-        power: DataManager.getNumber(docs, Constants.powerDoc).toInt(),
+        power: pwr,
+        size: size,
         avatarUrl: DataManager.getString(docs, Constants.avatarDoc),
         friendIDs: DataManager.getList(docs, Constants.friendsDoc),
-        friendshipsLoaded: false,
+        friendshipsLoaded: friendshipsLoaded,
         avatar: avatar);
-
-    //I will have to work on that
 
     return bubble;
   }
@@ -111,10 +87,6 @@ class Bubble {
 
   @override
   int get hashCode => id.hashCode;
-
-  static double _bubbleSize(Bubble bubble) {
-    return 60 + bubble.power * 55 / 12;
-  }
 
   double textHeight() {
     return 5 / 12 * size;

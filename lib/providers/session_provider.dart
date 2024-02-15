@@ -25,6 +25,17 @@ class SessionProvider extends ChangeNotifier {
   final List<String> ids;
   String? _caption;
   final int _characterLimit = 300; // Set your desired character limit
+  bool _isSessionEnded = false;
+
+  int selectedIndex = 0;
+
+  int pointsLength() {
+    return _privacy.criticalPoints.length;
+  }
+
+  double getPoint() {
+    return _privacy.criticalPoints.elementAt(selectedIndex);
+  }
 
   Future<void> showImageFullScreen(
     BuildContext context,
@@ -104,13 +115,13 @@ class SessionProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> disposeSession() async {
-    if (host.main()) {
-      HostListening.setPictureToFalse();
+  void _myPop(BuildContext context) {
+    _isSessionEnded = true;
+    if (context.mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        GoRouter.of(context).pop();
+      });
     }
-    await HostListening.onDispose(host);
-
-    dispose();
   }
 
   Future<void> pictureProcess() async {
@@ -127,10 +138,23 @@ class SessionProvider extends ChangeNotifier {
     bool sliderValuesUpdated = false;
     debugPrint('(SessionProvider): Processing snapshot...');
 
+    if (_isSessionEnded) {
+      return;
+    }
+
     if (_sliderValues.isEmpty) {
       for (DocumentSnapshot doc in snapshot.docs) {
-        _sliderValues[doc.id] =
-            DataManager.getNumber(doc, Constants.sliderDoc).toDouble();
+        double val = DataManager.getNumber(doc, Constants.sliderDoc).toDouble();
+        _sliderValues[doc.id] = val;
+
+        if (doc.id == host.user.id) {
+          for (int i = 0; i < _privacy.criticalPoints.length; i++) {
+            if (_privacy.criticalPoints.elementAt(i) == val) {
+              selectedIndex = i;
+              break;
+            }
+          }
+        }
       }
       sliderValuesUpdated = true;
     }
@@ -150,11 +174,14 @@ class SessionProvider extends ChangeNotifier {
           debugPrint('(SessionProvider): Users: ${sessionUsers.toString()}');
 
           if (!sessionUsers.contains(host.host.id)) {
-            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-              GoRouter.of(context).pop();
-            });
+            debugPrint('(SessionProvider): No host pop');
+            _myPop(context);
+          } else if (sessionUsers.length == 1 &&
+              sessionUsers.contains(host.user.id)) {
+            debugPrint('(SessionProvider): Only 1 user pop');
+            _myPop(context);
           } else if (sessionUsers.length != ids.length) {
-            _updateUsersList(sessionUsers);
+            _updateUsersList(sessionUsers, context);
           } else if (picture.startsWith(Constants.pictureMarker) &&
               !picture.contains(host.imageUrl ?? 'potato123456789')) {
             picture = picture.substring(Constants.pictureMarker.length);
@@ -165,10 +192,12 @@ class SessionProvider extends ChangeNotifier {
             });
           } else if (picture == Constants.publishingState) {
             // Navigate back
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              GoRouter.of(context).pop();
-            });
+            debugPrint('(SessionProvider): Picture published pop');
+            _myPop(context);
           }
+        } else {
+          debugPrint('(SessionProvider): Else pop');
+          _myPop(context);
         }
 
         break;
@@ -176,27 +205,34 @@ class SessionProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getFriendshipsMap() async {
+  Future<String> getFriendshipsMap() async {
     if (host.friendshipsMap.isEmpty) {
       DocumentSnapshot documentSnapshot =
           await DataManager.getData(id: host.host.id);
 
-      Map<String, dynamic> map = documentSnapshot
+      Map<String, dynamic> friendshipsMap = documentSnapshot
               .data()
               .toString()
               .contains(Constants.hostingFriendships)
           ? documentSnapshot.get(Constants.hostingFriendships)
           : {};
 
-      for (MapEntry<String, dynamic> user in map.entries) {
+      // Map of users and their friendList
+      for (MapEntry<String, dynamic> sessionUserData
+          in friendshipsMap.entries) {
         List<FriendshipProgress> friendships = [];
-        for (Map<String, dynamic> friendMap in user.value) {
-          FriendshipProgress friendship = FriendshipProgress.fromMap(friendMap);
+        for (Map<String, dynamic> friendMap in sessionUserData.value) {
+          FriendshipProgress friendship =
+              FriendshipProgress.fromMap(friendMap, sessionUserData.key);
           friendships.add(friendship);
         }
-        host.friendshipsMap[user.key] = friendships;
+        host.friendshipsMap[sessionUserData.key] = friendships;
       }
+
+      _privacy.setCriticalPoints(host);
     }
+
+    return 'Completed';
   }
 
   void showFriendList(BuildContext context) {
@@ -204,17 +240,21 @@ class SessionProvider extends ChangeNotifier {
         context, host, _sliderValues, (userId) => bubble(userId));
   }
 
-  void _updateUsersList(
-    List<dynamic> sessionUsers,
-  ) {
+  void _updateUsersList(List<dynamic> sessionUsers, BuildContext context) {
     debugPrint(
         '(SessionProvider): Removing a user. \nList1: ${sessionUsers.toString()}\nList2: ${ids.toString()} ');
+
     // Remove users who left
     ids.removeWhere((id) => (!sessionUsers.contains(id)));
 
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      notifyListeners();
-    });
+    if (!ids.contains(host.user.id)) {
+      debugPrint('(SessionProvider): User removed pop');
+      _myPop(context);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        notifyListeners();
+      });
+    }
   }
 
   Future<void> publishPicture(BuildContext context) async {
@@ -304,9 +344,21 @@ class SessionProvider extends ChangeNotifier {
     host.imageUrl = downloadUrl;
     debugPrint('(SessionProvider): Moved picture to $downloadUrl');
 
+    List<String> sessionUsernames = sessionUsers
+        .map((e) =>
+            host.joiners.firstWhere((element) => element.id == e).username)
+        .toList();
+
     // Create a Picture object
-    PictureData picture = PictureData.newPicture(host.imageUrl!, host.user.name,
-        timestamp, host.tempFile(), _privacy.isPublic, _caption!, usersAllowed);
+    PictureData picture = PictureData.newPicture(
+        host.imageUrl!,
+        host.user.name,
+        timestamp,
+        host.tempFile(),
+        _privacy.isPublic,
+        _caption!,
+        usersAllowed,
+        sessionUsernames);
 
     for (String userID in sessionUsers) {
       // Save the picture to the user's subcollection
@@ -318,21 +370,9 @@ class SessionProvider extends ChangeNotifier {
   }
 
   Future<void> cancelLobby(BuildContext context) async {
-    if (host.main()) {
-      // If the host quits, clear the list
-      await Constants.usersCollection.doc(host.host.id).update({
-        Constants.hostingDoc: FieldValue.arrayRemove([host.host.id])
-      });
-    } else {
-      // If a joiner quits, remove their ID
-      await Constants.usersCollection.doc(host.host.id).update({
-        Constants.hostingDoc: FieldValue.arrayRemove([host.user.id])
-      });
+    HostListening.setPictureToFalse();
 
-      if (context.mounted) {
-        GoRouter.of(context).pop();
-      }
-    }
+    await HostListening.onDispose(host);
   }
 
   SessionProvider._(

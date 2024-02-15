@@ -119,26 +119,35 @@ class _UserSliderState extends State<UserSlider> {
             ),
             Column(
               children: [
-                Slider(
-                  value: sliderValue,
-                  min: 0,
-                  max: 100,
-                  divisions: 100,
-                  onChanged: provider.isUser(widget.bubble.id)
-                      ? (double value) {
-                          setState(() {
-                            sliderValue = value;
-                          });
-                        }
-                      : null,
-                  onChangeEnd: provider.isUser(widget.bubble.id)
-                      ? (double value) async {
-                          // Debounce logic here if needed
-                          await widget.reference
-                              .update({Constants.sliderDoc: value});
-                        }
-                      : null,
-                ),
+                Builder(builder: (context) {
+                  if (provider.isUser(widget.bubble.id)) {
+                    return Slider(
+                      value: provider.selectedIndex.toDouble(),
+                      min: 0.0,
+                      max: provider.pointsLength() - 1,
+                      divisions: provider.pointsLength() - 1,
+                      onChanged: (double value) {
+                        setState(() {
+                          provider.selectedIndex = value.toInt();
+                          debugPrint("(Sliders): Selected privacy = $value");
+                        });
+                      },
+                      onChangeEnd: (double value) async {
+                        // Debounce logic here if needed
+                        await widget.reference
+                            .update({Constants.sliderDoc: provider.getPoint()});
+                      },
+                    );
+                  } else {
+                    return Slider(
+                      value: sliderValue,
+                      min: 0.0,
+                      max: 1.0,
+                      divisions: 100,
+                      onChanged: null,
+                    );
+                  }
+                }),
                 Row(
                   children: [
                     Padding(

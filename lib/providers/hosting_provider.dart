@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:befriend/models/data/data_query.dart';
-import 'package:befriend/models/data/friend_manager.dart';
 import 'package:befriend/models/data/user_manager.dart';
-import 'package:befriend/models/objects/friendship_progress.dart';
 import 'package:befriend/models/objects/host.dart';
 import 'package:befriend/models/qr/host_listening.dart';
 import 'package:befriend/models/qr/qr.dart';
 import 'package:befriend/utilities/constants.dart';
+import 'package:befriend/models/qr/encrypt.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 
 import '../models/objects/bubble.dart';
@@ -19,8 +19,13 @@ class HostingProvider extends ChangeNotifier {
   StreamSubscription<DocumentSnapshot>? _stream;
 
   void showQR(BuildContext context) {
-    QR.showQRCodeDialog(
-        context, '${Constants.appID}.${_host.host.id}', _host.joiners.length);
+    String data =
+        '${Constants.appID}${Constants.dataSeparator}${_host.host.id}${Constants.dataSeparator}${DateTime.timestamp().toIso8601String()}';
+    data = SimpleEncryptionService.encrypt64(data);
+    data =
+        '${SimpleEncryptionService.iv.base64}${Constants.dataSeparator}$data';
+
+    QR.showQRCodeDialog(context, data, _host.joiners.length);
   }
 
   Future<String> startingHost(BuildContext context) async {
@@ -107,11 +112,26 @@ class HostingProvider extends ChangeNotifier {
     List<dynamic> sessionUsers = [Constants.pictureState];
     List<String> userIds = _host.joiners.map((e) => e.id).toList();
     sessionUsers.addAll(userIds);
-    Map<String, List<FriendshipProgress>> idToFriendships =
-        await FriendManager.fetchFriendshipsForUsers(userIds);
 
+    await _generateFriendshipMap(userIds, _host.host.id);
     await DataQuery.updateDocument(Constants.hostingDoc, sessionUsers);
-    await DataQuery.updateDocument(
-        Constants.hostingFriendships, idToFriendships);
+  }
+
+  Future<void> _generateFriendshipMap(
+      List<String> sessionUsers, String hostId) async {
+    FirebaseFunctions functions = FirebaseFunctions.instance;
+
+    try {
+      final result =
+          await functions.httpsCallable('generateFriendshipMap').call({
+        'sessionUsers': sessionUsers,
+        'hostId': hostId,
+      });
+
+      // The cloud function returns { success: true } upon successful completion
+      debugPrint('Function call success: ${result.data}');
+    } catch (e) {
+      debugPrint('Error calling cloud function: $e');
+    }
   }
 }

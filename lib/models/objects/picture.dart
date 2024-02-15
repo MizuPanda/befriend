@@ -27,7 +27,7 @@ class Picture extends PictureData {
         public: data.public,
         caption: data.caption,
         allowedIDS: data.allowedIDS,
-        usersHavingSeen: data.allowedIDS);
+        sessionUsernames: data.sessionUsernames);
   }
 
   Picture._(
@@ -40,7 +40,7 @@ class Picture extends PictureData {
       required super.public,
       required super.caption,
       required super.allowedIDS,
-      required super.usersHavingSeen});
+      required super.sessionUsernames});
 
   factory Picture.fromDocument(
     DocumentSnapshot docs,
@@ -58,8 +58,7 @@ class Picture extends PictureData {
         public: DataManager.getBoolean(docs, Constants.publicDoc),
         caption: DataManager.getString(docs, Constants.captionDoc),
         allowedIDS: DataManager.getList(docs, Constants.allowedUsersDoc),
-        usersHavingSeen:
-            DataManager.getList(docs, Constants.usersHavingSeenDoc));
+        sessionUsernames: DataManager.getList(docs, Constants.sessionUsersDoc));
   }
 }
 
@@ -72,7 +71,7 @@ class PictureData {
   bool public;
   String caption;
   List<dynamic> allowedIDS;
-  List<dynamic> usersHavingSeen;
+  List<dynamic> sessionUsernames;
 
   PictureData(
       {required this.id,
@@ -83,7 +82,7 @@ class PictureData {
       required this.public,
       required this.caption,
       required this.allowedIDS,
-      required this.usersHavingSeen});
+      required this.sessionUsernames});
 
   factory PictureData.fromDocument(
     DocumentSnapshot docs,
@@ -97,8 +96,7 @@ class PictureData {
         public: DataManager.getBoolean(docs, Constants.publicDoc),
         caption: DataManager.getString(docs, Constants.captionDoc),
         allowedIDS: DataManager.getList(docs, Constants.allowedUsersDoc),
-        usersHavingSeen:
-            DataManager.getList(docs, Constants.usersHavingSeenDoc));
+        sessionUsernames: DataManager.getList(docs, Constants.sessionUsersDoc));
   }
 
   factory PictureData.newPicture(
@@ -109,6 +107,7 @@ class PictureData {
     bool isPublic,
     String caption,
     List<dynamic> allowedIDS,
+    List<dynamic> sessionUsernames,
   ) {
     String uuid = const Uuid().v4().toString();
     Map<String, String> metadata = {
@@ -124,7 +123,7 @@ class PictureData {
         public: isPublic,
         caption: caption,
         allowedIDS: allowedIDS,
-        usersHavingSeen: List.empty());
+        sessionUsernames: sessionUsernames);
   }
 
   Map<String, dynamic> toMap() {
@@ -136,7 +135,7 @@ class PictureData {
       Constants.publicDoc: public,
       Constants.captionDoc: caption,
       Constants.allowedUsersDoc: allowedIDS,
-      Constants.usersHavingSeenDoc: usersHavingSeen
+      Constants.sessionUsersDoc: sessionUsernames
     };
   }
 

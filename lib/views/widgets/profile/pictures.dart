@@ -96,10 +96,12 @@ class _ProfilePicturesState extends State<ProfilePictures> {
   Widget build(BuildContext context) => PagedListView<int, Picture>(
         pagingController: _pagingController,
         builderDelegate: PagedChildBuilderDelegate<Picture>(
-          itemBuilder: (context, item, index) => PictureCard(
-            picture: item,
-          ),
-        ),
+            itemBuilder: (context, item, index) => PictureCard(
+                  picture: item,
+                ),
+            noItemsFoundIndicatorBuilder: (BuildContext context) {
+              return const Center();
+            }),
       );
 
   @override

@@ -8,8 +8,8 @@ class Friendship extends FriendshipProgress {
 
   Friendship._({
     required super.index,
-    required super.user1ID,
-    required super.user2ID,
+    required super.user1,
+    required super.user2,
     required super.friendshipID,
     required super.username1,
     required super.username2,
@@ -28,8 +28,8 @@ class Friendship extends FriendshipProgress {
   Friendship switchBubble(Bubble friendBubble, Friendship f) {
     return Friendship._(
       index: f.index,
-      user1ID: f.user1ID,
-      user2ID: f.user2ID,
+      user1: f.user1,
+      user2: f.user2,
       friendshipID: f.friendshipID,
       username1: f.username1,
       username2: f.username2,
@@ -55,8 +55,8 @@ class Friendship extends FriendshipProgress {
   ) {
     Friendship friendship = Friendship._(
       index: index,
-      user1ID: user1ID,
-      user2ID: user2ID,
+      user1: user1ID,
+      user2: user2ID,
       friendshipID: friendshipID,
       username1: username1,
       username2: username2,
@@ -69,13 +69,15 @@ class Friendship extends FriendshipProgress {
     return friendship;
   }
 
-  factory Friendship.fromDocs(Bubble friendBubble, DocumentSnapshot docs) {
-    FriendshipProgress friendshipProgress = FriendshipProgress.fromDocs(docs);
+  factory Friendship.fromDocs(
+      String currentUserId, Bubble friendBubble, DocumentSnapshot docs) {
+    FriendshipProgress friendshipProgress =
+        FriendshipProgress.fromDocs(docs, currentUserId);
 
     return Friendship._(
       index: friendshipProgress.index,
-      user1ID: friendshipProgress.user1ID,
-      user2ID: friendshipProgress.user2ID,
+      user1: friendshipProgress.user1,
+      user2: friendshipProgress.user2,
       friendshipID: friendshipProgress.friendshipID,
       username1: friendshipProgress.username1,
       username2: friendshipProgress.username2,

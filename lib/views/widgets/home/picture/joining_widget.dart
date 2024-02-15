@@ -9,22 +9,101 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../../models/authentication/authentication.dart';
 import '../../../../models/data/data_manager.dart';
 import '../../../../models/objects/bubble.dart';
+import '../../../../models/qr/encrypt.dart';
 import 'hosting_widget.dart';
 
 class JoiningWidget extends StatefulWidget {
-  const JoiningWidget({Key? key}) : super(key: key);
+  const JoiningWidget({super.key});
 
   @override
   State<JoiningWidget> createState() => _JoiningWidgetState();
 }
 
 class _JoiningWidgetState extends State<JoiningWidget> {
-  MobileScannerController cameraController = MobileScannerController();
+  late MobileScannerController cameraController;
+  bool _isProcessingBarcode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    cameraController = MobileScannerController();
+  }
 
   @override
   void dispose() {
-    cameraController.dispose();
     super.dispose();
+    cameraController.dispose();
+  }
+
+  Future<void> _handleBarcodeDetection(BarcodeCapture capture) async {
+    if (_isProcessingBarcode) return; // Skip if already processing a barcode
+    _isProcessingBarcode = true;
+
+    // Your existing barcode processing logic here
+    final List<Barcode> barcodes = capture.barcodes.toSet().toList();
+    for (final barcode in barcodes) {
+      String? value = barcode.rawValue;
+
+      if (value != null && value.isNotEmpty) {
+        String iv = value.split(Constants.dataSeparator).first;
+        value = value.substring(iv.length + Constants.dataSeparator.length);
+
+        value = SimpleEncryptionService.decrypt(value, iv);
+        debugPrint('(JoiningWidget): Decrypt= $value');
+        if (value.contains(Constants.appID)) {
+          List<String> values = value.split(Constants.dataSeparator);
+          if (values.length == 3) {
+            String id = values[1];
+            String dateTimeParse = values.last;
+            final DateTime dateTime = DateTime.parse(dateTimeParse);
+
+            const Duration oneHour = Duration(hours: 1);
+
+            final DateTime now = DateTime.timestamp();
+            final DateTime before = now.subtract(oneHour);
+            final DateTime after = now.add(oneHour);
+
+            if (dateTime.compareTo(before) >= 0 &&
+                dateTime.compareTo(after) <= 0) {
+              DocumentSnapshot data = await DataManager.getData(id: id);
+              List<dynamic> joiners =
+                  DataManager.getList(data, Constants.hostingDoc);
+              if (joiners.length == 10) {
+                if (context.mounted) {
+                  QR.showLobbyFull(context);
+                }
+              } else {
+                ImageProvider avatar = await DataManager.getAvatar(data);
+
+                Bubble selectedHost =
+                    Bubble.fromMapWithoutFriends(data, avatar);
+
+                await Constants.usersCollection.doc(selectedHost.id).update({
+                  Constants.hostingDoc:
+                      FieldValue.arrayUnion([AuthenticationManager.id()])
+                });
+
+                if (mounted) {
+                  // Check if the widget is still part of the tree
+                  // Safe to use context here
+                  context.pop();
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return RoundedDialog(
+                          child:
+                              HostingWidget(isHost: false, host: selectedHost));
+                    },
+                  );
+                }
+
+                _isProcessingBarcode = false; // Reset the flag after processing
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   @override
@@ -51,46 +130,7 @@ class _JoiningWidgetState extends State<JoiningWidget> {
               // fit: BoxFit.contain,
               controller: cameraController,
               onDetect: (capture) async {
-                final List<Barcode> barcodes = capture.barcodes;
-                for (final barcode in barcodes) {
-                  String? value = barcode.rawValue;
-                  if (value != null &&
-                      value.isNotEmpty &&
-                      value.contains(Constants.appID)) {
-                    String id = value.substring(Constants.appID.length + 1);
-                    DocumentSnapshot data = await DataManager.getData(id: id);
-                    List<dynamic> joiners =
-                        DataManager.getList(data, Constants.hostingDoc);
-                    if (joiners.length == 10) {
-                      if (context.mounted) {
-                        QR.showLobbyFull(context);
-                      }
-                    } else {
-                      ImageProvider avatar = await DataManager.getAvatar(data);
-
-                      Bubble selectedHost =
-                          Bubble.fromMapWithoutFriends(data, avatar);
-
-                      await Constants.usersCollection
-                          .doc(selectedHost.id)
-                          .update({
-                        Constants.hostingDoc:
-                            FieldValue.arrayUnion([AuthenticationManager.id()])
-                      });
-
-                      if (context.mounted) {
-                        context.pop();
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return RoundedDialog(
-                                  child: HostingWidget(
-                                      isHost: false, host: selectedHost));
-                            });
-                      }
-                    }
-                  }
-                }
+                await _handleBarcodeDetection(capture);
               },
             ),
           ),

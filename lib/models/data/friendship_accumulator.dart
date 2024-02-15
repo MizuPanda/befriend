@@ -13,10 +13,10 @@ class FriendshipAccumulator {
   Friendship? containsFriendship(String id1, String id2, Bubble bubble) {
     Friendship? friendship;
     for (Friendship f in _savedFriendships) {
-      if (f.user1ID == id1 && f.user2ID == id2) {
+      if (f.user1 == id1 && f.user2 == id2) {
         friendship = f.switchBubble(bubble, f);
         break;
-      } else if (f.user1ID == id2 && f.user2ID == id1) {
+      } else if (f.user1 == id2 && f.user2 == id1) {
         friendship = f.swap(bubble, id1, f);
         break;
       }

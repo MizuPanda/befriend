@@ -39,24 +39,20 @@ class FriendManager {
     List<FriendshipProgress> friendships = [];
 
     // Fetch friendships where the user is either user1 or user2
-    QuerySnapshot querySnapshot1 = await Constants.friendshipsCollection
-        .where('${Constants.userDoc}1',
-            isEqualTo: userId, whereNotIn: sessionUsers)
+
+    QuerySnapshot query = await Constants.friendshipsCollection
+        .where(Filter.or(
+          Filter('${Constants.userDoc}1', isEqualTo: userId),
+          Filter('${Constants.userDoc}2', isEqualTo: userId),
+        ))
         .get();
 
-    QuerySnapshot querySnapshot2 = await Constants.friendshipsCollection
-        .where('${Constants.userDoc}2',
-            isEqualTo: userId, whereNotIn: sessionUsers)
-        .get();
-
-    for (DocumentSnapshot doc in querySnapshot1.docs) {
-      FriendshipProgress progress = FriendshipProgress.fromDocs(doc);
-      friendships.add(progress);
-    }
-
-    for (DocumentSnapshot doc in querySnapshot2.docs) {
-      FriendshipProgress progress = FriendshipProgress.fromDocs(doc);
-      friendships.add(progress);
+    for (DocumentSnapshot doc in query.docs) {
+      FriendshipProgress progress = FriendshipProgress.fromDocs(doc, userId);
+      //debugPrint('(FriendManager): User ${progress.friendUsername()}');
+      if (!sessionUsers.contains(progress.friendId())) {
+        friendships.add(progress);
+      }
     }
 
     return friendships;

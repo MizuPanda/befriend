@@ -29,7 +29,7 @@ class Constants {
   static const String publicDoc = 'public';
   static const String captionDoc = 'caption';
   static const String allowedUsersDoc = 'allowed';
-  static const String usersHavingSeenDoc = 'usersThatHaveSeen';
+  static const String sessionUsersDoc = 'sessionUsers';
   //STORAGE
   static const String profilePictureStorage = 'profile_pictures';
   static const String sessionPictureStorage = 'session_pictures';
@@ -52,13 +52,15 @@ class Constants {
   static const double homeButtonPadding = 60;
   //PICTURE SIZES
   static const double pictureDialogWidth = 350;
-  static const double pictureDialogHeight = 450;
+  static const double pictureDialogHeight = 400;
   static const double pictureDialogAvatarSize = 30;
   //PICTURE STATES
   static const String pictureState = 'picture';
   static const String cancelledState = 'cancelled';
   static const String pictureMarker = 'pic:';
   static const String publishingState = 'publishing';
+  // SEPARATORS
+  static const String dataSeparator = '_';
   // ADDRESSES
   static const String homepageAddress = '/${MyRouter.homepage}';
   static const String profileAddress = '/${MyRouter.profile}';

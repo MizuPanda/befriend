@@ -45,7 +45,7 @@ class DataQuery {
         DocumentSnapshot friendshipDocs =
             await FriendManager.getData(userID, friend.id);
 
-        friendship = Friendship.fromDocs(friend, friendshipDocs);
+        friendship = Friendship.fromDocs(userID, friend, friendshipDocs);
       }
 
       friendships.add(friendship);

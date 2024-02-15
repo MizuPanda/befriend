@@ -6,7 +6,7 @@ import 'package:befriend/views/pages/mutual_page.dart';
 import 'package:befriend/views/pages/picture_sign_page.dart';
 import 'package:befriend/views/pages/profile_page.dart';
 import 'package:befriend/views/pages/sign_page.dart';
-import 'package:befriend/views/widgets/home/picture/picture_session.dart';
+import 'package:befriend/views/pages/session_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -73,7 +73,7 @@ class MyRouter {
             GoRoute(
                 path: session,
                 builder: (BuildContext context, GoRouterState state) {
-                  return PictureSession(host: state.extra as Host);
+                  return SessionPage(host: state.extra as Host);
                 }),
             GoRoute(
                 path: mutual,

@@ -113,17 +113,19 @@ class HostListening {
   static Future<void> onDispose(Host host) async {
     if (!_isTakingPicture) {
       if (host.main()) {
-        debugPrint('(HostingProvider): Stopping hosting');
-        await Constants.usersCollection
-            .doc(host.host.id)
-            .update({Constants.hostingDoc: List.empty()});
+        debugPrint('(HostingListening): Stopping hosting');
+
         await Constants.usersCollection
             .doc(host.host.id)
             .update({Constants.hostingFriendships: {}});
         await PictureQuery.deleteTemporaryPictures(host);
+
+        await Constants.usersCollection
+            .doc(host.host.id)
+            .update({Constants.hostingDoc: List.empty()});
         host.clearTemporaryFiles();
       } else {
-        debugPrint('(HostingProvider): Stopping joining');
+        debugPrint('(HostingListening): Stopping joining');
         await _leaveHost(host);
       }
     }
