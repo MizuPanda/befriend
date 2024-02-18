@@ -57,7 +57,7 @@ class FriendshipProgress {
   factory FriendshipProgress.fromMap(
       Map<String, dynamic> map, String currentUserID) {
     int index;
-    String user1 = map['${Constants.userDoc}1'];
+    String user1 = map[Constants.user1Doc];
     if (user1 == currentUserID) {
       index = 0;
     } else {
@@ -67,22 +67,22 @@ class FriendshipProgress {
     return FriendshipProgress(
       index: index,
       user1: user1,
-      user2: map['${Constants.userDoc}2'] as String,
-      username1: map['${Constants.usernameDoc}1'] as String,
-      username2: map['${Constants.usernameDoc}2'] as String,
+      user2: map[Constants.user2Doc] as String,
+      username1: map[Constants.username1Doc] as String,
+      username2: map[Constants.username2Doc] as String,
       level: map[Constants.levelDoc] as int,
       progress: (map[Constants.progressDoc] as num).toDouble(),
       lastSeen: (map.containsKey(Constants.lastSeenDoc)
           ? (map[Constants.lastSeenDoc] as Timestamp).toDate()
           : DateTime.utc(0)),
-      friendshipID: (map['${Constants.userDoc}1'] as String) +
-          map['${Constants.userDoc}2'],
+      friendshipID: (map[Constants.user1Doc] as String) +
+          (map[Constants.user2Doc] as String),
     );
   }
 
   factory FriendshipProgress.fromDocs(
       DocumentSnapshot docs, String currentUserId) {
-    String user1 = DataManager.getString(docs, '${Constants.userDoc}1');
+    String user1 = DataManager.getString(docs, Constants.user1Doc);
     int index;
     if (user1 == currentUserId) {
       index = 0;
@@ -98,7 +98,7 @@ class FriendshipProgress {
       progress: DataManager.getNumber(docs, Constants.progressDoc).toDouble(),
       lastSeen: DataManager.getDateTime(docs, Constants.lastSeenDoc),
       user1: user1,
-      user2: DataManager.getString(docs, '${Constants.userDoc}2'),
+      user2: DataManager.getString(docs, Constants.user2Doc),
     );
   }
 
@@ -135,10 +135,10 @@ class FriendshipProgress {
 
   Map<String, dynamic> toMap() {
     return {
-      '${Constants.userDoc}1': user1,
-      '${Constants.userDoc}2': user2,
-      '${Constants.usernameDoc}1': username1,
-      '${Constants.usernameDoc}2': username2,
+      Constants.user1Doc: user1,
+      Constants.user2Doc: user2,
+      Constants.username1Doc: username1,
+      Constants.username2Doc: username2,
       Constants.levelDoc: level,
       Constants.progressDoc: progress,
       Constants.lastSeenDoc: lastSeen,

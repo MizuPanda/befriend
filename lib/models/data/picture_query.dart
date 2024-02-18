@@ -7,7 +7,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart' as path;
-import 'package:uuid/uuid.dart';
 
 class PictureQuery {
   static Reference _hostSessionRef(Host host) {
@@ -50,14 +49,11 @@ class PictureQuery {
     // Get file extension
     String fileExtension = path.extension(file.path);
 
-    // Get uuid
-    String uuid = const Uuid().v4().toString();
-
     // Get the timestamp
     String dateTime = DateTime.timestamp().toString();
 
     // Create fileName
-    String fileName = '${dateTime}_$uuid$fileExtension';
+    String fileName = '${dateTime}_${host.host.id}$fileExtension';
 
     // Create a reference to the user's profile picture
     Reference ref = _hostSessionRef(host)
@@ -133,6 +129,7 @@ class PictureQuery {
     ListResult items = await tempDirRef.listAll();
     for (Reference item in items.items) {
       await item.delete(); // Delete each item
+      debugPrint('(HostListening): Deleting ${item.name}');
     }
   }
 }

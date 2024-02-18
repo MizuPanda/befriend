@@ -1,4 +1,5 @@
 import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/utilities/validators.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 
@@ -38,12 +39,15 @@ class SignProvider extends ChangeNotifier {
 
   //#region VALIDATORS
   String? emailValidator(String? email) {
-    if (email == null || email.isEmpty) {
-      return 'Please enter an email.';
+    String? validator = Validators.emailValidator(email);
+
+    if (validator != null) {
+      return validator;
     }
+
     final RegExp emailRegex = RegExp(
         r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$");
-    if (!emailRegex.hasMatch(email) || _error == 'invalid-email') {
+    if (!emailRegex.hasMatch(email!) || _error == 'invalid-email') {
       if (_error == 'invalid-email') {
         _error = null;
       }
@@ -58,36 +62,14 @@ class SignProvider extends ChangeNotifier {
   }
 
   String? nameValidator(String? name) {
-    if (name == null || name.isEmpty) {
-      return 'Please enter your name';
-    }
-    // Minimum and maximum length requirements
-    if (name.length < 2 || name.length > 35) {
-      return 'Please enter a shorter or longer name.';
-    }
-
-    // Disallowed characters (example disallowed characters: <, >, &)
-    final disallowedCharacters = RegExp(r'[<>]');
-    if (disallowedCharacters.hasMatch(name)) {
-      return 'Your name contains characters that are not allowed';
-    }
-
-    return null;
+    return Validators.nameValidator(name);
   }
 
   String? usernameValidator(String? username) {
-    if (username == null || username.isEmpty) {
-      return "Please enter a username.";
-    }
-    // Minimum and maximum length requirements
-    if (username.length < 2 || username.length > 20) {
-      return 'This username is too short or too lengthy.';
-    }
+    String? validator = Validators.usernameValidator(username);
 
-    // Allowed characters (alphanumeric, underscores, periods)
-    final RegExp allowedCharacters = RegExp(r'^[a-zA-Z0-9_.]+$');
-    if (!allowedCharacters.hasMatch(username)) {
-      return 'This username contains characters that are not allowed.';
+    if (validator != null) {
+      return validator;
     }
 
     if (_error == _usernameError) {
@@ -99,26 +81,11 @@ class SignProvider extends ChangeNotifier {
   }
 
   String? passwordValidator(String? password) {
-    if (password == null || password.isEmpty) {
-      return 'Please enter a password';
-    }
-    if (password.length < 8) {
-      return 'This password is too short.';
-    }
-    if (strength() <= 3) {
-      return 'This password is not strong enough.';
-    }
-
-    return null;
+    return Validators.passwordValidator(password);
   }
 
   String? repeatValidator(String? repeat) {
-    if (repeat == null || repeat.isEmpty) {
-      return 'Please repeat your password.';
-    }
-    return repeat == _password
-        ? null
-        : 'This password does not match with the first one.';
+    return Validators.repeatValidator(repeat, _password);
   }
 
   //#endregion

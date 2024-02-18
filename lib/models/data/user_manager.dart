@@ -34,7 +34,7 @@ class UserManager {
             await DataQuery.friendList(docs.id, friendIDs);
 
         ImageProvider avatar = await DataQuery.getNetworkImage(avatarUrl);
-        _instance = Bubble.fromMapWithFriends(docs, avatar, friendList);
+        _instance = Bubble.fromDocsWithFriends(docs, avatar, friendList);
       } catch (e) {
         debugPrint('(UserManager): ${e.toString()}');
       }

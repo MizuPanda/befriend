@@ -1,9 +1,7 @@
 import 'package:befriend/models/authentication/authentication.dart';
-import 'package:befriend/models/data/friendship_accumulator.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/bubble.dart';
 import 'package:befriend/models/data/data_manager.dart';
-import 'package:befriend/models/data/friend_manager.dart';
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DataQuery {
+  static const int _friendsLimit = 20;
   static Future<void> updateDocument(String docId, dynamic data) async {
     await Constants.usersCollection
         .doc(AuthenticationManager.id())
@@ -20,13 +19,29 @@ class DataQuery {
 
   static Future<List<Friendship>> friendList(
       String userID, List<dynamic> friendIDs) async {
-    final FriendshipAccumulator accumulator = FriendshipAccumulator();
     final List<Friendship> friendships = [];
     final String mainID = AuthenticationManager.id();
 
-    for (String friendID in friendIDs) {
+    QuerySnapshot query = await Constants.friendshipsCollection
+        .where(Filter.or(
+          Filter(Constants.user1Doc, isEqualTo: userID),
+          Filter(Constants.user2Doc, isEqualTo: userID),
+        ))
+        .orderBy(Constants.levelDoc, descending: true)
+        .limit(_friendsLimit)
+        .get();
+
+    for (QueryDocumentSnapshot doc in query.docs) {
       Bubble friend;
       Friendship friendship;
+      String friendID;
+      String user1 = DataManager.getString(doc, Constants.user1Doc);
+      String user2 = DataManager.getString(doc, Constants.user2Doc);
+      if (user1 == userID) {
+        friendID = user2;
+      } else {
+        friendID = user1;
+      }
 
       if (mainID != userID && friendID == mainID) {
         friend = await UserManager.getInstance();
@@ -34,22 +49,12 @@ class DataQuery {
         DocumentSnapshot friendDocs = await DataManager.getData(id: friendID);
         ImageProvider avatar = await DataManager.getAvatar(friendDocs);
 
-        friend = Bubble.fromMapWithoutFriends(friendDocs, avatar);
+        friend = Bubble.fromDocsWithoutFriends(friendDocs, avatar);
       }
 
-      Friendship? f = accumulator.containsFriendship(userID, friendID, friend);
-
-      if (f != null) {
-        friendship = f;
-      } else {
-        DocumentSnapshot friendshipDocs =
-            await FriendManager.getData(userID, friend.id);
-
-        friendship = Friendship.fromDocs(userID, friend, friendshipDocs);
-      }
+      friendship = Friendship.fromDocs(userID, friend, doc);
 
       friendships.add(friendship);
-      accumulator.addFriendship(friendship);
     }
 
     return friendships;

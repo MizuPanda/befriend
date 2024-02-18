@@ -65,27 +65,32 @@ class _ShakeableBubbleState extends State<ShakeableBubble>
         builder: (BuildContext context, HomeProvider provider, Widget? child) {
       return GestureDetector(
         onLongPress: () {
-          setState(() {
-            _isPressed = true;
-          });
-          _startShakeAnimation();
-          HapticFeedback.selectionClick(); // Optionally provide haptic feedback
-          Future.delayed(const Duration(milliseconds: 275), () {
-            if (_isPressed) {
-              GoRouter.of(context)
-                  .push(Constants.homepageAddress, extra: widget.specificHome);
-              _animationController.reset();
-            }
-          });
+          if (widget.specificHome.isFriendToUser()) {
+            setState(() {
+              _isPressed = true;
+            });
+            _startShakeAnimation();
+            HapticFeedback
+                .selectionClick(); // Optionally provide haptic feedback
+            Future.delayed(const Duration(milliseconds: 275), () {
+              if (_isPressed) {
+                GoRouter.of(context).push(Constants.homepageAddress,
+                    extra: widget.specificHome);
+                _animationController.reset();
+              }
+            });
+          }
         },
         onTap: () {
-          GoRouter.of(context).push(
-            Constants.profileAddress,
-            extra: Profile(
-                user: widget.specificHome.user,
-                notifyParent: provider.notify,
-                friendship: widget.specificHome.friendship),
-          );
+          if (widget.specificHome.isFriendToUser()) {
+            GoRouter.of(context).push(
+              Constants.profileAddress,
+              extra: Profile(
+                  user: widget.specificHome.user,
+                  notifyParent: provider.notify,
+                  friendship: widget.specificHome.friendship),
+            );
+          }
 
           debugPrint(
               '(ShakeableBubble): ${widget.specificHome.user.username} Tapped');

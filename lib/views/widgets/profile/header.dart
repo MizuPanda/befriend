@@ -50,14 +50,13 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                   width: 140,
                   height: 100,
                   child: IconButton(
-                    onPressed: widget.profile.user.main()
-                        ? () async {
-                            await provider.changeProfilePicture(
-                                context,
-                                widget.profile.user,
-                                widget.profile.notifyParent);
-                          }
-                        : null,
+                    onPressed: () {
+                      provider.showEditProfileDialog(
+                          context, widget.profile.user, () {
+                        setState(() {});
+                        widget.profile.notifyParent();
+                      });
+                    },
                     icon: const Icon(
                       Icons.mode_edit_outline_outlined,
                       size: 30,

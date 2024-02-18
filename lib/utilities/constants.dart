@@ -14,13 +14,15 @@ class Constants {
   static const String powerDoc = 'power';
   static const String hostingDoc = 'hosting';
   static const String sliderDoc = 'sliderValue';
-  static const String hostingFriendships = 'hostingFriendships';
-  static const String pictureSubCollection = 'pictures';
+  static const String hostingFriendshipsDoc = 'hostingFriendships';
   //FRIENDSHIPS
   static const String progressDoc = 'progress';
   static const String levelDoc = 'level';
   static const String lastSeenDoc = 'last_seen';
-  static const String userDoc = 'user';
+  static const String user1Doc = 'user1';
+  static const String user2Doc = 'user2';
+  static const String username1Doc = 'username1';
+  static const String username2Doc = 'username2';
   //PICTURES
   static const String urlDoc = 'fileUrl';
   static const String pictureTakerDoc = 'pictureTaker';
@@ -30,6 +32,7 @@ class Constants {
   static const String captionDoc = 'caption';
   static const String allowedUsersDoc = 'allowed';
   static const String sessionUsersDoc = 'sessionUsers';
+  static const String likesDoc = 'likes';
   //STORAGE
   static const String profilePictureStorage = 'profile_pictures';
   static const String sessionPictureStorage = 'session_pictures';
@@ -39,11 +42,13 @@ class Constants {
   static const double pictureExpValue = 0.1;
   static const int baseLevel = 1;
   static const double baseProgress = 1;
-  //COLLECTION
+  //COLLECTIONS
   static final CollectionReference friendshipsCollection =
       _firestore.collection('friendships');
   static final CollectionReference usersCollection =
       _firestore.collection('users');
+  // SUB COLLECTIONS
+  static const String pictureSubCollection = 'pictures';
   // HOME PAGE SIZES
   static const double viewerSize = 5000;
   static const double homeButtonSize = 20;

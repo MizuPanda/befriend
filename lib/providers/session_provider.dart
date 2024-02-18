@@ -1,8 +1,8 @@
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/data/picture_query.dart';
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/friendship_progress.dart';
-import 'package:befriend/models/qr/host_listening.dart';
 import 'package:befriend/models/qr/privacy.dart';
 import 'package:befriend/models/social/friend_update.dart';
 import 'package:befriend/models/social/friendship_update.dart';
@@ -13,6 +13,7 @@ import 'package:photo_view/photo_view.dart';
 
 import '../models/data/picture_manager.dart';
 import '../models/objects/bubble.dart';
+import '../models/objects/home.dart';
 import '../models/objects/host.dart';
 import '../models/objects/picture.dart';
 import '../utilities/constants.dart';
@@ -117,10 +118,20 @@ class SessionProvider extends ChangeNotifier {
 
   void _myPop(BuildContext context) {
     _isSessionEnded = true;
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      GoRouter.of(context).pop();
+    });
+  }
+
+  Future<void> _goHome(BuildContext context) async {
+    _isSessionEnded = true;
+    UserManager.refreshPlayer();
+    Home home = await UserManager.userHome();
+
     if (context.mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        GoRouter.of(context).pop();
-      });
+      debugPrint('(SessionProvider): Going Home');
+
+      GoRouter.of(context).go(Constants.homepageAddress, extra: home);
     }
   }
 
@@ -192,8 +203,9 @@ class SessionProvider extends ChangeNotifier {
             });
           } else if (picture == Constants.publishingState) {
             // Navigate back
+
             debugPrint('(SessionProvider): Picture published pop');
-            _myPop(context);
+            _goHome(context);
           }
         } else {
           debugPrint('(SessionProvider): Else pop');
@@ -213,8 +225,8 @@ class SessionProvider extends ChangeNotifier {
       Map<String, dynamic> friendshipsMap = documentSnapshot
               .data()
               .toString()
-              .contains(Constants.hostingFriendships)
-          ? documentSnapshot.get(Constants.hostingFriendships)
+              .contains(Constants.hostingFriendshipsDoc)
+          ? documentSnapshot.get(Constants.hostingFriendshipsDoc)
           : {};
 
       // Map of users and their friendList
@@ -276,6 +288,7 @@ class SessionProvider extends ChangeNotifier {
       List<dynamic> lst = [(Constants.publishingState)];
       lst.addAll(ids);
       await DataQuery.updateDocument(Constants.hostingDoc, lst);
+      await _resetData();
     }
   }
 
@@ -350,7 +363,7 @@ class SessionProvider extends ChangeNotifier {
         .toList();
 
     // Create a Picture object
-    PictureData picture = PictureData.newPicture(
+    Picture picture = Picture.newPicture(
         host.imageUrl!,
         host.user.name,
         timestamp,
@@ -370,9 +383,22 @@ class SessionProvider extends ChangeNotifier {
   }
 
   Future<void> cancelLobby(BuildContext context) async {
-    HostListening.setPictureToFalse();
+    debugPrint('(SessionProvider): Stopping hosting');
 
-    await HostListening.onDispose(host);
+    if (host.main()) {
+      await _resetData();
+    }
+  }
+
+  Future<void> _resetData() async {
+    debugPrint('(SessionProvider): Resetting Data');
+
+    await Constants.usersCollection
+        .doc(host.host.id)
+        .update({Constants.hostingFriendshipsDoc: {}});
+    await PictureQuery.deleteTemporaryPictures(host);
+
+    host.clearTemporaryFiles();
   }
 
   SessionProvider._(

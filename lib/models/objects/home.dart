@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:befriend/models/objects/friendship.dart';
 
+import '../authentication/authentication.dart';
 import 'bubble.dart';
 
 class Home {
@@ -71,5 +72,10 @@ class Home {
         }
       }
     }
+  }
+
+  // Tells if a user is a friend with the main connected user.
+  bool isFriendToUser() {
+    return connectedHome || user.friendIDs.contains(AuthenticationManager.id());
   }
 }

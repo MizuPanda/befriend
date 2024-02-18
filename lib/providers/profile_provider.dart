@@ -1,11 +1,13 @@
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../models/objects/bubble.dart';
 import '../models/data/picture_manager.dart';
 import '../models/objects/profile.dart';
+import '../views/dialogs/profile/profile_edit_dialog.dart';
 
 class ProfileProvider extends ChangeNotifier {
   String? _imageUrl;
@@ -61,12 +63,25 @@ class ProfileProvider extends ChangeNotifier {
 
   Future<void> changeProfilePicture(
       BuildContext context, Bubble bubble, Function notifyParent) async {
-    await PictureManager.showChoiceDialog(context, (String? url) {
+    await PictureManager.takeProfilePicture(context, (String? url) {
       _imageUrl = url;
     });
     if (context.mounted) {
       await _loadPictureChange(context, _imageUrl, bubble, notifyParent);
     }
+  }
+
+  void showEditProfileDialog(
+      BuildContext context, Bubble bubble, Function notifyParent) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ProfileEditDialog(
+          bubble: bubble,
+          notifyParent: notifyParent,
+        );
+      },
+    );
   }
 
   Future<void> _loadPictureChange(BuildContext context, String? imageUrl,

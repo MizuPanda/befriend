@@ -14,12 +14,12 @@ class FriendshipUpdate {
     progress = progress + exp;
 
     if (progress >= 1) {
-      progress--;
       await Constants.friendshipsCollection.doc(friendshipDoc.id).update({
         Constants.progressDoc: progress,
         Constants.levelDoc: FieldValue.increment(1),
         Constants.timestampDoc: timestamp,
       });
+
       await Constants.usersCollection
           .doc(userID1)
           .update({Constants.powerDoc: FieldValue.increment(1)});

@@ -10,16 +10,16 @@ import 'package:flutter/material.dart';
 class Bubble {
   final String id;
   final String username;
-  final String name;
+  String name;
   final String avatarUrl;
   final int power;
   ImageProvider avatar;
 
-  late List<Friendship> friendships;
+  List<Friendship> friendships = [];
   List<dynamic> friendIDs;
   bool friendshipsLoaded;
   //-----------------------
-  final double size;
+  double size;
   double x = 0;
   double y = 0;
 
@@ -41,22 +41,22 @@ class Bubble {
     required this.friendshipsLoaded,
   });
 
-  factory Bubble.fromMapWithFriends(
+  factory Bubble.fromDocsWithFriends(
       DocumentSnapshot docs, ImageProvider avatar, List<Friendship> friends) {
-    Bubble bubble = Bubble._fromMap(docs, avatar, true);
+    Bubble bubble = Bubble._fromDocs(docs, avatar, true);
     bubble.friendships = friends;
 
     return bubble;
   }
 
-  factory Bubble.fromMapWithoutFriends(
+  factory Bubble.fromDocsWithoutFriends(
       DocumentSnapshot docs, ImageProvider avatar) {
-    Bubble bubble = Bubble._fromMap(docs, avatar, false);
+    Bubble bubble = Bubble._fromDocs(docs, avatar, false);
 
     return bubble;
   }
 
-  factory Bubble._fromMap(
+  factory Bubble._fromDocs(
       DocumentSnapshot docs, ImageProvider avatar, bool friendshipsLoaded) {
     int pwr = DataManager.getNumber(docs, Constants.powerDoc).toInt();
 

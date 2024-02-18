@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:befriend/models/data/picture_query.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -12,10 +11,6 @@ import '../objects/host.dart';
 
 class HostListening {
   static bool _isTakingPicture = false;
-
-  static void setPictureToFalse() {
-    _isTakingPicture = false;
-  }
 
   static StreamSubscription<DocumentSnapshot> startListening(
       BuildContext context, Host host, Function notifyListeners) {
@@ -89,7 +84,7 @@ class HostListening {
           DocumentSnapshot newUserSnapshot = await DataManager.getData(id: id);
           ImageProvider avatar = await DataManager.getAvatar(newUserSnapshot);
           Bubble newUser =
-              Bubble.fromMapWithoutFriends(newUserSnapshot, avatar);
+              Bubble.fromDocsWithoutFriends(newUserSnapshot, avatar);
           host.joiners.add(newUser);
         } catch (e) {
           debugPrint('Error adding new user: $e');
@@ -107,35 +102,6 @@ class HostListening {
         !connectedIds.contains(host.user.id) &&
         context.mounted) {
       Navigator.of(context).pop(); // Exiting the picture session
-    }
-  }
-
-  static Future<void> onDispose(Host host) async {
-    if (!_isTakingPicture) {
-      if (host.main()) {
-        debugPrint('(HostingListening): Stopping hosting');
-
-        await Constants.usersCollection
-            .doc(host.host.id)
-            .update({Constants.hostingFriendships: {}});
-        await PictureQuery.deleteTemporaryPictures(host);
-
-        await Constants.usersCollection
-            .doc(host.host.id)
-            .update({Constants.hostingDoc: List.empty()});
-        host.clearTemporaryFiles();
-      } else {
-        debugPrint('(HostingListening): Stopping joining');
-        await _leaveHost(host);
-      }
-    }
-  }
-
-  /// JOINER: Removes the user from the list of the connected users.
-  static Future<void> _leaveHost(Host host) async {
-    if (host.joiners.contains(host.user)) {
-      await host.updateDocument(
-          Constants.hostingDoc, FieldValue.arrayRemove([host.user.id]));
     }
   }
 }

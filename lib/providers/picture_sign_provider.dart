@@ -19,13 +19,16 @@ class PictureSignProvider extends ChangeNotifier {
   }
 
   ImageProvider image() {
-    return PictureManager.image(_imagePath).image;
+    return Image.file(File(_imagePath!)).image;
   }
 
   Future<void> retrieveImage(BuildContext context) async {
-    await PictureManager.showChoiceDialog(context, (String? url) {
-      _imagePath = url;
-    });
+    await PictureManager.takeProfilePicture(
+      context,
+      (String? url) {
+        _imagePath = url;
+      },
+    );
     notifyListeners();
   }
 

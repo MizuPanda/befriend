@@ -59,7 +59,7 @@ class AuthenticationManager {
       Constants.powerDoc: 0,
       Constants.hostingDoc: List.empty(),
       Constants.sliderDoc: 0,
-      Constants.hostingFriendships: {}
+      Constants.hostingFriendshipsDoc: {}
     };
     await Constants.usersCollection.doc(user!.uid).set(userInfo).then(
       //IF COMPLETED WITHOUT ERRORS

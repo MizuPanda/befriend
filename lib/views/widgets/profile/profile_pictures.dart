@@ -1,4 +1,5 @@
 import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/picture.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/views/widgets/profile/picture_card.dart';
@@ -11,10 +12,10 @@ import '../../../models/objects/bubble.dart';
 class ProfilePictures extends StatefulWidget {
   const ProfilePictures({
     super.key,
-    required this.user,
+    required this.userID,
   });
 
-  final Bubble user;
+  final String userID;
 
   @override
   State<ProfilePictures> createState() => _ProfilePicturesState();
@@ -37,31 +38,20 @@ class _ProfilePicturesState extends State<ProfilePictures> {
 
   Future<void> _fetchPage(int pageKey) async {
     try {
-      final String userId = widget.user.id;
+      final String userId = widget.userID;
       final Future<QuerySnapshot> query;
-      if (pageKey == 0 && _lastVisible == null) {
-        query = Constants.usersCollection
-            .doc(userId)
-            .collection(Constants.pictureSubCollection)
-            .where(Filter.or(
-                Filter(Constants.publicDoc, isEqualTo: true),
-                Filter(Constants.allowedUsersDoc,
-                    arrayContains: AuthenticationManager.id())))
-            .orderBy(Constants.timestampDoc, descending: true)
-            .limit(_pageSize)
-            .get();
+      final Query q = Constants.usersCollection
+          .doc(userId)
+          .collection(Constants.pictureSubCollection)
+          .where(Filter.or(
+              Filter(Constants.publicDoc, isEqualTo: true),
+              Filter(Constants.allowedUsersDoc,
+                  arrayContains: AuthenticationManager.id())))
+          .orderBy(Constants.timestampDoc, descending: true);
+      if (pageKey == 0 || _lastVisible == null) {
+        query = q.limit(_pageSize).get();
       } else {
-        query = Constants.usersCollection
-            .doc(userId)
-            .collection(Constants.pictureSubCollection)
-            .where(Filter.or(
-                Filter(Constants.publicDoc, isEqualTo: true),
-                Filter(Constants.allowedUsersDoc,
-                    arrayContains: AuthenticationManager.id())))
-            .orderBy(Constants.timestampDoc, descending: true)
-            .startAfterDocument(_lastVisible!)
-            .limit(_pageSize)
-            .get();
+        query = q.startAfterDocument(_lastVisible!).limit(_pageSize).get();
       }
 
       query.then(
@@ -93,16 +83,28 @@ class _ProfilePicturesState extends State<ProfilePictures> {
   }
 
   @override
-  Widget build(BuildContext context) => PagedListView<int, Picture>(
-        pagingController: _pagingController,
-        builderDelegate: PagedChildBuilderDelegate<Picture>(
-            itemBuilder: (context, item, index) => PictureCard(
-                  picture: item,
-                ),
-            noItemsFoundIndicatorBuilder: (BuildContext context) {
-              return const Center();
-            }),
-      );
+  Widget build(BuildContext context) => FutureBuilder(
+      future: UserManager.getInstance(),
+      builder: (BuildContext context, AsyncSnapshot<Bubble> mainBubble) {
+        if (!mainBubble.hasData || mainBubble.data == null) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        return PagedListView<int, Picture>(
+          pagingController: _pagingController,
+          cacheExtent: 3600,
+          builderDelegate: PagedChildBuilderDelegate<Picture>(
+              itemBuilder: (context, item, index) => PictureCard(
+                    picture: item,
+                    userID: widget.userID,
+                    connectedUsername: mainBubble.data!.username,
+                  ),
+              noItemsFoundIndicatorBuilder: (BuildContext context) {
+                return const Center();
+              }),
+        );
+      });
 
   @override
   void dispose() {

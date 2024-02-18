@@ -7,10 +7,13 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../providers/picture_provider.dart';
+import '../../providers/picture_sign_provider.dart';
 import '../objects/bubble.dart';
 
 class PictureManager {
+  static const int _sessionQuality = 25;
+  static const int _profilePictureQuality = 10;
+
   static Future<void> changeMainPicture(String path, Bubble bubble) async {
     File file = File(path);
 
@@ -18,10 +21,6 @@ class PictureManager {
     if (downloadUrl != null) {
       bubble.avatar = await UserManager.refreshAvatar(file);
     }
-  }
-
-  static Image image(String? imagePath) {
-    return Image.file(File(imagePath!));
   }
 
   static Future<void> _askCameraPermission() async {
@@ -39,10 +38,25 @@ class PictureManager {
     }
   }
 
-  static Future<void> showChoiceDialog(
-      BuildContext context, Function(String?) onImageSelected) async {
-    await _askCameraPermission();
+  static Future<void> takeSessionPicture(
+    BuildContext context,
+    Function(String?) onImageSelected,
+  ) async {
+    await _showChoiceDialog(context, onImageSelected,
+        imageQuality: _sessionQuality);
+  }
 
+  static Future<void> takeProfilePicture(
+    BuildContext context,
+    Function(String?) onImageSelected,
+  ) async {
+    await _showChoiceDialog(context, onImageSelected,
+        imageQuality: _profilePictureQuality);
+  }
+
+  static Future<void> _showChoiceDialog(
+      BuildContext context, Function(String?) onImageSelected,
+      {required int imageQuality}) async {
     if (context.mounted) {
       await showDialog(
         context: context,
@@ -55,7 +69,8 @@ class PictureManager {
                   GestureDetector(
                     child: const Text("Gallery"),
                     onTap: () async {
-                      await _pickImage(ImageSource.gallery, onImageSelected);
+                      await _pickImage(ImageSource.gallery, onImageSelected,
+                          imageQuality: imageQuality);
                       if (context.mounted) {
                         Navigator.of(context).pop(); // Close the dialog
                       }
@@ -65,7 +80,8 @@ class PictureManager {
                   GestureDetector(
                     child: const Text("Camera"),
                     onTap: () async {
-                      await _pickImage(ImageSource.camera, onImageSelected);
+                      await _pickImage(ImageSource.camera, onImageSelected,
+                          imageQuality: imageQuality);
                       if (context.mounted) {
                         Navigator.of(context).pop(); // Close the dialog
                       }
@@ -80,14 +96,22 @@ class PictureManager {
     }
   }
 
-  static Future<void> cameraPicture(Function(String?) onImageSelected) async {
-    await _pickImage(ImageSource.camera, onImageSelected);
+  static Future<void> cameraPicture(
+    Function(String?) onImageSelected,
+  ) async {
+    await _pickImage(ImageSource.camera, onImageSelected,
+        imageQuality: _sessionQuality);
   }
 
   static Future<void> _pickImage(
-      ImageSource source, Function(String?) onImageSelected) async {
-    final pickedImage =
-        await ImagePicker().pickImage(source: source, imageQuality: 10);
+      ImageSource source, Function(String?) onImageSelected,
+      {required int imageQuality}) async {
+    if (source == ImageSource.camera) {
+      await _askCameraPermission();
+    }
+
+    final pickedImage = await ImagePicker()
+        .pickImage(source: source, imageQuality: imageQuality);
 
     if (pickedImage != null) {
       CroppedFile? croppedFile = await ImageCropper().cropImage(
@@ -108,7 +132,7 @@ class PictureManager {
         ],
       );
 
-      onImageSelected(croppedFile!.path);
+      onImageSelected(croppedFile?.path);
     }
   }
 }

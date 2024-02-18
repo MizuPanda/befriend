@@ -8,8 +8,8 @@ import 'package:provider/provider.dart';
 import '../../models/objects/bubble.dart';
 import '../../models/objects/profile.dart';
 import '../widgets/profile/header.dart';
-import '../widgets/profile/pictures.dart';
-import '../widgets/profile/state.dart';
+import '../widgets/profile/profile_pictures.dart';
+import '../widgets/profile/profile_state.dart';
 
 class ProfilePage extends StatelessWidget {
   final Profile profile;
@@ -70,7 +70,7 @@ class ProfilePage extends StatelessWidget {
                       ),
                       Expanded(
                         child: ProfilePictures(
-                          user: profile.user,
+                          userID: profile.user.id,
                         ),
                       ),
                     ],

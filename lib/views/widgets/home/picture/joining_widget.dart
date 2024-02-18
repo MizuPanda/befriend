@@ -76,7 +76,7 @@ class _JoiningWidgetState extends State<JoiningWidget> {
                 ImageProvider avatar = await DataManager.getAvatar(data);
 
                 Bubble selectedHost =
-                    Bubble.fromMapWithoutFriends(data, avatar);
+                    Bubble.fromDocsWithoutFriends(data, avatar);
 
                 await Constants.usersCollection.doc(selectedHost.id).update({
                   Constants.hostingDoc:
