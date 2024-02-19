@@ -80,6 +80,33 @@ class Bubble {
     return id == AuthenticationManager.id();
   }
 
+  Iterable<String> loadedFriendIds() {
+    return friendships.map((e) => e.friendId());
+  }
+
+  Iterable<String> nonLoadedFriendIds() {
+    final List<String> nonLoadedIds = [];
+    final Iterable<String> loadedIds = loadedFriendIds();
+
+    for (String friendID in friendIDs) {
+      if (!loadedIds.contains(friendID)) {
+        nonLoadedIds.add(friendID);
+      }
+    }
+
+    return nonLoadedIds;
+  }
+
+  bool hasNonLoadedFriends() {
+    return friendIDs.length > friendships.length;
+  }
+
+  Future<DocumentSnapshot> getLastFriendshipDocument() async {
+    return await Constants.friendshipsCollection
+        .doc(friendships.last.friendshipID)
+        .get();
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||

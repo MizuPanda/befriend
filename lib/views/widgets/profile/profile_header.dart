@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:befriend/providers/profile_provider.dart';
+import 'package:befriend/utilities/decorations.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -29,17 +30,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
           return Stack(
             children: [
               Container(
-                  decoration: const BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black,
-                        spreadRadius: 0.8,
-                        offset: Offset(0, 2),
-                        blurRadius: 3,
-                      ),
-                    ],
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: Decorations.bubbleDecoration,
                   child: ProfilePhoto(
                     radius: 50,
                     user: widget.profile.user,

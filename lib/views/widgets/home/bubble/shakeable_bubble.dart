@@ -1,9 +1,11 @@
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/providers/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../models/objects/bubble.dart';
 import '../../../../models/objects/home.dart';
 import '../../../../models/objects/profile.dart';
 import '../../../../utilities/constants.dart';
@@ -81,15 +83,24 @@ class _ShakeableBubbleState extends State<ShakeableBubble>
             });
           }
         },
-        onTap: () {
+        onTap: () async {
           if (widget.specificHome.isFriendToUser()) {
-            GoRouter.of(context).push(
-              Constants.profileAddress,
-              extra: Profile(
-                  user: widget.specificHome.user,
-                  notifyParent: provider.notify,
-                  friendship: widget.specificHome.friendship),
-            );
+            Bubble connectedUser;
+            if (widget.specificHome.connectedHome) {
+              connectedUser = widget.specificHome.user;
+            } else {
+              connectedUser = await UserManager.getInstance();
+            }
+            if (context.mounted) {
+              GoRouter.of(context).push(
+                Constants.profileAddress,
+                extra: Profile(
+                    user: widget.specificHome.user,
+                    currentUser: connectedUser,
+                    notifyParent: provider.notify,
+                    friendship: widget.specificHome.friendship),
+              );
+            }
           }
 
           debugPrint(

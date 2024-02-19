@@ -77,7 +77,7 @@ class _ProfilePicturesState extends State<ProfilePictures> {
         _pagingController.appendPage(newItems, nextPageKey);
       }
     } catch (error) {
-      debugPrint(error.toString());
+      debugPrint('(ProfilePicture): Error= $error');
       _pagingController.error = error;
     }
   }

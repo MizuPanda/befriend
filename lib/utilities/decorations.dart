@@ -28,4 +28,16 @@ class Decorations {
         ),
         suffixIcon: suffixIcon);
   }
+
+  static const BoxDecoration bubbleDecoration = BoxDecoration(
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black,
+        spreadRadius: 0.8,
+        offset: Offset(0, 2),
+        blurRadius: 3,
+      ),
+    ],
+    shape: BoxShape.circle,
+  );
 }

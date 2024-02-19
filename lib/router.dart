@@ -1,5 +1,7 @@
+import 'package:befriend/models/objects/bubble.dart';
 import 'package:befriend/models/objects/profile.dart';
 import 'package:befriend/views/pages/forgot_pass_page.dart';
+import 'package:befriend/views/pages/friend_list_page.dart';
 import 'package:befriend/views/pages/home_page.dart';
 import 'package:befriend/views/pages/login_page.dart';
 import 'package:befriend/views/pages/mutual_page.dart';
@@ -23,6 +25,7 @@ class MyRouter {
   static const String picture = 'picture';
   static const String session = 'session';
   static const String mutual = 'mutual';
+  static const String friendList = 'friendList';
 
   static final GoRouter router = GoRouter(
     routes: <RouteBase>[
@@ -78,8 +81,17 @@ class MyRouter {
             GoRoute(
                 path: mutual,
                 builder: (BuildContext context, GoRouterState state) {
-                  return const MutualPage();
+                  return MutualPage(
+                    profile: state.extra as Profile,
+                  );
                 }),
+            GoRoute(
+                path: friendList,
+                builder: (BuildContext context, GoRouterState state) {
+                  return FriendsListPage(
+                    user: state.extra as Bubble,
+                  );
+                })
           ]),
     ],
   );

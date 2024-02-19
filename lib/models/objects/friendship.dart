@@ -40,35 +40,6 @@ class Friendship extends FriendshipProgress {
     );
   }
 
-  factory Friendship.custom(
-    int index,
-    String user1ID,
-    String user2ID,
-    String friendshipID,
-    String username1,
-    String username2,
-    int level,
-    double progress,
-    DateTime lastSeen,
-    int numberOfPicsNotSeen,
-    Bubble friend,
-  ) {
-    Friendship friendship = Friendship._(
-      index: index,
-      user1: user1ID,
-      user2: user2ID,
-      friendshipID: friendshipID,
-      username1: username1,
-      username2: username2,
-      level: level,
-      progress: progress,
-      lastSeen: lastSeen,
-      friend: friend,
-    );
-
-    return friendship;
-  }
-
   factory Friendship.fromDocs(
       String currentUserId, Bubble friendBubble, DocumentSnapshot docs) {
     FriendshipProgress friendshipProgress =
