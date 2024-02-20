@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:befriend/models/data/user_manager.dart';
+import 'package:befriend/models/services/post_service.dart';
 import 'package:befriend/providers/profile_provider.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -32,10 +33,13 @@ class PictureCard extends StatefulWidget {
 class _PictureCardState extends State<PictureCard> {
   final double _likeSize = 35;
   bool _isLiked = false;
+  late bool _isNotLikedYet;
 
   @override
   void initState() {
     _isLiked = widget.picture.likes.contains(widget.connectedUsername);
+    _isNotLikedYet =
+        !widget.picture.firstLikes.contains(widget.connectedUsername);
     super.initState();
   }
 
@@ -84,17 +88,41 @@ class _PictureCardState extends State<PictureCard> {
                       size: _likeSize,
                       isLiked: _isLiked,
                       onTap: (bool isLiked) async {
+                        Map<Object, Object?> data;
+
+                        if (isLiked) {
+                          // Action ==> Unlike
+                          data = {
+                            Constants.likesDoc: FieldValue.arrayRemove(
+                                [widget.connectedUsername]),
+                          };
+                        } else {
+                          // Action ==> Like
+                          debugPrint(
+                              '(PictureCard): Is liked yet = $_isNotLikedYet');
+                          if (_isNotLikedYet) {
+                            data = {
+                              Constants.likesDoc: FieldValue.arrayUnion(
+                                  [widget.connectedUsername]),
+                              Constants.firstLikesDoc: FieldValue.arrayUnion(
+                                  [widget.connectedUsername])
+                            };
+                            _isNotLikedYet = true;
+                            PostService.sendPostLikeNotification(
+                                widget.connectedUsername, widget.userID);
+                          } else {
+                            data = {
+                              Constants.likesDoc: FieldValue.arrayUnion(
+                                  [widget.connectedUsername]),
+                            };
+                          }
+                        }
                         await Constants.usersCollection
                             .doc(widget.userID)
                             .collection(Constants.pictureSubCollection)
                             .doc(widget.picture.id)
-                            .update({
-                          Constants.likesDoc: isLiked
-                              ? FieldValue.arrayRemove(
-                                  [widget.connectedUsername])
-                              : FieldValue.arrayUnion(
-                                  [widget.connectedUsername]),
-                        }).then((value) {
+                            .update(data)
+                            .then((value) {
                           debugPrint(
                               '(PictureCard): Updated like to ${(!isLiked).toString()}');
                         }).onError((error, stackTrace) {
@@ -138,7 +166,8 @@ class _PictureCardState extends State<PictureCard> {
                     if (widget.picture.likes.isNotEmpty)
                       LikeText(
                         picture: widget.picture,
-                        color: _isLiked ? Colors.deepPurpleAccent : Colors.grey,
+                        color:
+                            _isLiked ? Colors.deepPurpleAccent : Colors.black,
                       )
                   ],
                 ),

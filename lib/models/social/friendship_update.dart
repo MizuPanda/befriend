@@ -11,9 +11,11 @@ class FriendshipUpdate {
     // Update existing friendship
     double progress =
         DataManager.getNumber(friendshipDoc, Constants.progressDoc).toDouble();
-    progress = progress + exp;
+    progress += exp;
 
     if (progress >= 1) {
+      progress -= 1;
+
       await Constants.friendshipsCollection.doc(friendshipDoc.id).update({
         Constants.progressDoc: progress,
         Constants.levelDoc: FieldValue.increment(1),

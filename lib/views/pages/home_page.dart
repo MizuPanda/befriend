@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/objects/friendship.dart';
 import '../../models/objects/home.dart';
+import '../../models/services/notification_service.dart';
 import '../widgets/home/bubble/bubble_group.dart';
 import '../widgets/home/buttons/home_button.dart';
 import '../widgets/home/buttons/picture_button.dart';
@@ -23,12 +24,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  final NotificationService _notificationService = NotificationService();
   late final HomeProvider _provider = HomeProvider(home: widget.home);
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     _provider.init(this);
+    _notificationService.initTokenListener(_scaffoldKey, _provider.notify);
+
     super.initState();
   }
 
@@ -56,7 +60,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   }
                   return const Center(
                       child:
-                          CircularProgressIndicator()); //CHANGE THIS WITH SAMPLE SCREEN LATER (LOADING)
+                          CircularProgressIndicator()); // CHANGE THIS WITH SAMPLE SCREEN LATER (LOADING)
                 });
           } else {
             return HomeStack(provider: provider, widget: widget);

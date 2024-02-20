@@ -21,7 +21,6 @@ class UsernameText extends StatelessWidget {
       child: AutoSizeText(user.main() ? 'You' : user.username,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          minFontSize: 12,
           style: GoogleFonts.openSans(
             textStyle: TextStyle(
                 color: Colors.black,

@@ -4,6 +4,7 @@ import 'package:befriend/models/data/picture_query.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/friendship_progress.dart';
 import 'package:befriend/models/qr/privacy.dart';
+import 'package:befriend/models/services/post_service.dart';
 import 'package:befriend/models/social/friend_update.dart';
 import 'package:befriend/models/social/friendship_update.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -284,12 +285,37 @@ class SessionProvider extends ChangeNotifier {
       // PUBLISH PICTURE
       await _uploadPicture(sessionUsers, timestamp);
 
+      // SEND NOTIFICATIONS. Note: Add a friendsListening array field doc in users doc. Start it empty. If user press on...
+      _sendNotificationsToUser(sessionUsers);
+
       // SET HOST INDEX TO PUBLISHING STATE, WHICH NOTIFIES USERS THAT THE PICTURE HAS BEEN UPLOADED
       List<dynamic> lst = [(Constants.publishingState)];
       lst.addAll(ids);
       await DataQuery.updateDocument(Constants.hostingDoc, lst);
       await _resetData();
     }
+  }
+
+  void _sendNotificationsToUser(List<dynamic> sessionUsers) async {
+    Set<dynamic> usersToNotify = {};
+
+    // If PUBLIC    --> Add all friends of sessionUsers, except sessionUsers
+    // If PRIVATE   --> Do nothing.
+    // If Moderated --> Add friendsAllowed
+    if (_privacy.isPublic) {
+      for (Bubble joiner in host.joiners) {
+        if (sessionUsers.contains(joiner.id)) {
+          usersToNotify.addAll(joiner.friendIDs
+              .where((element) => !sessionUsers.contains(element)));
+        }
+      }
+    } else if (!_privacy.isPrivate) {
+      usersToNotify.addAll(_privacy.friendsAllowed);
+    }
+
+    // Future, but not useful to screen or anything
+    PostService.sendPostNotification(
+        usersToNotify.toList(), host.host.username, host.host.id);
   }
 
   Future<void> _createOrUpdateFriendships(
@@ -347,7 +373,8 @@ class SessionProvider extends ChangeNotifier {
       usersAllowed.addAll(sessionUsers);
 
       if (!_privacy.isPrivate) {
-        usersAllowed.addAll(_privacy.friendsAllowed.toList());
+        List<String> friendsAllowed = _privacy.friendsAllowed.toList();
+        usersAllowed.addAll(friendsAllowed);
       }
     }
 

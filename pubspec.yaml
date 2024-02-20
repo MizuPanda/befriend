@@ -44,6 +44,7 @@ dependencies:
   firebase_app_check: ^0.2.1+4
   firebase_crashlytics: ^3.4.14
   firebase_analytics: ^10.8.5
+  firebase_messaging: ^14.7.16
 
   qr_flutter: ^4.1.0
   mobile_scanner: ^3.5.5
@@ -65,6 +66,7 @@ dependencies:
   permission_handler: ^11.1.0
   timeago: ^3.6.1
   encrypt: ^5.0.3
+  flutter_local_notifications: ^16.3.2
 
 dev_dependencies:
   flutter_test:

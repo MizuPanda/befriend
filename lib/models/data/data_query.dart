@@ -17,6 +17,21 @@ class DataQuery {
         .update(<String, dynamic>{docId: data});
   }
 
+  static Future<Friendship> getFriendship(
+      String currentUserID, String otherUserID) async {
+    List<String> ids = [currentUserID, otherUserID];
+    ids.sort();
+    String friendshipID = ids.first + ids.last;
+
+    DocumentSnapshot friendshipSnap =
+        await Constants.friendshipsCollection.doc(friendshipID).get();
+    DocumentSnapshot bubbleSnap = await DataManager.getData(id: otherUserID);
+    ImageProvider avatar = await DataManager.getAvatar(bubbleSnap);
+
+    Bubble friendBubble = Bubble.fromDocsWithoutFriends(bubbleSnap, avatar);
+    return Friendship.fromDocs(currentUserID, friendBubble, friendshipSnap);
+  }
+
   static Future<List<Friendship>> friendList(
       String userID, List<dynamic> friendIDs) async {
     final List<Friendship> friendships = [];

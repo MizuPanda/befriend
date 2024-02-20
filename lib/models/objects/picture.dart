@@ -18,6 +18,7 @@ class Picture {
   final List<dynamic> allowedIDS;
   final List<dynamic> sessionUsernames;
   List<dynamic> likes;
+  List<dynamic> firstLikes;
 
   Picture._({
     required this.id,
@@ -30,6 +31,7 @@ class Picture {
     required this.allowedIDS,
     required this.sessionUsernames,
     required this.likes,
+    required this.firstLikes,
   });
 
   factory Picture.newPicture(
@@ -47,16 +49,18 @@ class Picture {
       'extension': path.extension(file.path),
     };
     return Picture._(
-        id: '',
-        fileUrl: fileUrl,
-        pictureTaker: pictureTaker,
-        timestamp: timestamp,
-        metadata: metadata,
-        public: isPublic,
-        caption: caption,
-        allowedIDS: allowedIDS,
-        sessionUsernames: sessionUsernames,
-        likes: List.empty());
+      id: '',
+      fileUrl: fileUrl,
+      pictureTaker: pictureTaker,
+      timestamp: timestamp,
+      metadata: metadata,
+      public: isPublic,
+      caption: caption,
+      allowedIDS: allowedIDS,
+      sessionUsernames: sessionUsernames,
+      likes: List.empty(),
+      firstLikes: List.empty(),
+    );
   }
 
   factory Picture.fromDocument(
@@ -65,17 +69,17 @@ class Picture {
     String url = DataManager.getString(docs, Constants.urlDoc);
 
     return Picture._(
-      id: docs.id,
-      fileUrl: url,
-      pictureTaker: DataManager.getString(docs, Constants.pictureTakerDoc),
-      timestamp: DataManager.getDateTime(docs, Constants.timestampDoc),
-      metadata: DataManager.getMap(docs, Constants.metadataDoc),
-      public: DataManager.getBoolean(docs, Constants.publicDoc),
-      caption: DataManager.getString(docs, Constants.captionDoc),
-      allowedIDS: DataManager.getList(docs, Constants.allowedUsersDoc),
-      sessionUsernames: DataManager.getList(docs, Constants.sessionUsersDoc),
-      likes: DataManager.getList(docs, Constants.likesDoc),
-    );
+        id: docs.id,
+        fileUrl: url,
+        pictureTaker: DataManager.getString(docs, Constants.pictureTakerDoc),
+        timestamp: DataManager.getDateTime(docs, Constants.timestampDoc),
+        metadata: DataManager.getMap(docs, Constants.metadataDoc),
+        public: DataManager.getBoolean(docs, Constants.publicDoc),
+        caption: DataManager.getString(docs, Constants.captionDoc),
+        allowedIDS: DataManager.getList(docs, Constants.allowedUsersDoc),
+        sessionUsernames: DataManager.getList(docs, Constants.sessionUsersDoc),
+        likes: DataManager.getList(docs, Constants.likesDoc),
+        firstLikes: DataManager.getList(docs, Constants.firstLikesDoc));
   }
 
   Map<String, dynamic> toMap() {
@@ -88,7 +92,8 @@ class Picture {
       Constants.captionDoc: caption,
       Constants.allowedUsersDoc: allowedIDS,
       Constants.sessionUsersDoc: sessionUsernames,
-      Constants.likesDoc: likes
+      Constants.likesDoc: likes,
+      Constants.firstLikesDoc: firstLikes,
     };
   }
 

@@ -97,6 +97,10 @@ class Bubble {
     return nonLoadedIds;
   }
 
+  bool isFriendLoaded(String friendId) {
+    return loadedFriendIds().contains(friendId);
+  }
+
   bool hasNonLoadedFriends() {
     return friendIDs.length > friendships.length;
   }

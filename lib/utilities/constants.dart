@@ -8,6 +8,7 @@ class Constants {
   //USERS
   static const String nameDoc = 'name';
   static const String usernameDoc = 'username';
+  static const String notificationToken = 'notificationToken';
   static const String avatarDoc = 'avatar';
   static const String counterDoc = 'counter';
   static const String friendsDoc = 'friends';
@@ -33,6 +34,7 @@ class Constants {
   static const String allowedUsersDoc = 'allowed';
   static const String sessionUsersDoc = 'sessionUsers';
   static const String likesDoc = 'likes';
+  static const String firstLikesDoc = 'firstLikes';
   //STORAGE
   static const String profilePictureStorage = 'profile_pictures';
   static const String sessionPictureStorage = 'session_pictures';

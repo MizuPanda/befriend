@@ -115,19 +115,20 @@ class PictureManager {
 
     if (pickedImage != null) {
       CroppedFile? croppedFile = await ImageCropper().cropImage(
+        compressQuality: 100,
         sourcePath: pickedImage.path,
         aspectRatioPresets: [
           CropAspectRatioPreset.square,
         ],
         uiSettings: [
           AndroidUiSettings(
-              toolbarTitle: 'Cropper',
+              toolbarTitle: 'Edit your picture',
               toolbarColor: PictureSignProvider.foregroundColor,
-              toolbarWidgetColor: Colors.white,
+              toolbarWidgetColor: Colors.black,
               initAspectRatio: CropAspectRatioPreset.original,
               lockAspectRatio: false),
           IOSUiSettings(
-            title: 'Cropper',
+            title: 'Edit your picture',
           ),
         ],
       );

@@ -101,3 +101,95 @@ async function fetchFriendshipsForUser(userId, sessionUsers) {
 
         return friendships;
 }
+
+exports.sendNewPostNotification = functions.https.onCall((data, context) => {
+    // Ensure the user is authenticated
+    if (!context.auth) {
+        throw new functions.https.HttpsError("unauthenticated", "The function must be called while authenticated.");
+    }
+
+    const userIds = data.userIds; // Array of user IDs who can see the post
+    const postCreatorName = data.postCreatorName; // Name of the user who created the post
+    const hostId = data.hostId;
+
+    // Loop through each userId and send a notification
+    const promises = userIds.map(userId => {
+        return admin.firestore().collection("users").doc(userId).get().then(doc => {
+            if (!doc.exists) {
+                console.log("No such user:", userId);
+                return null;
+            }
+            const user = doc.data();
+            const token = user.notificationToken; // Ensure you have stored the token as mentioned earlier
+
+            if (token) {
+                const message = {
+                    notification: {
+                        title: "New Post",
+                        body: `${postCreatorName} has posted a new picture. Check it out!`,
+                    },
+                    token: token,
+                    data: {
+                        hostId: hostId,
+                    }
+
+                };
+
+                return admin.messaging().send(message);
+            } else {
+                console.log("No notification token for user:", userId);
+                return null;
+            }
+        });
+    });
+
+    return Promise.all(promises).then(results => {
+        console.log('Notifications sent:', results);
+        return { success: true, message: 'Notifications sent' };
+    }).catch(error => {
+        console.error('Error sending notifications:', error);
+        throw new functions.https.HttpsError('internal', 'Error sending notifications');
+    });
+});
+
+exports.sendPostLikeNotification = functions.https.onCall(async (data, context) => {
+    // Ensure the user is authenticated
+    if (!context.auth) {
+        throw new functions.https.HttpsError('failed-precondition', 'The function must be called while authenticated.');
+    }
+
+    // Extract data passed from the client
+    const likerUsername = data.likerUsername;
+    const ownerId = data.ownerId;
+
+    try {
+        // Fetch the owner's notification token from Firestore
+        const ownerDoc = await admin.firestore().collection('users').doc(ownerId).get();
+        if (!ownerDoc.exists) {
+            throw new functions.https.HttpsError('not-found', 'Failed to find the post owner in Firestore.');
+        }
+        const ownerToken = ownerDoc.data().notificationToken;
+        if (!ownerToken) {
+            throw new functions.https.HttpsError('not-found', 'The post owner does not have a notification token.');
+        }
+
+        // Prepare the notification message
+        const message = {
+            notification: {
+                title: 'Someone liked your post!',
+                body: `${likerUsername} has liked your post!`,
+            },
+            token: ownerToken,
+        };
+
+        // Send the notification
+        const response = await admin.messaging().send(message);
+        console.log('Successfully sent message:', response);
+
+        // Respond to the client indicating success
+        return { result: `Message sent to ${ownerId} successfully.` };
+    } catch (error) {
+        console.log('Error sending message:', error);
+        throw new functions.https.HttpsError('unknown', 'Failed to send notification.', error);
+    }
+});
