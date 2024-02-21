@@ -10,6 +10,7 @@ import 'package:befriend/models/social/friendship_update.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:photo_view/photo_view.dart';
 
 import '../models/data/picture_manager.dart';
@@ -18,6 +19,8 @@ import '../models/objects/home.dart';
 import '../models/objects/host.dart';
 import '../models/objects/picture.dart';
 import '../utilities/constants.dart';
+
+import 'dart:io' show Platform;
 
 class SessionProvider extends ChangeNotifier {
   final Privacy _privacy = Privacy();
@@ -30,6 +33,29 @@ class SessionProvider extends ChangeNotifier {
   bool _isSessionEnded = false;
 
   int selectedIndex = 0;
+
+  InterstitialAd? _interstitialAd;
+
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: Platform.isAndroid
+          ? Constants.androidTestAdUnit
+          : Constants.iosTestAdUnit,
+      // Replace with your ad unit ID - TO CHANGE DEPENDENTLY ON PLATFORM
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (InterstitialAd ad) {
+          _interstitialAd = ad;
+          debugPrint('(SessionProvider): Interstitial Ad Loaded');
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          debugPrint(
+              '(SessionProvider): Interstitial Ad Failed to Load: $error');
+          _interstitialAd = null;
+        },
+      ),
+    );
+  }
 
   int pointsLength() {
     return _privacy.criticalPoints.length;
@@ -125,6 +151,28 @@ class SessionProvider extends ChangeNotifier {
   }
 
   Future<void> _goHome(BuildContext context) async {
+    if (_interstitialAd != null) {
+      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+        onAdDismissedFullScreenContent: (InterstitialAd ad) {
+          ad.dispose();
+          _navigateHome(context);
+        },
+        onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+          debugPrint('(SessionProvider): Ad failed to show.');
+          ad.dispose();
+          _navigateHome(context);
+        },
+      );
+
+      _interstitialAd!.show();
+      _interstitialAd = null; // Reset for next ad load
+    } else {
+      // No ad loaded, proceed as normal
+      _navigateHome(context);
+    }
+  }
+
+  Future<void> _navigateHome(BuildContext context) async {
     _isSessionEnded = true;
     UserManager.refreshPlayer();
     Home home = await UserManager.userHome();
@@ -202,6 +250,9 @@ class SessionProvider extends ChangeNotifier {
             WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
               notifyListeners();
             });
+            if (_interstitialAd == null) {
+              _loadInterstitialAd();
+            }
           } else if (picture == Constants.publishingState) {
             // Navigate back
 

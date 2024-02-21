@@ -60,7 +60,7 @@ class Bubble {
       DocumentSnapshot docs, ImageProvider avatar, bool friendshipsLoaded) {
     int pwr = DataManager.getNumber(docs, Constants.powerDoc).toInt();
 
-    double size = 60 + pwr * 55 / 12;
+    double size = 60 + pwr * 11 / 3;
 
     Bubble bubble = Bubble._(
         id: docs.id,

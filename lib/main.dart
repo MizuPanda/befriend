@@ -8,6 +8,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'firebase_options.dart';
 import 'models/objects/home.dart';
@@ -24,6 +25,17 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  MobileAds.instance.initialize();
+
+  // Set up test devices
+  if (kDebugMode) {
+    RequestConfiguration configuration = RequestConfiguration(
+        testDeviceIds: <String>[
+          "2aba1d87-7514-4a40-853c-836cad16ba31"
+        ]); // Replace with your actual device ID
+    MobileAds.instance.updateRequestConfiguration(configuration);
+  }
 
   if (!kDebugMode) {
     // Pass all uncaught "fatal" errors from the framework to Crashlytics

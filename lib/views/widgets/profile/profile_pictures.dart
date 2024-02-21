@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/picture.dart';
 import 'package:befriend/utilities/constants.dart';
+import 'package:befriend/views/widgets/profile/custom_native_ad.dart';
 import 'package:befriend/views/widgets/profile/picture_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +27,7 @@ class ProfilePictures extends StatefulWidget {
 class _ProfilePicturesState extends State<ProfilePictures> {
   static const _pageSize = 5;
   DocumentSnapshot? _lastVisible;
+  int _nextAdIndex = 0;
 
   final PagingController<int, Picture> _pagingController =
       PagingController(firstPageKey: 0);
@@ -34,6 +38,10 @@ class _ProfilePicturesState extends State<ProfilePictures> {
       _fetchPage(pageKey);
     });
     super.initState();
+  }
+
+  int _randomAdRange() {
+    return 4 + Random().nextInt(3);
   }
 
   Future<void> _fetchPage(int pageKey) async {
@@ -66,14 +74,31 @@ class _ProfilePicturesState extends State<ProfilePictures> {
 
       final QuerySnapshot querySnapshot = await query;
 
-      final List<Picture> newItems =
+      final List<Picture> newItems = [];
+
+      final List<Picture> pictures =
           querySnapshot.docs.map((doc) => Picture.fromDocument(doc)).toList();
 
-      final bool isLastPage = newItems.length < _pageSize;
+      if (_nextAdIndex == 0) {
+        _nextAdIndex = _randomAdRange(); // Randomly choose between 4, 5, or 6
+        debugPrint('(ProfilePictures): Next ad at $_nextAdIndex');
+      }
+
+      for (int i = 0; i < pictures.length; i++) {
+        newItems.add(pictures[i]);
+        if (_nextAdIndex - 1 == 0) {
+          newItems.add(Picture.pictureAd); // Placeholder for an ad
+          _nextAdIndex = _randomAdRange(); // Set next ad position
+          debugPrint('(ProfilePictures): Next ad at $_nextAdIndex');
+        }
+        _nextAdIndex--;
+      }
+
+      final bool isLastPage = pictures.length < _pageSize;
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);
       } else {
-        final int nextPageKey = pageKey + newItems.length;
+        final int nextPageKey = pageKey + pictures.length;
         _pagingController.appendPage(newItems, nextPageKey);
       }
     } catch (error) {
@@ -95,14 +120,19 @@ class _ProfilePicturesState extends State<ProfilePictures> {
           pagingController: _pagingController,
           cacheExtent: 3600,
           builderDelegate: PagedChildBuilderDelegate<Picture>(
-              itemBuilder: (context, item, index) => PictureCard(
-                    picture: item,
-                    userID: widget.userID,
-                    connectedUsername: mainBubble.data!.username,
-                  ),
-              noItemsFoundIndicatorBuilder: (BuildContext context) {
-                return const Center();
-              }),
+              itemBuilder: (context, item, index) {
+            if (item == Picture.pictureAd) {
+              return const CustomNativeAd();
+            }
+
+            return PictureCard(
+              picture: item,
+              userID: widget.userID,
+              connectedUsername: mainBubble.data!.username,
+            );
+          }, noItemsFoundIndicatorBuilder: (BuildContext context) {
+            return const Center();
+          }),
         );
       });
 

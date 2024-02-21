@@ -45,3 +45,7 @@ app.*.map.json
 
 # Ignore creds.json
 /functions/creds.json
+
+# Ignore secrets.dart and encrypt.dart
+/lib/utilities/secrets.dart
+/lib/models/qr/encrypt.dart

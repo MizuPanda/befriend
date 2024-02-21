@@ -34,6 +34,19 @@ class Picture {
     required this.firstLikes,
   });
 
+  static final pictureAd = Picture._(
+      id: 'ad',
+      fileUrl: '',
+      pictureTaker: 'google',
+      timestamp: DateTime(0),
+      metadata: {},
+      public: true,
+      caption: '',
+      allowedIDS: [],
+      sessionUsernames: [],
+      likes: [],
+      firstLikes: []);
+
   factory Picture.newPicture(
     String fileUrl,
     String pictureTaker,
@@ -103,4 +116,16 @@ class Picture {
     var i = (log(bytes) / log(1024)).floor();
     return '${(bytes / pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Picture &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          pictureTaker == other.pictureTaker &&
+          timestamp == other.timestamp;
+
+  @override
+  int get hashCode => id.hashCode ^ pictureTaker.hashCode ^ timestamp.hashCode;
 }

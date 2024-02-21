@@ -66,6 +66,15 @@ class Constants {
   static const String cancelledState = 'cancelled';
   static const String pictureMarker = 'pic:';
   static const String publishingState = 'publishing';
+  // MOBILE ADS
+  static const String androidTestAdUnit =
+      'ca-app-pub-3940256099942544/1033173712';
+  static const String androidTestNativeAdUnit =
+      'ca-app-pub-3940256099942544/2247696110';
+  static const String iosTestAdUnit = 'ca-app-pub-3940256099942544/4411468910';
+  static const String iosTestNativeAdUnit =
+      'ca-app-pub-3940256099942544/3986624511';
+  static const String postAdTile = 'postTile';
   // SEPARATORS
   static const String dataSeparator = '_';
   // ADDRESSES

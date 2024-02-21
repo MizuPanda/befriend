@@ -4,15 +4,20 @@ import 'package:befriend/utilities/decorations.dart';
 import 'package:befriend/views/widgets/users/profile_photo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import '../../models/data/data_manager.dart';
 import '../../models/objects/bubble.dart';
+import '../../models/objects/profile.dart';
 import '../widgets/users/progress_bar.dart';
 
 class FriendsListPage extends StatefulWidget {
-  const FriendsListPage({super.key, required this.user});
+  const FriendsListPage({
+    super.key,
+    required this.user,
+  });
 
   @override
   State<FriendsListPage> createState() => _FriendsListPageState();
@@ -165,9 +170,29 @@ class _FriendsListPageState extends State<FriendsListPage> {
                       ],
                     ),
                     const Spacer(),
-                    Text(
-                      'LVL${friendship.level}',
-                      style: GoogleFonts.openSans(),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        Text(
+                          'LVL${friendship.level}',
+                          style: GoogleFonts.openSans(),
+                        ),
+                        IconButton(
+                            onPressed: () {
+                              GoRouter.of(context).push(
+                                Constants.profileAddress,
+                                extra: Profile(
+                                    user: friendship.friend,
+                                    currentUser: widget.user,
+                                    notifyParent: () {},
+                                    friendship: friendship),
+                              );
+                            },
+                            icon: const Icon(Icons.house_rounded)),
+                      ],
                     ),
                   ],
                 ),

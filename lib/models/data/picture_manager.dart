@@ -11,7 +11,7 @@ import '../../providers/picture_sign_provider.dart';
 import '../objects/bubble.dart';
 
 class PictureManager {
-  static const int _sessionQuality = 25;
+  static const int _sessionQuality = 20;
   static const int _profilePictureQuality = 10;
 
   static Future<void> changeMainPicture(String path, Bubble bubble) async {
