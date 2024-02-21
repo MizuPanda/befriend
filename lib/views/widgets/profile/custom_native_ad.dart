@@ -39,11 +39,11 @@ class _CustomNativeAdState extends State<CustomNativeAd> {
         request: const AdRequest(),
         // Styling
         nativeTemplateStyle: NativeTemplateStyle(
-            // Required: Choose a template.
-            templateType: TemplateType.medium,
-            // Optional: Customize the ad's style.
-            //mainBackgroundColor: Colors.purple,
-            ))
+          // Required: Choose a template.
+          templateType: TemplateType.medium,
+          // Optional: Customize the ad's style.
+          //mainBackgroundColor: Colors.purple,
+        ))
       ..load();
   }
 
@@ -64,6 +64,6 @@ class _CustomNativeAdState extends State<CustomNativeAd> {
     // TODO: implement build
     return SizedBox(
         height: 346,
-        child: _nativeAdIsLoaded? AdWidget(ad: _nativeAd!) : null);
+        child: _nativeAdIsLoaded ? AdWidget(ad: _nativeAd!) : null);
   }
 }

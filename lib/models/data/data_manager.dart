@@ -9,18 +9,9 @@ class DataManager {
   /// If the id is given, it returns the user data of the user with the given id.
   /// If neither the id nor the counter is given, it returns the user data of the current user.
   static Future<DocumentSnapshot> getData({String? id}) async {
-    if (id != null) {
-      return await _getUserByID(id);
-    } else {
-      return await Constants.usersCollection
-          .doc(AuthenticationManager.id())
-          .get();
-    }
-  }
-
-  /// Returns the user data of the user with the given id.
-  static Future<DocumentSnapshot> _getUserByID(String id) async {
-    return await Constants.usersCollection.doc(id).get();
+    return await Constants.usersCollection
+        .doc(id ?? AuthenticationManager.id())
+        .get();
   }
 
   static Future<ImageProvider> getAvatar(DocumentSnapshot snapshot) async {
@@ -35,6 +26,12 @@ class DataManager {
 
   static Map<String, dynamic> getMap(DocumentSnapshot snapshot, String id) {
     return snapshot.data().toString().contains(id) ? snapshot.get(id) : {};
+  }
+
+  static Map<String, DateTime> getDateTimeMap(
+      DocumentSnapshot snapshot, String id) {
+    return DataManager.getMap(snapshot, Constants.lastSeenUsersMapDoc)
+        .map((key, value) => MapEntry(key, (value as Timestamp).toDate()));
   }
 
   static bool getBoolean(DocumentSnapshot snapshot, String id) {

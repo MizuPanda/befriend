@@ -9,7 +9,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../../models/authentication/authentication.dart';
 import '../../../../models/data/data_manager.dart';
 import '../../../../models/objects/bubble.dart';
-import '../../../../models/qr/encrypt.dart';
+import '../../../../models/qr/simple_encryption_service.dart';
 import 'hosting_widget.dart';
 
 class JoiningWidget extends StatefulWidget {
@@ -68,9 +68,18 @@ class _JoiningWidgetState extends State<JoiningWidget> {
               DocumentSnapshot data = await DataManager.getData(id: id);
               List<dynamic> joiners =
                   DataManager.getList(data, Constants.hostingDoc);
+              Map<String, DateTime> lastSeenMap = DataManager.getDateTimeMap(
+                  data, Constants.lastSeenUsersMapDoc);
+              String username =
+                  DataManager.getString(data, Constants.usernameDoc);
+
               if (joiners.length == 10) {
-                if (context.mounted) {
+                if (mounted) {
                   QR.showLobbyFull(context);
+                }
+              } else if (lastSeenMap.containsKey(AuthenticationManager.id())) {
+                if (mounted) {
+                  QR.showUserSeenToday(context, username);
                 }
               } else {
                 ImageProvider avatar = await DataManager.getAvatar(data);

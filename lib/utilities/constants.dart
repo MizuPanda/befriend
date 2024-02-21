@@ -16,6 +16,7 @@ class Constants {
   static const String hostingDoc = 'hosting';
   static const String sliderDoc = 'sliderValue';
   static const String hostingFriendshipsDoc = 'hostingFriendships';
+  static const String lastSeenUsersMapDoc = 'lastSeenUsersMap';
   //FRIENDSHIPS
   static const String progressDoc = 'progress';
   static const String levelDoc = 'level';

@@ -1,12 +1,13 @@
 import 'dart:async';
 
+import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/host.dart';
 import 'package:befriend/models/qr/host_listening.dart';
 import 'package:befriend/models/qr/qr.dart';
 import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/models/qr/encrypt.dart';
+import 'package:befriend/models/qr/simple_encryption_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
@@ -30,9 +31,25 @@ class HostingProvider extends ChangeNotifier {
 
   Future<String> startingHost(BuildContext context) async {
     Bubble user = await UserManager.getInstance();
-    debugPrint('(UserManager): ${user.toString()}');
+    debugPrint('(HostingProvider): $user');
     _host = Host(host: user, joiners: [user], user: user);
-    await DataQuery.updateDocument(Constants.hostingDoc, List.empty());
+
+    final Map<String, DateTime> newLastSeenMap = {};
+    DateTime now = DateTime.now();
+
+    for (MapEntry<String, DateTime> entry in user.lastSeenUsersMap.entries) {
+      // If the last picture with that user has been taken the same day
+      //    --> then, keep the user in the map
+      if (QR.areSameDay(now, entry.value)) {
+        newLastSeenMap[entry.key] = entry.value;
+      }
+    }
+
+    await Constants.usersCollection.doc(AuthenticationManager.id()).update({
+      Constants.hostingDoc: List.empty(),
+      Constants.lastSeenUsersMapDoc: newLastSeenMap
+    });
+    user.lastSeenUsersMap = newLastSeenMap;
 
     if (context.mounted) {
       _initiateListening(context);
@@ -127,9 +144,9 @@ class HostingProvider extends ChangeNotifier {
       });
 
       // The cloud function returns { success: true } upon successful completion
-      debugPrint('Function call success: ${result.data}');
+      debugPrint('(HostingProvider): Function call success: ${result.data}');
     } catch (e) {
-      debugPrint('Error calling cloud function: $e');
+      debugPrint('(HostingProvider): Error calling cloud function: $e');
     }
   }
 }

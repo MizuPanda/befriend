@@ -15,6 +15,8 @@ class Bubble {
   final int power;
   ImageProvider avatar;
 
+  Map<String, DateTime> lastSeenUsersMap;
+
   List<Friendship> friendships = [];
   List<dynamic> friendIDs;
   bool friendshipsLoaded;
@@ -37,6 +39,7 @@ class Bubble {
     required this.size,
     required this.avatar,
     required this.avatarUrl,
+    required this.lastSeenUsersMap,
     required this.friendIDs,
     required this.friendshipsLoaded,
   });
@@ -69,6 +72,8 @@ class Bubble {
         power: pwr,
         size: size,
         avatarUrl: DataManager.getString(docs, Constants.avatarDoc),
+        lastSeenUsersMap:
+            DataManager.getDateTimeMap(docs, Constants.lastSeenUsersMapDoc),
         friendIDs: DataManager.getList(docs, Constants.friendsDoc),
         friendshipsLoaded: friendshipsLoaded,
         avatar: avatar);

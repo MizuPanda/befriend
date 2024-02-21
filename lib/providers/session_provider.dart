@@ -154,13 +154,13 @@ class SessionProvider extends ChangeNotifier {
     if (_interstitialAd != null) {
       _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (InterstitialAd ad) {
-          ad.dispose();
           _navigateHome(context);
+          ad.dispose();
         },
         onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
           debugPrint('(SessionProvider): Ad failed to show.');
-          ad.dispose();
           _navigateHome(context);
+          ad.dispose();
         },
       );
 
@@ -324,7 +324,11 @@ class SessionProvider extends ChangeNotifier {
   Future<void> publishPicture(BuildContext context) async {
     _caption = await _promptForCaption(context);
     if (_caption != null) {
-      List<String> sessionUsers = host.joiners.map((e) => e.id).toList();
+      List<String> sessionUsers = ids;
+      Iterable<Bubble> joinersStillConnected =
+          host.joiners.where((element) => sessionUsers.contains(element.id));
+
+      debugPrint('(SessionProvider): Publishing to $sessionUsers');
       final DateTime timestamp = DateTime.timestamp();
 
       // CALCULATE PRIVACY AND USERS THAT WILL BE ABLE TO SEE IT
@@ -336,29 +340,25 @@ class SessionProvider extends ChangeNotifier {
       // PUBLISH PICTURE
       await _uploadPicture(sessionUsers, timestamp);
 
-      // SEND NOTIFICATIONS. Note: Add a friendsListening array field doc in users doc. Start it empty. If user press on...
-      _sendNotificationsToUser(sessionUsers);
+      // SET NEW USER DATA FOR EVERY USER
+      await _setUsersData(sessionUsers, joinersStillConnected, timestamp);
 
-      // SET HOST INDEX TO PUBLISHING STATE, WHICH NOTIFIES USERS THAT THE PICTURE HAS BEEN UPLOADED
-      List<dynamic> lst = [(Constants.publishingState)];
-      lst.addAll(ids);
-      await DataQuery.updateDocument(Constants.hostingDoc, lst);
-      await _resetData();
+      // SEND NOTIFICATIONS. Note: Add a friendsListening array field doc in users doc. Start it empty. If user press on...
+      _sendNotificationsToUser(sessionUsers, joinersStillConnected);
     }
   }
 
-  void _sendNotificationsToUser(List<dynamic> sessionUsers) async {
+  void _sendNotificationsToUser(List<dynamic> sessionUsers,
+      Iterable<Bubble> joinersStillConnected) async {
     Set<dynamic> usersToNotify = {};
 
     // If PUBLIC    --> Add all friends of sessionUsers, except sessionUsers
     // If PRIVATE   --> Do nothing.
     // If Moderated --> Add friendsAllowed
     if (_privacy.isPublic) {
-      for (Bubble joiner in host.joiners) {
-        if (sessionUsers.contains(joiner.id)) {
-          usersToNotify.addAll(joiner.friendIDs
-              .where((element) => !sessionUsers.contains(element)));
-        }
+      for (Bubble joiner in joinersStillConnected) {
+        usersToNotify.addAll(joiner.friendIDs
+            .where((element) => !sessionUsers.contains(element)));
       }
     } else if (!_privacy.isPrivate) {
       usersToNotify.addAll(_privacy.friendsAllowed);
@@ -452,11 +452,44 @@ class SessionProvider extends ChangeNotifier {
         sessionUsernames);
 
     for (String userID in sessionUsers) {
-      // Save the picture to the user's subcollection
+      // Save the picture to the user's sub collection
       await Constants.usersCollection
           .doc(userID)
           .collection(Constants.pictureSubCollection)
           .add(picture.toMap());
+    }
+  }
+
+  Future<void> _setUsersData(List<dynamic> sessionUsers,
+      Iterable<Bubble> joinersStillConnected, DateTime timestamp) async {
+    List<dynamic> lst = [(Constants.publishingState)];
+    lst.addAll(sessionUsers);
+
+    for (Bubble joiner in joinersStillConnected) {
+      for (Bubble otherJoiner in joinersStillConnected) {
+        // If another user -->
+        if (otherJoiner.id != joiner.id) {
+          joiner.lastSeenUsersMap[otherJoiner.id] = timestamp;
+        }
+      }
+
+      if (joiner == host.host) {
+        debugPrint('(SessionProvider): Resetting Host Data');
+        // SET HOST INDEX TO PUBLISHING STATE, WHICH NOTIFIES USERS THAT THE PICTURE HAS BEEN UPLOADED
+        await Constants.usersCollection.doc(joiner.id).update({
+          Constants.hostingDoc: lst,
+          Constants.hostingFriendshipsDoc: {},
+          Constants.lastSeenUsersMapDoc: joiner.lastSeenUsersMap,
+        });
+
+        await PictureQuery.deleteTemporaryPictures(host);
+        host.clearTemporaryFiles();
+      } else {
+        await DataQuery.updateDocument(
+            userId: joiner.id,
+            Constants.lastSeenUsersMapDoc,
+            joiner.lastSeenUsersMap);
+      }
     }
   }
 

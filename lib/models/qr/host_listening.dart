@@ -20,7 +20,7 @@ class HostListening {
     return Constants.usersCollection.doc(hostUserId).snapshots().listen(
       (snapshot) => _processSnapshot(snapshot, context, host, notifyListeners),
       onError: (error) {
-        debugPrint('Error in Firestore subscription: $error');
+        debugPrint('(HostListening): Error in Firestore subscription: $error');
       },
     );
   }
@@ -41,7 +41,7 @@ class HostListening {
       }
       notifyListeners();
     } catch (e) {
-      debugPrint('Error processing snapshot: $e');
+      debugPrint('(HostListening): Error processing snapshot: $e');
     }
   }
 
@@ -69,7 +69,7 @@ class HostListening {
 
   static Future<void> _updateUsersList(
       List<dynamic> connectedIds, BuildContext context, Host host) async {
-    debugPrint(connectedIds.toString());
+    debugPrint('(HostListening): $connectedIds');
     // Remove users who left
     host.joiners.removeWhere(
         (user) => (user.id != host.host.id && !connectedIds.contains(user.id)));
@@ -87,7 +87,7 @@ class HostListening {
               Bubble.fromDocsWithoutFriends(newUserSnapshot, avatar);
           host.joiners.add(newUser);
         } catch (e) {
-          debugPrint('Error adding new user: $e');
+          debugPrint('(HostListening): Error adding new user: $e');
         }
       }
     }

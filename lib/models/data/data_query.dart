@@ -11,10 +11,11 @@ import 'package:flutter/material.dart';
 
 class DataQuery {
   static const int _friendsLimit = 20;
-  static Future<void> updateDocument(String docId, dynamic data) async {
+  static Future<void> updateDocument(String fieldID, dynamic data,
+      {String? userId}) async {
     await Constants.usersCollection
-        .doc(AuthenticationManager.id())
-        .update(<String, dynamic>{docId: data});
+        .doc(userId ?? AuthenticationManager.id())
+        .update(<String, dynamic>{fieldID: data});
   }
 
   static Future<Friendship> getFriendship(
