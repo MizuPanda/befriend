@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:befriend/models/objects/friendship.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../authentication/authentication.dart';
 import 'bubble.dart';
@@ -9,14 +10,16 @@ class Home {
   late Bubble user;
   late Friendship? friendship;
   final bool connectedHome;
+  final Key? key;
 
   Home(
       {required this.connectedHome,
       required this.user,
-      required this.friendship});
+      required this.friendship,
+      this.key});
 
-  factory Home.fromUser(Bubble user) {
-    return Home(connectedHome: true, user: user, friendship: null);
+  factory Home.fromUser(Bubble user, {Key? key}) {
+    return Home(connectedHome: true, user: user, friendship: null, key: key);
   }
 
   factory Home.fromFriendship(Friendship friendship) {

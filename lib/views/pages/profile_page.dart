@@ -15,18 +15,65 @@ class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key, required this.profile});
 
   static const double padding = 16.0;
+  static const double _iconTextDistance = 5.0;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          title: const BefriendTitle(),
-          foregroundColor: Colors.black,
-          backgroundColor: Colors.white),
-      body: ChangeNotifierProvider(
-          create: (_) => ProfileProvider(profile: profile),
-          builder: (BuildContext context, Widget? child) {
-            return Column(
+    return ChangeNotifierProvider(
+        create: (_) => ProfileProvider(profile: profile),
+        builder: (BuildContext context, Widget? child) {
+          return Scaffold(
+            appBar: AppBar(
+                title: const BefriendTitle(),
+                actions: !profile.user.main()
+                    ? [
+                        Consumer(builder: (BuildContext context,
+                            ProfileProvider provider, Widget? child) {
+                          return PopupMenuButton<int>(
+                              icon: const Icon(
+                                Icons.more_vert,
+                              ),
+                              onSelected: (int selection) async {
+                                await provider.onSelectMenu(selection, context);
+                              },
+                              itemBuilder: (BuildContext context) => [
+                                    const PopupMenuItem<int>(
+                                      value: 0,
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.delete_outline_rounded,
+                                              color:
+                                                  Colors.red), // Archive icon
+                                          SizedBox(width: _iconTextDistance),
+                                          Text(
+                                            'Delete this user',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                          SizedBox(
+                                              width: _iconTextDistance * 2),
+                                        ],
+                                      ),
+                                    ),
+                                    const PopupMenuItem<int>(
+                                      value: 1,
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.block_rounded,
+                                              color: Colors.black), // Info icon
+                                          SizedBox(width: _iconTextDistance),
+                                          Text('Block this user'),
+                                          SizedBox(
+                                              width: _iconTextDistance * 2),
+                                        ],
+                                      ),
+                                    ),
+                                  ]);
+                        })
+                      ]
+                    : null,
+                foregroundColor: Colors.black,
+                backgroundColor: Colors.white),
+            body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
@@ -54,11 +101,12 @@ class ProfilePage extends StatelessWidget {
                 Expanded(
                   child: ProfilePictures(
                     userID: profile.user.id,
+                    showArchived: false,
                   ),
                 ),
               ],
-            );
-          }),
-    );
+            ),
+          );
+        });
   }
 }

@@ -86,10 +86,6 @@ class HostingProvider extends ChangeNotifier {
     return _host.joiners.length;
   }
 
-  String name(int index) {
-    return _host.joiners[index].name;
-  }
-
   String username(int index) {
     return _host.joiners[index].username;
   }

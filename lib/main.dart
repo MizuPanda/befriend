@@ -1,4 +1,6 @@
+import 'package:befriend/models/authentication/consent_manager.dart';
 import 'package:befriend/router.dart';
+import 'package:befriend/utilities/secrets.dart';
 import 'package:befriend/views/pages/home_page.dart';
 import 'package:befriend/views/pages/login_page.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -22,22 +24,41 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
+  // await ConsentManager.debugReset();
+
+  final params = ConsentRequestParameters(
+      // consentDebugSettings: Secrets.consentDebugSettings
+      );
+  ConsentInformation.instance.requestConsentInfoUpdate(
+    params,
+    () async {
+      // The consent information state was updated.
+      // You are now ready to check if a form is available.
+    },
+    (FormError error) {
+      // Handle the error
+    },
+  );
+
+  // Should call these functions only if consent has been given.
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  MobileAds.instance.initialize();
+  if (kDebugMode) {
+    MobileAds.instance.initialize();
+  }
+
+  final RequestConfiguration configuration;
 
   // Set up test devices
   if (kDebugMode) {
-    RequestConfiguration configuration = RequestConfiguration(
-        testDeviceIds: <String>[
-          "2aba1d87-7514-4a40-853c-836cad16ba31"
-        ]); // Replace with your actual device ID
-    MobileAds.instance.updateRequestConfiguration(configuration);
-  }
+    configuration = RequestConfiguration(testDeviceIds: <String>[
+      Secrets.requestConfigurationDeviceID
+    ]); // Replace with your actual device ID
 
-  if (!kDebugMode) {
+    MobileAds.instance.updateRequestConfiguration(configuration);
+  } else {
     // Pass all uncaught "fatal" errors from the framework to Crashlytics
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   }
@@ -96,13 +117,15 @@ class _SelectPageState extends State<SelectPage> {
       return FutureBuilder(
         future: UserManager.userHome(),
         builder: (BuildContext context, AsyncSnapshot<Home> snapshot) {
-          if (snapshot.data == null) {
+          if (!snapshot.hasData) {
             return const Scaffold(
               body: Center(
                 child: CircularProgressIndicator(),
               ),
             );
           }
+
+          ConsentManager.setTagForChildrenAds(snapshot.data!.user.birthYear);
 
           return HomePage(home: snapshot.data!);
         },

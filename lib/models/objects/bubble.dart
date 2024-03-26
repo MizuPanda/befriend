@@ -10,10 +10,12 @@ import 'package:flutter/material.dart';
 class Bubble {
   final String id;
   final String username;
-  String name;
   final String avatarUrl;
   final int power;
   ImageProvider avatar;
+  final int birthYear;
+
+  Map<String, dynamic> blockedUsers;
 
   Map<String, DateTime> lastSeenUsersMap;
 
@@ -34,14 +36,15 @@ class Bubble {
   Bubble._({
     required this.id,
     required this.username,
-    required this.name,
     required this.power,
+    required this.birthYear,
     required this.size,
     required this.avatar,
     required this.avatarUrl,
     required this.lastSeenUsersMap,
     required this.friendIDs,
     required this.friendshipsLoaded,
+    required this.blockedUsers,
   });
 
   factory Bubble.fromDocsWithFriends(
@@ -54,9 +57,7 @@ class Bubble {
 
   factory Bubble.fromDocsWithoutFriends(
       DocumentSnapshot docs, ImageProvider avatar) {
-    Bubble bubble = Bubble._fromDocs(docs, avatar, false);
-
-    return bubble;
+    return Bubble._fromDocs(docs, avatar, false);
   }
 
   factory Bubble._fromDocs(
@@ -67,15 +68,16 @@ class Bubble {
 
     Bubble bubble = Bubble._(
         id: docs.id,
-        name: DataManager.getString(docs, Constants.nameDoc),
         username: DataManager.getString(docs, Constants.usernameDoc),
         power: pwr,
+        birthYear: DataManager.getNumber(docs, Constants.birthYearDoc).toInt(),
         size: size,
         avatarUrl: DataManager.getString(docs, Constants.avatarDoc),
         lastSeenUsersMap:
             DataManager.getDateTimeMap(docs, Constants.lastSeenUsersMapDoc),
         friendIDs: DataManager.getList(docs, Constants.friendsDoc),
         friendshipsLoaded: friendshipsLoaded,
+        blockedUsers: DataManager.getMap(docs, Constants.blockedUsersDoc),
         avatar: avatar);
 
     return bubble;
@@ -83,6 +85,10 @@ class Bubble {
 
   bool main() {
     return id == AuthenticationManager.id();
+  }
+
+  bool didBlockYou() {
+    return blockedUsers.keys.contains(AuthenticationManager.id());
   }
 
   Iterable<String> loadedFriendIds() {
@@ -138,6 +144,6 @@ class Bubble {
 
   @override
   String toString() {
-    return 'Bubble{id: $id, username: $username, name: $name, avatarUrl: $avatarUrl, power: $power, avatar: $avatar, friendIDs: $friendIDs, friendshipsLoaded: $friendshipsLoaded,}';
+    return 'Bubble{id: $id, username: $username, avatarUrl: $avatarUrl, power: $power, friendIDs: $friendIDs, friendshipsLoaded: $friendshipsLoaded,}';
   }
 }

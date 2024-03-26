@@ -4,7 +4,9 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:io' show Platform;
 
 class CustomNativeAd extends StatefulWidget {
-  const CustomNativeAd({super.key});
+  const CustomNativeAd({
+    super.key,
+  });
 
   @override
   State<CustomNativeAd> createState() => _CustomNativeAdState();
@@ -20,7 +22,7 @@ class _CustomNativeAdState extends State<CustomNativeAd> {
       : Constants.iosTestNativeAdUnit;
 
   /// Loads a native ad.
-  void loadAd() {
+  void loadAd() async {
     _nativeAd = NativeAd(
         adUnitId: _adUnitId,
         listener: NativeAdListener(

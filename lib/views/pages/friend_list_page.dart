@@ -137,7 +137,9 @@ class _FriendsListPageState extends State<FriendsListPage> {
       body: PagedListView<int, Friendship>(
         pagingController: _pagingController,
         builderDelegate: PagedChildBuilderDelegate<Friendship>(
-            itemBuilder: (context, friendship, index) {
+            noItemsFoundIndicatorBuilder: (BuildContext context) {
+          return const Center();
+        }, itemBuilder: (context, friendship, index) {
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(

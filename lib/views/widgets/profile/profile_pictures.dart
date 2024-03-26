@@ -16,9 +16,11 @@ class ProfilePictures extends StatefulWidget {
   const ProfilePictures({
     super.key,
     required this.userID,
+    required this.showArchived,
   });
 
   final String userID;
+  final bool showArchived;
 
   @override
   State<ProfilePictures> createState() => _ProfilePicturesState();
@@ -51,6 +53,7 @@ class _ProfilePicturesState extends State<ProfilePictures> {
       final Query q = Constants.usersCollection
           .doc(userId)
           .collection(Constants.pictureSubCollection)
+          .where(Constants.archived, isEqualTo: widget.showArchived)
           .where(Filter.or(
               Filter(Constants.publicDoc, isEqualTo: true),
               Filter(Constants.allowedUsersDoc,
@@ -69,7 +72,7 @@ class _ProfilePicturesState extends State<ProfilePictures> {
             _lastVisible = value.docs[value.size - 1];
           }
         },
-        onError: (e) => debugPrint("(Pictures): Error completing: $e"),
+        onError: (e) => debugPrint("(ProfilePictures): Error completing: $e"),
       );
 
       final QuerySnapshot querySnapshot = await query;
@@ -102,13 +105,23 @@ class _ProfilePicturesState extends State<ProfilePictures> {
         _pagingController.appendPage(newItems, nextPageKey);
       }
     } catch (error) {
-      debugPrint('(ProfilePicture): Error= $error');
+      debugPrint('(ProfilePictures): Error= $error');
       _pagingController.error = error;
     }
   }
 
+  void _handleArchiveSuccess(String archivedPictureId) {
+    // Remove the archived picture from the _pagingController's item list
+    final List<Picture> items =
+        List<Picture>.from(_pagingController.itemList ?? []);
+    items.removeWhere((item) => item.id == archivedPictureId);
+
+    // Update the paging controller with the new item list
+    _pagingController.itemList = items;
+  }
+
   @override
-  Widget build(BuildContext context) => FutureBuilder(
+  Widget build(BuildContext context) => FutureBuilder<Bubble>(
       future: UserManager.getInstance(),
       builder: (BuildContext context, AsyncSnapshot<Bubble> mainBubble) {
         if (!mainBubble.hasData || mainBubble.data == null) {
@@ -129,6 +142,9 @@ class _ProfilePicturesState extends State<ProfilePictures> {
               picture: item,
               userID: widget.userID,
               connectedUsername: mainBubble.data!.username,
+              isConnectedUserProfile:
+                  widget.userID == AuthenticationManager.id(),
+              onArchiveSuccess: _handleArchiveSuccess,
             );
           }, noItemsFoundIndicatorBuilder: (BuildContext context) {
             return const Center();

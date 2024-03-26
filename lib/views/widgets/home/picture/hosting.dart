@@ -48,8 +48,7 @@ class _HostingColumnState extends State<HostingColumn> {
                       user: provider.bubble(index),
                       radius: Constants.pictureDialogAvatarSize,
                     ),
-                    title: Text(provider.name(index)),
-                    subtitle: Text(provider.username(index)),
+                    title: Text(provider.username(index)),
                     trailing: IconButton(
                       onPressed: () async {
                         await provider.deleteUser(index);
@@ -66,8 +65,7 @@ class _HostingColumnState extends State<HostingColumn> {
                       user: provider.bubble(index),
                       radius: Constants.pictureDialogAvatarSize,
                     ),
-                    title: Text(provider.name(index)),
-                    subtitle: Text(provider.username(index)),
+                    title: Text(provider.username(index)),
                   );
                 }
               });

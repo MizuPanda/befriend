@@ -45,8 +45,7 @@ class _SearchButtonState extends State<SearchButton> {
               username = username.trim();
 
               for (Friendship friendship in provider.home.user.friendships) {
-                if (friendship.friend.username == username ||
-                    friendship.friend.name == username) {
+                if (friendship.friend.username == username) {
                   Bubble searchedBubble = friendship.friend;
                   provider.animateToFriend(context,
                       dx: searchedBubble.x, dy: searchedBubble.y);

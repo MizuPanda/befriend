@@ -1,16 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:befriend/models/data/user_manager.dart';
-import 'package:befriend/models/services/post_service.dart';
-import 'package:befriend/providers/profile_provider.dart';
-import 'package:befriend/utilities/constants.dart';
+import 'package:befriend/providers/picture_card_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:like_button/like_button.dart';
 import 'package:provider/provider.dart';
 
-import '../../../models/objects/bubble.dart';
 import '../../../models/objects/picture.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -18,12 +13,16 @@ class PictureCard extends StatefulWidget {
   final Picture picture;
   final String userID;
   final String connectedUsername;
+  final bool isConnectedUserProfile;
+  final Function(String) onArchiveSuccess;
 
   const PictureCard({
     Key? key,
     required this.picture,
     required this.userID,
     required this.connectedUsername,
+    required this.isConnectedUserProfile,
+    required this.onArchiveSuccess,
   }) : super(key: key);
 
   @override
@@ -31,178 +30,142 @@ class PictureCard extends StatefulWidget {
 }
 
 class _PictureCardState extends State<PictureCard> {
+  late final PictureCardProvider _provider = PictureCardProvider(
+      widget.picture,
+      widget.userID,
+      widget.connectedUsername,
+      widget.isConnectedUserProfile,
+      widget.onArchiveSuccess);
   final double _likeSize = 35;
-  bool _isLiked = false;
-  late bool _isNotLikedYet;
 
   @override
   void initState() {
-    _isLiked = widget.picture.likes.contains(widget.connectedUsername);
-    _isNotLikedYet =
-        !widget.picture.firstLikes.contains(widget.connectedUsername);
+    _provider.initLikes();
     super.initState();
+    debugPrint("(PictureCard): picture id = ${widget.picture.id}");
+  }
+
+  @override
+  void didUpdateWidget(covariant PictureCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.picture.id != oldWidget.picture.id) {
+      _provider.updatePicture(widget.picture);
+      debugPrint("(PictureCard): Updated with: ${widget.picture.id}");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip
-          .antiAlias, // Ensures the image is clipped to the card's boundaries
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment
-            .stretch, // Makes the image stretch to fill the card width
-        children: [
-          Stack(
-            children: [
-              CachedNetworkImage(
-                fit: BoxFit.scaleDown,
-                imageUrl: widget.picture.fileUrl,
-                progressIndicatorBuilder: (context, url, downloadProgress) =>
-                    SizedBox(
-                        height: MediaQuery.of(context).size.width,
-                        width: MediaQuery.of(context).size.width,
-                        child: Center(
-                            child: CircularProgressIndicator(
-                                value: downloadProgress.progress))),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-              ),
-              Container(
-                  alignment: Alignment.topRight,
-                  padding: const EdgeInsets.only(right: 8, top: 10),
-                  child: UserInfoIconButton(
-                      usernames: widget.picture.sessionUsernames)),
-            ],
-          ), // Check if the image is fully loaded
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: [
-                    LikeButton(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      size: _likeSize,
-                      isLiked: _isLiked,
-                      onTap: (bool isLiked) async {
-                        Map<Object, Object?> data;
-
-                        if (isLiked) {
-                          // Action ==> Unlike
-                          data = {
-                            Constants.likesDoc: FieldValue.arrayRemove(
-                                [widget.connectedUsername]),
-                          };
-                        } else {
-                          // Action ==> Like
-                          debugPrint(
-                              '(PictureCard): Is liked yet = $_isNotLikedYet');
-                          if (_isNotLikedYet) {
-                            data = {
-                              Constants.likesDoc: FieldValue.arrayUnion(
-                                  [widget.connectedUsername]),
-                              Constants.firstLikesDoc: FieldValue.arrayUnion(
-                                  [widget.connectedUsername])
-                            };
-                            _isNotLikedYet = true;
-                            PostService.sendPostLikeNotification(
-                                widget.connectedUsername, widget.userID);
-                          } else {
-                            data = {
-                              Constants.likesDoc: FieldValue.arrayUnion(
-                                  [widget.connectedUsername]),
-                            };
-                          }
-                        }
-                        await Constants.usersCollection
-                            .doc(widget.userID)
-                            .collection(Constants.pictureSubCollection)
-                            .doc(widget.picture.id)
-                            .update(data)
-                            .then((value) {
-                          debugPrint(
-                              '(PictureCard): Updated like to ${(!isLiked).toString()}');
-                        }).onError((error, stackTrace) {
-                          debugPrint(
-                              '(PictureCard): Error updating likes= ${error.toString()}');
-                        });
-
-                        WidgetsBinding.instance
-                            .addPostFrameCallback((timeStamp) {
-                          setState(() {
-                            if (isLiked) {
-                              widget.picture.likes
-                                  .remove(widget.connectedUsername);
-                            } else {
-                              widget.picture.likes
-                                  .add(widget.connectedUsername);
-                            }
-                          });
-                        });
-                        _isLiked = !_isLiked;
-
-                        return _isLiked;
-                      },
-                      circleColor: const CircleColor(
-                          start: Color(0xff00ddff), end: Color(0xff0099cc)),
-                      bubblesColor: const BubblesColor(
-                        dotPrimaryColor: Color(0xff33b5e5),
-                        dotSecondaryColor: Color(0xff0099cc),
+    return ChangeNotifierProvider.value(
+        value: _provider,
+        builder: (BuildContext context, Widget? child) {
+          return Card(
+            clipBehavior: Clip
+                .antiAlias, // Ensures the image is clipped to the card's boundaries
+            child: Consumer(builder: (BuildContext context,
+                PictureCardProvider provider, Widget? child) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment
+                    .stretch, // Makes the image stretch to fill the card width
+                children: [
+                  Stack(
+                    children: [
+                      CachedNetworkImage(
+                        fit: BoxFit.scaleDown,
+                        imageUrl: widget.picture.fileUrl,
+                        progressIndicatorBuilder:
+                            (context, url, downloadProgress) => SizedBox(
+                                height: MediaQuery.of(context).size.width,
+                                width: MediaQuery.of(context).size.width,
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                        value: downloadProgress.progress))),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
                       ),
-                      likeBuilder: (bool isLiked) {
-                        return Icon(
-                          !isLiked
-                              ? Icons.favorite_border_rounded
-                              : Icons.favorite_rounded,
-                          color:
-                              isLiked ? Colors.deepPurpleAccent : Colors.grey,
-                          size: _likeSize,
-                        );
-                      },
+                      Container(
+                          alignment: Alignment.topRight,
+                          padding: const EdgeInsets.only(right: 8, top: 10),
+                          child: MoreButton(
+                            usernames: widget.picture.sessionUsers.values,
+                          )),
+                    ],
+                  ), // Check if the image is fully loaded
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        if (!widget.picture.archived)
+                          Row(
+                            children: [
+                              LikeButton(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                size: _likeSize,
+                                isLiked: provider.isLiked,
+                                onTap: provider.onLike,
+                                circleColor: const CircleColor(
+                                    start: Color(0xff00ddff),
+                                    end: Color(0xff0099cc)),
+                                bubblesColor: const BubblesColor(
+                                  dotPrimaryColor: Color(0xff33b5e5),
+                                  dotSecondaryColor: Color(0xff0099cc),
+                                ),
+                                likeBuilder: (bool isLiked) {
+                                  return Icon(
+                                    !isLiked
+                                        ? Icons.favorite_border_rounded
+                                        : Icons.favorite_rounded,
+                                    color: isLiked
+                                        ? Colors.deepPurpleAccent
+                                        : Colors.grey,
+                                    size: _likeSize,
+                                  );
+                                },
+                              ),
+                              if (widget.picture.likes.isNotEmpty)
+                                const LikeText()
+                            ],
+                          ),
+                        Text.rich(TextSpan(children: [
+                          TextSpan(
+                            text: widget.picture.pictureTaker,
+                            style: GoogleFonts.openSans(
+                                fontSize: 15, fontWeight: FontWeight.bold),
+                          ),
+                          TextSpan(
+                              text: ' ${widget.picture.caption}',
+                              style: GoogleFonts.openSans(fontSize: 14)),
+                        ])),
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        Text(
+                          timeago.format(widget.picture.timestamp),
+                          style: GoogleFonts.openSans(
+                              color: Colors.grey, fontSize: 12.5),
+                        ),
+                        const SizedBox(
+                            height: 2), // Adds a small space before the date
+                        Text(
+                          _formatDate(widget.picture.timestamp),
+                          style: GoogleFonts.openSans(
+                              color: Colors.grey, fontSize: 12),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                      ],
                     ),
-                    if (widget.picture.likes.isNotEmpty)
-                      LikeText(
-                        picture: widget.picture,
-                        color:
-                            _isLiked ? Colors.deepPurpleAccent : Colors.black,
-                      )
-                  ],
-                ),
-                Text.rich(TextSpan(children: [
-                  TextSpan(
-                    text: widget.picture.pictureTaker,
-                    style: GoogleFonts.openSans(
-                        fontSize: 15, fontWeight: FontWeight.bold),
                   ),
-                  TextSpan(
-                      text: ' ${widget.picture.caption}',
-                      style: GoogleFonts.openSans(fontSize: 14)),
-                ])),
-                const SizedBox(
-                  height: 4,
-                ),
-                Text(
-                  timeago.format(widget.picture.timestamp),
-                  style:
-                      GoogleFonts.openSans(color: Colors.grey, fontSize: 12.5),
-                ),
-                const SizedBox(height: 2), // Adds a small space before the date
-                Text(
-                  _formatDate(widget.picture.timestamp),
-                  style: GoogleFonts.openSans(color: Colors.grey, fontSize: 12),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+                ],
+              );
+            }),
+          );
+        });
   }
 
   String _formatDate(DateTime date) {
@@ -212,122 +175,101 @@ class _PictureCardState extends State<PictureCard> {
   }
 }
 
-class UserInfoIconButton extends StatelessWidget {
-  final List<dynamic> usernames;
+class MoreButton extends StatelessWidget {
+  final Iterable<dynamic> usernames;
 
-  const UserInfoIconButton({Key? key, required this.usernames})
-      : super(key: key);
+  const MoreButton({
+    Key? key,
+    required this.usernames,
+  }) : super(key: key);
+
+  static const double _iconTextDistance = 16;
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      iconSize: 25,
-      icon: Icon(
-        Icons.info,
-        color: Colors.grey.withOpacity(0.9),
-      ), // Partially transparent icon
-      onPressed: () => _showUsernamesDialog(context),
-    );
-  }
-
-  Future<void> _showUsernamesDialog(BuildContext context) async {
-    Bubble bubble = await UserManager.getInstance();
-
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return SimpleDialog(
-            title: const Text("People in this picture"),
-            children: usernames
-                .map((username) => SimpleDialogOption(
-                      child:
-                          Text(bubble.username == username ? 'You' : username),
-                    ))
-                .toList(),
-          );
+    return Consumer(builder:
+        (BuildContext context, PictureCardProvider provider, Widget? child) {
+      return PopupMenuButton<PopSelection>(
+        icon: Icon(
+          Icons.more_vert,
+          color: Colors.grey.withOpacity(0.9),
+        ),
+        itemBuilder: (BuildContext context) => [
+          if (provider.isUsersProfile)
+            PopupMenuItem<PopSelection>(
+              value: PopSelection.archive,
+              child: Row(
+                children: [
+                  const Icon(Icons.archive_outlined,
+                      color: Colors.black), // Archive icon
+                  const SizedBox(width: _iconTextDistance),
+                  Text(provider.isArchived() ? 'Restore' : 'Archive'),
+                  const SizedBox(width: _iconTextDistance * 2),
+                ],
+              ),
+            ),
+          if (provider.isPictureHost())
+            const PopupMenuItem<PopSelection>(
+              value: PopSelection.delete,
+              child: Row(
+                children: [
+                  Icon(Icons.delete_outline_rounded,
+                      color: Colors.red), // Archive icon
+                  SizedBox(width: _iconTextDistance),
+                  Text('Delete', style: TextStyle(color: Colors.red)),
+                  SizedBox(width: _iconTextDistance * 2),
+                ],
+              ),
+            ),
+          const PopupMenuItem<PopSelection>(
+            value: PopSelection.info,
+            child: Row(
+              children: [
+                Icon(Icons.info_outline_rounded,
+                    color: Colors.black), // Info icon
+                SizedBox(width: _iconTextDistance),
+                Text('Info'),
+                SizedBox(width: _iconTextDistance * 2),
+              ],
+            ),
+          ),
+        ],
+        onSelected: (PopSelection value) async {
+          await provider.onSelectPop(value, context, usernames);
         },
       );
-    }
+    });
   }
 }
 
 class LikeText extends StatelessWidget {
-  const LikeText({super.key, required this.picture, required this.color});
-
-  final Picture picture;
-  final Color color;
-
-  String getUser() {
-    return '';
-  }
-
-  String usersThatLiked() {
-    switch (picture.likes.length) {
-      case 1:
-        return picture.likes.first;
-      default:
-        return '${picture.likes.first} and others';
-    }
-  }
-
-  Future<void> _showLikesDialog(BuildContext context) async {
-    Bubble bubble = await UserManager.getInstance();
-
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return SimpleDialog(
-            title: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.favorite_rounded,
-                  color: Colors.red,
-                ),
-                Icon(
-                  Icons.favorite_rounded,
-                  color: Colors.red,
-                ),
-                Icon(
-                  Icons.favorite_rounded,
-                  color: Colors.red,
-                )
-              ],
-            ),
-            children: picture.likes
-                .map((username) => SimpleDialogOption(
-                      child:
-                          Text(bubble.username == username ? 'You' : username),
-                    ))
-                .toList(),
-          );
-        },
-      );
-    }
-  }
+  const LikeText({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ProfileProvider>(builder:
-        (BuildContext context, ProfileProvider provider, Widget? child) {
+    return Consumer<PictureCardProvider>(builder:
+        (BuildContext context, PictureCardProvider provider, Widget? child) {
       return TextButton(
           style: ButtonStyle(
             overlayColor: MaterialStateProperty.all(
                 Colors.transparent), // Removes splash effect
           ),
           onPressed: () async {
-            await _showLikesDialog(context);
+            await provider.showLikesDialog(context);
           },
           child: AutoSizeText.rich(TextSpan(
-              style: GoogleFonts.openSans(fontSize: 13, color: color),
+              style:
+                  GoogleFonts.openSans(fontSize: 13, color: provider.color()),
               children: [
                 const TextSpan(text: 'Liked by '),
                 TextSpan(
-                    text: usersThatLiked(),
+                    text: provider.usersThatLiked(),
                     style: const TextStyle(fontWeight: FontWeight.bold))
               ])));
     });
   }
 }
+
+enum PopSelection { archive, delete, info }

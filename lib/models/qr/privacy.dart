@@ -102,12 +102,18 @@ class Privacy {
                 debugPrint('(Privacy):     Friend not checked yet.');
                 usersAlreadyChecked.add(friendId);
 
-                if (_isUserAllowed(
-                    host, friendship, host.friendshipsMap, sliderValuesMap)) {
+                if (!host.joiners.any(
+                    (joiner) => joiner.blockedUsers.keys.contains(friendId))) {
+                  if (_isUserAllowed(
+                      host, friendship, host.friendshipsMap, sliderValuesMap)) {
+                    debugPrint(
+                        '(Privacy):  ${friendship.friendUsername()} is allowed to see the picture.');
+                    _friendsAllowed.add(friendId);
+                    _friendships.add(friendship);
+                  }
+                } else {
                   debugPrint(
-                      '(Privacy):  ${friendship.friendUsername()} is allowed to see the picture.');
-                  _friendsAllowed.add(friendId);
-                  _friendships.add(friendship);
+                      '(Privacy):  ${friendship.friendUsername()} is blocked by a user.');
                 }
               }
             }
@@ -123,7 +129,8 @@ class Privacy {
       FriendshipProgress friendship,
       Map<String, List<FriendshipProgress>> friendshipsMap,
       Map<String, double> sliderValuesMap) {
-    return friendshipsMap.entries.every((sessionUser) {
+    return friendshipsMap.entries
+        .every((MapEntry<String, List<FriendshipProgress>> sessionUser) {
       double? sliderValue = sliderValuesMap[sessionUser.key];
       debugPrint('(Privacy): ${sessionUser.key} has privacy $sliderValue');
       // If that user has set his parameters to 0, then return true for this session user

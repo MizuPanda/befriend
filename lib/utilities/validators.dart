@@ -13,24 +13,6 @@ class Validators {
     return null;
   }
 
-  static String? nameValidator(String? name) {
-    if (name == null || name.isEmpty) {
-      return 'Please enter your name';
-    }
-    // Minimum and maximum length requirements
-    if (name.length < 2 || name.length > 35) {
-      return 'Please enter a shorter or longer name.';
-    }
-
-    // Disallowed characters (example disallowed characters: <, >, &)
-    final disallowedCharacters = RegExp(r'[<>]');
-    if (disallowedCharacters.hasMatch(name)) {
-      return 'Your name contains characters that are not allowed';
-    }
-
-    return null;
-  }
-
   static String? usernameValidator(String? username) {
     if (username == null || username.isEmpty) {
       return "Please enter a username.";

@@ -30,9 +30,6 @@ class BaseFormField extends StatelessWidget {
       controller: controller,
       textInputAction: action,
       focusNode: focusNode,
-      onTapOutside: (_) {
-        FocusScope.of(context).unfocus();
-      },
       onChanged: onChanged,
       onSaved: onSaved,
       validator: validator,

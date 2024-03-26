@@ -1,8 +1,5 @@
 import 'dart:io';
 
-import 'package:befriend/models/data/data_query.dart';
-import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/utilities/validators.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/data/picture_manager.dart';
@@ -22,7 +19,6 @@ class ProfileEditDialog extends StatefulWidget {
 class _ProfileEditDialogState extends State<ProfileEditDialog> {
   String? _imageUrl;
   final TextEditingController _nameController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
 
   Future<void> _pickImage() async {
     await PictureManager.takeProfilePicture(context, (String? imageUrl) {
@@ -38,7 +34,6 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
 
   @override
   void initState() {
-    _nameController.text = widget.bubble.name;
     super.initState();
   }
 
@@ -100,45 +95,16 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
               ),
             ),
             const SizedBox(height: 20.0),
-            Form(
-              key: _formKey,
-              child: TextFormField(
-                controller: _nameController,
-                validator: Validators.nameValidator,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(30)),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () async {
                 // Handle save profile data
-                bool validate = _formKey.currentState!.validate();
-
-                if (validate) {
-                  String newName = _nameController.text.trim();
-                  debugPrint(newName);
-
-                  if (newName != widget.bubble.name) {
-                    // If the form is valid, use the name from the _nameController to update the database
-
-                    // Update new name
-                    await DataQuery.updateDocument(Constants.nameDoc, newName);
-                    widget.bubble.name = newName;
-                    debugPrint('(ProfileEditDialog): Name changed to $newName');
-                  }
-                  if (_imageUrl != null) {
-                    await PictureManager.changeMainPicture(
-                        _imageUrl!, widget.bubble);
-                  }
-                  if (context.mounted) {
-                    widget.notifyParent();
-                    Navigator.of(context).pop();
-                  }
+                if (_imageUrl != null) {
+                  await PictureManager.changeMainPicture(
+                      _imageUrl!, widget.bubble);
+                }
+                if (context.mounted) {
+                  widget.notifyParent();
+                  Navigator.of(context).pop();
                 }
               },
               style: ElevatedButton.styleFrom(

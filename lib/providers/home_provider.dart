@@ -1,6 +1,4 @@
 import 'package:befriend/models/data/data_query.dart';
-import 'package:befriend/models/data/user_manager.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
@@ -65,7 +63,7 @@ class HomeProvider extends ChangeNotifier {
 
   HomeProvider({required this.home});
 
-  void init(TickerProvider vsync) {
+  void init(TickerProvider vsync) async {
     // Initializing controller
     _animationController = AnimationController(
       vsync: vsync,
@@ -77,6 +75,8 @@ class HomeProvider extends ChangeNotifier {
     if (home.user.friendshipsLoaded) {
       home.initializePositions();
     }
+
+    notifyListeners();
   }
 
   Matrix4 _middlePos() {
@@ -120,12 +120,7 @@ class HomeProvider extends ChangeNotifier {
     _animationController.forward();
   }
 
-  Future<void> signOut(BuildContext context) async {
-    debugPrint('Signing out');
-    await FirebaseAuth.instance.signOut();
-    UserManager.refreshPlayer();
-    if (context.mounted) {
-      GoRouter.of(context).pushReplacement(Constants.loginAddress);
-    }
+  void goToSettings(BuildContext context) {
+    GoRouter.of(context).push(Constants.settingsAddress);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:befriend/models/authentication/consent_manager.dart';
 import 'package:befriend/views/widgets/home/picture/hosting_widget.dart';
 import 'package:befriend/views/widgets/home/picture/joining_widget.dart';
 import 'package:flutter/material.dart';
@@ -81,21 +82,25 @@ class _PictureButtonState extends State<PictureButton> {
                   )
                 ]),
             child: GestureDetector(
-              onTap: () {
-                if (isJoinMode) {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return const RoundedDialog(child: JoiningWidget());
-                      });
-                } else {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return const RoundedDialog(
-                          child: HostingWidget(isHost: true, host: null),
-                        );
-                      });
+              onTap: () async {
+                await ConsentManager.getConsentForm(reload: false);
+
+                if (context.mounted) {
+                  if (isJoinMode) {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const RoundedDialog(child: JoiningWidget());
+                        });
+                  } else {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const RoundedDialog(
+                            child: HostingWidget(isHost: true, host: null),
+                          );
+                        });
+                  }
                 }
               },
               child: Center(

@@ -1,4 +1,5 @@
 import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/models/authentication/date_manager.dart';
 import 'package:befriend/utilities/validators.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,10 @@ import '../utilities/password_strength.dart';
 
 class SignProvider extends ChangeNotifier {
   late NavigatorState _navigator;
+
+  bool? _hasConsented = false;
+
+  bool? get hasConsented => _hasConsented;
 
   bool _passwordVisible = false;
 
@@ -20,7 +25,7 @@ class SignProvider extends ChangeNotifier {
 
   get formKey => _formKey;
 
-  String? _email, _name, _username, _password;
+  String? _email, _username, _password;
   String? _error;
   static const String _usernameError = 'username-already-in-use';
 
@@ -28,8 +33,25 @@ class SignProvider extends ChangeNotifier {
 
   bool get loading => _loading;
 
+  DateTime _date = DateTime(2022, 05, 09);
+
+  DateTime get date => _date;
+
   double strength() {
     return PasswordStrength.getPasswordStrength(_password);
+  }
+
+  bool isPasswordEmpty() {
+    return _password == null || _password!.isEmpty;
+  }
+
+  void onDateTimeChanged(DateTime dateTime) {
+    _date = dateTime;
+    notifyListeners();
+  }
+
+  String dateText() {
+    return '${_date.month}-${_date.day}-${_date.year}';
   }
 
   void onChanged(String password) {
@@ -59,10 +81,6 @@ class SignProvider extends ChangeNotifier {
     }
 
     return null;
-  }
-
-  String? nameValidator(String? name) {
-    return Validators.nameValidator(name);
   }
 
   String? usernameValidator(String? username) {
@@ -95,16 +113,17 @@ class SignProvider extends ChangeNotifier {
     _email = value!.trim();
   }
 
-  void nameSaved(String? value) {
-    _name = value!.trim();
-  }
-
   void usernameSaved(String? value) {
     _username = value!.trim();
   }
 
   void passwordSaved(String? value) {
     _password = value!.trim();
+  }
+
+  void onCheck(bool? value) {
+    _hasConsented = value;
+    notifyListeners();
   }
 
   //#endregion
@@ -131,7 +150,6 @@ class SignProvider extends ChangeNotifier {
 
   void toDispose() {
     _navigator.focusNode.unfocus();
-    notifyListeners();
   }
 
   void hidePassword() {
@@ -144,28 +162,59 @@ class SignProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _showAgeRequirementSnackBar(BuildContext context) {
+    _showError(
+        context, 'You must be at least 13 years old to create an account.');
+  }
+
+  void _showConsentSnackBar(BuildContext context) {
+    _showError(context,
+        'Please agree to the Privacy Policy and to the Terms and Conditions to continue with the sign-up process.');
+  }
+
+  void _showError(BuildContext context, String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 3),
+      action: SnackBarAction(
+        label: 'Close',
+        onPressed: () {
+          // Some action if needed
+        },
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   /// Sign up the user
   Future<void> signUp(BuildContext context) async {
-    _loading = true;
-    notifyListeners();
-    _formKey.currentState!.save();
+    if (!DateManager.isOldEnough(birthday: _date, age: 13)) {
+      _showAgeRequirementSnackBar(context);
+    } else if (_hasConsented == null || !_hasConsented!) {
+      _showConsentSnackBar(context);
+    } else {
+      _loading = true;
+      notifyListeners();
+      _formKey.currentState!.save();
 
-    if (_formKey.currentState!.validate()) {
-      bool usernameAvailable = await _checkUsernameAvailability(_username!);
-      if (!usernameAvailable) {
-        _error = _usernameError;
-        _formKey.currentState!.validate();
-      } else {
-        if (context.mounted) {
-          _error = await AuthenticationManager.createUserWithEmailAndPassword(
-              _email!, _password!, _name!, _username!, context);
-        }
-        if (_error != null) {
+      if (_formKey.currentState!.validate()) {
+        bool usernameAvailable = await _checkUsernameAvailability(_username!);
+        if (!usernameAvailable) {
+          _error = _usernameError;
           _formKey.currentState!.validate();
+        } else {
+          if (context.mounted) {
+            _error = await AuthenticationManager.createUserWithEmailAndPassword(
+                _email!, _password!, _username!, _date.year, context);
+          }
+          if (_error != null) {
+            _formKey.currentState!.validate();
+          }
         }
       }
+      _loading = false;
+      notifyListeners();
     }
-    _loading = false;
-    notifyListeners();
   }
 }

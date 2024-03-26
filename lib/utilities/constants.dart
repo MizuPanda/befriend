@@ -6,17 +6,18 @@ class Constants {
 
   static const String appID = 'befriend';
   //USERS
-  static const String nameDoc = 'name';
   static const String usernameDoc = 'username';
   static const String notificationToken = 'notificationToken';
   static const String avatarDoc = 'avatar';
   static const String counterDoc = 'counter';
   static const String friendsDoc = 'friends';
   static const String powerDoc = 'power';
+  static const String birthYearDoc = 'birthYear';
   static const String hostingDoc = 'hosting';
   static const String sliderDoc = 'sliderValue';
   static const String hostingFriendshipsDoc = 'hostingFriendships';
   static const String lastSeenUsersMapDoc = 'lastSeenUsersMap';
+  static const String blockedUsersDoc = 'blocked';
   //FRIENDSHIPS
   static const String progressDoc = 'progress';
   static const String levelDoc = 'level';
@@ -27,6 +28,7 @@ class Constants {
   static const String username2Doc = 'username2';
   //PICTURES
   static const String urlDoc = 'fileUrl';
+  static const String hostId = 'hostId';
   static const String pictureTakerDoc = 'pictureTaker';
   static const String timestampDoc = 'timestamp';
   static const String metadataDoc = 'metadata';
@@ -36,6 +38,7 @@ class Constants {
   static const String sessionUsersDoc = 'sessionUsers';
   static const String likesDoc = 'likes';
   static const String firstLikesDoc = 'firstLikes';
+  static const String archived = 'archived';
   //STORAGE
   static const String profilePictureStorage = 'profile_pictures';
   static const String sessionPictureStorage = 'session_pictures';
@@ -88,4 +91,5 @@ class Constants {
   static const String sessionAddress = '/${MyRouter.session}';
   static const String mutualAddress = '/${MyRouter.mutual}';
   static const String friendListAddress = '/${MyRouter.friendList}';
+  static const String settingsAddress = '/${MyRouter.settings}';
 }

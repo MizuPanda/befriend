@@ -1,10 +1,14 @@
+import 'package:befriend/models/authentication/consent_manager.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/utilities/constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+
+import '../objects/home.dart';
 
 class AuthenticationManager {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -20,8 +24,8 @@ class AuthenticationManager {
   static Future<String?> createUserWithEmailAndPassword(
       String email,
       String password,
-      String name,
       String username,
+      int birthYear,
       BuildContext context) async {
     String? errorCode;
 
@@ -33,7 +37,7 @@ class AuthenticationManager {
         .then((value) async {
       User? user = value.user;
       debugPrint("Successfully created user: ${user!.uid}");
-      await _registerUserData(name, username, user, context);
+      await _registerUserData(username, birthYear, user, context);
     }).onError((FirebaseAuthException error, stackTrace) {
       //Handle every possible errors
       debugPrint('(CreateUser) An error occurred: ${error.code}');
@@ -50,22 +54,25 @@ class AuthenticationManager {
   /// The name and username are stored in the database.
   /// The counter is incremented by 1 and stored in the database.
   static Future<void> _registerUserData(
-      String name, String username, User? user, BuildContext context) async {
+      String username, int birthYear, User? user, BuildContext context) async {
     final userInfo = <String, dynamic>{
-      Constants.nameDoc: name,
       Constants.usernameDoc: username,
       Constants.avatarDoc: '',
       Constants.friendsDoc: List.empty(),
       Constants.powerDoc: 0,
+      Constants.birthYearDoc: birthYear,
       Constants.hostingDoc: List.empty(),
       Constants.sliderDoc: 0,
-      Constants.hostingFriendshipsDoc: {}
+      Constants.hostingFriendshipsDoc: {},
+      'consent': {'given': true, 'when': FieldValue.serverTimestamp()},
+      Constants.blockedUsersDoc: {},
     };
+
     await Constants.usersCollection.doc(user!.uid).set(userInfo).then(
       //IF COMPLETED WITHOUT ERRORS
       (value) async {
         await user.sendEmailVerification();
-
+        ConsentManager.setTagForChildrenAds(birthYear);
         if (context.mounted) {
           GoRouter.of(context).replace(Constants.pictureAddress);
         }
@@ -83,9 +90,11 @@ class AuthenticationManager {
       String email, String password, BuildContext context) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+      Home home = await UserManager.userHome();
+
       if (context.mounted) {
-        GoRouter.of(context).replace(Constants.homepageAddress,
-            extra: await UserManager.userHome());
+        ConsentManager.setTagForChildrenAds(home.user.birthYear);
+        GoRouter.of(context).go(Constants.homepageAddress, extra: home);
       }
     } on FirebaseAuthException catch (e) {
       debugPrint('(Authentication-Error): ${e.code}');

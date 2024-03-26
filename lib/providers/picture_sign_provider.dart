@@ -35,7 +35,7 @@ class PictureSignProvider extends ChangeNotifier {
   Future<void> continueHome(BuildContext context) async {
     await PictureQuery.uploadAvatar(File(_imagePath!));
     if (context.mounted) {
-      skipHome(context);
+      await skipHome(context);
     }
   }
 

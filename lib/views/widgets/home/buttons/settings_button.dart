@@ -17,7 +17,7 @@ class SettingsButton extends StatelessWidget {
           (BuildContext context, HomeProvider provider, Widget? child) {
         return IconButton(
             onPressed: () {
-              provider.signOut(context);
+              provider.goToSettings(context);
             },
             icon: const Icon(
               Icons.settings_outlined,

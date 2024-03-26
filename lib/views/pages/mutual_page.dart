@@ -116,8 +116,7 @@ class _MutualPageState extends State<MutualPage> {
     final lowerCaseSearchTerm = searchTerm.toLowerCase();
 
     filteredUsers = _allLoadedUsers.where((user) {
-      return user.username.toLowerCase().contains(lowerCaseSearchTerm) ||
-          user.name.toLowerCase().contains(lowerCaseSearchTerm);
+      return user.username.toLowerCase().contains(lowerCaseSearchTerm);
     }).toList();
 
     setState(() {
@@ -159,7 +158,6 @@ class _MutualPageState extends State<MutualPage> {
                           backgroundImage: user.avatar,
                         ),
                         title: Text(user.username),
-                        subtitle: Text(user.name),
                       );
                     },
                   )
@@ -171,7 +169,6 @@ class _MutualPageState extends State<MutualPage> {
                           backgroundImage: item.avatar,
                         ),
                         title: Text(item.username),
-                        subtitle: Text(item.name),
                       ),
                     ),
                     /*

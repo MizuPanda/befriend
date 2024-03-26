@@ -8,6 +8,7 @@ import 'package:befriend/models/services/post_service.dart';
 import 'package:befriend/models/social/friend_update.dart';
 import 'package:befriend/models/social/friendship_update.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -15,7 +16,6 @@ import 'package:photo_view/photo_view.dart';
 
 import '../models/data/picture_manager.dart';
 import '../models/objects/bubble.dart';
-import '../models/objects/home.dart';
 import '../models/objects/host.dart';
 import '../models/objects/picture.dart';
 import '../utilities/constants.dart';
@@ -36,12 +36,12 @@ class SessionProvider extends ChangeNotifier {
 
   InterstitialAd? _interstitialAd;
 
-  void _loadInterstitialAd() {
+  void _loadInterstitialAd() async {
+    // Replace with your ad unit ID - TO CHANGE DEPENDENTLY ON PLATFORM
     InterstitialAd.load(
       adUnitId: Platform.isAndroid
           ? Constants.androidTestAdUnit
           : Constants.iosTestAdUnit,
-      // Replace with your ad unit ID - TO CHANGE DEPENDENTLY ON PLATFORM
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (InterstitialAd ad) {
@@ -174,14 +174,8 @@ class SessionProvider extends ChangeNotifier {
 
   Future<void> _navigateHome(BuildContext context) async {
     _isSessionEnded = true;
-    UserManager.refreshPlayer();
-    Home home = await UserManager.userHome();
 
-    if (context.mounted) {
-      debugPrint('(SessionProvider): Going Home');
-
-      GoRouter.of(context).go(Constants.homepageAddress, extra: home);
-    }
+    await UserManager.reloadHome(context);
   }
 
   Future<void> pictureProcess() async {
@@ -325,8 +319,10 @@ class SessionProvider extends ChangeNotifier {
     _caption = await _promptForCaption(context);
     if (_caption != null) {
       List<String> sessionUsers = ids;
-      Iterable<Bubble> joinersStillConnected =
-          host.joiners.where((element) => sessionUsers.contains(element.id));
+
+      host.joiners = host.joiners
+          .where((element) => sessionUsers.contains(element.id))
+          .toList();
 
       debugPrint('(SessionProvider): Publishing to $sessionUsers');
       final DateTime timestamp = DateTime.timestamp();
@@ -335,16 +331,16 @@ class SessionProvider extends ChangeNotifier {
       _privacy.calculateAllowedUsers(host, _sliderValues, bubble);
 
       // CREATE FRIENDSHIPS
-      await _createOrUpdateFriendships(sessionUsers, timestamp);
+      await _createOrUpdateFriendships(host.joiners, timestamp);
 
       // PUBLISH PICTURE
-      await _uploadPicture(sessionUsers, timestamp);
+      await _uploadPicture(sessionUsers, host.joiners, timestamp);
 
       // SET NEW USER DATA FOR EVERY USER
-      await _setUsersData(sessionUsers, joinersStillConnected, timestamp);
+      await _setUsersData(sessionUsers, host.joiners, timestamp);
 
       // SEND NOTIFICATIONS. Note: Add a friendsListening array field doc in users doc. Start it empty. If user press on...
-      _sendNotificationsToUser(sessionUsers, joinersStillConnected);
+      _sendNotificationsToUser(sessionUsers, host.joiners);
     }
   }
 
@@ -370,50 +366,54 @@ class SessionProvider extends ChangeNotifier {
   }
 
   Future<void> _createOrUpdateFriendships(
-      List<dynamic> sessionUsers, DateTime timestamp) async {
-    for (int i = 0; i < sessionUsers.length; i++) {
-      for (int j = i + 1; j < sessionUsers.length; j++) {
-        String userID1 =
-            sessionUsers[i]; // Assuming each user has an 'id' field
-        String userID2 = sessionUsers[j];
+      List<Bubble> joiners, DateTime timestamp) async {
+    for (int i = 0; i < joiners.length; i++) {
+      for (int j = i + 1; j < joiners.length; j++) {
+        String userID1 = joiners[i].id; // Assuming each user has an 'id' field
+        String userID2 = joiners[j].id;
 
-        // Ensure the IDs are in alphabetical order for the document ID
-        List<String> ids = [userID1, userID2];
-        ids.sort();
-        String friendshipDocId = ids.join();
+        // Verifying if one user is blocking the other one.
+        if (!joiners[i].blockedUsers.keys.contains(userID2) &&
+            !joiners[i].blockedUsers.keys.contains(userID1)) {
+          // Ensure the IDs are in alphabetical order for the document ID
+          List<String> ids = [userID1, userID2];
+          ids.sort();
+          String friendshipDocId = ids.join();
 
-        // Check if the friendship already exists
-        DocumentSnapshot friendshipDoc =
-            await Constants.friendshipsCollection.doc(friendshipDocId).get();
+          // Check if the friendship already exists
+          DocumentSnapshot friendshipDoc =
+              await Constants.friendshipsCollection.doc(friendshipDocId).get();
 
-        if (friendshipDoc.exists) {
-          // Update existing friendship
-          await FriendshipUpdate.addProgress(
-              userID1, userID2, friendshipDoc, timestamp,
-              exp: Constants.pictureExpValue);
-        } else {
-          // Create a new friendship
-          String username1 = idToBubbleMap[userID1]!.username;
-          String username2 = idToBubbleMap[userID2]!.username;
+          if (friendshipDoc.exists) {
+            // Update existing friendship
+            await FriendshipUpdate.addProgress(
+                userID1, userID2, friendshipDoc, timestamp,
+                exp: Constants.pictureExpValue);
+          } else {
+            // Create a new friendship
+            String username1 = idToBubbleMap[userID1]!.username;
+            String username2 = idToBubbleMap[userID2]!.username;
 
-          await FriendshipUpdate.createFriendship(
-              userID1: userID1,
-              userID2: userID2,
-              username1: username1,
-              username2: username2,
-              friendshipDocId: friendshipDocId,
-              timestamp: timestamp);
+            await FriendshipUpdate.createFriendship(
+                userID1: userID1,
+                userID2: userID2,
+                username1: username1,
+                username2: username2,
+                friendshipDocId: friendshipDocId,
+                timestamp: timestamp);
 
-          // Update both users 'friendships document'
-          await FriendUpdate.addFriend(userID2, mainUserId: userID1);
-          await FriendUpdate.addFriend(userID1, mainUserId: userID2);
+            // Update both users 'friendships document'
+            await FriendUpdate.addFriend(userID2, mainUserId: userID1);
+            await FriendUpdate.addFriend(userID1, mainUserId: userID2);
+          }
         }
       }
     }
   }
 
   Future<void> _uploadPicture(
-    List<dynamic> sessionUsers,
+    List<String> sessionUsers,
+    List<Bubble> joinersStillConnected,
     DateTime timestamp,
   ) async {
     List<dynamic> usersAllowed = [];
@@ -435,28 +435,41 @@ class SessionProvider extends ChangeNotifier {
     host.imageUrl = downloadUrl;
     debugPrint('(SessionProvider): Moved picture to $downloadUrl');
 
-    List<String> sessionUsernames = sessionUsers
-        .map((e) =>
-            host.joiners.firstWhere((element) => element.id == e).username)
-        .toList();
+    Map<String, String> sessionUsersMap = {};
+
+    for (Bubble bubble in joinersStillConnected) {
+      sessionUsersMap[bubble.id] = bubble.username;
+    }
 
     // Create a Picture object
     Picture picture = Picture.newPicture(
         host.imageUrl!,
-        host.user.name,
+        host.host.id,
+        host.host.username,
         timestamp,
         host.tempFile(),
         _privacy.isPublic,
         _caption!,
         usersAllowed,
-        sessionUsernames);
+        sessionUsersMap);
+
+    String id = '';
 
     for (String userID in sessionUsers) {
-      // Save the picture to the user's sub collection
-      await Constants.usersCollection
-          .doc(userID)
-          .collection(Constants.pictureSubCollection)
-          .add(picture.toMap());
+      if (id.isEmpty) {
+        // Save the picture to the user's sub collection
+        DocumentReference ref = await Constants.usersCollection
+            .doc(userID)
+            .collection(Constants.pictureSubCollection)
+            .add(picture.toMap());
+        id = ref.id;
+      } else {
+        await Constants.usersCollection
+            .doc(userID)
+            .collection(Constants.pictureSubCollection)
+            .doc(id)
+            .set(picture.toMap());
+      }
     }
   }
 
@@ -466,10 +479,12 @@ class SessionProvider extends ChangeNotifier {
     lst.addAll(sessionUsers);
 
     for (Bubble joiner in joinersStillConnected) {
-      for (Bubble otherJoiner in joinersStillConnected) {
-        // If another user -->
-        if (otherJoiner.id != joiner.id) {
-          joiner.lastSeenUsersMap[otherJoiner.id] = timestamp;
+      if (!kDebugMode) {
+        for (Bubble otherJoiner in joinersStillConnected) {
+          // If another user -->
+          if (otherJoiner.id != joiner.id) {
+            joiner.lastSeenUsersMap[otherJoiner.id] = timestamp;
+          }
         }
       }
 
@@ -494,19 +509,23 @@ class SessionProvider extends ChangeNotifier {
   }
 
   Future<void> cancelLobby(BuildContext context) async {
-    debugPrint('(SessionProvider): Stopping hosting');
+    debugPrint('(SessionProvider): Quitting lobby');
 
     if (host.main()) {
       await _resetData();
     }
+
+    await Constants.usersCollection.doc(host.host.id).update({
+      Constants.hostingDoc: FieldValue.arrayRemove([host.user.id]),
+    });
   }
 
   Future<void> _resetData() async {
     debugPrint('(SessionProvider): Resetting Data');
 
-    await Constants.usersCollection
-        .doc(host.host.id)
-        .update({Constants.hostingFriendshipsDoc: {}});
+    await Constants.usersCollection.doc(host.host.id).update({
+      Constants.hostingFriendshipsDoc: {},
+    });
     await PictureQuery.deleteTemporaryPictures(host);
 
     host.clearTemporaryFiles();

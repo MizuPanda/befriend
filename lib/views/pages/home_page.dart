@@ -3,6 +3,7 @@ import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/objects/friendship.dart';
@@ -32,6 +33,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void initState() {
     _provider.init(this);
     _notificationService.initTokenListener(_scaffoldKey, _provider.notify);
+    MobileAds.instance.initialize();
 
     super.initState();
   }
@@ -44,28 +46,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: _provider,
-      child: Scaffold(
-        key: _scaffoldKey,
-        body: Consumer<HomeProvider>(builder:
-            (BuildContext context, HomeProvider provider, Widget? child) {
-          if (!provider.home.user.friendshipsLoaded) {
-            return FutureBuilder(
-                future: provider.loadFriendships(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Friendship>> friendships) {
-                  if (friendships.hasData) {
-                    return HomeStack(provider: provider, widget: widget);
-                  }
-                  return const Center(
-                      child:
-                          CircularProgressIndicator()); // CHANGE THIS WITH SAMPLE SCREEN LATER (LOADING)
-                });
-          } else {
-            return HomeStack(provider: provider, widget: widget);
-          }
-        }),
+    return PopScope(
+      canPop: widget.home.connectedHome ? false : true,
+      child: ChangeNotifierProvider.value(
+        value: _provider,
+        child: Scaffold(
+          key: _scaffoldKey,
+          body: Consumer<HomeProvider>(builder:
+              (BuildContext context, HomeProvider provider, Widget? child) {
+            if (!provider.home.user.friendshipsLoaded) {
+              return FutureBuilder(
+                  future: provider.loadFriendships(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Friendship>> friendships) {
+                    if (friendships.hasData) {
+                      return HomeStack(provider: provider, widget: widget);
+                    }
+                    return const Center(
+                        child:
+                            CircularProgressIndicator()); // CHANGE THIS WITH SAMPLE SCREEN LATER (LOADING)
+                  });
+            } else {
+              return HomeStack(provider: provider, widget: widget);
+            }
+          }),
+        ),
       ),
     );
   }

@@ -6,7 +6,7 @@ Befriend - Expand Your Social Circle (In-Progress)
 Befriend is a mobile application designed to connect people and foster friendships based on real life interactions. Utilizing Flutter for cross-platform functionality and Firebase for backend support, Befriend stands out as an original, user-friendly, and feature-rich social platform.
 
 
-<img src="https://github.com/MizuPanda/befriend/assets/42700556/86790350-b357-4d7c-9a9c-6dff94bcb029" width="30%">
+<img src="https://github.com/MizuPanda/befriend/assets/42700556/86790350-b357-4d7c-9a9c-6dff94bcb029" width="30%" alt="">
 
 ## Features
 - **Authentication:** Create an account and join your friends on Befriend!

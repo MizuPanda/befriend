@@ -7,7 +7,8 @@ import 'package:befriend/views/pages/login_page.dart';
 import 'package:befriend/views/pages/mutual_page.dart';
 import 'package:befriend/views/pages/picture_sign_page.dart';
 import 'package:befriend/views/pages/profile_page.dart';
-import 'package:befriend/views/pages/sign_page.dart';
+import 'package:befriend/views/pages/settings_page.dart';
+import 'package:befriend/views/pages/sign_up_page.dart';
 import 'package:befriend/views/pages/session_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +27,7 @@ class MyRouter {
   static const String session = 'session';
   static const String mutual = 'mutual';
   static const String friendList = 'friendList';
+  static const String settings = 'settings';
 
   static final GoRouter router = GoRouter(
     routes: <RouteBase>[
@@ -38,7 +40,12 @@ class MyRouter {
             GoRoute(
               path: homepage,
               pageBuilder: (context, state) {
-                return MaterialPage(child: HomePage(home: state.extra as Home));
+                Home home = state.extra as Home;
+                return MaterialPage(
+                    child: HomePage(
+                  home: home,
+                  key: home.key,
+                ));
                 //homepage
               },
             ),
@@ -91,7 +98,12 @@ class MyRouter {
                   return FriendsListPage(
                     user: state.extra as Bubble,
                   );
-                })
+                }),
+            GoRoute(
+                path: settings,
+                builder: (BuildContext context, GoRouterState state) {
+                  return const SettingsPage();
+                }),
           ]),
     ],
   );

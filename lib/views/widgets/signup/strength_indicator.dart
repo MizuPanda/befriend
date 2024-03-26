@@ -23,7 +23,10 @@ class _PasswordStrengthIndicatorState extends State<PasswordStrengthIndicator> {
       String text;
       final double strength = provider.strength();
 
-      if (strength <= 2) {
+      if (provider.isPasswordEmpty()) {
+        indicatorColor = Colors.transparent;
+        text = '';
+      } else if (strength <= 2) {
         indicatorColor = Colors.red;
         text = 'Weak';
       } else if (strength <= 3) {

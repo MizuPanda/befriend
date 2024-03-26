@@ -462,6 +462,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0+1"
+  flutter_markdown:
+    dependency: "direct main"
+    description:
+      name: flutter_markdown
+      sha256: a64c5323ac83ed2b7940d2b6288d160aa1753ff271ba9d9b2a86770414aa3eab
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.20+1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -470,6 +478,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.17"
+  flutter_settings_ui:
+    dependency: "direct main"
+    description:
+      name: flutter_settings_ui
+      sha256: aa371acae2f99b3348bf4e1a155f715dc146ac4cd410834f5bc44c3c12955a10
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   flutter_staggered_grid_view:
     dependency: transitive
     description:
@@ -604,10 +620,10 @@ packages:
     dependency: transitive
     description:
       name: image_picker_platform_interface
-      sha256: fa4e815e6fcada50e35718727d83ba1c92f1edf95c0b4436554cec301b56233b
+      sha256: "3d2c323daea9d60608f1caf30be32a938916f4975434b8352e6f73dae496da38"
       url: "https://pub.dev"
     source: hosted
-    version: "2.9.3"
+    version: "2.9.4"
   image_picker_windows:
     dependency: transitive
     description:
@@ -688,6 +704,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  markdown:
+    dependency: transitive
+    description:
+      name: markdown
+      sha256: "1b134d9f8ff2da15cb298efe6cd8b7d2a78958c1b00384ebcbdf13fe340a6c90"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.2.1"
   matcher:
     dependency: transitive
     description:
@@ -1135,4 +1159,4 @@ packages:
     version: "6.5.0"
 sdks:
   dart: ">=3.3.0 <4.0.0"
-  flutter: ">=3.16.6"
+  flutter: ">=3.19.0"

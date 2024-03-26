@@ -15,7 +15,7 @@ class FriendshipUpdate {
 
     if (progress >= 1) {
       await Constants.friendshipsCollection.doc(friendshipDoc.id).update({
-        Constants.progressDoc: progress,
+        Constants.progressDoc: progress - 1,
         Constants.levelDoc: FieldValue.increment(1),
         Constants.timestampDoc: timestamp,
       });

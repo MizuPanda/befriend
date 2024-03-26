@@ -102,17 +102,11 @@ class _UserSliderState extends State<UserSlider> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.bubble.name,
+                    Text(widget.bubble.username,
                         style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.bold,
                         )),
-                    const SizedBox(
-                        height:
-                            4.0), // For spacing between the name and username
-                    Text(widget.bubble.username,
-                        style: const TextStyle(
-                            fontSize: 14.0, color: Colors.grey)),
                   ],
                 ),
               ],
@@ -121,6 +115,7 @@ class _UserSliderState extends State<UserSlider> {
               children: [
                 Builder(builder: (context) {
                   if (provider.isUser(widget.bubble.id)) {
+                    debugPrint('(Sliders): ${provider.pointsLength() - 1}');
                     return Slider(
                       value: provider.selectedIndex.toDouble(),
                       min: 0.0,

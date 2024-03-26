@@ -60,26 +60,13 @@ class _ProfileHeaderState extends State<ProfileHeader> {
         }),
         const SizedBox(width: 16),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AutoSizeText(
-                widget.profile.user.name,
-                style: GoogleFonts.openSans(
-                    fontSize: 20.0, fontWeight: FontWeight.bold),
-                maxLines: 1,
-                minFontSize: 16.0,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '@${widget.profile.user.username}',
-                style: GoogleFonts.openSans(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
+          child: AutoSizeText(
+            '@${widget.profile.user.username}',
+            style: GoogleFonts.openSans(
+                fontSize: 20.0, fontWeight: FontWeight.bold),
+            maxLines: 1,
+            minFontSize: 16.0,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

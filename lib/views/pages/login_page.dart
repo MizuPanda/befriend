@@ -2,6 +2,7 @@ import 'package:befriend/providers/login_provider.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
 import 'package:befriend/views/widgets/login/login_password_field.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/login/login_email_field.dart';
@@ -30,66 +31,97 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: _provider,
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Container(
-          padding: const EdgeInsets.all(20.0),
-          child: Stack(
-            children: [
-              const SafeArea(
-                  child: Align(
-                      alignment: Alignment.topCenter,
-                      child: BefriendTitle(
-                        fontSize: 50,
-                      ))),
-              Consumer<LoginProvider>(builder: (BuildContext context,
-                  LoginProvider provider, Widget? child) {
-                return Form(
-                  key: _provider.formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const EmailFormField(
-                        labelText: 'Enter your email',
-                      ),
-                      const SizedBox(height: 20.0),
-                      const PasswordFormField(),
-                      const SizedBox(height: 20.0),
-                      Row(
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              _provider.navigateToSignUp(context);
-                            },
-                            child: const Text('Sign up'),
-                          ),
-                          const Spacer(),
-                          ElevatedButton(
-                            onPressed: () async {
-                              await _provider.login(context);
-                            },
-                            style: const ButtonStyle(enableFeedback: true),
-                            child: const Text('Login'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10.0),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {
-                            _provider.openForgotPasswordPage(context);
-                          },
-                          child: const Text('Forgot your password?'),
+    return PopScope(
+      canPop: false,
+      child: ChangeNotifierProvider.value(
+        value: _provider,
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          body: Container(
+            padding: const EdgeInsets.all(20.0),
+            child: Stack(
+              children: [
+                const SafeArea(
+                    child: Align(
+                        alignment: Alignment.topCenter,
+                        child: BefriendTitle(
+                          fontSize: 50,
+                        ))),
+                Consumer<LoginProvider>(builder: (BuildContext context,
+                    LoginProvider provider, Widget? child) {
+                  return Form(
+                    key: _provider.formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        const EmailFormField(
+                          labelText: 'Enter your email',
                         ),
+                        const SizedBox(height: 20.0),
+                        const PasswordFormField(),
+                        const SizedBox(height: 20.0),
+                        Row(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                _provider.navigateToSignUp(context);
+                              },
+                              child: const Text('Sign up'),
+                            ),
+                            const Spacer(),
+                            ElevatedButton(
+                              onPressed: () async {
+                                await _provider.login(context);
+                              },
+                              style: const ButtonStyle(enableFeedback: true),
+                              child: const Text('Login'),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10.0),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              _provider.openForgotPasswordPage(context);
+                            },
+                            child: const Text('Forgot your password?'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                          onPressed: () async {
+                            await _provider.openPrivacyPolicy(context);
+                          },
+                          child: Text(
+                            'Privacy Policy',
+                            style: GoogleFonts.openSans(),
+                          )),
+                      const SizedBox(
+                        width: 15,
                       ),
+                      TextButton(
+                          onPressed: () async {
+                            await _provider.openTerms(context);
+                          },
+                          child: Text(
+                            'Terms & Conditions',
+                            style: GoogleFonts.openSans(),
+                          ))
                     ],
                   ),
-                );
-              }),
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),

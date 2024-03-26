@@ -193,3 +193,233 @@ exports.sendPostLikeNotification = functions.https.onCall(async (data, context) 
         throw new functions.https.HttpsError('unknown', 'Failed to send notification.', error);
     }
 });
+
+exports.deleteUserData = functions.https.onCall(async (data, context) => {
+  // Ensure the user is authenticated
+  if (!context.auth) {
+      throw new functions.https.HttpsError('failed-precondition', 'The function must be called while authenticated.');
+  }
+
+  const uid = data.uid;
+  const friendshipIds = data.friendshipIds;
+  const friendIds = data.friendIds;
+
+   // Reference to the user's document
+    const userDocRef = admin.firestore().collection('users').doc(uid);
+
+    // First, fetch the user document to access the avatar field
+    const userDoc = await userDocRef.get();
+    if (!userDoc.exists) {
+      console.log(`User document for UID: ${uid} does not exist.`);
+    } else {
+      // If the avatar field exists and contains a URL, delete the corresponding file in Storage
+      const avatarUrl = userDoc.data().avatar;
+      if (avatarUrl) {
+        // Parse the avatarUrl to extract the file path
+        const decodeURL = decodeURIComponent(avatarUrl);
+        const pathMatch = decodeURL.match(/\/o\/(.+)\?alt=media/);
+        if (pathMatch && pathMatch.length > 1) {
+          const filePath = pathMatch[1];
+          // Delete the file from Firebase Storage
+          await admin.storage().bucket().file(filePath).delete();
+        }
+      }
+    }
+
+    // Delete the user's document
+    await userDocRef.delete();
+
+  // Get a reference for the sub collection.
+  const picturesCollectionRef = userDocRef.collection('pictures');
+
+  // Find and delete all pictures where the user is the host
+  const picturesSnapshot = await picturesCollectionRef.where('hostId', '==', uid).get();
+  for (const doc of picturesSnapshot.docs) {
+      const pictureData = doc.data();
+      await deletePicture({
+          hostId: uid,
+          pictureId: doc.id,
+          downloadUrl: pictureData.downloadUrl
+      });
+  }
+
+  // Delete the 'pictures' subcollection
+  await deleteCollection(picturesCollectionRef);
+
+  // Delete user's document from "User" collection
+  await admin.firestore().collection('users').doc(uid).delete();
+
+  // Delete the user's Firebase Authentication account
+  try {
+    await admin.auth().deleteUser(uid);
+    console.log(`Successfully deleted Firebase Auth user for UID: ${uid}`);
+  } catch (error) {
+    console.error(`Error deleting Firebase Auth user for UID: ${uid}`, error);
+  }
+
+  // Remove user's UID from each friend's 'friends' array
+  const friendPromises = friendIds.map(friendId =>
+    admin.firestore().collection('users').doc(friendId).update({
+      friends: admin.firestore.FieldValue.arrayRemove(uid)
+    })
+  );
+  await Promise.all(friendPromises);
+
+  // Delete all friendship documents
+  const friendshipPromises = friendshipIds.map(friendshipId =>
+    admin.firestore().collection('friendships').doc(friendshipId).delete()
+  );
+  await Promise.all(friendshipPromises);
+
+  // Delete user's profile picture from "profile_pictures" folder
+  const profilePicPath = `profile_pictures/${uid}.jpg`;
+  await admin.storage().bucket().file(profilePicPath).delete().catch(error => console.log(error.message));
+
+  // Delete all files in user's "session_pictures" folder
+  // Note: As Firebase Admin SDK does not support direct folder deletion, list and delete each file.
+  const sessionPicsPath = `session_pictures/${uid}/`;
+  const files = await admin.storage().bucket().getFiles({ prefix: sessionPicsPath });
+  const deletePromises = files[0].map(file => file.delete());
+  await Promise.all(deletePromises).catch(error => console.log(error.message));
+
+  console.log(`Successfully deleted all data for user: ${uid}`);
+});
+
+async function deleteCollection(collectionRef) {
+  const snapshot = await collectionRef.get();
+  const deletionPromises = [];
+  snapshot.forEach(doc => {
+    deletionPromises.push(doc.ref.delete());
+  });
+  await Promise.all(deletionPromises);
+}
+
+// Shared logic for modifying user relationships
+async function updateUserRelationships({ userId, targetUserId, targetUsername, friendshipId, action }) {
+  const userRef = admin.firestore().collection('users').doc(userId);
+  const targetUserRef = admin.firestore().collection('users').doc(targetUserId);
+  const friendshipRef = admin.firestore().collection('friendships').doc(friendshipId);
+
+  await admin.firestore().runTransaction(async (transaction) => {
+    // Remove targetUserId from the user's 'friends' array
+    transaction.update(userRef, {
+      friends: admin.firestore.FieldValue.arrayRemove(targetUserId)
+    });
+    transaction.update(targetUserRef, {
+          friends: admin.firestore.FieldValue.arrayRemove(userId)
+        });
+
+    // Depending on the action, block the user
+    if (action === 'block') {
+      let updates = {};
+      updates[`blocked.${targetUserId}`] = targetUsername; // Dynamically create the property path
+
+      transaction.update(userRef, updates);
+    }
+
+    // Delete the friendship document
+    transaction.delete(friendshipRef);
+  });
+}
+
+// Function to handle friendship deletion
+exports.deleteFriendship = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+  }
+
+  const { userId, targetUserId, targetUsername, friendshipId } = data;
+  if (!userId || !targetUserId || !targetUsername || !friendshipId) {
+    throw new functions.https.HttpsError('invalid-argument', 'The function must be called with userId, targetUserId and friendshipId.');
+  }
+
+  try {
+    await updateUserRelationships({ userId, targetUserId, targetUsername, friendshipId, action: 'delete' });
+    return { success: true, message: 'Friendship deleted successfully.' };
+  } catch (error) {
+    console.error('Error in deleteFriendship:', error);
+    throw new functions.https.HttpsError('internal', 'Unable to delete friendship.');
+  }
+});
+
+// Function to handle user blocking
+exports.blockUser = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+  }
+
+  const { userId, targetUserId, targetUsername, friendshipId } = data;
+  if (!userId || !targetUserId || !targetUsername || !friendshipId) {
+    throw new functions.https.HttpsError('invalid-argument', 'The function must be called with userId, targetUserId, friendshipId.');
+  }
+
+  try {
+    await updateUserRelationships({ userId, targetUserId, targetUsername, friendshipId, action: 'block' });
+    return { success: true, message: 'User blocked successfully.' };
+  } catch (error) {
+    console.error('Error in blockUser:', error);
+    throw new functions.https.HttpsError('internal', 'Unable to block user.');
+  }
+});
+
+exports.deletePictureForSessionUsers = functions.https.onCall(async (data, context) => {
+  // Ensure the user is authenticated
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+  }
+
+  const { hostId, pictureId, downloadUrl } = data;
+
+  if (!hostId || !pictureId || !downloadUrl) {
+    throw new functions.https.HttpsError('invalid-argument', 'The function must be called with both hostId, pictureId, and downloadUrl.');
+  }
+
+  try {
+    // Directly use the helper function for deletion
+    await deletePicture({ hostId, pictureId, downloadUrl });
+
+    return { success: true, message: 'Picture deleted successfully for all session users.' };
+  } catch (error) {
+    console.error('Error deleting picture for session users:', error);
+    throw new functions.https.HttpsError('internal', 'An error occurred while deleting the picture for session users.');
+  }
+});
+
+// Helper function to delete a picture and its references from session users
+async function deletePicture({hostId, pictureId, downloadUrl}) {
+  // Delete the picture from each session user's pictures subcollection
+  const pictureDoc = await admin.firestore()
+    .collection('users').doc(hostId)
+    .collection('pictures').doc(pictureId)
+    .get();
+
+  if (!pictureDoc.exists) {
+    console.log('Picture document does not exist:', pictureId);
+    return;
+  }
+
+  const sessionUsers = pictureDoc.data().sessionUsers;
+  if (!sessionUsers) {
+    console.log('The sessionUsers field is missing in the picture document:', pictureId);
+    return;
+  }
+
+  const deletePromises = Object.keys(sessionUsers).map(userId =>
+    admin.firestore()
+      .collection('users').doc(userId)
+      .collection('pictures').doc(pictureId)
+      .delete()
+  );
+
+  // Delete the file from Firebase Storage
+  if (downloadUrl) {
+    const decodeURL = decodeURIComponent(downloadUrl);
+    const pathMatch = decodeURL.match(/\/o\/(.+)\?alt=media/);
+    if (pathMatch && pathMatch.length > 1) {
+      const filePath = pathMatch[1];
+      deletePromises.push(admin.storage().bucket().file(filePath).delete());
+    }
+  }
+
+  await Promise.all(deletePromises);
+}

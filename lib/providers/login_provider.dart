@@ -1,3 +1,4 @@
+import 'package:befriend/models/authentication/consent_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
@@ -37,6 +38,14 @@ class LoginProvider extends ChangeNotifier {
   bool get passwordVisible => _passwordVisible;
 
   String? _email, _password;
+
+  Future<void> openPrivacyPolicy(BuildContext context) async {
+    await ConsentManager.showPrivacyPolicyDialog(context);
+  }
+
+  Future<void> openTerms(BuildContext context) async {
+    await ConsentManager.showTermsConditionsDialog(context);
+  }
 
   void emailSaved(String? value) {
     _email = value!.trim();

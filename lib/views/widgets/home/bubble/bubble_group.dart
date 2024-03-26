@@ -43,7 +43,9 @@ class BubbleGroupWidget extends StatelessWidget {
               specificHome: provider.home,
             ),
           ),
-          ...provider.home.user.friendships.map((Friendship friendship) {
+          ...provider.home.user.friendships
+              .where((friend) => !friend.friend.didBlockYou())
+              .map((Friendship friendship) {
             return Positioned(
               left: widthCentered(context,
                   size: friendship.friend.size, dx: friendship.friend.x),
