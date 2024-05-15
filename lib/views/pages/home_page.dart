@@ -1,10 +1,10 @@
 import 'package:befriend/providers/home_provider.dart';
-import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../models/objects/friendship.dart';
 import '../../models/objects/home.dart';
@@ -14,28 +14,47 @@ import '../widgets/home/buttons/home_button.dart';
 import '../widgets/home/buttons/picture_button.dart';
 import '../widgets/home/buttons/search_button.dart';
 import '../widgets/home/buttons/settings_button.dart';
+import '../widgets/shimmers/loading_screen.dart';
 
-class HomePage extends StatefulWidget {
-  final Home home;
-
+class HomePage extends StatelessWidget {
   const HomePage({super.key, required this.home});
 
+  final Home home;
+
   @override
-  State<HomePage> createState() => _HomePageState();
+  Widget build(BuildContext context) {
+    return ShowCaseWidget(
+        builder: Builder(builder: (context) => HomeView(home: home)));
+  }
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+class HomeView extends StatefulWidget {
+  final Home home;
+
+  const HomeView({super.key, required this.home});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   final NotificationService _notificationService = NotificationService();
-  late final HomeProvider _provider = HomeProvider(home: widget.home);
+  late final HomeProvider _provider;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
-    _provider.init(this);
+    super.initState();
+    _provider = HomeProvider.init(this, home: widget.home);
     _notificationService.initTokenListener(_scaffoldKey, _provider.notify);
     MobileAds.instance.initialize();
 
-    super.initState();
+    debugPrint('(HomePage): _showTutorial=${_provider.home.showTutorial}');
+    // _provider.home.activeTutorial(); // For testing
+    if (_provider.home.showTutorial) {
+      _provider.initShowcase(context);
+      _provider.home.deactivateTutorial();
+    }
   }
 
   @override
@@ -62,9 +81,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     if (friendships.hasData) {
                       return HomeStack(provider: provider, widget: widget);
                     }
-                    return const Center(
-                        child:
-                            CircularProgressIndicator()); // CHANGE THIS WITH SAMPLE SCREEN LATER (LOADING)
+                    return const LoadingScreen();
                   });
             } else {
               return HomeStack(provider: provider, widget: widget);
@@ -85,7 +102,7 @@ class HomeStack extends StatelessWidget {
 
   final HomeProvider provider;
 
-  final HomePage widget;
+  final HomeView widget;
 
   @override
   Widget build(BuildContext context) {
@@ -107,16 +124,20 @@ class HomeStack extends StatelessWidget {
               provider.centerToMiddle();
               await HapticFeedback.mediumImpact();
             },
-            child: const SizedBox(
-                height: Constants.viewerSize,
-                width: Constants.viewerSize,
-                child: BubbleGroupWidget()),
+            child: SizedBox(
+                height: provider.viewerSize,
+                width: provider.viewerSize,
+                child: const BubbleGroupWidget()),
           ),
         ),
-        const BefriendWidget(),
+        BefriendWidget(
+          five: provider.five,
+        ),
         const SettingsButton(),
         const SearchButton(),
-        const PictureButton(),
+        PictureButton(
+          four: provider.four,
+        ),
         if (!widget.home.connectedHome) const HomeButton(),
       ],
     );

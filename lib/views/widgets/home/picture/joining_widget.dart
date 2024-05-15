@@ -1,16 +1,9 @@
-import 'package:befriend/models/qr/qr.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/views/widgets/home/picture/rounded_dialog.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:befriend/providers/joining_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-
-import '../../../../models/authentication/authentication.dart';
-import '../../../../models/data/data_manager.dart';
-import '../../../../models/objects/bubble.dart';
-import '../../../../models/qr/simple_encryption_service.dart';
-import 'hosting_widget.dart';
+import 'package:provider/provider.dart';
 
 class JoiningWidget extends StatefulWidget {
   const JoiningWidget({super.key});
@@ -20,174 +13,111 @@ class JoiningWidget extends StatefulWidget {
 }
 
 class _JoiningWidgetState extends State<JoiningWidget> {
-  late MobileScannerController cameraController;
-  bool _isProcessingBarcode = false;
-
-  @override
-  void initState() {
-    super.initState();
-    cameraController = MobileScannerController();
-  }
+  final JoiningProvider _provider = JoiningProvider();
 
   @override
   void dispose() {
     super.dispose();
-    cameraController.dispose();
-  }
-
-  Future<void> _handleBarcodeDetection(BarcodeCapture capture) async {
-    if (_isProcessingBarcode) return; // Skip if already processing a barcode
-    _isProcessingBarcode = true;
-
-    // Your existing barcode processing logic here
-    final List<Barcode> barcodes = capture.barcodes.toSet().toList();
-    for (final barcode in barcodes) {
-      String? value = barcode.rawValue;
-
-      if (value != null && value.isNotEmpty) {
-        String iv = value.split(Constants.dataSeparator).first;
-        value = value.substring(iv.length + Constants.dataSeparator.length);
-
-        value = SimpleEncryptionService.decrypt(value, iv);
-        debugPrint('(JoiningWidget): Decrypt= $value');
-        if (value.contains(Constants.appID)) {
-          List<String> values = value.split(Constants.dataSeparator);
-          if (values.length == 3) {
-            String id = values[1];
-            String dateTimeParse = values.last;
-            final DateTime dateTime = DateTime.parse(dateTimeParse);
-
-            const Duration oneHour = Duration(hours: 1);
-
-            final DateTime now = DateTime.timestamp();
-            final DateTime before = now.subtract(oneHour);
-            final DateTime after = now.add(oneHour);
-
-            if (dateTime.compareTo(before) >= 0 &&
-                dateTime.compareTo(after) <= 0) {
-              DocumentSnapshot data = await DataManager.getData(id: id);
-              List<dynamic> joiners =
-                  DataManager.getList(data, Constants.hostingDoc);
-              Map<String, DateTime> lastSeenMap = DataManager.getDateTimeMap(
-                  data, Constants.lastSeenUsersMapDoc);
-              String username =
-                  DataManager.getString(data, Constants.usernameDoc);
-
-              if (joiners.length == 10) {
-                if (mounted) {
-                  QR.showLobbyFull(context);
-                }
-              } else if (lastSeenMap.containsKey(AuthenticationManager.id())) {
-                if (mounted) {
-                  QR.showUserSeenToday(context, username);
-                }
-              } else {
-                ImageProvider avatar = await DataManager.getAvatar(data);
-
-                Bubble selectedHost =
-                    Bubble.fromDocsWithoutFriends(data, avatar);
-
-                await Constants.usersCollection.doc(selectedHost.id).update({
-                  Constants.hostingDoc:
-                      FieldValue.arrayUnion([AuthenticationManager.id()])
-                });
-
-                if (mounted) {
-                  // Check if the widget is still part of the tree
-                  // Safe to use context here
-                  context.pop();
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return RoundedDialog(
-                          child:
-                              HostingWidget(isHost: false, host: selectedHost));
-                    },
-                  );
-                }
-
-                _isProcessingBarcode = false; // Reset the flag after processing
-              }
-            }
-          }
-        }
-      }
-    }
+    _provider.disposeState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: Constants.pictureDialogHeight,
-      width: Constants.pictureDialogWidth,
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          const Text(
-            "Scan your friend's QR Code!",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20.0,
-            ),
-          ),
-          Container(
-            height: Constants.pictureDialogHeight - 150,
-            width: Constants.pictureDialogHeight - 150,
-            decoration: BoxDecoration(border: Border.all(color: Colors.black)),
-            child: MobileScanner(
-              // fit: BoxFit.contain,
-              controller: cameraController,
-              onDetect: (capture) async {
-                await _handleBarcodeDetection(capture);
-              },
-            ),
-          ),
-          const SizedBox(height: 20.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              IconButton(
-                color: Colors.white,
-                icon: ValueListenableBuilder(
-                  valueListenable: cameraController.torchState,
-                  builder: (context, state, child) {
-                    switch (state) {
-                      case TorchState.off:
-                        return const Icon(Icons.flash_off, color: Colors.black);
-                      case TorchState.on:
-                        return const Icon(Icons.flash_on_outlined,
-                            color: Colors.blue);
-                    }
-                  },
-                ),
-                iconSize: 32.0,
-                onPressed: () => cameraController.toggleTorch(),
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+
+    final double iconSize = 0.08 * width;
+
+    return ChangeNotifierProvider.value(
+        value: _provider,
+        builder: (BuildContext context, Widget? child) {
+          return Consumer(builder:
+              (BuildContext context, JoiningProvider provider, Widget? child) {
+            return Container(
+              width: width * Constants.pictureDialogWidthMultiplier,
+              height: height * Constants.pictureDialogHeightMultiplier,
+              padding: EdgeInsets.all(0.045 * width),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  const AutoSizeText(
+                    "Scan your friend's QR Code!",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                    ),
+                  ),
+                  Container(
+                    height: Constants.pictureDialogHeightMultiplier *
+                        0.625 *
+                        height,
+                    width: Constants.pictureDialogHeightMultiplier *
+                        0.625 *
+                        height,
+                    decoration: BoxDecoration(
+                        border:
+                            Border.all(color: Theme.of(context).primaryColor)),
+                    child: MobileScanner(
+                      // fit: BoxFit.contain,
+                      controller: provider.cameraController,
+                      onDetect: (capture) async {
+                        await provider.handleBarcodeDetection(capture, context);
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 0.020 * height),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        IconButton(
+                          icon: ValueListenableBuilder(
+                            valueListenable: provider.torchState(),
+                            builder: (context, state, child) {
+                              switch (state) {
+                                case TorchState.off:
+                                  return const Icon(
+                                    Icons.flash_off,
+                                  );
+                                case TorchState.on:
+                                  return const Icon(Icons.flash_on_outlined,
+                                      color: Colors.blue);
+                              }
+                            },
+                          ),
+                          iconSize: iconSize,
+                          onPressed: () => provider.toggleTorch(),
+                        ),
+                        SizedBox(
+                          width: 0.045 * width,
+                        ),
+                        IconButton(
+                          icon: ValueListenableBuilder(
+                            valueListenable: provider.cameraFacingState(),
+                            builder: (context, state, child) {
+                              switch (state) {
+                                case CameraFacing.front:
+                                  return const Icon(
+                                    Icons.camera_front,
+                                  );
+                                case CameraFacing.back:
+                                  return const Icon(
+                                    Icons.camera_rear,
+                                  );
+                              }
+                            },
+                          ),
+                          onPressed: () => provider.switchCamera(),
+                          iconSize: iconSize,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(
-                width: 20,
-              ),
-              IconButton(
-                color: Colors.black,
-                icon: ValueListenableBuilder(
-                  valueListenable: cameraController.cameraFacingState,
-                  builder: (context, state, child) {
-                    switch (state) {
-                      case CameraFacing.front:
-                        return const Icon(Icons.camera_front);
-                      case CameraFacing.back:
-                        return const Icon(Icons.camera_rear);
-                    }
-                  },
-                ),
-                iconSize: 32.0,
-                onPressed: () => cameraController.switchCamera(),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+            );
+          });
+        });
   }
 }

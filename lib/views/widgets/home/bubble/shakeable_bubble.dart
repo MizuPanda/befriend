@@ -47,6 +47,7 @@ class _ShakeableBubbleState extends State<ShakeableBubble>
         curve: Curves.easeInOut,
       ),
     );
+    setState(() {});
     super.initState();
   }
 

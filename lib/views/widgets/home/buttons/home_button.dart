@@ -5,22 +5,21 @@ import '../../../../models/objects/home.dart';
 import '../../../../models/data/user_manager.dart';
 import '../../../../utilities/constants.dart';
 
-class HomeButton extends StatefulWidget {
+class HomeButton extends StatelessWidget {
   const HomeButton({
     super.key,
   });
 
   @override
-  State<HomeButton> createState() => _HomeButtonState();
-}
-
-class _HomeButtonState extends State<HomeButton> {
-  @override
   Widget build(BuildContext context) {
+    final double height = MediaQuery.of(context).size.height;
+    final double width = MediaQuery.of(context).size.width;
+
     return Container(
       alignment: Alignment.bottomLeft,
-      margin: const EdgeInsets.only(
-          bottom: 90, left: Constants.homeHorizontalPadding),
+      margin: EdgeInsets.only(
+          bottom: Constants.homeButtonBottomPaddingMultiplier * height,
+          left: width * Constants.homeHorizontalPaddingMultiplier),
       child: Container(
         width: Constants.homeButtonSize + Constants.homeButtonAddSize,
         height: Constants.homeButtonSize + Constants.homeButtonAddSize,

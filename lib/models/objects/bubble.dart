@@ -27,12 +27,6 @@ class Bubble {
   double x = 0;
   double y = 0;
 
-  final Gradient gradient = const LinearGradient(
-    colors: [Color(0xFFFF5F6D), Color(0xFFFFC371)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
   Bubble._({
     required this.id,
     required this.username,
@@ -93,23 +87,6 @@ class Bubble {
 
   Iterable<String> loadedFriendIds() {
     return friendships.map((e) => e.friendId());
-  }
-
-  Iterable<String> nonLoadedFriendIds() {
-    final List<String> nonLoadedIds = [];
-    final Iterable<String> loadedIds = loadedFriendIds();
-
-    for (String friendID in friendIDs) {
-      if (!loadedIds.contains(friendID)) {
-        nonLoadedIds.add(friendID);
-      }
-    }
-
-    return nonLoadedIds;
-  }
-
-  bool isFriendLoaded(String friendId) {
-    return loadedFriendIds().contains(friendId);
   }
 
   bool hasNonLoadedFriends() {

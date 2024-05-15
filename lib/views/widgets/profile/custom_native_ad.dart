@@ -63,9 +63,10 @@ class _CustomNativeAdState extends State<CustomNativeAd> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    final double height = MediaQuery.of(context).size.height;
+
     return SizedBox(
-        height: 346,
+        height: 0.346 * height,
         child: _nativeAdIsLoaded ? AdWidget(ad: _nativeAd!) : null);
   }
 }

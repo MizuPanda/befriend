@@ -1,5 +1,5 @@
 import 'package:befriend/models/objects/bubble.dart';
-import 'package:befriend/views/widgets/home/picture/visibility_settings.dart';
+import 'package:befriend/views/dialogs/session/visibility_settings_dialog.dart';
 import 'package:flutter/material.dart';
 
 import '../objects/friendship_progress.dart';
@@ -104,8 +104,7 @@ class Privacy {
 
                 if (!host.joiners.any(
                     (joiner) => joiner.blockedUsers.keys.contains(friendId))) {
-                  if (_isUserAllowed(
-                      host, friendship, host.friendshipsMap, sliderValuesMap)) {
+                  if (_isUserAllowed(host, friendship, sliderValuesMap)) {
                     debugPrint(
                         '(Privacy):  ${friendship.friendUsername()} is allowed to see the picture.');
                     _friendsAllowed.add(friendId);
@@ -124,12 +123,9 @@ class Privacy {
   }
 
   /// Check if friend is allowed by every user to check the picture.
-  bool _isUserAllowed(
-      Host host,
-      FriendshipProgress friendship,
-      Map<String, List<FriendshipProgress>> friendshipsMap,
+  bool _isUserAllowed(Host host, FriendshipProgress friendship,
       Map<String, double> sliderValuesMap) {
-    return friendshipsMap.entries
+    return host.friendshipsMap.entries
         .every((MapEntry<String, List<FriendshipProgress>> sessionUser) {
       double? sliderValue = sliderValuesMap[sessionUser.key];
       debugPrint('(Privacy): ${sessionUser.key} has privacy $sliderValue');

@@ -9,6 +9,9 @@ import 'package:provider/provider.dart';
 import '../../../models/objects/picture.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import 'like_text.dart';
+import 'more_button.dart';
+
 class PictureCard extends StatefulWidget {
   final Picture picture;
   final String userID;
@@ -36,13 +39,14 @@ class _PictureCardState extends State<PictureCard> {
       widget.connectedUsername,
       widget.isConnectedUserProfile,
       widget.onArchiveSuccess);
-  final double _likeSize = 35;
+  final double _likeSizeWidthMultiplier = 35 / 448;
 
   @override
   void initState() {
     _provider.initLikes();
-    super.initState();
     debugPrint("(PictureCard): picture id = ${widget.picture.id}");
+
+    super.initState();
   }
 
   @override
@@ -56,6 +60,9 @@ class _PictureCardState extends State<PictureCard> {
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+
     return ChangeNotifierProvider.value(
         value: _provider,
         builder: (BuildContext context, Widget? child) {
@@ -75,8 +82,8 @@ class _PictureCardState extends State<PictureCard> {
                         imageUrl: widget.picture.fileUrl,
                         progressIndicatorBuilder:
                             (context, url, downloadProgress) => SizedBox(
-                                height: MediaQuery.of(context).size.width,
-                                width: MediaQuery.of(context).size.width,
+                                height: width,
+                                width: width,
                                 child: Center(
                                     child: CircularProgressIndicator(
                                         value: downloadProgress.progress))),
@@ -85,26 +92,27 @@ class _PictureCardState extends State<PictureCard> {
                       ),
                       Container(
                           alignment: Alignment.topRight,
-                          padding: const EdgeInsets.only(right: 8, top: 10),
+                          padding: EdgeInsets.only(
+                              right: 8 / 448 * width, top: 0.01 * height),
                           child: MoreButton(
                             usernames: widget.picture.sessionUsers.values,
                           )),
                     ],
                   ), // Check if the image is fully loaded
                   Padding(
-                    padding: const EdgeInsets.only(left: 16.0),
+                    padding: EdgeInsets.only(left: 16.0 / 448 * width),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(
-                          height: 10,
+                        SizedBox(
+                          height: 0.01 * height,
                         ),
                         if (!widget.picture.archived)
                           Row(
                             children: [
                               LikeButton(
                                 mainAxisAlignment: MainAxisAlignment.start,
-                                size: _likeSize,
+                                size: _likeSizeWidthMultiplier * width,
                                 isLiked: provider.isLiked,
                                 onTap: provider.onLike,
                                 circleColor: const CircleColor(
@@ -120,9 +128,9 @@ class _PictureCardState extends State<PictureCard> {
                                         ? Icons.favorite_border_rounded
                                         : Icons.favorite_rounded,
                                     color: isLiked
-                                        ? Colors.deepPurpleAccent
+                                        ? Theme.of(context).colorScheme.primary
                                         : Colors.grey,
-                                    size: _likeSize,
+                                    size: _likeSizeWidthMultiplier * width,
                                   );
                                 },
                               ),
@@ -130,7 +138,7 @@ class _PictureCardState extends State<PictureCard> {
                                 const LikeText()
                             ],
                           ),
-                        Text.rich(TextSpan(children: [
+                        AutoSizeText.rich(TextSpan(children: [
                           TextSpan(
                             text: widget.picture.pictureTaker,
                             style: GoogleFonts.openSans(
@@ -140,23 +148,24 @@ class _PictureCardState extends State<PictureCard> {
                               text: ' ${widget.picture.caption}',
                               style: GoogleFonts.openSans(fontSize: 14)),
                         ])),
-                        const SizedBox(
-                          height: 4,
+                        SizedBox(
+                          height: 0.004 * height,
                         ),
-                        Text(
+                        AutoSizeText(
                           timeago.format(widget.picture.timestamp),
                           style: GoogleFonts.openSans(
                               color: Colors.grey, fontSize: 12.5),
                         ),
-                        const SizedBox(
-                            height: 2), // Adds a small space before the date
-                        Text(
+                        SizedBox(
+                            height: 0.002 *
+                                height), // Adds a small space before the date
+                        AutoSizeText(
                           _formatDate(widget.picture.timestamp),
                           style: GoogleFonts.openSans(
                               color: Colors.grey, fontSize: 12),
                         ),
-                        const SizedBox(
-                          height: 5,
+                        SizedBox(
+                          height: 0.005 * height,
                         ),
                       ],
                     ),
@@ -174,102 +183,3 @@ class _PictureCardState extends State<PictureCard> {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
 }
-
-class MoreButton extends StatelessWidget {
-  final Iterable<dynamic> usernames;
-
-  const MoreButton({
-    Key? key,
-    required this.usernames,
-  }) : super(key: key);
-
-  static const double _iconTextDistance = 16;
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer(builder:
-        (BuildContext context, PictureCardProvider provider, Widget? child) {
-      return PopupMenuButton<PopSelection>(
-        icon: Icon(
-          Icons.more_vert,
-          color: Colors.grey.withOpacity(0.9),
-        ),
-        itemBuilder: (BuildContext context) => [
-          if (provider.isUsersProfile)
-            PopupMenuItem<PopSelection>(
-              value: PopSelection.archive,
-              child: Row(
-                children: [
-                  const Icon(Icons.archive_outlined,
-                      color: Colors.black), // Archive icon
-                  const SizedBox(width: _iconTextDistance),
-                  Text(provider.isArchived() ? 'Restore' : 'Archive'),
-                  const SizedBox(width: _iconTextDistance * 2),
-                ],
-              ),
-            ),
-          if (provider.isPictureHost())
-            const PopupMenuItem<PopSelection>(
-              value: PopSelection.delete,
-              child: Row(
-                children: [
-                  Icon(Icons.delete_outline_rounded,
-                      color: Colors.red), // Archive icon
-                  SizedBox(width: _iconTextDistance),
-                  Text('Delete', style: TextStyle(color: Colors.red)),
-                  SizedBox(width: _iconTextDistance * 2),
-                ],
-              ),
-            ),
-          const PopupMenuItem<PopSelection>(
-            value: PopSelection.info,
-            child: Row(
-              children: [
-                Icon(Icons.info_outline_rounded,
-                    color: Colors.black), // Info icon
-                SizedBox(width: _iconTextDistance),
-                Text('Info'),
-                SizedBox(width: _iconTextDistance * 2),
-              ],
-            ),
-          ),
-        ],
-        onSelected: (PopSelection value) async {
-          await provider.onSelectPop(value, context, usernames);
-        },
-      );
-    });
-  }
-}
-
-class LikeText extends StatelessWidget {
-  const LikeText({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<PictureCardProvider>(builder:
-        (BuildContext context, PictureCardProvider provider, Widget? child) {
-      return TextButton(
-          style: ButtonStyle(
-            overlayColor: MaterialStateProperty.all(
-                Colors.transparent), // Removes splash effect
-          ),
-          onPressed: () async {
-            await provider.showLikesDialog(context);
-          },
-          child: AutoSizeText.rich(TextSpan(
-              style:
-                  GoogleFonts.openSans(fontSize: 13, color: provider.color()),
-              children: [
-                const TextSpan(text: 'Liked by '),
-                TextSpan(
-                    text: provider.usersThatLiked(),
-                    style: const TextStyle(fontWeight: FontWeight.bold))
-              ])));
-    });
-  }
-}
-
-enum PopSelection { archive, delete, info }

@@ -6,9 +6,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/objects/profile.dart';
+import '../../../providers/material_provider.dart';
 import '../users/profile_photo.dart';
 
-class ProfileHeader extends StatefulWidget {
+class ProfileHeader extends StatelessWidget {
   const ProfileHeader({
     super.key,
     required this.profile,
@@ -17,59 +18,55 @@ class ProfileHeader extends StatefulWidget {
   final Profile profile;
 
   @override
-  State<ProfileHeader> createState() => _ProfileHeaderState();
-}
-
-class _ProfileHeaderState extends State<ProfileHeader> {
-  @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Consumer<ProfileProvider>(builder:
-            (BuildContext context, ProfileProvider provider, Widget? child) {
-          return Stack(
+    final double width = MediaQuery.of(context).size.width;
+
+    return Consumer<ProfileProvider>(builder:
+        (BuildContext context, ProfileProvider provider, Widget? child) {
+      return Stack(
+        children: [
+          Row(
             children: [
-              Container(
-                  decoration: Decorations.bubbleDecoration,
-                  child: ProfilePhoto(
-                    radius: 50,
-                    user: widget.profile.user,
-                  )),
-              if (widget.profile.user.main())
-                Container(
-                  alignment: Alignment.topRight,
-                  width: 140,
-                  height: 100,
-                  child: IconButton(
-                    onPressed: () {
-                      provider.showEditProfileDialog(
-                          context, widget.profile.user, () {
-                        setState(() {});
-                        widget.profile.notifyParent();
-                      });
-                    },
-                    icon: const Icon(
-                      Icons.mode_edit_outline_outlined,
-                      size: 30,
-                      color: Colors.black,
-                    ),
-                  ),
+              Consumer(builder: (BuildContext context,
+                  MaterialProvider materialProvider, Widget? child) {
+                final bool isLightMode = materialProvider.isLightMode(context);
+
+                return Container(
+                    decoration: Decorations.bubbleDecoration(isLightMode),
+                    child: ProfilePhoto(
+                      radius: 50,
+                      user: profile.user,
+                    ));
+              }),
+              SizedBox(width: 16 / 448 * width),
+              Expanded(
+                child: AutoSizeText(
+                  '@${profile.user.username}',
+                  style: GoogleFonts.openSans(
+                      fontSize: 20.0, fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+              ),
             ],
-          );
-        }),
-        const SizedBox(width: 16),
-        Expanded(
-          child: AutoSizeText(
-            '@${widget.profile.user.username}',
-            style: GoogleFonts.openSans(
-                fontSize: 20.0, fontWeight: FontWeight.bold),
-            maxLines: 1,
-            minFontSize: 16.0,
-            overflow: TextOverflow.ellipsis,
           ),
-        ),
-      ],
-    );
+          if (profile.user.main())
+            Positioned(
+              left: 90,
+              child: IconButton(
+                onPressed: () {
+                  provider.showEditProfileDialog(context, profile.user, () {
+                    profile.notifyParent();
+                  });
+                },
+                icon: const Icon(
+                  Icons.mode_edit_outline_outlined,
+                  size: 30,
+                ),
+              ),
+            ),
+        ],
+      );
+    });
   }
 }

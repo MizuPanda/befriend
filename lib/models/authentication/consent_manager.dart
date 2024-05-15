@@ -1,53 +1,47 @@
+import 'package:befriend/utilities/error_handling.dart';
+import 'package:befriend/views/dialogs/home/consent_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../../utilities/constants.dart';
+
 class ConsentManager {
-  static const String _termsAddress = 'assets/terms_and_conditions.md';
   static const String _termsDialogName = 'Terms & Conditions';
 
-  static const String _privacyAddress = 'assets/privacy_policy.md';
   static const String _privacyDialogName = 'Privacy Policy';
 
   static Future<void> showTermsConditionsDialog(BuildContext context) async {
-    await _showConsentDialog(context, _termsAddress, _termsDialogName);
+    try {
+      await _showConsentDialog(
+          context, Constants.termsAddress, _termsDialogName);
+    } catch (e) {
+      debugPrint(
+          '(ConsentManager): Error displaying terms and conditions dialog: $e');
+      // Provide user feedback or log error
+      if (context.mounted) {
+        ErrorHandling.showError(context,
+            'Failed to display the terms and conditions. Please try again.');
+      }
+    }
   }
 
   static Future<void> showPrivacyPolicyDialog(BuildContext context) async {
-    await _showConsentDialog(context, _privacyAddress, _privacyDialogName);
+    try {
+      await _showConsentDialog(
+          context, Constants.privacyAddress, _privacyDialogName);
+    } catch (e) {
+      debugPrint('(ConsentManager): Error displaying privacy dialog: $e');
+      // Provide user feedback or log error
+      if (context.mounted) {
+        ErrorHandling.showError(
+            context, 'Failed to display the privacy policy. Please try again.');
+      }
+    }
   }
 
   static Future<void> _showConsentDialog(
       BuildContext context, String fileAddress, String dialogName) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(dialogName),
-          content: FutureBuilder(
-            future: DefaultAssetBundle.of(context).loadString(fileAddress),
-            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-              if (snapshot.hasData) {
-                return SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    height: MediaQuery.of(context).size.height * 0.5,
-                    child: Markdown(data: snapshot.data ?? ''));
-              } else {
-                return const CircularProgressIndicator();
-              }
-            },
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+    return ConsentDialog.showConsentDialog(context, dialogName, fileAddress);
   }
 
   static void setTagForChildrenAds(int birthYear) async {
@@ -69,6 +63,8 @@ class ConsentManager {
   }
 
   static Future<bool> isGDRP() async {
+    debugPrint(
+        "(ConsentManager): Consent Status= ${(await ConsentInformation.instance.getConsentStatus())}");
     return (await ConsentInformation.instance.getConsentStatus()) !=
         ConsentStatus.notRequired;
   }
@@ -77,7 +73,8 @@ class ConsentManager {
     await ConsentInformation.instance.reset();
   }
 
-  static Future<void> getConsentForm({required bool reload}) async {
+  static Future<void> getConsentForm(BuildContext context,
+      {required bool reload}) async {
     final params = ConsentRequestParameters(
         // consentDebugSettings: Secrets.consentDebugSettings
         );
@@ -85,18 +82,24 @@ class ConsentManager {
       params,
       () async {
         if (await ConsentInformation.instance.isConsentFormAvailable()) {
-          debugPrint('(Consent): Consent form is available.');
-          _loadForm(reload);
+          debugPrint('(ConsentManager): Consent form is available.');
+          if (context.mounted) {
+            _loadForm(context, reload);
+          }
         }
       },
       (FormError error) {
         // Handle the error
-        debugPrint("(Consent): Error getting consent form; $error");
+        debugPrint("(ConsentManager): Error getting consent form; $error");
+
+        // Consider adding retry logic or a user notification here
+        ErrorHandling.showError(
+            context, "Failed to update consent information. Please try again.");
       },
     );
   }
 
-  static void _loadForm(bool reload) {
+  static void _loadForm(BuildContext context, bool reload) {
     ConsentForm.loadConsentForm(
       (ConsentForm consentForm) async {
         ConsentStatus status =
@@ -108,13 +111,17 @@ class ConsentManager {
           consentForm.show(
             (FormError? formError) {
               // Handle dismissal by reloading form
-              _loadForm(false);
+              _loadForm(context, false);
             },
           );
         }
       },
       (formError) {
         // Handle the error
+        debugPrint('(ConsentManager): Error loading consent form; $formError');
+        // Inform the user or retry loading the form
+        ErrorHandling.showError(
+            context, "Failed to load the consent form. Please try again.");
       },
     );
   }

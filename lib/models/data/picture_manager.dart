@@ -2,24 +2,34 @@ import 'dart:io';
 
 import 'package:befriend/models/data/picture_query.dart';
 import 'package:befriend/models/data/user_manager.dart';
+import 'package:befriend/utilities/error_handling.dart';
+import 'package:befriend/views/dialogs/profile/picture_choice_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../providers/picture_sign_provider.dart';
 import '../objects/bubble.dart';
 
 class PictureManager {
   static const int _sessionQuality = 20;
   static const int _profilePictureQuality = 10;
 
-  static Future<void> changeMainPicture(String path, Bubble bubble) async {
-    File file = File(path);
-
-    String? downloadUrl = await PictureQuery.uploadAvatar(file);
-    if (downloadUrl != null) {
-      bubble.avatar = await UserManager.refreshAvatar(file);
+  static Future<void> changeMainPicture(
+      BuildContext context, String path, Bubble bubble) async {
+    try {
+      File file = File(path);
+      String? downloadUrl = await PictureQuery.uploadAvatar(file);
+      if (downloadUrl != null) {
+        bubble.avatar = await UserManager.refreshAvatar(file);
+      }
+    } catch (e) {
+      debugPrint('(PictureManager): Error changing main picture: $e');
+      // Maybe inform the user with a UI update
+      if (context.mounted) {
+        ErrorHandling.showError(context,
+            'Failed to update your profile picture. Please try again.');
+      }
     }
   }
 
@@ -30,7 +40,9 @@ class PictureManager {
       await Permission.camera
           .onDeniedCallback(() {})
           .onGrantedCallback(() {})
-          .onPermanentlyDeniedCallback(() {})
+          .onPermanentlyDeniedCallback(() {
+            openAppSettings();
+          })
           .onRestrictedCallback(() {})
           .onLimitedCallback(() {})
           .onProvisionalCallback(() {})
@@ -58,41 +70,22 @@ class PictureManager {
       BuildContext context, Function(String?) onImageSelected,
       {required int imageQuality}) async {
     if (context.mounted) {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Make a choice!'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: [
-                  GestureDetector(
-                    child: const Text("Gallery"),
-                    onTap: () async {
-                      await _pickImage(ImageSource.gallery, onImageSelected,
-                          imageQuality: imageQuality);
-                      if (context.mounted) {
-                        Navigator.of(context).pop(); // Close the dialog
-                      }
-                    },
-                  ),
-                  const Padding(padding: EdgeInsets.all(8.0)),
-                  GestureDetector(
-                    child: const Text("Camera"),
-                    onTap: () async {
-                      await _pickImage(ImageSource.camera, onImageSelected,
-                          imageQuality: imageQuality);
-                      if (context.mounted) {
-                        Navigator.of(context).pop(); // Close the dialog
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
+      await PictureChoiceDialog.showPictureChoiceDialog(context, () async {
+        await _pickImage(ImageSource.gallery, onImageSelected,
+            imageQuality: imageQuality);
+        if (context.mounted) {
+          Navigator.of(context).pop(); // Close the dialog
+        }
+      }, () async {
+        await _pickImage(ImageSource.camera, onImageSelected,
+            imageQuality: imageQuality);
+        if (context.mounted) {
+          Navigator.of(context).pop(); // Close the dialog
+        }
+      }).catchError((e) {
+        debugPrint('(PictureManager): Error showing choice dialog: $e');
+        // Handle the error, maybe close the dialog or show an error message
+      });
     }
   }
 
@@ -106,34 +99,38 @@ class PictureManager {
   static Future<void> _pickImage(
       ImageSource source, Function(String?) onImageSelected,
       {required int imageQuality}) async {
-    if (source == ImageSource.camera) {
-      await _askCameraPermission();
-    }
+    try {
+      if (source == ImageSource.camera) {
+        await _askCameraPermission();
+      }
 
-    final pickedImage = await ImagePicker()
-        .pickImage(source: source, imageQuality: imageQuality);
+      final pickedImage = await ImagePicker()
+          .pickImage(source: source, imageQuality: imageQuality);
 
-    if (pickedImage != null) {
-      CroppedFile? croppedFile = await ImageCropper().cropImage(
-        compressQuality: 100,
-        sourcePath: pickedImage.path,
-        aspectRatioPresets: [
-          CropAspectRatioPreset.square,
-        ],
-        uiSettings: [
-          AndroidUiSettings(
-              toolbarTitle: 'Edit your picture',
-              toolbarColor: PictureSignProvider.foregroundColor,
-              toolbarWidgetColor: Colors.black,
-              initAspectRatio: CropAspectRatioPreset.original,
-              lockAspectRatio: false),
-          IOSUiSettings(
-            title: 'Edit your picture',
-          ),
-        ],
-      );
+      if (pickedImage != null) {
+        CroppedFile? croppedFile = await ImageCropper().cropImage(
+          compressQuality: 100,
+          sourcePath: pickedImage.path,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+          ],
+          uiSettings: [
+            AndroidUiSettings(
+                toolbarTitle: 'Edit your picture',
+                toolbarWidgetColor: Colors.black,
+                initAspectRatio: CropAspectRatioPreset.original,
+                lockAspectRatio: false),
+            IOSUiSettings(
+              title: 'Edit your picture',
+            ),
+          ],
+        );
 
-      onImageSelected(croppedFile?.path);
+        onImageSelected(croppedFile?.path);
+      }
+    } catch (e) {
+      debugPrint('(PictureManager): Failed to pick or crop image: $e');
+      onImageSelected(null);
     }
   }
 }

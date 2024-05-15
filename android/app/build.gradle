@@ -6,6 +6,8 @@ plugins {
     id "com.google.firebase.crashlytics"
 }
 
+
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -27,11 +29,16 @@ if (flutterVersionName == null) {
 android {
     namespace 'com.befriendapp.befriend'
     compileSdkVersion 34
-    ndkVersion flutter.ndkVersion
+    ndkVersion "25.1.8937393"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled = true
+    }
+
+    dependencies {
+        coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'  // Correct placement
     }
 
     defaultConfig {

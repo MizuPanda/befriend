@@ -5,8 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../objects/home.dart';
 
@@ -14,7 +12,7 @@ class AuthenticationManager {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
   static String id() {
-    return _auth.currentUser!.uid;
+    return _auth.currentUser?.uid ?? 'AuthenticationManager-NOT-FOUND-ID';
   }
 
   /// Creates a new user with email and password.
@@ -42,8 +40,21 @@ class AuthenticationManager {
       //Handle every possible errors
       debugPrint('(CreateUser) An error occurred: ${error.code}');
       switch (error.code) {
-        case 'email-already-in-use':
+        case Constants.emailAlreadyInUse:
           errorCode = error.code;
+          break;
+        case Constants.invalidEmail:
+          errorCode = error.code;
+          break;
+        // Handle invalid email
+        case Constants.weakPassword:
+          errorCode = error.code;
+          // Handle weak password
+          break;
+        default:
+          errorCode = Constants.unknownError;
+          // Handle unexpected errors
+          break;
       }
     });
 
@@ -80,9 +91,19 @@ class AuthenticationManager {
       },
     ).catchError((error) async {
       // If registration data fails to save, delete the user
-      debugPrint('(RegisterUser) An error occurred: ${error.toString()}');
+      debugPrint('(Authentication): An error occurred: $error');
+      if (error is FirebaseException) {
+        const SnackBar snackBar = SnackBar(
+          content: Text("Something went wrong. Please try again later..."),
+          duration: Duration(seconds: 3),
+          showCloseIcon: true,
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
       await user.delete();
-      debugPrint("User deleted due to failure in registration data saving");
+      debugPrint(
+          "(Authentication): User deleted due to failure in registration data saving");
     });
   }
 
@@ -97,15 +118,16 @@ class AuthenticationManager {
         GoRouter.of(context).go(Constants.homepageAddress, extra: home);
       }
     } on FirebaseAuthException catch (e) {
-      debugPrint('(Authentication-Error): ${e.code}');
+      debugPrint('(Authentication): ${e.code}');
+      const SnackBar snackBar = SnackBar(
+        content: Text(
+            "Something went wrong. Please check your credentials and try again"),
+        duration: Duration(seconds: 3),
+        showCloseIcon: true,
+      );
+
       if (context.mounted) {
-        showTopSnackBar(
-            Overlay.of(context),
-            const CustomSnackBar.error(
-              message:
-                  "Something went wrong. Please check your credentials and try again",
-            ),
-            snackBarPosition: SnackBarPosition.bottom);
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     }
   }

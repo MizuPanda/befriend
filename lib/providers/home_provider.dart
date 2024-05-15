@@ -1,6 +1,9 @@
 import 'package:befriend/models/data/data_query.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../models/objects/friendship.dart';
 import '../models/objects/home.dart';
@@ -12,7 +15,38 @@ class HomeProvider extends ChangeNotifier {
   late final AnimationController _animationController;
   Animation<Matrix4>? _animationCenter;
 
+  /// Info
+  final GlobalKey _one = GlobalKey();
+
+  /// Tap profile
+  final GlobalKey _two = GlobalKey();
+
+  /// Hold Character
+  final GlobalKey _three = GlobalKey();
+
+  /// Swipe Picture Button*
+  final GlobalKey _four = GlobalKey();
+
+  /// Tap on Befriend*
+  final GlobalKey _five = GlobalKey();
+
+  GlobalKey get one => _one;
+  GlobalKey get two => _two;
+  GlobalKey get three => _three;
+  GlobalKey get four => _four;
+  GlobalKey get five => _five;
+
   Home home;
+
+  void initShowcase(BuildContext context) {
+    if (home.user.friendshipsLoaded) {
+      WidgetsBinding.instance.addPostFrameCallback((_) =>
+          ShowCaseWidget.of(context)
+              .startShowCase([_one, _two, _three, _four, _five]));
+    }
+  }
+
+  double get viewerSize => home.viewerSize;
 
   void _onAnimateReset() {
     _transformationController.value = _animationCenter!.value;
@@ -52,38 +86,42 @@ class HomeProvider extends ChangeNotifier {
     debugPrint('(HomeProvider): loadFriendships()');
     if (!home.user.friendshipsLoaded) {
       debugPrint('(HomeProvider): Starting friendships...');
-      home.user.friendships =
-          await DataQuery.friendList(home.user.id, home.user.friendIDs);
-      home.user.friendshipsLoaded = true;
-      home.initializePositions();
+      try {
+        home.user.friendships =
+            await DataQuery.friendList(home.user.id, home.user.friendIDs);
+        home.user.friendshipsLoaded = true;
+        home.initializePositions();
+        _transformationController.value = home.middlePos();
+        debugPrint('(HomeProvider): Friendships loaded successfully.');
+      } catch (e) {
+        debugPrint('(HomeProvider): Error loading friendships: $e');
+        // Optionally, handle error for user feedback
+      }
     }
 
     return home.user.friendships;
   }
 
-  HomeProvider({required this.home});
+  HomeProvider._({
+    required this.home,
+  });
 
-  void init(TickerProvider vsync) async {
+  factory HomeProvider.init(TickerProvider vsync, {required Home home}) {
+    HomeProvider homeProvider = HomeProvider._(home: home);
+
     // Initializing controller
-    _animationController = AnimationController(
+    homeProvider._animationController = AnimationController(
       vsync: vsync,
       duration: const Duration(milliseconds: 300),
     );
-
-    _transformationController.value = _middlePos();
 
     if (home.user.friendshipsLoaded) {
       home.initializePositions();
     }
 
-    notifyListeners();
-  }
+    homeProvider._transformationController.value = home.middlePos();
 
-  Matrix4 _middlePos() {
-    // Calculate the initial transformation to center the content
-
-    return Matrix4.identity()
-      ..translate(-Constants.viewerSize / 2, -Constants.viewerSize / 2);
+    return homeProvider;
   }
 
   void doDispose() {
@@ -95,7 +133,7 @@ class HomeProvider extends ChangeNotifier {
     _animationController.reset();
     _animationCenter = Matrix4Tween(
       begin: _transformationController.value,
-      end: _middlePos(),
+      end: home.middlePos(),
     ).animate(
         CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
     _animationCenter!.addListener(_onAnimateReset);
@@ -104,11 +142,10 @@ class HomeProvider extends ChangeNotifier {
 
   void animateToFriend(BuildContext context,
       {required double dx, required double dy}) {
-    double width = dx + Constants.viewerSize / 2;
-    double height = dy + Constants.viewerSize / 2;
+    double width = dx + home.viewerSize / 4;
+    double height = dy + home.viewerSize / 4;
 
     Matrix4 friendPos = Matrix4.identity()..translate(-width, -height);
-    debugPrint('(HomeProvider): FriendPos = $friendPos');
 
     _animationController.reset();
     _animationCenter = Matrix4Tween(

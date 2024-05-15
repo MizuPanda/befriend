@@ -3,16 +3,19 @@ import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/data/picture_query.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/friendship_progress.dart';
-import 'package:befriend/models/qr/privacy.dart';
 import 'package:befriend/models/services/post_service.dart';
 import 'package:befriend/models/social/friend_update.dart';
 import 'package:befriend/models/social/friendship_update.dart';
+import 'package:befriend/utilities/error_handling.dart';
+import 'package:befriend/views/dialogs/session/caption_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../models/data/picture_manager.dart';
 import '../models/objects/bubble.dart';
@@ -23,7 +26,10 @@ import '../utilities/constants.dart';
 import 'dart:io' show Platform;
 
 class SessionProvider extends ChangeNotifier {
-  final Privacy _privacy = Privacy();
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
+
   final Host host;
   final Map<String, Bubble> idToBubbleMap;
   final Map<String, double> _sliderValues = {};
@@ -35,6 +41,36 @@ class SessionProvider extends ChangeNotifier {
   int selectedIndex = 0;
 
   InterstitialAd? _interstitialAd;
+
+  final GlobalKey _one = GlobalKey(); // Hold picture (Host)
+  final GlobalKey _two = GlobalKey(); // Press picture
+  final GlobalKey _three = GlobalKey(); // Privacy
+  final GlobalKey _four = GlobalKey(); // Who will see
+  final GlobalKey _five = GlobalKey(); // Publish (Host)
+
+  GlobalKey get one => _one;
+  GlobalKey get two => _two;
+  GlobalKey get three => _three;
+  GlobalKey get four => _four;
+  GlobalKey get five => _five;
+
+  bool showTutorial = false;
+
+  void _initShowcase(BuildContext context, bool showTutorial) {
+    if (showTutorial) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => showCase(context));
+    }
+  }
+
+  void showCase(BuildContext context) {
+    ShowCaseWidget.of(context).startShowCase(host.main()
+        ? [_one, _two, _three, _four, _five]
+        : [
+            _two,
+            _three,
+            _four,
+          ]);
+  }
 
   void _loadInterstitialAd() async {
     // Replace with your ad unit ID - TO CHANGE DEPENDENTLY ON PLATFORM
@@ -58,11 +94,15 @@ class SessionProvider extends ChangeNotifier {
   }
 
   int pointsLength() {
-    return _privacy.criticalPoints.length;
+    return host.pointsLength();
+  }
+
+  Set<double> criticalPoints() {
+    return host.criticalPoints();
   }
 
   double getPoint() {
-    return _privacy.criticalPoints.elementAt(selectedIndex);
+    return host.getPoint(selectedIndex);
   }
 
   Future<void> showImageFullScreen(
@@ -89,42 +129,12 @@ class SessionProvider extends ChangeNotifier {
   }
 
   Future<String?> _promptForCaption(BuildContext context) async {
-    TextEditingController captionController = TextEditingController();
-    return await showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          actionsAlignment: MainAxisAlignment.spaceEvenly,
-          title: const Text('Enter a Caption'),
-          content: TextField(
-            controller: captionController,
-            decoration: InputDecoration(
-              hintText: "Caption for the picture",
-              counterText:
-                  'Characters limit: ${_characterLimit.toString()}', // Optional: Hide the counter text
-            ),
-            maxLines: null,
-            keyboardType: TextInputType.multiline,
-            maxLength: _characterLimit, // Enforces the character limit
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Publish'),
-              onPressed: () {
-                Navigator.of(context).pop(captionController.text.trim());
-              },
-            ),
-          ],
-        );
-      },
-    );
+    try {
+      return await CaptionDialog.showCaptionDialog(context, _characterLimit);
+    } catch (e) {
+      debugPrint('(SessionProvider): Error prompting for caption: $e');
+      return null;
+    }
   }
 
   ImageProvider networkImage() {
@@ -179,91 +189,97 @@ class SessionProvider extends ChangeNotifier {
   }
 
   Future<void> pictureProcess() async {
-    await PictureManager.cameraPicture((String? url) {
-      host.imagePath = url;
-    });
-    if (!host.pathNull()) {
-      host.imageUrl = await PictureQuery.uploadTempPicture(host, ids);
-      host.addCacheFile();
+    try {
+      await PictureManager.cameraPicture((String? url) {
+        host.imagePath = url;
+      });
+      if (!host.pathNull()) {
+        host.imageUrl = await PictureQuery.uploadTempPicture(host, ids);
+        host.addCacheFile();
+      }
+    } catch (e) {
+      debugPrint('(SessionProvider): Error in pictureProcess: $e');
     }
   }
 
   void processSnapshot(QuerySnapshot snapshot, BuildContext context) {
-    bool sliderValuesUpdated = false;
-    debugPrint('(SessionProvider): Processing snapshot...');
+    try {
+      bool sliderValuesUpdated = false;
+      debugPrint('(SessionProvider): Processing snapshot...');
 
-    if (_isSessionEnded) {
-      return;
-    }
+      if (_isSessionEnded) {
+        return;
+      }
 
-    if (_sliderValues.isEmpty) {
-      for (DocumentSnapshot doc in snapshot.docs) {
-        double val = DataManager.getNumber(doc, Constants.sliderDoc).toDouble();
-        _sliderValues[doc.id] = val;
+      if (_sliderValues.isEmpty) {
+        for (DocumentSnapshot doc in snapshot.docs) {
+          double val =
+              DataManager.getNumber(doc, Constants.sliderDoc).toDouble();
+          _sliderValues[doc.id] = val;
 
-        if (doc.id == host.user.id) {
-          for (int i = 0; i < _privacy.criticalPoints.length; i++) {
-            if (_privacy.criticalPoints.elementAt(i) == val) {
-              selectedIndex = i;
-              break;
+          if (doc.id == host.user.id) {
+            for (int i = 0; i < host.pointsLength(); i++) {
+              if (host.getPoint(i) == val) {
+                selectedIndex = i;
+                break;
+              }
             }
           }
         }
+        sliderValuesUpdated = true;
       }
-      sliderValuesUpdated = true;
-    }
 
-    // Assuming the host document contains a list of user IDs in the session
-    for (DocumentChange docChange in snapshot.docChanges) {
-      if (!sliderValuesUpdated) {
-        _sliderValues[docChange.doc.id] =
-            DataManager.getNumber(docChange.doc, Constants.sliderDoc)
-                .toDouble();
-      }
-      if (docChange.doc.id == host.host.id) {
-        List<dynamic> sessionUsers = docChange.doc[Constants.hostingDoc];
-        if (sessionUsers.isNotEmpty) {
-          String picture = sessionUsers.first.toString();
-          sessionUsers = sessionUsers.skip(1).toList();
-          debugPrint('(SessionProvider): Users: ${sessionUsers.toString()}');
-
-          if (!sessionUsers.contains(host.host.id)) {
-            debugPrint('(SessionProvider): No host pop');
-            _myPop(context);
-          } else if (sessionUsers.length == 1 &&
-              sessionUsers.contains(host.user.id)) {
-            debugPrint('(SessionProvider): Only 1 user pop');
-            _myPop(context);
-          } else if (sessionUsers.length != ids.length) {
-            _updateUsersList(sessionUsers, context);
-          } else if (picture.startsWith(Constants.pictureMarker) &&
-              !picture.contains(host.imageUrl ?? 'potato123456789')) {
-            picture = picture.substring(Constants.pictureMarker.length);
-            host.imageUrl = picture;
-
-            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-              notifyListeners();
-            });
-            if (_interstitialAd == null) {
-              _loadInterstitialAd();
-            }
-          } else if (picture == Constants.publishingState) {
-            // Navigate back
-
-            debugPrint('(SessionProvider): Picture published pop');
-            _goHome(context);
-          }
-        } else {
-          debugPrint('(SessionProvider): Else pop');
-          _myPop(context);
+      for (DocumentChange docChange in snapshot.docChanges) {
+        if (!sliderValuesUpdated) {
+          _sliderValues[docChange.doc.id] =
+              DataManager.getNumber(docChange.doc, Constants.sliderDoc)
+                  .toDouble();
         }
+        if (docChange.doc.id == host.host.id) {
+          List<dynamic> sessionUsers = docChange.doc[Constants.hostingDoc];
+          if (sessionUsers.isNotEmpty) {
+            String picture = sessionUsers.first.toString();
+            sessionUsers = sessionUsers.skip(1).toList();
+            debugPrint('(SessionProvider): Users: ${sessionUsers.toString()}');
 
-        break;
+            if (!sessionUsers.contains(host.host.id)) {
+              debugPrint('(SessionProvider): No host pop');
+              _myPop(context);
+            } else if (sessionUsers.length == 1 &&
+                sessionUsers.contains(host.user.id)) {
+              debugPrint('(SessionProvider): Only 1 user pop');
+              _myPop(context);
+            } else if (sessionUsers.length != ids.length) {
+              _updateUsersList(sessionUsers, context);
+            } else if (picture.startsWith(Constants.pictureMarker) &&
+                !picture.contains(host.imageUrl ?? 'potato123456789')) {
+              picture = picture.substring(Constants.pictureMarker.length);
+              host.imageUrl = picture;
+
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                notifyListeners();
+              });
+              if (_interstitialAd == null) {
+                _loadInterstitialAd();
+              }
+            } else if (picture == Constants.publishingState) {
+              debugPrint('(SessionProvider): Picture published pop');
+              _goHome(context);
+            }
+          } else {
+            debugPrint('(SessionProvider): Else pop');
+            _myPop(context);
+          }
+
+          break;
+        }
       }
+    } catch (e) {
+      debugPrint('(SessionProvider): Error processing snapshot: $e');
     }
   }
 
-  Future<String> getFriendshipsMap() async {
+  Future<String> getFriendshipsMap(BuildContext context) async {
     if (host.friendshipsMap.isEmpty) {
       DocumentSnapshot documentSnapshot =
           await DataManager.getData(id: host.host.id);
@@ -287,15 +303,40 @@ class SessionProvider extends ChangeNotifier {
         host.friendshipsMap[sessionUserData.key] = friendships;
       }
 
-      _privacy.setCriticalPoints(host);
+      host.setCriticalPoints();
+    }
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Remove data for the 'counter' key.
+
+    if (host.main()) {
+      // await prefs.remove(Constants.showSessionHostTutorialKey); // For testing
+
+      showTutorial =
+          prefs.getBool(Constants.showSessionHostTutorialKey) ?? true;
+      if (showTutorial) {
+        prefs.setBool(Constants.showSessionHostTutorialKey, false);
+      }
+    } else {
+      // await prefs.remove(Constants.showSessionJoinerTutorialKey); // For testing
+
+      showTutorial =
+          prefs.getBool(Constants.showSessionJoinerTutorialKey) ?? true;
+      if (showTutorial) {
+        prefs.setBool(Constants.showSessionJoinerTutorialKey, false);
+      }
+    }
+
+    if (context.mounted) {
+      _initShowcase(context, showTutorial);
     }
 
     return 'Completed';
   }
 
   void showFriendList(BuildContext context) {
-    _privacy.showFriendList(
-        context, host, _sliderValues, (userId) => bubble(userId));
+    host.showFriendList(context, _sliderValues, (userId) => bubble(userId));
   }
 
   void _updateUsersList(List<dynamic> sessionUsers, BuildContext context) {
@@ -316,31 +357,38 @@ class SessionProvider extends ChangeNotifier {
   }
 
   Future<void> publishPicture(BuildContext context) async {
-    _caption = await _promptForCaption(context);
-    if (_caption != null) {
-      List<String> sessionUsers = ids;
+    try {
+      _caption = await _promptForCaption(context);
+      if (_caption != null) {
+        _isLoading = true;
+        notifyListeners();
 
-      host.joiners = host.joiners
-          .where((element) => sessionUsers.contains(element.id))
-          .toList();
+        List<String> sessionUsers = ids;
 
-      debugPrint('(SessionProvider): Publishing to $sessionUsers');
-      final DateTime timestamp = DateTime.timestamp();
+        host.joiners = host.joiners
+            .where((element) => sessionUsers.contains(element.id))
+            .toList();
 
-      // CALCULATE PRIVACY AND USERS THAT WILL BE ABLE TO SEE IT
-      _privacy.calculateAllowedUsers(host, _sliderValues, bubble);
+        debugPrint('(SessionProvider): Publishing to $sessionUsers');
+        final DateTime timestamp = DateTime.timestamp();
 
-      // CREATE FRIENDSHIPS
-      await _createOrUpdateFriendships(host.joiners, timestamp);
+        host.calculateAllowedUsers(_sliderValues, bubble);
+        await _createOrUpdateFriendships(host.joiners, timestamp);
+        await _uploadPicture(sessionUsers, host.joiners, timestamp);
+        await _setUsersData(sessionUsers, host.joiners, timestamp);
+        _sendNotificationsToUser(sessionUsers, host.joiners);
 
-      // PUBLISH PICTURE
-      await _uploadPicture(sessionUsers, host.joiners, timestamp);
-
-      // SET NEW USER DATA FOR EVERY USER
-      await _setUsersData(sessionUsers, host.joiners, timestamp);
-
-      // SEND NOTIFICATIONS. Note: Add a friendsListening array field doc in users doc. Start it empty. If user press on...
-      _sendNotificationsToUser(sessionUsers, host.joiners);
+        _isLoading = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('(SessionProvider): Error publishing picture: $e');
+      _isLoading = false;
+      notifyListeners();
+      if (context.mounted) {
+        ErrorHandling.showError(
+            context, 'Error publishing picture. Please try again.');
+      }
     }
   }
 
@@ -351,13 +399,13 @@ class SessionProvider extends ChangeNotifier {
     // If PUBLIC    --> Add all friends of sessionUsers, except sessionUsers
     // If PRIVATE   --> Do nothing.
     // If Moderated --> Add friendsAllowed
-    if (_privacy.isPublic) {
+    if (host.isPublic()) {
       for (Bubble joiner in joinersStillConnected) {
         usersToNotify.addAll(joiner.friendIDs
             .where((element) => !sessionUsers.contains(element)));
       }
-    } else if (!_privacy.isPrivate) {
-      usersToNotify.addAll(_privacy.friendsAllowed);
+    } else if (!host.isPrivate()) {
+      usersToNotify.addAll(host.friendsAllowed());
     }
 
     // Future, but not useful to screen or anything
@@ -416,60 +464,61 @@ class SessionProvider extends ChangeNotifier {
     List<Bubble> joinersStillConnected,
     DateTime timestamp,
   ) async {
-    List<dynamic> usersAllowed = [];
+    try {
+      List<dynamic> usersAllowed = [];
 
-    // Three possible states
-    // Private, Moderated, Public
-    if (!_privacy.isPublic) {
-      usersAllowed.addAll(sessionUsers);
+      if (!host.isPublic()) {
+        usersAllowed.addAll(sessionUsers);
 
-      if (!_privacy.isPrivate) {
-        List<String> friendsAllowed = _privacy.friendsAllowed.toList();
-        usersAllowed.addAll(friendsAllowed);
+        if (!host.isPrivate()) {
+          List<String> friendsAllowed = host.friendsAllowed().toList();
+          usersAllowed.addAll(friendsAllowed);
+        }
       }
-    }
 
-    // Move picture to the posted folder
-    String? downloadUrl =
-        await PictureQuery.movePictureToPermanentStorage(host);
-    host.imageUrl = downloadUrl;
-    debugPrint('(SessionProvider): Moved picture to $downloadUrl');
+      String? downloadUrl =
+          await PictureQuery.movePictureToPermanentStorage(host);
+      host.imageUrl = downloadUrl;
+      debugPrint('(SessionProvider): Moved picture to $downloadUrl');
 
-    Map<String, String> sessionUsersMap = {};
+      Map<String, String> sessionUsersMap = {};
 
-    for (Bubble bubble in joinersStillConnected) {
-      sessionUsersMap[bubble.id] = bubble.username;
-    }
-
-    // Create a Picture object
-    Picture picture = Picture.newPicture(
-        host.imageUrl!,
-        host.host.id,
-        host.host.username,
-        timestamp,
-        host.tempFile(),
-        _privacy.isPublic,
-        _caption!,
-        usersAllowed,
-        sessionUsersMap);
-
-    String id = '';
-
-    for (String userID in sessionUsers) {
-      if (id.isEmpty) {
-        // Save the picture to the user's sub collection
-        DocumentReference ref = await Constants.usersCollection
-            .doc(userID)
-            .collection(Constants.pictureSubCollection)
-            .add(picture.toMap());
-        id = ref.id;
-      } else {
-        await Constants.usersCollection
-            .doc(userID)
-            .collection(Constants.pictureSubCollection)
-            .doc(id)
-            .set(picture.toMap());
+      for (Bubble bubble in joinersStillConnected) {
+        sessionUsersMap[bubble.id] = bubble.username;
       }
+
+      Picture picture = Picture.newPicture(
+          host.imageUrl!,
+          host.host.id,
+          host.host.username,
+          timestamp,
+          host.tempFile(),
+          host.isPublic(),
+          _caption!,
+          usersAllowed,
+          sessionUsersMap);
+
+      String id = '';
+
+      for (String userID in sessionUsers) {
+        if (id.isEmpty) {
+          DocumentReference ref = await Constants.usersCollection
+              .doc(userID)
+              .collection(Constants.pictureSubCollection)
+              .add(picture.toMap());
+          id = ref.id;
+        } else {
+          await Constants.usersCollection
+              .doc(userID)
+              .collection(Constants.pictureSubCollection)
+              .doc(id)
+              .set(picture.toMap());
+        }
+      }
+    } catch (e) {
+      debugPrint('(SessionProvider): Error uploading picture: $e');
+
+      throw Exception('Error uploading picture. Please try again.');
     }
   }
 

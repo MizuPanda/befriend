@@ -56,20 +56,34 @@ class Constants {
   // SUB COLLECTIONS
   static const String pictureSubCollection = 'pictures';
   // HOME PAGE SIZES
-  static const double viewerSize = 5000;
+  // static const double viewerSize = 5000;
   static const double homeButtonSize = 20;
   static const double homeButtonAddSize = 25;
-  static const double homeHorizontalPadding = 15;
+  static const double homeHorizontalPaddingMultiplier = 0.033;
+  // static const double homeHorizontalPadding = 15;
   static const double homeButtonPadding = 60;
+  static const double homeButtonBottomPaddingMultiplier = 0.09;
   //PICTURE SIZES
-  static const double pictureDialogWidth = 350;
-  static const double pictureDialogHeight = 400;
+  static const double pictureDialogWidthMultiplier = 350 / 448;
+  // 350*x = 250
+  // static const double pictureDialogWidth = 350;
+  static const double pictureDialogHeightMultiplier = 0.4;
+  // static const double pictureDialogHeight = 400;
   static const double pictureDialogAvatarSize = 30;
   //PICTURE STATES
   static const String pictureState = 'picture';
   static const String cancelledState = 'cancelled';
   static const String pictureMarker = 'pic:';
   static const String publishingState = 'publishing';
+  // SHARED PREFERENCES
+  static const String darkThemeValue = 'dark';
+  static const String lightThemeValue = 'light';
+  static const String autoThemeValue = 'auto';
+  static const String themeKey = 'theme';
+  static const String showHostTutorialKey = 'showHostTutorial';
+  static const String showSessionHostTutorialKey = 'showSessionHostTutorial';
+  static const String showSessionJoinerTutorialKey =
+      'showSessionJoinerTutorial';
   // MOBILE ADS
   static const String androidTestAdUnit =
       'ca-app-pub-3940256099942544/1033173712';
@@ -79,6 +93,18 @@ class Constants {
   static const String iosTestNativeAdUnit =
       'ca-app-pub-3940256099942544/3986624511';
   static const String postAdTile = 'postTile';
+  // ERRORS
+  static const String unknownError = 'unknown-error';
+  static const String emailAlreadyInUse = 'email-already-in-use';
+  static const String weakPassword = 'weak-password';
+  static const String invalidEmail = 'invalid-email';
+  static const String usernameError = 'username-already-in-use';
+  // ASSETS
+  static const String termsAddress = 'assets/policies/terms_and_conditions.md';
+  static const String privacyAddress = 'assets/policies/privacy_policy.md';
+  static const String defaultPictureAddress =
+      'assets/images/account_circle.png';
+
   // SEPARATORS
   static const String dataSeparator = '_';
   // ADDRESSES

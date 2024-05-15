@@ -20,101 +20,72 @@ class NotificationService {
   static const int likeID = 1;
 
   Future<void> initTokenListener(GlobalKey key, Function notify) async {
-    // Request user permission for push notifications
-    NotificationSettings settings = await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      // Get the token each time the application loads
-      String? token = await _messaging.getToken();
-      // Save the initial token to the database
-      saveTokenToDatabase(token);
-
-      // Any time the token refreshes, store this in the database too.
-      FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
-    }
-
-    // Initialize flutter_local_notifications
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-    await _localNotifications.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        _selectNotification(response, key, notify);
-      },
-    );
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _showNotification(message);
-    });
-
-    // Handle background notification clicks
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint('(NotificationService): Data= ${message.data}');
-
-      _NotificationType type = message.data.containsKey(_hostIdField)
-          ? _NotificationType.newPost
-          : _NotificationType.like;
-
-      switch (type) {
-        case _NotificationType.newPost:
-          String? friendIdPayload = message.data[_hostIdField];
-          // Assuming you have access to context and notify here, or manage to pass them
-          _navigateToProfile(key, friendIdPayload, notify);
-          break;
-        case _NotificationType.like:
-          _navigateToConnectedProfile(key, notify);
-          break;
+    try {
+      NotificationSettings settings = await _messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        String? token = await _messaging.getToken();
+        saveTokenToDatabase(token);
+        FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
       }
-    });
 
-    // Setup a background message handler
-    FirebaseMessaging.onBackgroundMessage(_backgroundMessageHandler);
+      const AndroidInitializationSettings initializationSettingsAndroid =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const InitializationSettings initializationSettings =
+          InitializationSettings(android: initializationSettingsAndroid);
+      await _localNotifications.initialize(
+        initializationSettings,
+        onDidReceiveNotificationResponse: (NotificationResponse response) {
+          _selectNotification(response, key, notify);
+        },
+      );
 
-    // Handle initial message
-    if (key.currentContext!.mounted) {
-      handleInitialMessage(key, notify);
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        _showNotification(message);
+      });
+
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        debugPrint('(NotificationService): Data= ${message.data}');
+        _NotificationType type = message.data.containsKey(_hostIdField)
+            ? _NotificationType.newPost
+            : _NotificationType.like;
+
+        switch (type) {
+          case _NotificationType.newPost:
+            String? friendIdPayload = message.data[_hostIdField];
+            _navigateToProfile(key, friendIdPayload, notify);
+            break;
+          case _NotificationType.like:
+            _navigateToConnectedProfile(key, notify);
+            break;
+        }
+      });
+
+      FirebaseMessaging.onBackgroundMessage(_backgroundMessageHandler);
+
+      if (key.currentContext!.mounted) {
+        handleInitialMessage(key, notify);
+      }
+    } catch (e) {
+      debugPrint(
+          '(NotificationService): Error initializing token listener: $e');
     }
   }
 
   static Future<void> _selectNotification(
       NotificationResponse response, GlobalKey key, Function notify) async {
-    _NotificationType notificationType = response.id == likeID
-        ? _NotificationType.like
-        : _NotificationType.newPost;
+    try {
+      _NotificationType notificationType = response.id == likeID
+          ? _NotificationType.like
+          : _NotificationType.newPost;
 
-    switch (notificationType) {
-      case _NotificationType.newPost:
-        String? friendIdPayload = response.payload;
-        if (friendIdPayload != null) {
-          // Handle navigation to the profile page using payload (hostId)
-          // This assumes you have a navigator key or some other means of navigating without context
-          _navigateToProfile(key, friendIdPayload, notify);
-        }
-        break;
-      case _NotificationType.like:
-        _navigateToConnectedProfile(key, notify);
-        break;
-    }
-  }
-
-  static Future<void> handleInitialMessage(
-      GlobalKey key, Function notify) async {
-    RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
-
-    if (initialMessage != null) {
-      _NotificationType type = initialMessage.data.containsKey(_hostIdField)
-          ? _NotificationType.newPost
-          : _NotificationType.like;
-      switch (type) {
+      switch (notificationType) {
         case _NotificationType.newPost:
-          String? friendIdPayload = initialMessage.data[_hostIdField];
-          if (key.currentContext!.mounted) {
+          String? friendIdPayload = response.payload;
+          if (friendIdPayload != null) {
             _navigateToProfile(key, friendIdPayload, notify);
           }
           break;
@@ -122,103 +93,144 @@ class NotificationService {
           _navigateToConnectedProfile(key, notify);
           break;
       }
+    } catch (e) {
+      debugPrint('(NotificationService): Error selecting notification: $e');
+    }
+  }
+
+  static Future<void> handleInitialMessage(
+      GlobalKey key, Function notify) async {
+    try {
+      RemoteMessage? initialMessage =
+          await FirebaseMessaging.instance.getInitialMessage();
+
+      if (initialMessage != null) {
+        _NotificationType type = initialMessage.data.containsKey(_hostIdField)
+            ? _NotificationType.newPost
+            : _NotificationType.like;
+        switch (type) {
+          case _NotificationType.newPost:
+            String? friendIdPayload = initialMessage.data[_hostIdField];
+            if (key.currentContext!.mounted) {
+              _navigateToProfile(key, friendIdPayload, notify);
+            }
+            break;
+          case _NotificationType.like:
+            _navigateToConnectedProfile(key, notify);
+            break;
+        }
+      }
+    } catch (e) {
+      debugPrint('(NotificationService): Error handling initial message: $e');
     }
   }
 
   static void _navigateToConnectedProfile(
       GlobalKey key, Function notify) async {
-    // Example: Fetch necessary data and navigate
-    debugPrint("Navigating to user's profile");
-    Bubble connectedUser = await UserManager.getInstance();
-
-    if (key.currentContext!.mounted) {
-      GoRouter.of(key.currentContext!).push(
-        Constants.profileAddress,
-        extra: Profile(
-            user: connectedUser,
-            currentUser: connectedUser,
-            notifyParent: notify,
-            friendship: null),
-      );
-    }
-  }
-
-  static void _navigateToProfile(
-      GlobalKey key, String? friendIdPayload, Function notify) async {
-    if (friendIdPayload != null && friendIdPayload.isNotEmpty) {
-      // Example: Fetch necessary data and navigate
-      debugPrint("Navigating to profile of $friendIdPayload");
+    try {
+      debugPrint("Navigating to user's profile");
       Bubble connectedUser = await UserManager.getInstance();
-      Friendship friendship;
-
-      Friendship? f;
-
-      for (Friendship f1 in connectedUser.friendships) {
-        if (f1.friendId() == friendIdPayload) {
-          f = f1;
-          break;
-        }
-      }
-
-      if (f == null) {
-        friendship =
-            await DataQuery.getFriendship(connectedUser.id, friendIdPayload);
-      } else {
-        friendship = f;
-      }
 
       if (key.currentContext!.mounted) {
         GoRouter.of(key.currentContext!).push(
           Constants.profileAddress,
           extra: Profile(
-              user: friendship.friend,
+              user: connectedUser,
               currentUser: connectedUser,
               notifyParent: notify,
-              friendship: friendship),
+              friendship: null),
         );
       }
+    } catch (e) {
+      debugPrint(
+          '(NotificationService): Error navigating to connected profile: $e');
+    }
+  }
+
+  static void _navigateToProfile(
+      GlobalKey key, String? friendIdPayload, Function notify) async {
+    try {
+      if (friendIdPayload != null && friendIdPayload.isNotEmpty) {
+        debugPrint("Navigating to profile of $friendIdPayload");
+        Bubble connectedUser = await UserManager.getInstance();
+        Friendship friendship;
+
+        Friendship? f;
+
+        for (Friendship f1 in connectedUser.friendships) {
+          if (f1.friendId() == friendIdPayload) {
+            f = f1;
+            break;
+          }
+        }
+
+        if (f == null) {
+          friendship =
+              await DataQuery.getFriendship(connectedUser.id, friendIdPayload);
+        } else {
+          friendship = f;
+        }
+
+        if (key.currentContext!.mounted) {
+          GoRouter.of(key.currentContext!).push(
+            Constants.profileAddress,
+            extra: Profile(
+                user: friendship.friend,
+                currentUser: connectedUser,
+                notifyParent: notify,
+                friendship: friendship),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('(NotificationService): Error navigating to profile: $e');
     }
   }
 
   static void _showNotification(RemoteMessage message) async {
-    _NotificationType notificationType = message.data.containsKey(_hostIdField)
-        ? _NotificationType.newPost
-        : _NotificationType.like;
+    try {
+      _NotificationType notificationType =
+          message.data.containsKey(_hostIdField)
+              ? _NotificationType.newPost
+              : _NotificationType.like;
 
-    String? payload;
-    int id;
-    Importance importance;
-    Priority priority;
+      String? payload;
+      int id;
+      Importance importance;
+      Priority priority;
 
-    switch (notificationType) {
-      case _NotificationType.newPost:
-        payload = message.data[_hostIdField];
-        id = newPostID;
-        importance = Importance.defaultImportance;
-        priority = Priority.defaultPriority;
-        break;
-      case _NotificationType.like:
-        id = likeID;
-        importance = Importance.low;
-        priority = Priority.low;
-        break;
+      switch (notificationType) {
+        case _NotificationType.newPost:
+          payload = message.data[_hostIdField];
+          id = newPostID;
+          importance = Importance.defaultImportance;
+          priority = Priority.defaultPriority;
+          break;
+        case _NotificationType.like:
+          id = likeID;
+          importance = Importance.low;
+          priority = Priority.low;
+          break;
+      }
+
+      final AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails('befriend_id', 'befriend_name',
+              channelDescription: 'befriend',
+              importance: importance,
+              priority: priority,
+              showWhen: false);
+      final NotificationDetails platformChannelSpecifics =
+          NotificationDetails(android: androidPlatformChannelSpecifics);
+
+      await _localNotifications.show(
+          id, // ID
+          message.notification?.title, // Title
+          message.notification?.body, // Body
+          platformChannelSpecifics,
+          payload: payload); // Pass the hostId as payload
+    } catch (e) {
+      debugPrint('(NotificationService): Error showing notification: $e');
     }
-
-    final AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails('befriend_id', 'befriend_name',
-            channelDescription: 'befriend',
-            importance: importance,
-            priority: priority,
-            showWhen: false);
-    final NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await _localNotifications.show(
-        id, // ID
-        message.notification?.title, // Title
-        message.notification?.body, // Body
-        platformChannelSpecifics,
-        payload: payload); // Pass the hostId as payload
   }
 
   @pragma('vm:entry-point')
@@ -230,7 +242,11 @@ class NotificationService {
 
   static void saveTokenToDatabase(String? token) {
     // Save the token for this user in Firestore
-    DataQuery.updateDocument(Constants.notificationToken, token);
+    try {
+      DataQuery.updateDocument(Constants.notificationToken, token);
+    } catch (e) {
+      debugPrint('(NotificationService): Error saving token to database: $e');
+    }
   }
 }
 

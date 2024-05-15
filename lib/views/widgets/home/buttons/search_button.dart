@@ -2,6 +2,7 @@ import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:befriend/providers/home_provider.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../models/objects/bubble.dart';
@@ -18,17 +19,22 @@ class SearchButton extends StatefulWidget {
 
 class _SearchButtonState extends State<SearchButton> {
   final TextEditingController _textEditingController = TextEditingController();
-  static const double normalPadding = 30;
-  static const double friendPadding = normalPadding + 50;
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+
+    final double normalPadding = 0.067 * width;
+    final double friendPadding = normalPadding + 0.11 * width;
+
     return Consumer<HomeProvider>(
         builder: (BuildContext context, HomeProvider provider, Widget? child) {
       return Container(
         alignment: Alignment.bottomCenter,
-        margin: const EdgeInsets.only(
-            bottom: 60, right: Constants.homeHorizontalPadding),
+        padding: EdgeInsets.only(
+            bottom: 0.060 * height,
+            right: Constants.homeHorizontalPaddingMultiplier * width),
         child: GestureDetector(
           child: AnimSearchBar(
             rtl: true,

@@ -13,76 +13,95 @@ class DataQuery {
   static const int _friendsLimit = 20;
   static Future<void> updateDocument(String fieldID, dynamic data,
       {String? userId}) async {
-    await Constants.usersCollection
-        .doc(userId ?? AuthenticationManager.id())
-        .update(<String, dynamic>{fieldID: data});
+    try {
+      await Constants.usersCollection
+          .doc(userId ?? AuthenticationManager.id())
+          .update(<String, dynamic>{fieldID: data});
+    } catch (e) {
+      debugPrint('(DataQuery): Failed to update document: $e');
+      throw Exception('(DataQuery): Failed to update data.');
+    }
   }
 
   static Future<Friendship> getFriendship(
       String currentUserID, String otherUserID) async {
-    List<String> ids = [currentUserID, otherUserID];
-    ids.sort();
-    String friendshipID = ids.first + ids.last;
+    try {
+      List<String> ids = [currentUserID, otherUserID];
+      ids.sort();
+      String friendshipID = ids.first + ids.last;
 
-    DocumentSnapshot friendshipSnap =
-        await Constants.friendshipsCollection.doc(friendshipID).get();
-    DocumentSnapshot bubbleSnap = await DataManager.getData(id: otherUserID);
-    ImageProvider avatar = await DataManager.getAvatar(bubbleSnap);
+      DocumentSnapshot friendshipSnap =
+          await Constants.friendshipsCollection.doc(friendshipID).get();
+      DocumentSnapshot bubbleSnap = await DataManager.getData(id: otherUserID);
+      ImageProvider avatar = await DataManager.getAvatar(bubbleSnap);
 
-    Bubble friendBubble = Bubble.fromDocsWithoutFriends(bubbleSnap, avatar);
-    return Friendship.fromDocs(currentUserID, friendBubble, friendshipSnap);
+      Bubble friendBubble = Bubble.fromDocsWithoutFriends(bubbleSnap, avatar);
+      return Friendship.fromDocs(currentUserID, friendBubble, friendshipSnap);
+    } catch (e) {
+      debugPrint('(DataQuery): Error fetching friendship data: $e');
+      throw Exception('(DataQuery): Failed to fetch friendship data.');
+    }
   }
 
   static Future<List<Friendship>> friendList(
       String userID, List<dynamic> friendIDs) async {
-    final List<Friendship> friendships = [];
-    final String mainID = AuthenticationManager.id();
+    try {
+      final List<Friendship> friendships = [];
+      final String mainID = AuthenticationManager.id();
 
-    QuerySnapshot query = await Constants.friendshipsCollection
-        .where(Filter.or(
-          Filter(Constants.user1Doc, isEqualTo: userID),
-          Filter(Constants.user2Doc, isEqualTo: userID),
-        ))
-        .orderBy(Constants.levelDoc, descending: true)
-        .limit(_friendsLimit)
-        .get();
+      QuerySnapshot query = await Constants.friendshipsCollection
+          .where(Filter.or(
+            Filter(Constants.user1Doc, isEqualTo: userID),
+            Filter(Constants.user2Doc, isEqualTo: userID),
+          ))
+          .orderBy(Constants.levelDoc, descending: true)
+          .limit(_friendsLimit)
+          .get();
 
-    for (QueryDocumentSnapshot doc in query.docs) {
-      Bubble friend;
-      Friendship friendship;
-      String friendID;
-      String user1 = DataManager.getString(doc, Constants.user1Doc);
-      String user2 = DataManager.getString(doc, Constants.user2Doc);
-      if (user1 == userID) {
-        friendID = user2;
-      } else {
-        friendID = user1;
+      for (QueryDocumentSnapshot doc in query.docs) {
+        Bubble friend;
+        Friendship friendship;
+        String friendID;
+        String user1 = DataManager.getString(doc, Constants.user1Doc);
+        String user2 = DataManager.getString(doc, Constants.user2Doc);
+        if (user1 == userID) {
+          friendID = user2;
+        } else {
+          friendID = user1;
+        }
+
+        if (mainID != userID && friendID == mainID) {
+          friend = await UserManager.getInstance();
+        } else {
+          DocumentSnapshot friendDocs = await DataManager.getData(id: friendID);
+          ImageProvider avatar = await DataManager.getAvatar(friendDocs);
+
+          friend = Bubble.fromDocsWithoutFriends(friendDocs, avatar);
+        }
+
+        friendship = Friendship.fromDocs(userID, friend, doc);
+
+        friendships.add(friendship);
       }
-
-      if (mainID != userID && friendID == mainID) {
-        friend = await UserManager.getInstance();
-      } else {
-        DocumentSnapshot friendDocs = await DataManager.getData(id: friendID);
-        ImageProvider avatar = await DataManager.getAvatar(friendDocs);
-
-        friend = Bubble.fromDocsWithoutFriends(friendDocs, avatar);
-      }
-
-      friendship = Friendship.fromDocs(userID, friend, doc);
-
-      friendships.add(friendship);
+      return friendships;
+    } catch (e) {
+      debugPrint('Error retrieving friend list: $e');
+      throw Exception('Failed to retrieve friend list.');
     }
-
-    return friendships;
   }
 
   static Future<ImageProvider> getNetworkImage(String downloadUrl) async {
-    if (downloadUrl.isEmpty) {
-      return Image.asset('assets/account_circle.png').image;
-    }
-    final ref = FirebaseStorage.instance.refFromURL(downloadUrl);
-    final url = await ref.getDownloadURL();
+    try {
+      if (downloadUrl.isEmpty) {
+        return Image.asset(Constants.defaultPictureAddress).image;
+      }
+      final ref = FirebaseStorage.instance.refFromURL(downloadUrl);
+      final url = await ref.getDownloadURL();
 
-    return NetworkImage(url);
+      return NetworkImage(url);
+    } catch (e) {
+      debugPrint('(DataQuery): Error loading network image: $e');
+      return Image.asset(Constants.defaultPictureAddress).image;
+    }
   }
 }

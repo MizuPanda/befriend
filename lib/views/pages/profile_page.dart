@@ -22,57 +22,56 @@ class ProfilePage extends StatelessWidget {
     return ChangeNotifierProvider(
         create: (_) => ProfileProvider(profile: profile),
         builder: (BuildContext context, Widget? child) {
+          final double height = MediaQuery.of(context).size.height;
+
           return Scaffold(
             appBar: AppBar(
-                title: const BefriendTitle(),
-                actions: !profile.user.main()
-                    ? [
-                        Consumer(builder: (BuildContext context,
-                            ProfileProvider provider, Widget? child) {
-                          return PopupMenuButton<int>(
-                              icon: const Icon(
-                                Icons.more_vert,
-                              ),
-                              onSelected: (int selection) async {
-                                await provider.onSelectMenu(selection, context);
-                              },
-                              itemBuilder: (BuildContext context) => [
-                                    const PopupMenuItem<int>(
-                                      value: 0,
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.delete_outline_rounded,
-                                              color:
-                                                  Colors.red), // Archive icon
-                                          SizedBox(width: _iconTextDistance),
-                                          Text(
-                                            'Delete this user',
-                                            style: TextStyle(color: Colors.red),
-                                          ),
-                                          SizedBox(
-                                              width: _iconTextDistance * 2),
-                                        ],
-                                      ),
+              title: const BefriendTitle(),
+              actions: !profile.user.main()
+                  ? [
+                      Consumer(builder: (BuildContext context,
+                          ProfileProvider provider, Widget? child) {
+                        return PopupMenuButton<int>(
+                            icon: const Icon(
+                              Icons.more_vert,
+                            ),
+                            onSelected: (int selection) async {
+                              await provider.onSelectMenu(selection, context);
+                            },
+                            itemBuilder: (BuildContext context) => [
+                                  const PopupMenuItem<int>(
+                                    value: 0,
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.delete_outline_rounded,
+                                            color: Colors.red), // Archive icon
+                                        SizedBox(width: _iconTextDistance),
+                                        Text(
+                                          'Delete this user',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                        SizedBox(width: _iconTextDistance * 2),
+                                      ],
                                     ),
-                                    const PopupMenuItem<int>(
-                                      value: 1,
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.block_rounded,
-                                              color: Colors.black), // Info icon
-                                          SizedBox(width: _iconTextDistance),
-                                          Text('Block this user'),
-                                          SizedBox(
-                                              width: _iconTextDistance * 2),
-                                        ],
-                                      ),
+                                  ),
+                                  const PopupMenuItem<int>(
+                                    value: 1,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.block_rounded,
+                                        ), // Info icon
+                                        SizedBox(width: _iconTextDistance),
+                                        Text('Block this user'),
+                                        SizedBox(width: _iconTextDistance * 2),
+                                      ],
                                     ),
-                                  ]);
-                        })
-                      ]
-                    : null,
-                foregroundColor: Colors.black,
-                backgroundColor: Colors.white),
+                                  ),
+                                ]);
+                      })
+                    ]
+                  : null,
+            ),
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -83,7 +82,7 @@ class ProfilePage extends StatelessWidget {
                     profile: profile,
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 0.016 * height),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: padding),
                   child: ProfileState(

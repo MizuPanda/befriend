@@ -2,15 +2,15 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:befriend/models/authentication/consent_manager.dart';
 import 'package:befriend/providers/sign_provider.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
-import 'package:befriend/views/widgets/signup/birthday_picker.dart';
-import 'package:befriend/views/widgets/signup/strength_indicator.dart';
+import 'package:befriend/views/widgets/authentication/signup/birthday_picker.dart';
+import 'package:befriend/views/widgets/authentication/signup/strength_indicator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/login/icon_text_field.dart';
-import '../widgets/signup/sign_up.dart';
+import '../widgets/authentication/login/icon_text_field.dart';
+import '../widgets/authentication/signup/sign_up.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -36,6 +36,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+
     return ChangeNotifierProvider.value(
       value: _provider,
       child: Scaffold(
@@ -45,8 +48,11 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
         body: SafeArea(
           child: Padding(
-            padding:
-                const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 20),
+            padding: EdgeInsets.only(
+                left: width * 0.036,
+                right: width * 0.036,
+                top: 0.016 * height,
+                bottom: 0.020 * height),
             child: SingleChildScrollView(
               child: Consumer<SignProvider>(builder:
                   (BuildContext context, SignProvider provider, Widget? child) {
@@ -57,13 +63,13 @@ class _SignUpPageState extends State<SignUpPage> {
                     children: [
                       Align(
                         alignment: Alignment.center,
-                        child: Text(
+                        child: AutoSizeText(
                           'Welcome! Begin by creating an account',
                           style: GoogleFonts.openSans(
                               textStyle: const TextStyle(fontSize: 18)),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 0.020 * height),
                       IconTextField(
                         textInputAction: TextInputAction.next,
                         textInputType: TextInputType.emailAddress,
@@ -72,7 +78,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         onSaved: _provider.emailSaved,
                         validator: _provider.emailValidator,
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 0.020 * height),
                       IconTextField(
                         textInputType: TextInputType.text,
                         textInputAction: TextInputAction.next,
@@ -81,19 +87,20 @@ class _SignUpPageState extends State<SignUpPage> {
                         onSaved: _provider.usernameSaved,
                         validator: _provider.usernameValidator,
                       ),
-                      const SizedBox(
-                        height: 20,
+                      SizedBox(
+                        height: 0.020 * height,
                       ),
                       const BirthdayPicker(),
                       Padding(
-                        padding: const EdgeInsets.only(top: 8.0, left: 15),
-                        child: Text(
+                        padding: EdgeInsets.only(
+                            top: 0.008 * height, left: 0.033 * width),
+                        child: AutoSizeText(
                           'This information will not be displayed on your profile.',
                           style: GoogleFonts.openSans(
                               fontSize: 12, fontStyle: FontStyle.italic),
                         ),
                       ),
-                      const SizedBox(height: 15),
+                      SizedBox(height: 0.015 * height),
                       IconTextField(
                         textInputType: TextInputType.visiblePassword,
                         textInputAction: TextInputAction.next,
@@ -106,7 +113,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         hidePassword: _provider.hidePassword,
                       ),
                       const PasswordStrengthIndicator(),
-                      const SizedBox(height: 20),
+                      SizedBox(height: height * 0.020),
                       IconTextField(
                         textInputType: TextInputType.visiblePassword,
                         textInputAction: TextInputAction.done,
@@ -117,8 +124,8 @@ class _SignUpPageState extends State<SignUpPage> {
                         passwordVisible: _provider.passwordRepeatVisible,
                         hidePassword: _provider.hideRepeat,
                       ),
-                      const SizedBox(
-                        height: 20,
+                      SizedBox(
+                        height: 0.020 * height,
                       ),
                       Row(
                         children: [
@@ -133,7 +140,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                   TextSpan(
                                       text: "privacy policy",
                                       style: TextStyle(
-                                          color: ThemeData().primaryColor,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                           fontSize: 14),
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () async {
@@ -144,7 +153,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                   TextSpan(
                                       text: "terms and conditions",
                                       style: TextStyle(
-                                          color: ThemeData().primaryColor,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                           fontSize: 14),
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () async {
@@ -161,8 +172,8 @@ class _SignUpPageState extends State<SignUpPage> {
                               onChanged: provider.onCheck),
                         ],
                       ),
-                      const SizedBox(
-                        height: 20,
+                      SizedBox(
+                        height: 0.020 * height,
                       ),
                       SignUpButton(
                         onPressed: () async {

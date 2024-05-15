@@ -1,10 +1,10 @@
-import 'package:befriend/models/data/data_manager.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:befriend/models/objects/bubble.dart';
-import 'package:befriend/models/objects/friendship.dart';
-import 'package:befriend/utilities/constants.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:befriend/providers/mutual_provider.dart';
+import 'package:befriend/views/widgets/users/profile_photo.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/objects/profile.dart';
 
@@ -21,177 +21,108 @@ class MutualPage extends StatefulWidget {
 }
 
 class _MutualPageState extends State<MutualPage> {
-  List<Bubble> filteredUsers = [];
-  List<Bubble> _allLoadedUsers = [];
-
-  DocumentSnapshot? _lastDocument;
-
-  final PagingController<int, Bubble> _pagingController =
-      PagingController(firstPageKey: 0);
-  final int _pageSize = 10;
+  final MutualProvider _provider = MutualProvider();
 
   @override
   void initState() {
     super.initState();
 
-    _pagingController.itemList = widget.profile.commonFriends;
-    _allLoadedUsers = widget.profile.commonFriends;
-
-    _pagingController.addPageRequestListener((pageKey) {
-      _fetchPage(pageKey);
-      _allLoadedUsers = _pagingController.itemList!;
-    });
+    _provider.initState(
+        commonFriends: widget.profile.commonFriends,
+        userId: widget.profile.currentUser.id,
+        hasNonLoadedFriends: widget.profile.currentUser.hasNonLoadedFriends(),
+        getLastFriendshipDocument:
+            widget.profile.currentUser.getLastFriendshipDocument());
   }
-
-  Future<void> _fetchPage(int pageKey) async {
-    final List<Friendship> moreFriends = [];
-
-    String currentUserId = widget.profile.currentUser.id;
-
-    if (widget.profile.currentUser.hasNonLoadedFriends()) {
-      if (_lastDocument == null || pageKey == 0) {
-        _lastDocument ??=
-            await widget.profile.currentUser.getLastFriendshipDocument();
-      }
-
-      // Your Firestore query to fetch more friends, starting after the last document
-      QuerySnapshot querySnapshot = await Constants.friendshipsCollection
-          .where(Filter.or(
-            Filter(
-              Constants.user1Doc,
-              isEqualTo: currentUserId,
-            ),
-            Filter(
-              Constants.user2Doc,
-              isEqualTo: currentUserId,
-            ),
-          ))
-          .orderBy(Constants.levelDoc, descending: true)
-          .startAfterDocument(_lastDocument!)
-          .limit(_pageSize)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        _lastDocument = querySnapshot.docs.last;
-        for (QueryDocumentSnapshot snapshot in querySnapshot.docs) {
-          String user1 = DataManager.getString(snapshot, Constants.user1Doc);
-          String user2 = DataManager.getString(snapshot, Constants.user2Doc);
-          String friendId;
-          Bubble friend;
-          if (user1 == currentUserId) {
-            friendId = user2;
-          } else {
-            friendId = user1;
-          }
-          DocumentSnapshot bubbleSnapshot =
-              await DataManager.getData(id: friendId);
-          ImageProvider bubbleImage =
-              await DataManager.getAvatar(bubbleSnapshot);
-
-          friend = Bubble.fromDocsWithoutFriends(bubbleSnapshot, bubbleImage);
-
-          Friendship friendship =
-              Friendship.fromDocs(currentUserId, friend, snapshot);
-          moreFriends.add(friendship);
-        }
-      }
-    }
-
-    final List<Bubble> newItems = moreFriends.map((e) => e.friend).toList();
-    final isLastPage = newItems.length < _pageSize;
-    if (isLastPage) {
-      _pagingController.appendLastPage(newItems);
-    } else {
-      final int nextPageKey = pageKey + newItems.length;
-      _pagingController.appendPage(newItems, nextPageKey);
-    }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  void _filterUsers(String searchTerm) {
-    final lowerCaseSearchTerm = searchTerm.toLowerCase();
-
-    filteredUsers = _allLoadedUsers.where((user) {
-      return user.username.toLowerCase().contains(lowerCaseSearchTerm);
-    }).toList();
-
-    setState(() {
-      _isSearching = searchTerm.isNotEmpty;
-    });
-  }
-
-  bool _isSearching = false;
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: const Text('Mutual'),
+        title: const Text('Mutual friends'),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              onChanged: _filterUsers,
-              decoration: InputDecoration(
-                labelText: 'Search',
-                suffixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: _isSearching
-                ? ListView.builder(
-                    itemCount: filteredUsers.length,
-                    itemBuilder: (context, index) {
-                      final user = filteredUsers[index];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: user.avatar,
+      body: ChangeNotifierProvider.value(
+          value: _provider,
+          builder: (BuildContext context, Widget? child) {
+            return Consumer(builder:
+                (BuildContext context, MutualProvider provider, Widget? child) {
+              return Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(width * 0.03),
+                    child: TextField(
+                      onChanged: provider.filterUsers,
+                      decoration: InputDecoration(
+                        labelText: 'Search',
+                        suffixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
                         ),
-                        title: Text(user.username),
-                      );
-                    },
-                  )
-                : PagedListView<int, Bubble>(
-                    pagingController: _pagingController,
-                    builderDelegate: PagedChildBuilderDelegate<Bubble>(
-                      itemBuilder: (context, item, index) => ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: item.avatar,
-                        ),
-                        title: Text(item.username),
                       ),
                     ),
-                    /*
-            ListView.builder(
-              controller: _scrollController,
-              itemCount: filteredUsers.length
-              itemBuilder: (context, index) {
-
-                final user = filteredUsers[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: user.avatar,
                   ),
-                  title: Text(user.username),
-                  subtitle: Text(user.name),
-                );
-              },
-
-             */
+                  Expanded(
+                    child: provider.isSearching
+                        ? ListView.builder(
+                            itemCount: provider.length(),
+                            itemBuilder: (context, index) {
+                              final user = provider.user(index);
+                              return Padding(
+                                padding:
+                                    EdgeInsets.only(bottom: 0.008 * height),
+                                child: ListTile(
+                                  leading: Container(
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                            color: Theme.of(context)
+                                                .primaryColor)),
+                                    child: ProfilePhoto(
+                                      user: user,
+                                    ),
+                                  ),
+                                  title: AutoSizeText(
+                                    user.username,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : PagedListView<int, Bubble>(
+                            pagingController: provider.pagingController,
+                            builderDelegate: PagedChildBuilderDelegate<Bubble>(
+                              itemBuilder: (context, item, index) => Padding(
+                                padding:
+                                    EdgeInsets.only(bottom: 0.008 * height),
+                                child: ListTile(
+                                  leading: Container(
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                            color: Theme.of(context)
+                                                .primaryColor)),
+                                    child: ProfilePhoto(
+                                      user: item,
+                                    ),
+                                  ),
+                                  title: AutoSizeText(
+                                    item.username,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                   ),
-          ),
-        ],
-      ),
+                ],
+              );
+            });
+          }),
     );
   }
 }

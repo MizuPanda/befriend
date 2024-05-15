@@ -1,11 +1,12 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:befriend/providers/login_provider.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
-import 'package:befriend/views/widgets/login/login_password_field.dart';
+import 'package:befriend/views/widgets/authentication/login/login_password_field.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/login/login_email_field.dart';
+import '../widgets/authentication/login/login_email_field.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,6 +18,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final LoginProvider _provider = LoginProvider();
 
+  final double _sizedBoxHeightMultiplier = 0.02;
   @override
   void initState() {
     _provider.init();
@@ -31,6 +33,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+
     return PopScope(
       canPop: false,
       child: ChangeNotifierProvider.value(
@@ -38,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           body: Container(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(width * 0.045),
             child: Stack(
               children: [
                 const SafeArea(
@@ -58,16 +63,16 @@ class _LoginPageState extends State<LoginPage> {
                         const EmailFormField(
                           labelText: 'Enter your email',
                         ),
-                        const SizedBox(height: 20.0),
+                        SizedBox(height: height * _sizedBoxHeightMultiplier),
                         const PasswordFormField(),
-                        const SizedBox(height: 20.0),
+                        SizedBox(height: height * _sizedBoxHeightMultiplier),
                         Row(
                           children: [
                             ElevatedButton(
                               onPressed: () {
                                 _provider.navigateToSignUp(context);
                               },
-                              child: const Text('Sign up'),
+                              child: const AutoSizeText('Sign up'),
                             ),
                             const Spacer(),
                             ElevatedButton(
@@ -75,18 +80,26 @@ class _LoginPageState extends State<LoginPage> {
                                 await _provider.login(context);
                               },
                               style: const ButtonStyle(enableFeedback: true),
-                              child: const Text('Login'),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: _provider.isLoading
+                                    ? const CircularProgressIndicator()
+                                    : const AutoSizeText('Login'),
+                              ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10.0),
+                        SizedBox(
+                            height: MediaQuery.of(context).size.height *
+                                _sizedBoxHeightMultiplier /
+                                2),
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
                               _provider.openForgotPasswordPage(context);
                             },
-                            child: const Text('Forgot your password?'),
+                            child: const AutoSizeText('Forgot your password?'),
                           ),
                         ),
                       ],
@@ -102,18 +115,15 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: () async {
                             await _provider.openPrivacyPolicy(context);
                           },
-                          child: Text(
+                          child: AutoSizeText(
                             'Privacy Policy',
                             style: GoogleFonts.openSans(),
                           )),
-                      const SizedBox(
-                        width: 15,
-                      ),
                       TextButton(
                           onPressed: () async {
                             await _provider.openTerms(context);
                           },
-                          child: Text(
+                          child: AutoSizeText(
                             'Terms & Conditions',
                             style: GoogleFonts.openSans(),
                           ))

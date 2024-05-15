@@ -1,8 +1,10 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:befriend/providers/session_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../../models/objects/bubble.dart';
 import '../../../../../utilities/constants.dart';
@@ -26,14 +28,18 @@ class UserSlidersScreen extends StatelessWidget {
 
             provider.processSnapshot(snapshot.data!, context);
 
-            return ListView(
-              children: snapshot.data!.docs.map((userDocument) {
-                return UserSlider(
-                  bubble: provider.bubble(userDocument.id)!,
-                  sliderValue: provider.sliderValue(userDocument.id),
-                  reference: userDocument.reference,
-                );
-              }).toList(),
+            return Showcase(
+              key: provider.three,
+              description: 'Slide to select who you allow to see the picture.',
+              child: ListView(
+                children: snapshot.data!.docs.map((userDocument) {
+                  return UserSlider(
+                    bubble: provider.bubble(userDocument.id)!,
+                    sliderValue: provider.sliderValue(userDocument.id),
+                    reference: userDocument.reference,
+                  );
+                }).toList(),
+              ),
             );
           });
     });
@@ -58,7 +64,7 @@ class UserSlider extends StatefulWidget {
 
 class _UserSliderState extends State<UserSlider> {
   double sliderValue = 0;
-  static const _horizontalPadding = 16.0;
+  static const _horizontalPaddingMultiplier = 1 / 28;
 
   @override
   void initState() {
@@ -68,26 +74,30 @@ class _UserSliderState extends State<UserSlider> {
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+
     return Consumer<SessionProvider>(builder:
         (BuildContext context, SessionProvider provider, Widget? child) {
       if (!provider.isUser(widget.bubble.id)) {
         sliderValue = widget.sliderValue;
       }
-      return Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: _horizontalPadding, vertical: 10.0),
+      return Padding(
+        padding: EdgeInsets.symmetric(
+            horizontal: _horizontalPaddingMultiplier * width,
+            vertical: 0.010 * height),
         child: Column(
           children: [
             Row(
               children: [
                 Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black,
+                        color: Theme.of(context).primaryColor,
                         spreadRadius: 0.5,
-                        offset: Offset(0, 1),
+                        offset: const Offset(0, 1),
                         blurRadius: 5,
                       ),
                     ],
@@ -97,12 +107,13 @@ class _UserSliderState extends State<UserSlider> {
                     radius: Constants.pictureDialogAvatarSize,
                   ),
                 ),
-                const SizedBox(
-                    width: 16.0), // For spacing between the photo and text
+                SizedBox(
+                    width: _horizontalPaddingMultiplier *
+                        width), // For spacing between the photo and text
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.bubble.username,
+                    AutoSizeText(widget.bubble.username,
                         style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.bold,
@@ -116,6 +127,9 @@ class _UserSliderState extends State<UserSlider> {
                 Builder(builder: (context) {
                   if (provider.isUser(widget.bubble.id)) {
                     debugPrint('(Sliders): ${provider.pointsLength() - 1}');
+                    debugPrint(
+                        '(Sliders): Critical Points= ${provider.criticalPoints()}');
+
                     return Slider(
                       value: provider.selectedIndex.toDouble(),
                       min: 0.0,
@@ -146,8 +160,9 @@ class _UserSliderState extends State<UserSlider> {
                 Row(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: _horizontalPadding),
-                      child: Text(
+                      padding: EdgeInsets.only(
+                          left: _horizontalPaddingMultiplier * width),
+                      child: AutoSizeText(
                         'Public',
                         style: GoogleFonts.openSans(
                             fontSize: 12, fontStyle: FontStyle.italic),
@@ -155,8 +170,9 @@ class _UserSliderState extends State<UserSlider> {
                     ),
                     const Spacer(),
                     Padding(
-                      padding: const EdgeInsets.only(right: _horizontalPadding),
-                      child: Text(
+                      padding: EdgeInsets.only(
+                          right: _horizontalPaddingMultiplier * width),
+                      child: AutoSizeText(
                         'Private',
                         style: GoogleFonts.openSans(
                             fontSize: 12, fontStyle: FontStyle.italic),

@@ -14,7 +14,7 @@ class PostService {
         'postCreatorName': postCreatorName,
         'hostId': hostId,
       });
-      debugPrint('Cloud function executed, results: $results');
+      debugPrint('(PostService): Cloud function executed, results: $results');
     } catch (e) {
       debugPrint('(PostService): Error calling cloud function= $e');
     }
@@ -29,7 +29,7 @@ class PostService {
         'likerUsername': likerUsername,
         'ownerId': ownerId,
       });
-      debugPrint('Cloud function executed, results: $results');
+      debugPrint('(PostService): Cloud function executed, results: $results');
     } catch (e) {
       debugPrint('(PostService): Error calling cloud function= $e');
     }

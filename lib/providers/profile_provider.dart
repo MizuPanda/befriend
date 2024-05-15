@@ -1,8 +1,8 @@
 import 'package:befriend/models/data/user_manager.dart';
+import 'package:befriend/utilities/error_handling.dart';
+import 'package:befriend/views/dialogs/profile/friend_action_dialog.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../models/objects/bubble.dart';
 import '../models/data/picture_manager.dart';
@@ -63,6 +63,10 @@ class ProfileProvider extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('(ProfileProvider): Error $action: $e');
+      if (context.mounted) {
+        ErrorHandling.showError(
+            context, 'Error performing action. Please try again.');
+      }
     }
   }
 
@@ -78,41 +82,14 @@ class ProfileProvider extends ChangeNotifier {
       String description, String buttonText, Function onActionConfirmed) async {
     const double textButtonSize = 15.0;
 
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Text(description, style: const TextStyle(fontSize: 16)),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop(); // Dismiss the dialog
-              },
-              child: const Text(
-                "Cancel",
-                style: TextStyle(fontSize: textButtonSize),
-              ),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            TextButton(
-              onPressed: () async {
-                await onActionConfirmed(); // Call the function that handles the deletion
-                if (context.mounted) {
-                  Navigator.of(dialogContext).pop(); // Dismiss the dialog
-                }
-              },
-              child: Text(buttonText,
-                  style: const TextStyle(
-                      color: Colors.red, fontSize: textButtonSize)),
-            ),
-          ],
-        );
+    FriendActionDialog.showFriendActionDialog(
+      context,
+      title,
+      description,
+      buttonText,
+      textButtonSize,
+      () async {
+        await onActionConfirmed(); // Call the function that handles the deletion
       },
     );
   }
@@ -134,11 +111,19 @@ class ProfileProvider extends ChangeNotifier {
 
   Future<void> changeProfilePicture(
       BuildContext context, Bubble bubble, Function notifyParent) async {
-    await PictureManager.takeProfilePicture(context, (String? url) {
-      _imageUrl = url;
-    });
-    if (context.mounted) {
-      await _loadPictureChange(context, _imageUrl, bubble, notifyParent);
+    try {
+      await PictureManager.takeProfilePicture(context, (String? url) {
+        _imageUrl = url;
+      });
+      if (context.mounted) {
+        await _loadPictureChange(context, _imageUrl, bubble, notifyParent);
+      }
+    } catch (e) {
+      debugPrint('(ProfileProvider): Error changing profile picture: $e');
+      if (context.mounted) {
+        ErrorHandling.showError(
+            context, 'Error changing profile picture. Please try again.');
+      }
     }
   }
 
@@ -149,7 +134,10 @@ class ProfileProvider extends ChangeNotifier {
       builder: (BuildContext context) {
         return ProfileEditDialog(
           bubble: bubble,
-          notifyParent: notifyParent,
+          notifyParent: () {
+            notifyListeners();
+            notifyParent();
+          },
         );
       },
     );
@@ -158,20 +146,26 @@ class ProfileProvider extends ChangeNotifier {
   Future<void> _loadPictureChange(BuildContext context, String? imageUrl,
       Bubble bubble, Function notifyParent) async {
     if (_imageUrl == null) {
-      if (context.mounted) {
-        showTopSnackBar(
-            Overlay.of(context),
-            const CustomSnackBar.error(
-              maxLines: 1,
-              message: "Picture change cancelled",
-            ),
-            snackBarPosition: SnackBarPosition.bottom);
-      }
+      const SnackBar snackBar = SnackBar(
+        content: Text('Picture change cancelled.'),
+        duration: Duration(seconds: 3),
+        showCloseIcon: true,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } else {
-      debugPrint('Changing avatar...');
-      await PictureManager.changeMainPicture(_imageUrl!, bubble);
-      notifyListeners();
-      notifyParent();
+      try {
+        debugPrint('Changing avatar...');
+        await PictureManager.changeMainPicture(context, _imageUrl!, bubble);
+        notifyListeners();
+        notifyParent();
+      } catch (e) {
+        debugPrint('(ProfileProvider): Error loading picture change: $e');
+        if (context.mounted) {
+          ErrorHandling.showError(
+              context, 'Error loading picture change. Please try again.');
+        }
+      }
     }
   }
 }

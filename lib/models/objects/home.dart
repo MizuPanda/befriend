@@ -11,12 +11,27 @@ class Home {
   late Friendship? friendship;
   final bool connectedHome;
   final Key? key;
+  bool _showTutorial = false;
+
+  bool get showTutorial => _showTutorial;
+
+  double _viewerSize = 1500;
+
+  double get viewerSize => _viewerSize;
 
   Home(
       {required this.connectedHome,
       required this.user,
       required this.friendship,
       this.key});
+
+  void activeTutorial() {
+    _showTutorial = true;
+  }
+
+  void deactivateTutorial() {
+    _showTutorial = false;
+  }
 
   factory Home.fromUser(Bubble user, {Key? key}) {
     return Home(connectedHome: true, user: user, friendship: null, key: key);
@@ -48,6 +63,28 @@ class Home {
     }
 
     _avoidOverlapping();
+    _setViewerSize();
+  }
+
+  void _setViewerSize() {
+    double max = 0;
+
+    for (Friendship friendship in user.friendships) {
+      Bubble friend = friendship.friend;
+      double distance = sqrt(pow(friend.x, 2) + pow(friend.y, 2));
+
+      distance += friend.size;
+      if (distance > max) {
+        max = distance;
+      }
+    }
+
+    max *= 6;
+    debugPrint('(Home): Max = $max');
+    if (_viewerSize < max) {
+      _viewerSize = max;
+    }
+    debugPrint('(Home): ViewerSize = $viewerSize');
   }
 
   void _avoidOverlapping() {
@@ -75,6 +112,12 @@ class Home {
         }
       }
     }
+  }
+
+  Matrix4 middlePos() {
+    // Calculate the initial transformation to center the content
+
+    return Matrix4.identity()..translate(-_viewerSize / 4, -_viewerSize / 4);
   }
 
   // Tells if a user is a friend with the main connected user.

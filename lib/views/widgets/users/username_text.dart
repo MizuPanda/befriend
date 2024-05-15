@@ -20,14 +20,10 @@ class UsernameText extends StatelessWidget {
       alignment: Alignment.center,
       child: AutoSizeText(user.main() ? 'You' : user.username,
           maxLines: 1,
-          overflow: TextOverflow.ellipsis,
           style: GoogleFonts.openSans(
-            textStyle: TextStyle(
-                color: Colors.black,
-                fontWeight: user.main() ? FontWeight.w300 : FontWeight.w500,
-                fontStyle: user.main() ? FontStyle.italic : FontStyle.normal,
-                fontSize: 25),
-          )),
+              fontWeight: user.main() ? FontWeight.w300 : FontWeight.w500,
+              fontStyle: user.main() ? FontStyle.italic : FontStyle.normal,
+              fontSize: 25)),
     );
   }
 }

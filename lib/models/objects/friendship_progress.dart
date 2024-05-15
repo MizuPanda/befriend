@@ -46,14 +46,6 @@ class FriendshipProgress {
     return username1;
   }
 
-  void switchIndex() {
-    if (index == 0) {
-      index = 1;
-    } else {
-      index = 0;
-    }
-  }
-
   factory FriendshipProgress.fromMap(
       Map<String, dynamic> map, String currentUserID) {
     int index;

@@ -19,27 +19,6 @@ class Friendship extends FriendshipProgress {
     required this.friend,
   });
 
-  Friendship swap(Bubble friendBubble, String id, Friendship f) {
-    f.switchIndex();
-
-    return switchBubble(friendBubble, f);
-  }
-
-  Friendship switchBubble(Bubble friendBubble, Friendship f) {
-    return Friendship._(
-      index: f.index,
-      user1: f.user1,
-      user2: f.user2,
-      friendshipID: f.friendshipID,
-      username1: f.username1,
-      username2: f.username2,
-      level: f.level,
-      progress: f.progress,
-      lastSeen: f.lastSeen,
-      friend: friendBubble,
-    );
-  }
-
   factory Friendship.fromDocs(
       String currentUserId, Bubble friendBubble, DocumentSnapshot docs) {
     FriendshipProgress friendshipProgress =
@@ -57,10 +36,6 @@ class Friendship extends FriendshipProgress {
       progress: friendshipProgress.progress,
       lastSeen: friendshipProgress.lastSeen,
     );
-  }
-
-  static int setPicsSeen(Bubble bubble) {
-    return 0;
   }
 
   double distance() {

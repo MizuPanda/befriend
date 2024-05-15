@@ -6,35 +6,30 @@ import '../models/authentication/authentication.dart';
 import '../utilities/constants.dart';
 
 class LoginProvider extends ChangeNotifier {
-  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
+  final _formKey = GlobalKey<FormState>();
   get formKey => _formKey;
 
   bool _isEmailError = false;
   bool _isPassError = false;
-
   bool get isEmailError => _isEmailError;
-
   bool get isPassError => _isPassError;
 
   final FocusNode _emailFocusNode = FocusNode();
-
   FocusNode get emailFocusNode => _emailFocusNode;
 
   bool _isEmailFocused = false;
-
   bool get isEmailFocused => _isEmailFocused;
 
   final FocusNode _passwordFocusNode = FocusNode();
-
   FocusNode get passwordFocusNode => _passwordFocusNode;
 
   bool _isPasswordFocused = false;
-
   bool get isPasswordFocused => _isPasswordFocused;
 
   bool _passwordVisible = false;
-
   bool get passwordVisible => _passwordVisible;
 
   String? _email, _password;
@@ -107,13 +102,22 @@ class LoginProvider extends ChangeNotifier {
   }
 
   Future<void> login(BuildContext context) async {
+    _isLoading = true;
+    notifyListeners();
     _formKey.currentState!.save();
 
     if (_formKey.currentState!.validate()) {
-      if (context.mounted) {
-        await AuthenticationManager.signIn(_email!, _password!, context);
+      try {
+        if (context.mounted) {
+          await AuthenticationManager.signIn(_email!, _password!, context);
+        }
+      } catch (e) {
+        debugPrint('(LoginProvider): Error during login: $e');
       }
     }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   void openForgotPasswordPage(BuildContext context) {

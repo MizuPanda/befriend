@@ -10,6 +10,8 @@ class SettingsButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+
     return SafeArea(
         child: Align(
       alignment: Alignment.topRight,
@@ -19,10 +21,9 @@ class SettingsButton extends StatelessWidget {
             onPressed: () {
               provider.goToSettings(context);
             },
-            icon: const Icon(
+            icon: Icon(
               Icons.settings_outlined,
-              size: 35,
-              color: Colors.black,
+              size: 0.078 * width,
             ));
       }),
     ));

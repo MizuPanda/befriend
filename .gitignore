@@ -48,4 +48,4 @@ app.*.map.json
 
 # Ignore secrets.dart and encrypt.dart
 /lib/utilities/secrets.dart
-/lib/models/qr/simple_encryption_service.dart
+/lib/models/services/simple_encryption_service.dart

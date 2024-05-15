@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -21,10 +22,10 @@ class FriendLevelWidget extends StatelessWidget {
     return Container(
       width: specificHome.user.size,
       padding: EdgeInsets.only(
-          bottom: specificHome.user.textHeight() - levelHeight + 30 / 2,
+          bottom: specificHome.user.textHeight() - levelHeight + 15,
           left: specificHome.user.size / 2),
       alignment: Alignment.bottomCenter,
-      child: Text(
+      child: AutoSizeText(
         friendship.level.toString(),
         style: GoogleFonts.openSans(
             textStyle: TextStyle(
@@ -34,7 +35,6 @@ class FriendLevelWidget extends StatelessWidget {
               (1 + specificHome.user.size / (specificHome.user.size * 8)),
           shadows: const [
             Shadow(
-              offset: Offset.zero,
               blurRadius: 8.0,
               color: Colors.black,
             ),

@@ -1,5 +1,6 @@
 import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/authentication/date_manager.dart';
+import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/validators.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
@@ -27,11 +28,10 @@ class SignProvider extends ChangeNotifier {
 
   String? _email, _username, _password;
   String? _error;
-  static const String _usernameError = 'username-already-in-use';
 
-  bool _loading = false;
+  bool _isLoading = false;
 
-  bool get loading => _loading;
+  bool get isLoading => _isLoading;
 
   DateTime _date = DateTime(2022, 05, 09);
 
@@ -69,13 +69,13 @@ class SignProvider extends ChangeNotifier {
 
     final RegExp emailRegex = RegExp(
         r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$");
-    if (!emailRegex.hasMatch(email!) || _error == 'invalid-email') {
-      if (_error == 'invalid-email') {
+    if (!emailRegex.hasMatch(email!) || _error == Constants.invalidEmail) {
+      if (_error == Constants.invalidEmail) {
         _error = null;
       }
       return 'This email is not valid.';
     }
-    if (_error == 'email-already-in-use') {
+    if (_error == Constants.emailAlreadyInUse) {
       _error = null;
       return "This email is already in use.";
     }
@@ -90,7 +90,7 @@ class SignProvider extends ChangeNotifier {
       return validator;
     }
 
-    if (_error == _usernameError) {
+    if (_error == Constants.usernameError) {
       _error = null;
       return "This username is already in use.";
     }
@@ -99,7 +99,17 @@ class SignProvider extends ChangeNotifier {
   }
 
   String? passwordValidator(String? password) {
-    return Validators.passwordValidator(password);
+    String? validator = Validators.passwordValidator(password);
+    if (validator != null) {
+      return validator;
+    }
+
+    if (_error == Constants.weakPassword) {
+      _error = null;
+      return 'Your password is too weak.';
+    }
+
+    return null;
   }
 
   String? repeatValidator(String? repeat) {
@@ -138,8 +148,8 @@ class SignProvider extends ChangeNotifier {
       final isUsernameAvailable = result.data['isUsernameAvailable'] as bool;
       return isUsernameAvailable;
     } catch (error) {
-      // Handle any errors that occurred during the cloud function call
-      debugPrint('Error: $error');
+      debugPrint(
+          '(SignProvider): Error checking username availability: $error');
       return false;
     }
   }
@@ -172,16 +182,16 @@ class SignProvider extends ChangeNotifier {
         'Please agree to the Privacy Policy and to the Terms and Conditions to continue with the sign-up process.');
   }
 
+  void _showUnknownErrorSnackBar(BuildContext context) {
+    _showError(
+        context, 'An unknown error has occurred. Please try again later.');
+  }
+
   void _showError(BuildContext context, String message) {
-    final snackBar = SnackBar(
+    final SnackBar snackBar = SnackBar(
       content: Text(message),
       duration: const Duration(seconds: 3),
-      action: SnackBarAction(
-        label: 'Close',
-        onPressed: () {
-          // Some action if needed
-        },
-      ),
+      showCloseIcon: true,
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -193,15 +203,17 @@ class SignProvider extends ChangeNotifier {
       _showAgeRequirementSnackBar(context);
     } else if (_hasConsented == null || !_hasConsented!) {
       _showConsentSnackBar(context);
+    } else if (_error == Constants.unknownError) {
+      _showUnknownErrorSnackBar(context);
     } else {
-      _loading = true;
+      _isLoading = true;
       notifyListeners();
       _formKey.currentState!.save();
 
       if (_formKey.currentState!.validate()) {
         bool usernameAvailable = await _checkUsernameAvailability(_username!);
         if (!usernameAvailable) {
-          _error = _usernameError;
+          _error = Constants.usernameError;
           _formKey.currentState!.validate();
         } else {
           if (context.mounted) {
@@ -213,7 +225,7 @@ class SignProvider extends ChangeNotifier {
           }
         }
       }
-      _loading = false;
+      _isLoading = false;
       notifyListeners();
     }
   }

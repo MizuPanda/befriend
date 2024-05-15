@@ -29,8 +29,6 @@ class ConsentSettingsWidget extends StatelessWidget {
               }
 
               return SettingsList(
-                lightTheme:
-                    SettingsThemeData(titleTextColor: ThemeData().primaryColor),
                 sections: [
                   SettingsSection(
                     tiles: [
@@ -40,9 +38,7 @@ class ConsentSettingsWidget extends StatelessWidget {
                           title: const Text(
                             'Ads preferences',
                           ),
-                          onPressed: (_) {
-                            provider.reloadConsentForm();
-                          },
+                          onPressed: (_) => provider.reloadConsentForm,
                         ),
                       SettingsTile(
                         leading: const Icon(

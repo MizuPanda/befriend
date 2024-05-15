@@ -9,15 +9,26 @@ class DataManager {
   /// If the id is given, it returns the user data of the user with the given id.
   /// If neither the id nor the counter is given, it returns the user data of the current user.
   static Future<DocumentSnapshot> getData({String? id}) async {
-    return await Constants.usersCollection
-        .doc(id ?? AuthenticationManager.id())
-        .get();
+    try {
+      return await Constants.usersCollection
+          .doc(id ?? AuthenticationManager.id())
+          .get();
+    } catch (e) {
+      debugPrint('(DataManager): Error fetching data: $e');
+      throw Exception(
+          '(DataManager): Failed to fetch user data'); // Or handle more gracefully depending on your app's needs
+    }
   }
 
   static Future<ImageProvider> getAvatar(DocumentSnapshot snapshot) async {
-    String avatarUrl = getString(snapshot, Constants.avatarDoc);
-
-    return await DataQuery.getNetworkImage(avatarUrl);
+    try {
+      String avatarUrl = getString(snapshot, Constants.avatarDoc);
+      return await DataQuery.getNetworkImage(avatarUrl);
+    } catch (e) {
+      debugPrint('(DataManager): Error loading avatar image: $e');
+      return Image.asset('assets/images/account_circle.png').image;
+      // Fallback to a default image in case of an error
+    }
   }
 
   static num getNumber(DocumentSnapshot snapshot, String id) {
@@ -49,11 +60,15 @@ class DataManager {
   }
 
   static DateTime getDateTime(DocumentSnapshot snapshot, String id) {
-    if (snapshot.data().toString().contains(id)) {
-      Timestamp timestamp = snapshot.get(id);
-      return timestamp.toDate();
+    try {
+      if (snapshot.data().toString().contains(id)) {
+        Timestamp timestamp = snapshot.get(id);
+        return timestamp.toDate();
+      }
+      return DateTime.utc(0);
+    } catch (e) {
+      debugPrint('(DataManager): Error converting timestamp: $e');
+      return DateTime.utc(0);
     }
-
-    return DateTime.utc(0);
   }
 }

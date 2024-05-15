@@ -23,51 +23,36 @@ class BubbleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(
         builder: (BuildContext context, HomeProvider provider, Widget? child) {
-      return Builder(builder: (context) {
-        if (!specificHome.connectedHome) {
-          Friendship friendship = specificHome.friendship!;
-          return Builder(builder: (
-            BuildContext context,
-          ) {
-            if (provider.home.connectedHome) {
-              return Stack(
-                children: [
-                  Column(
-                    children: [
-                      Stack(children: [
-                        BubbleContainer(user: specificHome.user),
-                        BubbleProgressIndicator(friendship: friendship),
-                        BubbleGradientIndicator(friendship: friendship),
-                      ]),
-                      UsernameText(user: specificHome.user),
-                    ],
-                  ),
-                  FriendLevelWidget(
-                      specificHome: specificHome,
-                      levelHeight: levelHeight,
-                      friendship: friendship)
-                ],
-              );
-            } else {
-              return Column(
-                children: [
+      if (!specificHome.connectedHome && provider.home.connectedHome) {
+        Friendship friendship = specificHome.friendship!;
+        return Stack(
+          children: [
+            Column(
+              children: [
+                Stack(children: [
                   BubbleContainer(user: specificHome.user),
-                  UsernameText(user: specificHome.user),
-                ],
-              );
-            }
-          });
-        } else {
-          return Column(
-            children: [
-              BubbleContainer(user: specificHome.user),
-              UsernameText(
-                user: specificHome.user,
-              ),
-            ],
-          );
-        }
-      });
+                  BubbleProgressIndicator(friendship: friendship),
+                  BubbleGradientIndicator(friendship: friendship),
+                ]),
+                UsernameText(user: specificHome.user),
+              ],
+            ),
+            FriendLevelWidget(
+                specificHome: specificHome,
+                levelHeight: levelHeight,
+                friendship: friendship)
+          ],
+        );
+      } else {
+        return Column(
+          children: [
+            BubbleContainer(user: specificHome.user),
+            UsernameText(
+              user: specificHome.user,
+            ),
+          ],
+        );
+      }
     });
   }
 }

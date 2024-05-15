@@ -33,12 +33,18 @@ class BubbleGradientIndicator extends StatelessWidget {
 
   final Friendship friendship;
 
+  final Gradient _gradient = const LinearGradient(
+    colors: [Color(0xFFFF5F6D), Color(0xFFFFC371)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: CustomPaint(
         painter: GradientPainter(
-          gradient: friendship.friend.gradient,
+          gradient: _gradient,
           progress: friendship.progress,
           strokeWidth: BubbleProgressIndicator.strokeWidth,
         ),

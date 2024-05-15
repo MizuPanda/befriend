@@ -1,6 +1,9 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/utilities/constants.dart';
+import 'package:befriend/utilities/error_handling.dart';
+import 'package:befriend/views/dialogs/settings/unblock_dialog.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/objects/bubble.dart';
@@ -17,17 +20,22 @@ class BlockedSettingsWidget extends StatefulWidget {
 class _BlockedSettingsWidgetState extends State<BlockedSettingsWidget> {
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         title: const Row(
           children: [
-            Text("Blocked accounts"),
+            Text(
+              "Blocked accounts ",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             Icon(Icons.supervisor_account_rounded)
           ],
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        padding: EdgeInsets.symmetric(horizontal: 15.0 / 448 * width),
         child: FutureBuilder(
             future: UserManager.getInstance(),
             builder: (
@@ -50,67 +58,39 @@ class _BlockedSettingsWidgetState extends State<BlockedSettingsWidget> {
                       child: Row(
                         children: [
                           const Icon(Icons.person),
-                          const SizedBox(
-                            width: 20,
+                          SizedBox(
+                            width: 20 / 448 * width,
                           ),
-                          Text(username,
+                          AutoSizeText(username,
                               style: const TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold)),
                           const Spacer(),
                           TextButton(
                               onPressed: () async {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext dialogContext) {
-                                    return AlertDialog(
-                                      title: Text(
-                                        'Unblock $username',
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      content: Text(
-                                          "Are you sure you want to unblock $username?",
-                                          style: const TextStyle(fontSize: 16)),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(dialogContext)
-                                                .pop(); // Dismiss the dialog
-                                          },
-                                          child: const Text(
-                                            "Cancel",
-                                            style: TextStyle(fontSize: 15),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        TextButton(
-                                          onPressed: () async {
-                                            bubble.blockedUsers.remove(bubble
-                                                .blockedUsers.entries
-                                                .elementAt(index)
-                                                .key);
-                                            await DataQuery.updateDocument(
-                                                Constants.blockedUsersDoc,
-                                                bubble.blockedUsers);
-                                            if (context.mounted) {
-                                              Navigator.of(dialogContext)
-                                                  .pop(); // Dismiss the dialog
-                                            }
-                                            WidgetsBinding.instance
-                                                .addPostFrameCallback(
-                                                    (timeStamp) {
-                                              setState(() {});
-                                            });
-                                          },
-                                          child: const Text('Unblock',
-                                              style: TextStyle(
-                                                  color: Colors.red,
-                                                  fontSize: 15)),
-                                        ),
-                                      ],
-                                    );
+                                UnblockDialog.showUnblockDialog(
+                                  context,
+                                  username,
+                                  () async {
+                                    try {
+                                      bubble.blockedUsers.remove(bubble
+                                          .blockedUsers.entries
+                                          .elementAt(index)
+                                          .key);
+                                      await DataQuery.updateDocument(
+                                          Constants.blockedUsersDoc,
+                                          bubble.blockedUsers);
+                                      WidgetsBinding.instance
+                                          .addPostFrameCallback((timeStamp) {
+                                        setState(() {});
+                                      });
+                                    } catch (e) {
+                                      debugPrint(
+                                          '(BlockedSettingsWidget): Error: $e');
+                                      if (context.mounted) {
+                                        ErrorHandling.showError(context,
+                                            'An unexpected error occurred. Please try again.');
+                                      }
+                                    }
                                   },
                                 );
                               },

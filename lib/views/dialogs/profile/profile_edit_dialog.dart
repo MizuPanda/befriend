@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:befriend/providers/material_provider.dart';
+import 'package:befriend/views/dialogs/rounded_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../models/data/picture_manager.dart';
 import '../../../models/objects/bubble.dart';
@@ -18,7 +21,6 @@ class ProfileEditDialog extends StatefulWidget {
 
 class _ProfileEditDialogState extends State<ProfileEditDialog> {
   String? _imageUrl;
-  final TextEditingController _nameController = TextEditingController();
 
   Future<void> _pickImage() async {
     await PictureManager.takeProfilePicture(context, (String? imageUrl) {
@@ -32,92 +34,110 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-      child: Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Text(
-              'Edit Profile',
-              style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20.0),
-            SizedBox(
-              width: 150,
-              height: 110,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  InkWell(
-                    onTap: _pickImage,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.grey.shade300,
-                      backgroundImage: _imageUrl != null
-                          ? FileImage(File(_imageUrl!))
-                          : widget.bubble.avatar,
-                      child: _imageUrl == null
-                          ? Icon(Icons.add_a_photo,
-                              size: 50, color: Colors.black.withOpacity(0.5))
-                          : null,
-                    ),
-                  ),
-                  if (_imageUrl != null)
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _imageUrl = null;
-                          });
-                        },
-                        icon: const Icon(
-                          Icons.cancel_outlined,
-                          size: 30,
-                          color: Colors.black,
-                        ),
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+
+    return Consumer<MaterialProvider>(builder: (BuildContext context,
+        MaterialProvider materialProvider, Widget? child) {
+      final bool lightMode = materialProvider.isLightMode(context);
+
+      return RoundedDialog(
+        child: Container(
+          padding: EdgeInsets.all(0.036 * width),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Edit Profile',
+                style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 0.020 * height),
+              SizedBox(
+                width: 0.33 * width,
+                height: 0.11 * height,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    InkWell(
+                      onTap: _pickImage,
+                      child: CircleAvatar(
+                        radius: width * 0.11,
+                        backgroundColor: Colors.grey.shade300,
+                        backgroundImage: _imageUrl != null
+                            ? FileImage(File(_imageUrl!))
+                            : widget.bubble.avatar,
+                        child: _imageUrl == null
+                            ? Icon(Icons.add_a_photo,
+                                size: 50,
+                                color: (lightMode ? Colors.black : Colors.white)
+                                    .withOpacity(0.5))
+                            : null,
                       ),
                     ),
-                ],
+                    if (_imageUrl != null)
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _imageUrl = null;
+                            });
+                          },
+                          icon: const Icon(
+                            Icons.cancel_outlined,
+                            size: 30,
+                            color: Colors.pink,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () async {
-                // Handle save profile data
-                if (_imageUrl != null) {
-                  await PictureManager.changeMainPicture(
-                      _imageUrl!, widget.bubble);
-                }
-                if (context.mounted) {
-                  widget.notifyParent();
-                  Navigator.of(context).pop();
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                textStyle:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              SizedBox(height: 0.020 * height),
+              ElevatedButton(
+                onPressed: () async {
+                  setState(() {
+                    _isLoading = true;
+                  });
+                  //await Future.delayed(const Duration(seconds: 2));
+                  // return ;
+
+                  // Handle save profile data
+                  if (_imageUrl != null) {
+                    await PictureManager.changeMainPicture(
+                        context, _imageUrl!, widget.bubble);
+                    setState(() {
+                      _isLoading = false;
+                    });
+                    widget.notifyParent();
+                  }
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                style: ButtonStyle(
+                  padding: MaterialStatePropertyAll(EdgeInsets.symmetric(
+                      horizontal: 0.11 * width, vertical: 0.015 * height)),
+                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text(
+                        'Save',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
               ),
-              child: const Text('Save'),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
