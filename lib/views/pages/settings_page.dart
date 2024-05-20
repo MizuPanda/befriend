@@ -87,6 +87,15 @@ class _SettingsPageState extends State<SettingsPage> {
                                 const Text('Ads preferences, account deletion'),
                             onPressed: provider.goToConsentSettings,
                           ),
+                          SettingsTile.navigation(
+                            leading: Icon(lightMode
+                                ? Icons.notifications_rounded
+                                : Icons.notifications_outlined),
+                            title: const Text(
+                              'Notifications',
+                            ),
+                            onPressed: provider.goToNotificationsSettings,
+                          ),
                         ],
                       ),
                       SettingsSection(

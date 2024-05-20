@@ -19,6 +19,20 @@ class NotificationService {
   static const int newPostID = 0;
   static const int likeID = 1;
 
+  static bool _notificationHandled = false;
+
+  static void _resetNotificationHandled() {
+    _notificationHandled = false;
+  }
+
+  static void _markNotificationAsHandled() {
+    _notificationHandled = true;
+  }
+
+  static bool _isNotificationHandled() {
+    return _notificationHandled;
+  }
+
   Future<void> initTokenListener(GlobalKey key, Function notify) async {
     try {
       NotificationSettings settings = await _messaging.requestPermission(
@@ -28,14 +42,19 @@ class NotificationService {
       );
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         String? token = await _messaging.getToken();
-        saveTokenToDatabase(token);
-        FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
+        _saveTokenToDatabase(token);
+        FirebaseMessaging.instance.onTokenRefresh.listen(_saveTokenToDatabase);
       }
 
       const AndroidInitializationSettings initializationSettingsAndroid =
           AndroidInitializationSettings('@mipmap/ic_launcher');
+      const DarwinInitializationSettings darwinInitializationSettings =
+          DarwinInitializationSettings();
+
       const InitializationSettings initializationSettings =
-          InitializationSettings(android: initializationSettingsAndroid);
+          InitializationSettings(
+              android: initializationSettingsAndroid,
+              iOS: darwinInitializationSettings);
       await _localNotifications.initialize(
         initializationSettings,
         onDidReceiveNotificationResponse: (NotificationResponse response) {
@@ -67,7 +86,7 @@ class NotificationService {
       FirebaseMessaging.onBackgroundMessage(_backgroundMessageHandler);
 
       if (key.currentContext!.mounted) {
-        handleInitialMessage(key, notify);
+        _handleInitialMessage(key, notify);
       }
     } catch (e) {
       debugPrint(
@@ -98,7 +117,7 @@ class NotificationService {
     }
   }
 
-  static Future<void> handleInitialMessage(
+  static Future<void> _handleInitialMessage(
       GlobalKey key, Function notify) async {
     try {
       RemoteMessage? initialMessage =
@@ -188,7 +207,14 @@ class NotificationService {
   }
 
   static void _showNotification(RemoteMessage message) async {
+    _resetNotificationHandled();
+
+    if (_isNotificationHandled()) return;
+    _markNotificationAsHandled();
+
     try {
+      Bubble user = await UserManager.getInstance();
+
       _NotificationType notificationType =
           message.data.containsKey(_hostIdField)
               ? _NotificationType.newPost
@@ -201,12 +227,18 @@ class NotificationService {
 
       switch (notificationType) {
         case _NotificationType.newPost:
+          if (!user.postNotificationOn) {
+            return;
+          }
           payload = message.data[_hostIdField];
           id = newPostID;
           importance = Importance.defaultImportance;
           priority = Priority.defaultPriority;
           break;
         case _NotificationType.like:
+          if (!user.likeNotificationOn) {
+            return;
+          }
           id = likeID;
           importance = Importance.low;
           priority = Priority.low;
@@ -219,8 +251,12 @@ class NotificationService {
               importance: importance,
               priority: priority,
               showWhen: false);
-      final NotificationDetails platformChannelSpecifics =
-          NotificationDetails(android: androidPlatformChannelSpecifics);
+      const DarwinNotificationDetails darwinNotificationDetails =
+          DarwinNotificationDetails();
+
+      final NotificationDetails platformChannelSpecifics = NotificationDetails(
+          android: androidPlatformChannelSpecifics,
+          iOS: darwinNotificationDetails);
 
       await _localNotifications.show(
           id, // ID
@@ -237,10 +273,11 @@ class NotificationService {
   static Future<void> _backgroundMessageHandler(RemoteMessage message) async {
     //debugPrint("Handling a background message: ${message.messageId}");
     debugPrint('(NotificationService): $message');
+
     _showNotification(message);
   }
 
-  static void saveTokenToDatabase(String? token) {
+  static void _saveTokenToDatabase(String? token) {
     // Save the token for this user in Firestore
     try {
       DataQuery.updateDocument(Constants.notificationToken, token);

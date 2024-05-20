@@ -1,5 +1,6 @@
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/providers/home_provider.dart';
+import 'package:befriend/views/widgets/users/username_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -66,64 +67,69 @@ class _ShakeableBubbleState extends State<ShakeableBubble>
   Widget build(BuildContext context) {
     return Consumer<HomeProvider>(
         builder: (BuildContext context, HomeProvider provider, Widget? child) {
-      return GestureDetector(
-        onLongPress: () {
-          if (widget.specificHome.isFriendToUser()) {
-            setState(() {
-              _isPressed = true;
-            });
-            _startShakeAnimation();
-            HapticFeedback
-                .selectionClick(); // Optionally provide haptic feedback
-            Future.delayed(const Duration(milliseconds: 275), () {
-              if (_isPressed) {
-                GoRouter.of(context).push(Constants.homepageAddress,
-                    extra: widget.specificHome);
-                _animationController.reset();
+      return Column(
+        children: [
+          GestureDetector(
+            onLongPress: () {
+              if (widget.specificHome.isFriendToUser()) {
+                setState(() {
+                  _isPressed = true;
+                });
+                _startShakeAnimation();
+                HapticFeedback
+                    .selectionClick(); // Optionally provide haptic feedback
+                Future.delayed(const Duration(milliseconds: 275), () {
+                  if (_isPressed) {
+                    GoRouter.of(context).push(Constants.homepageAddress,
+                        extra: widget.specificHome);
+                    _animationController.reset();
+                  }
+                });
               }
-            });
-          }
-        },
-        onTap: () async {
-          if (widget.specificHome.isFriendToUser()) {
-            Bubble connectedUser;
-            if (widget.specificHome.connectedHome) {
-              connectedUser = widget.specificHome.user;
-            } else {
-              connectedUser = await UserManager.getInstance();
-            }
-            if (context.mounted) {
-              GoRouter.of(context).push(
-                Constants.profileAddress,
-                extra: Profile(
-                    user: widget.specificHome.user,
-                    currentUser: connectedUser,
-                    notifyParent: provider.notify,
-                    friendship: widget.specificHome.friendship),
-              );
-            }
-          }
+            },
+            onTap: () async {
+              if (widget.specificHome.isFriendToUser()) {
+                Bubble connectedUser;
+                if (widget.specificHome.connectedHome) {
+                  connectedUser = widget.specificHome.user;
+                } else {
+                  connectedUser = await UserManager.getInstance();
+                }
+                if (context.mounted) {
+                  GoRouter.of(context).push(
+                    Constants.profileAddress,
+                    extra: Profile(
+                        user: widget.specificHome.user,
+                        currentUser: connectedUser,
+                        notifyParent: provider.notify,
+                        friendship: widget.specificHome.friendship),
+                  );
+                }
+              }
 
-          debugPrint(
-              '(ShakeableBubble): ${widget.specificHome.user.username} Tapped');
-        },
-        onLongPressEnd: (LongPressEndDetails details) {
-          setState(() {
-            _isPressed = false;
-          });
-        },
-        child: SizedBox(
-          width: widget.specificHome.user.size,
-          height: widget.specificHome.user.bubbleHeight(),
-          child: AnimatedBuilder(
-              animation: _animation,
-              builder: (BuildContext context, Widget? child) {
-                return Transform.rotate(
-                  angle: _isPressed ? _animation.value : 0,
-                  child: BubbleWidget(specificHome: widget.specificHome),
-                );
-              }),
-        ),
+              debugPrint(
+                  '(ShakeableBubble): ${widget.specificHome.user.username} Tapped');
+            },
+            onLongPressEnd: (LongPressEndDetails details) {
+              setState(() {
+                _isPressed = false;
+              });
+            },
+            child: SizedBox(
+              width: widget.specificHome.user.size,
+              height: widget.specificHome.user.size,
+              child: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (BuildContext context, Widget? child) {
+                    return Transform.rotate(
+                      angle: _isPressed ? _animation.value : 0,
+                      child: BubbleWidget(specificHome: widget.specificHome),
+                    );
+                  }),
+            ),
+          ),
+          UsernameText(user: widget.specificHome.user)
+        ],
       );
     });
   }

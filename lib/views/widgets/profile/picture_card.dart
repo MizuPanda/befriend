@@ -44,8 +44,6 @@ class _PictureCardState extends State<PictureCard> {
   @override
   void initState() {
     _provider.initLikes();
-    debugPrint("(PictureCard): picture id = ${widget.picture.id}");
-
     super.initState();
   }
 

@@ -1,6 +1,7 @@
 import 'package:befriend/models/authentication/consent_manager.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/utilities/constants.dart';
+import 'package:befriend/utilities/error_handling.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,20 @@ class AuthenticationManager {
 
   static String id() {
     return _auth.currentUser?.uid ?? 'AuthenticationManager-NOT-FOUND-ID';
+  }
+
+  static bool isEmailVerified() {
+    return _auth.currentUser?.emailVerified ?? false;
+  }
+
+  static void sendEmailVerification(BuildContext context) {
+    try {
+      _auth.currentUser?.sendEmailVerification();
+    } catch (e) {
+      debugPrint('(AuthenticationManager): Error sending email verification');
+      ErrorHandling.showError(context,
+          'There was an error sending the verification email. Please try again later.');
+    }
   }
 
   /// Creates a new user with email and password.

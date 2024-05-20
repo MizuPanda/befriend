@@ -51,7 +51,13 @@ class FriendshipUpdate {
       required DateTime timestamp}) async {
     try {
       FriendshipProgress newFriendship = FriendshipProgress.newFriendship(
-          userID1, userID2, username1, username2, 1, 0.05, timestamp);
+          userID1,
+          userID2,
+          username1,
+          username2,
+          Constants.baseLevel,
+          Constants.baseProgress,
+          timestamp);
       await Constants.friendshipsCollection
           .doc(friendshipDocId)
           .set(newFriendship.toMap());

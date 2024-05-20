@@ -67,27 +67,31 @@ void main() async {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   }
 
-  if (kDebugMode) {
-    await FirebaseAppCheck.instance.activate(
-      // Default provider for Android is the Play Integrity provider. You can use the "AndroidProvider" enum to choose
-      // your preferred provider. Choose from:
-      // 1. Debug provider
-      // 2. Safety Net provider
-      // 3. Play Integrity provider
-      androidProvider: AndroidProvider.debug,
-      // Default provider for iOS/macOS is the Device Check provider. You can use the "AppleProvider" enum to choose
-      // your preferred provider. Choose from:
-      // 1. Debug provider
-      // 2. Device Check provider
-      // 3. App Attest provider
-      // 4. App Attest provider with fallback to Device Check provider (App Attest provider is only available on iOS 14.0+, macOS 14.0+)
-      appleProvider: AppleProvider.debug,
-    );
-  }
+  await _initializeAppCheck();
 
   debugPrint('(Main): Finished initiating main()');
 
   runApp(const MyApp());
+}
+
+Future<void> _initializeAppCheck() async {
+  try {
+    if (kDebugMode) {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.debug,
+        appleProvider: AppleProvider.debug,
+      );
+    } else {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.playIntegrity,
+        appleProvider: AppleProvider.deviceCheck,
+      );
+    }
+    debugPrint('(Main): AppCheck successful');
+  } catch (e) {
+    debugPrint('(Main): App Check activation failed: $e');
+    // Implement retry logic or handle the error
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -135,13 +139,15 @@ class SelectPage extends StatefulWidget {
 }
 
 class _SelectPageState extends State<SelectPage> {
-  late final Future<Home> _futureHome;
+  Future<Home>? _futureHome;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _futureHome = UserManager.userHome();
+    if (FirebaseAuth.instance.currentUser != null) {
+      _futureHome = UserManager.userHome();
+    }
   }
 
   @override
@@ -149,6 +155,8 @@ class _SelectPageState extends State<SelectPage> {
     // return const PictureSignPage();
     // return const LoadingScreen();
     if (FirebaseAuth.instance.currentUser != null) {
+      _futureHome ??= UserManager.userHome();
+
       return FutureBuilder(
         future: _futureHome,
         builder: (BuildContext context, AsyncSnapshot<Home> snapshot) {

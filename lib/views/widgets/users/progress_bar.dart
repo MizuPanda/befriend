@@ -9,7 +9,7 @@ class ProgressBar extends StatelessWidget {
   const ProgressBar({
     Key? key,
     required this.progress,
-    this.numberOfSeparators = 10, // Default to 10 for 10% increments
+    this.numberOfSeparators = 9, // Default to 9 for 10% increments
   }) : super(key: key);
 
   static const double _heightMultiplier = 0.02;

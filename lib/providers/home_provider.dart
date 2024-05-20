@@ -38,6 +38,8 @@ class HomeProvider extends ChangeNotifier {
 
   Home home;
 
+  double get viewerSize => home.viewerSize;
+
   void initShowcase(BuildContext context) {
     if (home.user.friendshipsLoaded) {
       WidgetsBinding.instance.addPostFrameCallback((_) =>
@@ -45,8 +47,6 @@ class HomeProvider extends ChangeNotifier {
               .startShowCase([_one, _two, _three, _four, _five]));
     }
   }
-
-  double get viewerSize => home.viewerSize;
 
   void _onAnimateReset() {
     _transformationController.value = _animationCenter!.value;

@@ -51,6 +51,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12.0),
           ),
+          width: 300,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -106,9 +107,6 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                   setState(() {
                     _isLoading = true;
                   });
-                  //await Future.delayed(const Duration(seconds: 2));
-                  // return ;
-
                   // Handle save profile data
                   if (_imageUrl != null) {
                     await PictureManager.changeMainPicture(
@@ -134,6 +132,16 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
               ),
+              TextButton(
+                  onPressed: () async {
+                    await PictureManager.removeMainPicture(
+                        context, widget.bubble);
+                    widget.notifyParent();
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: const Text('Remove your profile picture')),
             ],
           ),
         ),

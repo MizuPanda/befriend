@@ -37,7 +37,7 @@ class BubbleGroupWidget extends StatelessWidget {
             left: widthCentered(context, provider.viewerSize,
                 size: provider.home.user.size, dx: 0),
             top: heightCentered(context, provider.viewerSize,
-                bubbleHeight: provider.home.user.bubbleHeight(), dy: 0),
+                bubbleHeight: provider.home.user.size, dy: 0),
             child: Showcase(
               key: provider.one,
               descriptionAlignment: TextAlign.center,
@@ -63,7 +63,7 @@ class BubbleGroupWidget extends StatelessWidget {
               left: widthCentered(context, provider.viewerSize,
                   size: friendship.friend.size, dx: friendship.friend.x),
               top: heightCentered(context, provider.viewerSize,
-                  bubbleHeight: friendship.friend.bubbleHeight(),
+                  bubbleHeight: friendship.friend.size,
                   dy: friendship.friend.y),
               child: ShakeableBubble(
                   specificHome: friendship.friend.main()

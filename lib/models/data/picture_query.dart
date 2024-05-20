@@ -16,6 +16,14 @@ class PictureQuery {
         .child(host.host.id);
   }
 
+  static Future<void> removeProfilePicture() async {
+    try {
+      await DataQuery.updateDocument(Constants.avatarDoc, '');
+    } catch (e) {
+      debugPrint('(PictureQuery): Error removing avatar: $e');
+    }
+  }
+
   static Future<String?> uploadAvatar(File imageFile) async {
     try {
       String? downloadUrl = await _uploadProfilePicture(imageFile);
@@ -26,7 +34,7 @@ class PictureQuery {
       return downloadUrl;
     } catch (e) {
       debugPrint('(PictureQuery): Error uploading avatar: $e');
-      return null;
+      rethrow;
     }
   }
 
@@ -42,7 +50,7 @@ class PictureQuery {
       return downloadUrl;
     } catch (e) {
       debugPrint('(PictureQuery): Error uploading temporary picture: $e');
-      return null;
+      rethrow;
     }
   }
 
@@ -68,7 +76,7 @@ class PictureQuery {
       return await _uploadFile(ref, file);
     } catch (e) {
       debugPrint('(PictureQuery): Error uploading picture for session: $e');
-      return null;
+      rethrow;
     }
   }
 
@@ -94,8 +102,8 @@ class PictureQuery {
       // Upload file
       return await _uploadFile(ref, imageFile);
     } catch (e) {
-      debugPrint('Error uploading profile picture: $e');
-      return null;
+      debugPrint('(PictureQuery): Error uploading profile picture: $e');
+      rethrow;
     }
   }
 
@@ -104,11 +112,12 @@ class PictureQuery {
       await ref.putFile(file);
       // Get file URL
       String downloadURL = await ref.getDownloadURL();
-      debugPrint('Profile picture uploaded successfully. URL: $downloadURL');
+      debugPrint(
+          '(PictureQuery): Profile picture uploaded successfully. URL: $downloadURL');
       return downloadURL;
     } catch (e) {
-      debugPrint('Error uploading profile picture: $e');
-      return null;
+      debugPrint('(PictureQuery): Error uploading profile picture file: $e');
+      rethrow;
     }
   }
 
@@ -135,7 +144,7 @@ class PictureQuery {
     } catch (e) {
       debugPrint(
           '(PictureQuery): Error moving picture to permanent storage: $e');
-      return null;
+      rethrow;
     }
   }
 

@@ -52,7 +52,7 @@ class Home {
           pow(friend.x, 2)); //100 - 36 = 64, y = 8
 
       friend.x += (user.size + friend.size / 2) / 2;
-      friend.y += (user.size + friend.size / 2) / 2 + user.textHeight();
+      friend.y += (user.size + friend.size / 2) / 2;
 
       if (rand.nextBool()) {
         friend.x *= -1;

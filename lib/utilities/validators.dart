@@ -17,6 +17,7 @@ class Validators {
     if (username == null || username.isEmpty) {
       return "Please enter a username.";
     }
+    username.trim();
     // Minimum and maximum length requirements
     if (username.length < 2 || username.length > 20) {
       return 'This username is too short or too lengthy.';

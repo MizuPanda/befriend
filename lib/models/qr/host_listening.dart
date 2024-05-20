@@ -36,10 +36,13 @@ class HostListening {
       debugPrint('(HostListening): $connectedIds');
 
       if (_isHostTakingPicture(connectedIds)) {
+        debugPrint('(HostListening): Host is taking picture');
         _handleHostTakingPicture(host, context);
       } else if (_hasHostStoppedHosting(connectedIds, host)) {
+        debugPrint('(HostListening): Host has stopped hosting');
         _handleHostStoppedHosting(context);
       } else {
+        debugPrint('(HostListening): Updating user list');
         await _updateUsersList(connectedIds, context, host);
       }
       notifyListeners();
@@ -125,6 +128,31 @@ class HostListening {
         !connectedIds.contains(host.user.id) &&
         context.mounted) {
       Navigator.of(context).pop(); // Exiting the picture session
+    }
+  }
+
+  static Future<void> onDispose(Host host) async {
+    if (!_isTakingPicture) {
+      if (host.main()) {
+        debugPrint('(HostListening): Stopping hosting');
+        await Constants.usersCollection
+            .doc(host.host.id)
+            .update({Constants.hostingDoc: List.empty()});
+        await Constants.usersCollection
+            .doc(host.host.id)
+            .update({Constants.hostingFriendshipsDoc: {}});
+      } else {
+        debugPrint('(HostListening): Stopping joining');
+        await _leaveHost(host);
+      }
+    }
+  }
+
+  static Future<void> _leaveHost(Host host) async {
+    if (host.joiners.contains(host.user)) {
+      await Constants.usersCollection.doc(host.host.id).update({
+        Constants.hostingDoc: FieldValue.arrayRemove([host.user.id])
+      });
     }
   }
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:befriend/models/data/picture_query.dart';
 import 'package:befriend/models/data/user_manager.dart';
+import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/error_handling.dart';
 import 'package:befriend/views/dialogs/profile/picture_choice_dialog.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,21 @@ import '../objects/bubble.dart';
 class PictureManager {
   static const int _sessionQuality = 20;
   static const int _profilePictureQuality = 10;
+
+  static Future<void> removeMainPicture(
+      BuildContext context, Bubble bubble) async {
+    try {
+      await PictureQuery.removeProfilePicture();
+      bubble.avatar = Image.asset(Constants.defaultPictureAddress).image;
+    } catch (e) {
+      debugPrint('(PictureManager): Error removing main picture: $e');
+      // Maybe inform the user with a UI update
+      if (context.mounted) {
+        ErrorHandling.showError(context,
+            'Failed to update your profile picture. Please try again.');
+      }
+    }
+  }
 
   static Future<void> changeMainPicture(
       BuildContext context, String path, Bubble bubble) async {

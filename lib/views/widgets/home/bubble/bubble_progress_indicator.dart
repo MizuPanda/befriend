@@ -33,18 +33,60 @@ class BubbleGradientIndicator extends StatelessWidget {
 
   final Friendship friendship;
 
-  final Gradient _gradient = const LinearGradient(
-    colors: [Color(0xFFFF5F6D), Color(0xFFFFC371)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+  static const List<Color> _spectrumColors = [
+    Colors.red,
+    Colors.orange,
+    Colors.yellow,
+    Colors.green,
+    Colors.blue,
+    Colors.indigo,
+    Colors.purple,
+  ];
+
+  Color _interpolateColor(Color startColor, Color endColor, double factor) {
+    return Color.lerp(startColor, endColor, factor) ?? startColor;
+  }
+
+  List<Color> _generateGradientColors(int level, double progress) {
+    int totalColors = _spectrumColors.length;
+    int phase = level % totalColors;
+    double factor = (level % 100) / 100;
+
+    Color startColor = _interpolateColor(
+      _spectrumColors[phase],
+      _spectrumColors[(phase + 1) % totalColors],
+      factor,
+    );
+
+    // Adjust the brightness based on progress
+    Color endColor = _adjustBrightness(startColor, progress);
+
+    return [startColor, endColor];
+  }
+
+  Color _adjustBrightness(Color color, double factor) {
+    HSVColor hsvColor = HSVColor.fromColor(color);
+    HSVColor adjustedColor =
+        hsvColor.withValue(hsvColor.value * (0.5 + factor * 0.5));
+    return adjustedColor.toColor();
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Generate gradient colors based on the level
+    List<Color> gradientColors =
+        _generateGradientColors(friendship.level, friendship.progress);
+
+    final Gradient gradient = LinearGradient(
+      colors: gradientColors,
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
     return Positioned.fill(
       child: CustomPaint(
         painter: GradientPainter(
-          gradient: _gradient,
+          gradient: gradient,
           progress: friendship.progress,
           strokeWidth: BubbleProgressIndicator.strokeWidth,
         ),

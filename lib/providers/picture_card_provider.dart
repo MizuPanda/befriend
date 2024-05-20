@@ -8,6 +8,7 @@ import '../models/objects/bubble.dart';
 import '../models/objects/picture.dart';
 import '../models/services/post_service.dart';
 import '../utilities/constants.dart';
+import '../views/dialogs/profile/report_dialog.dart';
 import '../views/widgets/profile/more_button.dart';
 
 class PictureCardProvider extends ChangeNotifier {
@@ -39,6 +40,17 @@ class PictureCardProvider extends ChangeNotifier {
     return _picture.hostId == _userId && _isUsersProfile;
   }
 
+  void _showReportDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => ReportDialog(
+        pictureId: _picture.id,
+        profileId: _userId,
+        sessionUsers: _picture.sessionUsers,
+      ),
+    );
+  }
+
   bool isArchived() {
     return _picture.archived;
   }
@@ -56,6 +68,9 @@ class PictureCardProvider extends ChangeNotifier {
         break;
       case PopSelection.info:
         _showUsernamesDialog(context, usernames);
+        break;
+      case PopSelection.report:
+        _showReportDialog(context);
         break;
       case PopSelection.delete:
         await _deletePicture(context);
@@ -207,7 +222,7 @@ class PictureCardProvider extends ChangeNotifier {
           Constants.firstLikesDoc: FieldValue.arrayUnion([_connectedUsername])
         };
         _isNotLikedYet = true;
-        PostService.sendPostLikeNotification(_connectedUsername, _userId);
+        await PostService.sendPostLikeNotification(_connectedUsername, _userId);
       } else {
         data = {
           Constants.likesDoc: FieldValue.arrayUnion([_connectedUsername]),

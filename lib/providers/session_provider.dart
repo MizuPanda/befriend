@@ -395,6 +395,7 @@ class SessionProvider extends ChangeNotifier {
   void _sendNotificationsToUser(List<dynamic> sessionUsers,
       Iterable<Bubble> joinersStillConnected) async {
     Set<dynamic> usersToNotify = {};
+    Map<String, List<String>> notificationMap = {};
 
     // If PUBLIC    --> Add all friends of sessionUsers, except sessionUsers
     // If PRIVATE   --> Do nothing.
@@ -408,9 +409,26 @@ class SessionProvider extends ChangeNotifier {
       usersToNotify.addAll(host.friendsAllowed());
     }
 
-    // Future, but not useful to screen or anything
-    PostService.sendPostNotification(
-        usersToNotify.toList(), host.host.username, host.host.id);
+    // Create the map <String, List<String>>
+    for (String user in usersToNotify) {
+      for (Bubble joiner in joinersStillConnected) {
+        if (joiner.friendIDs.contains(user)) {
+          if (!notificationMap.containsKey(joiner.id)) {
+            notificationMap[joiner.id] = [];
+          }
+          if (!notificationMap[joiner.id]!.contains(user)) {
+            notificationMap[joiner.id]!.add(user);
+          }
+          break; // Ensure each userToNotify is only attributed to the first friend
+        }
+      }
+    }
+
+    // Send notifications
+    notificationMap.forEach((senderId, friendsList) {
+      PostService.sendPostNotification(
+          friendsList, host.host.username, senderId);
+    });
   }
 
   Future<void> _createOrUpdateFriendships(

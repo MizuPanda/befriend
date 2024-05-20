@@ -141,6 +141,7 @@ class HostingProvider extends ChangeNotifier {
   }
 
   Future<void> onDispose() async {
+    await HostListening.onDispose(_host);
     await _stream?.cancel();
     dispose();
   }

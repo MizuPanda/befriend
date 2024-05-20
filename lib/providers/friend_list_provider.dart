@@ -14,20 +14,25 @@ class FriendListProvider extends ChangeNotifier {
 
   final PagingController<int, Friendship> _pagingController =
       PagingController(firstPageKey: 0);
+  final TextEditingController _searchController = TextEditingController();
 
   PagingController<int, Friendship> get pagingController => _pagingController;
+  TextEditingController get searchController => _searchController;
 
   DocumentSnapshot? _lastDocument;
+  List<Friendship> _allFriends = [];
+  String _searchQuery = '';
 
   void goToFriendProfile(
       BuildContext context, Friendship friendship, Bubble user) {
     GoRouter.of(context).push(
       Constants.profileAddress,
       extra: Profile(
-          user: friendship.friend,
-          currentUser: user,
-          notifyParent: () {},
-          friendship: friendship),
+        user: friendship.friend,
+        currentUser: user,
+        notifyParent: () {},
+        friendship: friendship,
+      ),
     );
   }
 
@@ -37,9 +42,9 @@ class FriendListProvider extends ChangeNotifier {
       required String id}) {
     try {
       // Preload initial friends into the PagingController.
-      final List<Friendship> initialFriends = friendships;
-      if (initialFriends.isNotEmpty) {
-        _pagingController.itemList = initialFriends;
+      _allFriends = friendships;
+      if (_allFriends.isNotEmpty) {
+        _pagingController.itemList = _allFriends;
       }
 
       _pagingController.addPageRequestListener((pageKey) {
@@ -48,6 +53,9 @@ class FriendListProvider extends ChangeNotifier {
             lastFriendshipDocument: lastFriendshipDocument,
             id: id);
       });
+      _searchController.addListener(() {
+        _filterFriends(_searchController.text);
+      });
     } catch (e) {
       debugPrint('(FriendListProvider): Error in initState: $e');
     }
@@ -55,6 +63,16 @@ class FriendListProvider extends ChangeNotifier {
 
   void disposeState() {
     _pagingController.dispose();
+    _searchController.dispose();
+  }
+
+  void _filterFriends(String query) {
+    _searchQuery = query.toLowerCase();
+    List<Friendship> filteredFriends = _allFriends.where((friendship) {
+      return friendship.friend.username.toLowerCase().contains(_searchQuery);
+    }).toList();
+    _pagingController.itemList = filteredFriends;
+    notifyListeners();
   }
 
   Future<void> _fetchPage(int pageKey,
@@ -113,6 +131,8 @@ class FriendListProvider extends ChangeNotifier {
           Friendship friendship = Friendship.fromDocs(id, friend, snapshot);
           friendships.add(friendship);
         }
+
+        _allFriends.addAll(friendships);
       }
 
       final List<Friendship> newItems = friendships;
@@ -123,6 +143,9 @@ class FriendListProvider extends ChangeNotifier {
         final int nextPageKey = pageKey + newItems.length;
         _pagingController.appendPage(newItems, nextPageKey);
       }
+
+      // Apply search filter to newly loaded data
+      _filterFriends(_searchQuery);
     } catch (error) {
       _pagingController.error = error;
       debugPrint('(FriendListProvider): Error fetching page: $error');

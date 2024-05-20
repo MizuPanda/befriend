@@ -18,6 +18,8 @@ class Constants {
   static const String hostingFriendshipsDoc = 'hostingFriendships';
   static const String lastSeenUsersMapDoc = 'lastSeenUsersMap';
   static const String blockedUsersDoc = 'blocked';
+  static const String postNotificationOnDoc = 'postNotificationOn';
+  static const String likeNotificationOnDoc = 'likeNotificationOn';
   //FRIENDSHIPS
   static const String progressDoc = 'progress';
   static const String levelDoc = 'level';
@@ -45,9 +47,10 @@ class Constants {
   static const String tempPictureStorage = 'temp';
   static const String postedPictureStorage = 'posted';
   // SOCIAL LINK
-  static const double pictureExpValue = 0.1;
+  static const double pictureExpValue = 0.2;
+  static const double friendshipPowerValue = 1;
   static const int baseLevel = 1;
-  static const double baseProgress = 1;
+  static const double baseProgress = 0;
   //COLLECTIONS
   static final CollectionReference friendshipsCollection =
       _firestore.collection('friendships');
@@ -56,11 +59,9 @@ class Constants {
   // SUB COLLECTIONS
   static const String pictureSubCollection = 'pictures';
   // HOME PAGE SIZES
-  // static const double viewerSize = 5000;
   static const double homeButtonSize = 20;
   static const double homeButtonAddSize = 25;
   static const double homeHorizontalPaddingMultiplier = 0.033;
-  // static const double homeHorizontalPadding = 15;
   static const double homeButtonPadding = 60;
   static const double homeButtonBottomPaddingMultiplier = 0.09;
   //PICTURE SIZES

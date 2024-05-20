@@ -10,7 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DataQuery {
-  static const int _friendsLimit = 20;
+  static const int _friendsLimit = 15;
   static Future<void> updateDocument(String fieldID, dynamic data,
       {String? userId}) async {
     try {

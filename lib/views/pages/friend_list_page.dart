@@ -37,103 +37,137 @@ class _FriendsListPageState extends State<FriendsListPage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _provider.disposeState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
-          centerTitle: true,
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Friends List',
-                style: GoogleFonts.openSans(),
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              const Icon(Icons.people_outline_rounded),
-            ],
-          )),
+        centerTitle: true,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Friends List',
+              style: GoogleFonts.openSans(),
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            const Icon(Icons.people_outline_rounded),
+          ],
+        ),
+      ),
       body: ChangeNotifierProvider.value(
-          value: _provider,
-          builder: (BuildContext context, Widget? child) {
-            return Consumer(builder: (BuildContext context,
-                FriendListProvider provider, Widget? child) {
-              return PagedListView<int, Friendship>(
-                pagingController: provider.pagingController,
-                builderDelegate: PagedChildBuilderDelegate<Friendship>(
-                    noItemsFoundIndicatorBuilder: (BuildContext context) {
-                  return const Center();
-                }, itemBuilder: (context, friendship, index) {
-                  return Padding(
+        value: _provider,
+        builder: (BuildContext context, Widget? child) {
+          return Consumer<FriendListProvider>(
+            builder: (BuildContext context, FriendListProvider provider,
+                Widget? child) {
+              return Column(
+                children: [
+                  Padding(
                     padding: EdgeInsets.all(width * 0.02),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Consumer(builder: (BuildContext context,
-                                MaterialProvider materialProvider,
-                                Widget? child) {
-                              return Container(
-                                  decoration: Decorations.bubbleDecoration(
-                                      materialProvider.isLightMode(context)),
-                                  child: ProfilePhoto(
-                                    user: friendship.friend,
-                                    radius: 0.1 * width,
-                                  ));
-                            }),
-                            SizedBox(
-                              width: 0.03 * width,
-                            ),
-                            AutoSizeText(
-                              '@${friendship.friend.username}',
-                              style: GoogleFonts.openSans(
-                                fontSize: 20,
-                              ),
-                            ),
-                            const Spacer(),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    child: TextField(
+                      controller: provider.searchController,
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.search),
+                        hintText: 'Search by username',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: PagedListView<int, Friendship>(
+                      pagingController: provider.pagingController,
+                      builderDelegate: PagedChildBuilderDelegate<Friendship>(
+                        noItemsFoundIndicatorBuilder: (BuildContext context) {
+                          return const Center(
+                            child: Text('No friends found'),
+                          );
+                        },
+                        itemBuilder: (context, friendship, index) {
+                          return Padding(
+                            padding: EdgeInsets.all(width * 0.02),
+                            child: Column(
                               children: [
+                                Row(
+                                  children: [
+                                    Consumer<MaterialProvider>(
+                                      builder: (BuildContext context,
+                                          MaterialProvider materialProvider,
+                                          Widget? child) {
+                                        return Container(
+                                          decoration:
+                                              Decorations.bubbleDecoration(
+                                                  materialProvider
+                                                      .isLightMode(context)),
+                                          child: ProfilePhoto(
+                                            user: friendship.friend,
+                                            radius: 0.1 * width,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    SizedBox(
+                                      width: 0.03 * width,
+                                    ),
+                                    AutoSizeText(
+                                      '@${friendship.friend.username}',
+                                      style: GoogleFonts.openSans(
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        SizedBox(
+                                          height: 0.02 * height,
+                                        ),
+                                        AutoSizeText(
+                                          'LVL${friendship.level}',
+                                          style: GoogleFonts.openSans(),
+                                        ),
+                                        IconButton(
+                                          onPressed: () {
+                                            provider.goToFriendProfile(context,
+                                                friendship, widget.user);
+                                          },
+                                          icon: const Icon(Icons.house_rounded),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                                 SizedBox(
-                                  height: 0.02 * height,
+                                  height: 0.015 * height,
                                 ),
-                                AutoSizeText(
-                                  'LVL${friendship.level}',
-                                  style: GoogleFonts.openSans(),
+                                ProgressBar(
+                                  progress: friendship.progress,
                                 ),
-                                IconButton(
-                                    onPressed: () {
-                                      provider.goToFriendProfile(
-                                          context, friendship, widget.user);
-                                    },
-                                    icon: const Icon(Icons.house_rounded)),
                               ],
                             ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 0.015 * height,
-                        ),
-                        ProgressBar(
-                          progress: friendship.progress,
-                        ),
-                      ],
+                          );
+                        },
+                      ),
                     ),
-                  );
-                }),
+                  ),
+                ],
               );
-            });
-          }),
+            },
+          );
+        },
+      ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _provider.disposeState();
   }
 }

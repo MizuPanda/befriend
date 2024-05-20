@@ -37,6 +37,11 @@ class UserManager {
 
         ImageProvider avatar = await DataQuery.getNetworkImage(avatarUrl);
         _instance = Bubble.fromDocsWithFriends(docs, avatar, friendList);
+        _instance?.postNotificationOn =
+            DataManager.getBoolean(docs, Constants.postNotificationOnDoc);
+        _instance?.likeNotificationOn =
+            DataManager.getBoolean(docs, Constants.likeNotificationOnDoc);
+
         debugPrint("(UserManager): User data = $_instance");
       } catch (e) {
         debugPrint(
@@ -90,5 +95,13 @@ class UserManager {
       return Image.asset(Constants.defaultPictureAddress)
           .image; // Default image on error
     }
+  }
+
+  static void setPostNotification(bool value) {
+    _instance?.postNotificationOn = value;
+  }
+
+  static void setLikeNotification(bool value) {
+    _instance?.likeNotificationOn = value;
   }
 }

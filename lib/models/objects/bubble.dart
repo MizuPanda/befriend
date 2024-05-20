@@ -22,6 +22,9 @@ class Bubble {
   List<Friendship> friendships = [];
   List<dynamic> friendIDs;
   bool friendshipsLoaded;
+
+  late bool postNotificationOn;
+  late bool likeNotificationOn;
   //-----------------------
   double size;
   double x = 0;
@@ -106,14 +109,6 @@ class Bubble {
 
   @override
   int get hashCode => id.hashCode;
-
-  double textHeight() {
-    return 5 / 12 * size;
-  }
-
-  double bubbleHeight() {
-    return size + textHeight();
-  }
 
   Point<double> point() {
     return Point(x, y);

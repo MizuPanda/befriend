@@ -15,15 +15,13 @@ class UsernameText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: user.textHeight(),
-      width: user.size,
       alignment: Alignment.center,
       child: AutoSizeText(user.main() ? 'You' : user.username,
           maxLines: 1,
           style: GoogleFonts.openSans(
               fontWeight: user.main() ? FontWeight.w300 : FontWeight.w500,
               fontStyle: user.main() ? FontStyle.italic : FontStyle.normal,
-              fontSize: 25)),
+              fontSize: 27 / 117 * user.size)),
     );
   }
 }

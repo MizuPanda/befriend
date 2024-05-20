@@ -4,6 +4,7 @@ import 'package:befriend/views/dialogs/settings/contact_dialog.dart';
 import 'package:befriend/views/dialogs/settings/delete_account_dialog.dart';
 import 'package:befriend/views/widgets/settings/archive_settings_widget.dart';
 import 'package:befriend/views/widgets/settings/blocked_settings_widget.dart';
+import 'package:befriend/views/widgets/settings/notifications_settings_widget.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -56,6 +57,14 @@ class SettingsProvider extends ChangeNotifier {
         builder: (context) => ConsentSettingsWidget(
           provider: this,
         ),
+      ),
+    );
+  }
+
+  void goToNotificationsSettings(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const NotificationsSettingsWidget(),
       ),
     );
   }

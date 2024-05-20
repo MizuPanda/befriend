@@ -52,6 +52,22 @@ class MoreButton extends StatelessWidget {
                 ],
               ),
             ),
+          if (!provider.isPictureHost())
+            PopupMenuItem<PopSelection>(
+              value: PopSelection.report,
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.report_outlined,
+                  ),
+                  SizedBox(width: _iconTextDistanceWidthMultiplier * width),
+                  const Text(
+                    'Report',
+                  ),
+                  SizedBox(width: _iconTextDistanceWidthMultiplier * width * 2),
+                ],
+              ),
+            ),
           PopupMenuItem<PopSelection>(
             value: PopSelection.info,
             child: Row(
@@ -74,4 +90,4 @@ class MoreButton extends StatelessWidget {
   }
 }
 
-enum PopSelection { archive, delete, info }
+enum PopSelection { archive, delete, report, info }
