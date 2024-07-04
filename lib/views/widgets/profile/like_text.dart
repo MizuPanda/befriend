@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../providers/picture_card_provider.dart';
+import '../../../utilities/app_localizations.dart';
 
 class LikeText extends StatelessWidget {
   const LikeText({
@@ -16,7 +17,7 @@ class LikeText extends StatelessWidget {
         (BuildContext context, PictureCardProvider provider, Widget? child) {
       return TextButton(
           style: ButtonStyle(
-            overlayColor: MaterialStateProperty.all(
+            overlayColor: WidgetStateProperty.all(
               Colors.transparent,
             ),
             // Removes splash effect
@@ -31,9 +32,9 @@ class LikeText extends StatelessWidget {
                       ? Theme.of(context).colorScheme.primary
                       : Theme.of(context).primaryColor),
               children: [
-                const TextSpan(text: 'Liked by '),
+                 TextSpan(text: '${AppLocalizations.of(context)?.translate('lt_liked')?? 'Liked by'} '),
                 TextSpan(
-                    text: provider.usersThatLiked(),
+                    text: provider.usersThatLiked(context),
                     style: const TextStyle(fontWeight: FontWeight.bold))
               ])));
     });

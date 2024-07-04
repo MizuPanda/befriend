@@ -1,7 +1,9 @@
-import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/utilities/error_handling.dart';
+import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
+import '../../../utilities/app_localizations.dart';
 
 class ReportDialog extends StatefulWidget {
   final String pictureId;
@@ -29,13 +31,13 @@ class _ReportDialogState extends State<ReportDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Report'),
+      title:  Text(AppLocalizations.of(context)?.translate('rp_report')??'Report'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             CheckboxListTile(
-              title: const Text('Inappropriate content'),
+              title: Text(AppLocalizations.of(context)?.translate('rp_inap')??'Inappropriate content'),
               value: inappropriateContent,
               onChanged: (value) {
                 setState(() {
@@ -44,7 +46,7 @@ class _ReportDialogState extends State<ReportDialog> {
               },
             ),
             CheckboxListTile(
-              title: const Text('Other'),
+              title: Text(AppLocalizations.of(context)?.translate('general_word_other')??'Other'),
               value: other,
               onChanged: (value) {
                 setState(() {
@@ -55,8 +57,8 @@ class _ReportDialogState extends State<ReportDialog> {
             if (other)
               TextField(
                 controller: otherReasonController,
-                decoration: const InputDecoration(
-                  labelText: 'Reason',
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)?.translate('rp_reason')??'Reason',
                 ),
               ),
           ],
@@ -69,13 +71,13 @@ class _ReportDialogState extends State<ReportDialog> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text('Cancel'),
+                child:  Text(AppLocalizations.of(context)?.translate('dialog_cancel')??'Cancel'),
               ),
               ElevatedButton(
                 onPressed: () async {
                   await _report(context);
                 },
-                child: const Text('Report'),
+                child:  Text(AppLocalizations.of(context)?.translate('rp_report')??'Report'),
               ),
             ],
     );
@@ -89,7 +91,7 @@ class _ReportDialogState extends State<ReportDialog> {
       if (inappropriateContent || other) {
         // Prepare the report data
         final Map<String, dynamic> reportData = {
-          'sender': AuthenticationManager.id(),
+          'sender': Models.authenticationManager.id(),
           'timestamp': FieldValue.serverTimestamp(),
           'pictureId': widget.pictureId,
           'profileId': widget.profileId,
@@ -111,7 +113,7 @@ class _ReportDialogState extends State<ReportDialog> {
       debugPrint('(ReportDialog) Error reporting dialog: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, 'There was an unexpected error. Please try again.');
+            context, AppLocalizations.of(context)?.translate('general_error_message6')??'There was an unexpected error. Please try again.');
       }
     }
 

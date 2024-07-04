@@ -13,13 +13,14 @@ import 'package:go_router/go_router.dart';
 import '../models/data/user_manager.dart';
 import '../models/objects/bubble.dart';
 import '../models/objects/home.dart';
+import '../utilities/app_localizations.dart';
 import '../utilities/constants.dart';
 import '../views/widgets/settings/consent_settings_widget.dart';
 
 class SettingsProvider extends ChangeNotifier {
   Future<void> signOut(BuildContext context) async {
     try {
-      debugPrint('(SettingsPage): Signing out');
+      debugPrint('(SettingsProvider) Signing out');
 
       await FirebaseAuth.instance.signOut();
       UserManager.refreshPlayer();
@@ -27,10 +28,10 @@ class SettingsProvider extends ChangeNotifier {
         GoRouter.of(context).go(Constants.loginAddress);
       }
     } catch (e) {
-      debugPrint('(SettingsProvider): Error signing out: $e');
+      debugPrint('(SettingsProvider) Error signing out: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, 'Error signing out. Please try again.');
+            context, AppLocalizations.of(context)?.translate('stp_signOut_error')??'Error signing out. Please try again.');
       }
     }
   }
@@ -86,10 +87,10 @@ class SettingsProvider extends ChangeNotifier {
         GoRouter.of(context).push(Constants.homepageAddress, extra: home);
       }
     } catch (e) {
-      debugPrint('(SettingsProvider): Error opening tutorial: $e');
+      debugPrint('(SettingsProvider) Error opening tutorial: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, 'Error opening tutorial. Please try again.');
+            context, AppLocalizations.of(context)?.translate('stp_tut_error')??'Error opening tutorial. Please try again.');
       }
     }
   }
@@ -114,16 +115,16 @@ class SettingsProvider extends ChangeNotifier {
 
       if (confirmed) {
         if (context.mounted) {
-          debugPrint('(SettingsProvider): User confirmed account deletion');
+          debugPrint('(SettingsProvider) User confirmed account deletion');
           await _deleteAccount(context);
         }
       }
     } catch (e) {
       debugPrint(
-          '(SettingsProvider): Error showing delete account confirmation: $e');
+          '(SettingsProvider) Error showing delete account confirmation: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, 'Error showing confirmation. Please try again.');
+            context, AppLocalizations.of(context)?.translate('stp_delete_error')??'Error showing confirmation. Please try again.');
       }
     }
   }
@@ -148,24 +149,18 @@ class SettingsProvider extends ChangeNotifier {
 
       HttpsCallable callable = functions.httpsCallable('deleteUserData');
       final result = await callable.call(data);
-      debugPrint('(SettingsProvider): Function result: ${result.data}');
+      debugPrint('(SettingsProvider) Function result: ${result.data}');
 
       if (context.mounted) {
-        signOut(context);
+        await signOut(context);
       }
     } on FirebaseFunctionsException catch (e) {
       debugPrint(
-          '(SettingsProvider): FirebaseFunctionsException= ${e.code} - ${e.message}');
-      if (context.mounted) {
-        ErrorHandling.showError(
-            context, 'Error deleting account. Please try again.');
-      }
+          '(SettingsProvider) FirebaseFunctionsException= ${e.code} - ${e.message}');
+      rethrow;
     } catch (e) {
-      debugPrint('(SettingsProvider): General Exception: $e');
-      if (context.mounted) {
-        ErrorHandling.showError(
-            context, 'Error deleting account. Please try again.');
-      }
+      debugPrint('(SettingsProvider) General Exception: $e');
+      rethrow;
     }
   }
 }

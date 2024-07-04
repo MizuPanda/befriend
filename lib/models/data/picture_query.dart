@@ -16,15 +16,32 @@ class PictureQuery {
         .child(host.host.id);
   }
 
-  static Future<void> removeProfilePicture() async {
+  Future<void> removeProfilePicture(String downloadUrl) async {
     try {
+      // Update the document to remove the avatar reference
       await DataQuery.updateDocument(Constants.avatarDoc, '');
+
+      // Decode the URL to get the file path
+      final String decodedUrl = Uri.decodeFull(downloadUrl);
+      final RegExp regex = RegExp(r'/o/(.*)\?alt=media');
+      final RegExpMatch? match = regex.firstMatch(decodedUrl);
+
+      if (match != null) {
+        final String filePath = match.group(1)!.replaceAll('%2F', '/');
+        final Reference storageReference = FirebaseStorage.instance.ref().child(filePath);
+
+        // Delete the file from Firebase Storage
+        await storageReference.delete();
+        debugPrint('(PictureQuery): Successfully deleted avatar from storage.');
+      } else {
+        debugPrint('(PictureQuery): Invalid downloadUrl format.');
+      }
     } catch (e) {
       debugPrint('(PictureQuery): Error removing avatar: $e');
     }
   }
 
-  static Future<String?> uploadAvatar(File imageFile) async {
+  Future<String?> uploadAvatar(File imageFile) async {
     try {
       String? downloadUrl = await _uploadProfilePicture(imageFile);
       if (downloadUrl != null) {
@@ -165,4 +182,6 @@ class PictureQuery {
       debugPrint('(PictureQuery): Error deleting temporary pictures: $e');
     }
   }
+
+  PictureQuery.static();
 }

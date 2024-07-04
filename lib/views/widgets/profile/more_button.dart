@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../providers/picture_card_provider.dart';
+import '../../../utilities/app_localizations.dart';
 
 class MoreButton extends StatelessWidget {
   final Iterable<dynamic> usernames;
@@ -34,7 +35,7 @@ class MoreButton extends StatelessWidget {
                     Icons.archive_outlined,
                   ), // Archive icon
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width),
-                  Text(provider.isArchived() ? 'Restore' : 'Archive'),
+                  Text(provider.isArchived() ? AppLocalizations.of(context)?.translate('mb_restore')??'Restore' : AppLocalizations.of(context)?.translate('mb_archive')??'Archive'),
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width * 2),
                 ],
               ),
@@ -47,7 +48,7 @@ class MoreButton extends StatelessWidget {
                   const Icon(Icons.delete_outline_rounded,
                       color: Colors.red), // Archive icon
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width),
-                  const Text('Delete', style: TextStyle(color: Colors.red)),
+                   Text(AppLocalizations.of(context)?.translate('mb_delete')??'Delete', style: const TextStyle(color: Colors.red)),
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width * 2),
                 ],
               ),
@@ -61,8 +62,8 @@ class MoreButton extends StatelessWidget {
                     Icons.report_outlined,
                   ),
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width),
-                  const Text(
-                    'Report',
+                  Text(
+                    AppLocalizations.of(context)?.translate('mb_report')??'Report',
                   ),
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width * 2),
                 ],
@@ -76,7 +77,7 @@ class MoreButton extends StatelessWidget {
                   Icons.info_outline_rounded,
                 ), // Info icon
                 SizedBox(width: _iconTextDistanceWidthMultiplier * width),
-                const Text('Info'),
+                Text(AppLocalizations.of(context)?.translate('mb_info')??'Info'),
                 SizedBox(width: _iconTextDistanceWidthMultiplier * width * 2),
               ],
             ),

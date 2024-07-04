@@ -1,6 +1,8 @@
 import 'package:befriend/models/authentication/consent_manager.dart';
 import 'package:befriend/providers/material_provider.dart';
 import 'package:befriend/router.dart';
+import 'package:befriend/utilities/app_localizations.dart';
+import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/secrets.dart';
 import 'package:befriend/utilities/themes.dart';
 import 'package:befriend/views/pages/home_page.dart';
@@ -13,6 +15,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
@@ -28,7 +31,7 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  // await ConsentManager.debugReset();
+  //await ConsentManager.debugReset();
 
   final params = ConsentRequestParameters(
       // consentDebugSettings: Secrets.consentDebugSettings
@@ -69,7 +72,7 @@ void main() async {
 
   await _initializeAppCheck();
 
-  debugPrint('(Main): Finished initiating main()');
+  debugPrint('(Main) Finished initiating main()');
 
   runApp(const MyApp());
 }
@@ -82,14 +85,11 @@ Future<void> _initializeAppCheck() async {
         appleProvider: AppleProvider.debug,
       );
     } else {
-      await FirebaseAppCheck.instance.activate(
-        androidProvider: AndroidProvider.playIntegrity,
-        appleProvider: AppleProvider.deviceCheck,
-      );
+      await FirebaseAppCheck.instance.activate();
     }
-    debugPrint('(Main): AppCheck successful');
+    debugPrint('(Main) AppCheck successful');
   } catch (e) {
-    debugPrint('(Main): App Check activation failed: $e');
+    debugPrint('(Main) App Check activation failed: $e');
     // Implement retry logic or handle the error
   }
 }
@@ -118,6 +118,17 @@ class _MyAppState extends State<MyApp> {
           return Consumer<MaterialProvider>(builder: (BuildContext context,
               MaterialProvider materialProvider, Widget? child) {
             return MaterialApp.router(
+              // locale: const Locale(Constants.englishLocale),
+              supportedLocales: const [
+                Locale(Constants.englishLocale, ''),
+                Locale(Constants.frenchLocale, ''),
+              ],
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
               routerDelegate: MyRouter.router.routerDelegate,
               routeInformationParser: MyRouter.router.routeInformationParser,
               routeInformationProvider:

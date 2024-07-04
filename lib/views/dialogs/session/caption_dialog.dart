@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../utilities/app_localizations.dart';
+
 class CaptionDialog {
   static Future<String?> showCaptionDialog(
     BuildContext context,
@@ -13,13 +15,13 @@ class CaptionDialog {
         builder: (BuildContext context) {
           return AlertDialog(
             actionsAlignment: MainAxisAlignment.spaceEvenly,
-            title: const Text('Enter a Caption'),
+            title:  Text(AppLocalizations.of(context)?.translate('cd_enter')??'Enter a Caption'),
             content: TextField(
               controller: captionController,
               decoration: InputDecoration(
-                hintText: "Caption for the picture",
+                hintText: AppLocalizations.of(context)?.translate('cd_picture')??"Caption for the picture",
                 counterText:
-                    'Characters limit: $characterLimit', // Optional: Hide the counter text
+                    '${AppLocalizations.of(context)?.translate('cd_characters')?? 'Characters limit:'} $characterLimit', // Optional: Hide the counter text
               ),
               maxLines: null,
               keyboardType: TextInputType.multiline,
@@ -27,8 +29,8 @@ class CaptionDialog {
             ),
             actions: [
               TextButton(
-                child: const Text(
-                  'Cancel',
+                child:  Text(
+                  AppLocalizations.of(context)?.translate('dialog_cancel')??'Cancel',
                   textAlign: TextAlign.end,
                 ),
                 onPressed: () {
@@ -36,8 +38,8 @@ class CaptionDialog {
                 },
               ),
               TextButton(
-                child: const Text(
-                  'Publish',
+                child: Text(
+                  AppLocalizations.of(context)?.translate('dialog_publish')??'Publish',
                   textAlign: TextAlign.end,
                 ),
                 onPressed: () {

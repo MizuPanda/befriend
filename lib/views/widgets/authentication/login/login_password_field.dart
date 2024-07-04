@@ -3,6 +3,7 @@ import 'package:befriend/providers/material_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../utilities/app_localizations.dart';
 import '../../../../utilities/decorations.dart';
 import 'base_form_field.dart';
 import 'hide_icon.dart';
@@ -24,12 +25,14 @@ class PasswordFormField extends StatelessWidget {
             action: TextInputAction.done,
             focusNode: provider.passwordFocusNode,
             onSaved: provider.passwordSaved,
-            validator: provider.passwordValidator,
+            validator: (String? val) {
+              return provider.passwordValidator(context, val);
+            },
             keyboardType: provider.keyboardType(),
             obscureText: !provider.passwordVisible,
             decoration: Decorations.loginInputDecoration(
               lightMode: lightMode,
-              labelText: 'Enter your password',
+              labelText: AppLocalizations.of(context)?.translate('lpf_enter')??'Enter your password',
               isWidgetFocused: provider.isPasswordFocused,
               isError: provider.isPassError,
               suffixIcon: HideIconButton(

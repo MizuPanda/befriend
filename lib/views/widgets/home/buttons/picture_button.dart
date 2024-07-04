@@ -7,16 +7,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:showcaseview/showcaseview.dart';
 
+import '../../../../utilities/app_localizations.dart';
+
 class PictureButton extends StatefulWidget {
   const PictureButton({
     super.key,
-    required this.four,
+    required this.three,
   });
 
   @override
   State<PictureButton> createState() => _PictureButtonState();
 
-  final GlobalKey four;
+  final GlobalKey three;
 }
 
 class _PictureButtonState extends State<PictureButton> {
@@ -49,11 +51,11 @@ class _PictureButtonState extends State<PictureButton> {
                         materialProvider.isLightMode(context);
 
                     return Showcase(
-                      key: widget.four,
+                      key: widget.three,
                       description:
-                          'Swipe the picture button to switch between Host and Join mode.',
+                      AppLocalizations.of(context)?.translate('pb_three')??'Swipe here to switch between Host and Join mode.',
                       child: Container(
-                        width: MediaQuery.of(context).size.width,
+                        width: width,
                         height: 0.054 * height,
                         decoration: BoxDecoration(
                             gradient: RadialGradient(
@@ -119,8 +121,8 @@ class _PictureButtonState extends State<PictureButton> {
                               ),
                               AutoSizeText(
                                 provider.isJoinMode
-                                    ? 'Join a picture'
-                                    : 'Take a picture',
+                                    ? AppLocalizations.of(context)?.translate('pb_join')??'Join a picture'
+                                    : AppLocalizations.of(context)?.translate('pb_take')??'Take a picture',
                                 style: GoogleFonts.openSans(
                                   textStyle: const TextStyle(
                                     fontWeight: FontWeight.w500,

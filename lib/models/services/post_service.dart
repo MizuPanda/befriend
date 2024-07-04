@@ -5,19 +5,22 @@ class PostService {
   static final FirebaseFunctions _functions = FirebaseFunctions.instance;
 
   static Future<void> sendPostNotification(
-      List<String> userIds, String postCreatorName, String hostId) async {
+      List<String> userIds, String postCreatorName, String hostId, BuildContext context) async {
+    final String languageCode = Localizations.localeOf(context).languageCode;
+
     await _sendNotification('sendNewPostNotification', {
       'userIds': userIds,
       'postCreatorName': postCreatorName,
       'hostId': hostId,
+      'languageCode': languageCode
     });
   }
 
   static Future<void> sendPostLikeNotification(
-      String likerUsername, String ownerId) async {
+      String likerUsername, List<String> sessionUsers) async {
     await _sendNotification('sendPostLikeNotification', {
       'likerUsername': likerUsername,
-      'ownerId': ownerId,
+      'sessionUsers': sessionUsers,
     });
   }
 
@@ -26,9 +29,9 @@ class PostService {
     try {
       HttpsCallable callable = _functions.httpsCallable(functionName);
       final results = await callable.call(data);
-      debugPrint('(PostService): Cloud function executed, results: $results');
+      debugPrint('(PostService) Cloud function executed, results: $results');
     } catch (e) {
-      debugPrint('(PostService): Error calling cloud function= $e');
+      debugPrint('(PostService) Error calling cloud function= $e');
     }
   }
 }

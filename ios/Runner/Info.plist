@@ -35,11 +35,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>This app requires access to the camera to allow you to capture photos and videos.</string>
+	<string>$(NSCameraUsageDescription)</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires access to your photo library to allow you to select and upload photos.</string>
+	<string>$(NSPhotoLibraryUsageDescription)</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>This identifier will be used to deliver personalized ads to you.</string>
+	<string>$(NSUserTrackingUsageDescription)</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
@@ -258,6 +258,18 @@
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>UIRequiresFullScreen</key>
+	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>GADNativeAdValidatorEnabled</key>
+	<false/>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>fr</string>
 	</array>
 </dict>
 </plist>

@@ -1,6 +1,8 @@
-import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/widgets/profile/profile_pictures.dart';
 import 'package:flutter/material.dart';
+
+import '../../../utilities/app_localizations.dart';
 
 class ArchiveSettingsWidget extends StatelessWidget {
   const ArchiveSettingsWidget({super.key});
@@ -9,14 +11,15 @@ class ArchiveSettingsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Archives",
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title:  Text(
+          AppLocalizations.of(context)?.translate('asw_archives')??"Archives",
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: ProfilePictures(
-        userID: AuthenticationManager.id(),
+        userID: Models.authenticationManager.id(),
         showArchived: true,
+        showOnlyMe: false,
       ),
     );
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../utilities/app_localizations.dart';
+
 class PictureChoiceDialog {
   static Future<void> showPictureChoiceDialog(
       BuildContext context, Function()? onTap1, Function()? onTap2) {
@@ -9,18 +11,18 @@ class PictureChoiceDialog {
         context: context,
         builder: (BuildContext dialogContext) {
           return AlertDialog(
-            title: const Text('Make a choice!'),
+            title:  Text(AppLocalizations.of(context)?.translate('pcd_choice')??'Make a choice!'),
             content: SingleChildScrollView(
               child: ListBody(
                 children: [
                   GestureDetector(
                     onTap: onTap1,
-                    child: const Text("Gallery"),
+                    child: Text(AppLocalizations.of(context)?.translate('pcd_gallery')??"Gallery"),
                   ),
                   Padding(padding: EdgeInsets.all(0.008 * height)),
                   GestureDetector(
                     onTap: onTap2,
-                    child: const Text("Camera"),
+                    child: Text(AppLocalizations.of(context)?.translate('pcd_camera')??"Camera"),
                   ),
                 ],
               ),

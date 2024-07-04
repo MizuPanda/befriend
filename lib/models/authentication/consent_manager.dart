@@ -3,74 +3,99 @@ import 'package:befriend/views/dialogs/home/consent_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../../utilities/app_localizations.dart';
 import '../../utilities/constants.dart';
 
 class ConsentManager {
-  static const String _termsDialogName = 'Terms & Conditions';
+  static MobileAds _mobileAds = MobileAds.instance;
+  static ConsentDialog _consentDialog = ConsentDialog();
+  static ConsentInformation _consentInformation = ConsentInformation.instance;
 
-  static const String _privacyDialogName = 'Privacy Policy';
+  /// For testing purpose
+  static set mobileAds(MobileAds value) {
+    _mobileAds = value;
+  }
+  static set consentDialog(ConsentDialog value) {
+    _consentDialog = value;
+  }
+
+  static set consentInformation(ConsentInformation value) {
+    _consentInformation = value;
+  }
 
   static Future<void> showTermsConditionsDialog(BuildContext context) async {
     try {
+      // Get the current locale
+      Locale currentLocale = Localizations.localeOf(context);
+      // Extract the language code
+      String languageCode = currentLocale.languageCode;
+
+      String address = '${Constants.termsAddress}_$languageCode.md';
+
+      debugPrint("(ConsentManager) Address=$address");
+
       await _showConsentDialog(
-          context, Constants.termsAddress, _termsDialogName);
+          context, fileAddress: address, dialogName: AppLocalizations.of(context)?.translate('cm_tc')??'Terms & Conditions');
     } catch (e) {
       debugPrint(
           '(ConsentManager): Error displaying terms and conditions dialog: $e');
       // Provide user feedback or log error
       if (context.mounted) {
         ErrorHandling.showError(context,
-            'Failed to display the terms and conditions. Please try again.');
+            AppLocalizations.of(context)?.translate('cm_terms_error')??'Failed to display the terms and conditions. Please try again.');
       }
     }
   }
 
   static Future<void> showPrivacyPolicyDialog(BuildContext context) async {
     try {
+      // Get the current locale
+      Locale currentLocale = Localizations.localeOf(context);
+      // Extract the language code
+      String languageCode = currentLocale.languageCode;
+
+      String address = '${Constants.privacyAddress}_$languageCode.md';
+
       await _showConsentDialog(
-          context, Constants.privacyAddress, _privacyDialogName);
+          context, fileAddress: address, dialogName: AppLocalizations.of(context)?.translate('cm_pp')??'Privacy Policy');
     } catch (e) {
       debugPrint('(ConsentManager): Error displaying privacy dialog: $e');
       // Provide user feedback or log error
       if (context.mounted) {
         ErrorHandling.showError(
-            context, 'Failed to display the privacy policy. Please try again.');
+              context, AppLocalizations.of(context)?.translate('cm_privacy_error')?? 'Failed to display the privacy policy. Please try again.');
       }
     }
   }
 
   static Future<void> _showConsentDialog(
-      BuildContext context, String fileAddress, String dialogName) async {
-    return ConsentDialog.showConsentDialog(context, dialogName, fileAddress);
+      BuildContext context, {required String fileAddress, required String dialogName}) async {
+    return _consentDialog.showConsentDialog(context, dialogName: dialogName, fileAddress: fileAddress);
   }
 
-  static void setTagForChildrenAds(int birthYear) async {
+  static Future<void> setTagForChildrenAds(int birthYear) async {
     if (birthYear >= DateTime.now().year - 18) {
       if (!(await isGDRP())) {
         debugPrint('(ConsentManager): Setting child COPPA');
         // COPPA REQUIREMENTS
-        final RequestConfiguration requestConfiguration = RequestConfiguration(
-            tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes);
-        MobileAds.instance.updateRequestConfiguration(requestConfiguration);
+        _mobileAds.updateRequestConfiguration(Constants.coppa);
       } else {
         debugPrint('(ConsentManager): Setting child GDRP');
         // GDRP REQUIREMENTS
-        final RequestConfiguration requestConfiguration = RequestConfiguration(
-            tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.yes);
-        MobileAds.instance.updateRequestConfiguration(requestConfiguration);
+        _mobileAds.updateRequestConfiguration(Constants.gdrp);
       }
     }
   }
 
   static Future<bool> isGDRP() async {
     debugPrint(
-        "(ConsentManager): Consent Status= ${(await ConsentInformation.instance.getConsentStatus())}");
-    return (await ConsentInformation.instance.getConsentStatus()) !=
+        "(ConsentManager): Consent Status= ${(await _consentInformation.getConsentStatus())}");
+    return (await _consentInformation.getConsentStatus()) !=
         ConsentStatus.notRequired;
   }
 
   static Future<void> debugReset() async {
-    await ConsentInformation.instance.reset();
+    await _consentInformation.reset();
   }
 
   static Future<void> getConsentForm(BuildContext context,
@@ -78,10 +103,10 @@ class ConsentManager {
     final params = ConsentRequestParameters(
         // consentDebugSettings: Secrets.consentDebugSettings
         );
-    ConsentInformation.instance.requestConsentInfoUpdate(
+    _consentInformation.requestConsentInfoUpdate(
       params,
       () async {
-        if (await ConsentInformation.instance.isConsentFormAvailable()) {
+        if (await _consentInformation.isConsentFormAvailable()) {
           debugPrint('(ConsentManager): Consent form is available.');
           if (context.mounted) {
             _loadForm(context, reload);
@@ -94,18 +119,23 @@ class ConsentManager {
 
         // Consider adding retry logic or a user notification here
         ErrorHandling.showError(
-            context, "Failed to update consent information. Please try again.");
+            context, AppLocalizations.of(context)?.translate('cm_form_error')?? "Failed to update consent information. Please try again.");
       },
     );
+  }
+
+  /// For testing purposes
+  static void testLoadForm(BuildContext context, bool reload) {
+    _loadForm(context, reload);
   }
 
   static void _loadForm(BuildContext context, bool reload) {
     ConsentForm.loadConsentForm(
       (ConsentForm consentForm) async {
         ConsentStatus status =
-            await ConsentInformation.instance.getConsentStatus();
+            await _consentInformation.getConsentStatus();
 
-        debugPrint('(Consent): Status is $status');
+        debugPrint('(ConsentManager) Status is $status');
         if (status == ConsentStatus.required ||
             (status == ConsentStatus.obtained && reload)) {
           consentForm.show(
@@ -116,12 +146,10 @@ class ConsentManager {
           );
         }
       },
-      (formError) {
+      (FormError formError) {
         // Handle the error
-        debugPrint('(ConsentManager): Error loading consent form; $formError');
-        // Inform the user or retry loading the form
-        ErrorHandling.showError(
-            context, "Failed to load the consent form. Please try again.");
+        debugPrint(
+            '(ConsentManager) Error loading consent form; ${formError.message}');
       },
     );
   }

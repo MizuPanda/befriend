@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../utilities/app_localizations.dart';
+
 class JoiningWidget extends StatefulWidget {
   const JoiningWidget({super.key});
 
@@ -40,9 +42,9 @@ class _JoiningWidgetState extends State<JoiningWidget> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  const AutoSizeText(
-                    "Scan your friend's QR Code!",
-                    style: TextStyle(
+                   AutoSizeText(
+                     AppLocalizations.of(context)?.translate('jw_scan')??"Scan your friend's QR Code!",
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20.0,
                     ),

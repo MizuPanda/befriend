@@ -7,7 +7,7 @@ import '../objects/friendship_progress.dart';
 
 class FriendshipUpdate {
   static Future<void> addProgress(String userID1, String userID2,
-      DocumentSnapshot friendshipDoc, DateTime timestamp,
+      DocumentSnapshot friendshipDoc,
       {required double exp}) async {
     // Update existing friendship
     try {
@@ -20,7 +20,6 @@ class FriendshipUpdate {
         await Constants.friendshipsCollection.doc(friendshipDoc.id).update({
           Constants.progressDoc: progress - 1,
           Constants.levelDoc: FieldValue.increment(1),
-          Constants.timestampDoc: timestamp,
         });
 
         await Constants.usersCollection
@@ -32,7 +31,6 @@ class FriendshipUpdate {
       } else {
         await Constants.friendshipsCollection.doc(friendshipDoc.id).update({
           Constants.progressDoc: progress,
-          Constants.timestampDoc: timestamp,
         });
       }
       debugPrint(
@@ -48,7 +46,7 @@ class FriendshipUpdate {
       required String username1,
       required String username2,
       required String friendshipDocId,
-      required DateTime timestamp}) async {
+      required double baseProgress}) async {
     try {
       FriendshipProgress newFriendship = FriendshipProgress.newFriendship(
           userID1,
@@ -56,8 +54,8 @@ class FriendshipUpdate {
           username1,
           username2,
           Constants.baseLevel,
-          Constants.baseProgress,
-          timestamp);
+        baseProgress,
+      );
       await Constants.friendshipsCollection
           .doc(friendshipDocId)
           .set(newFriendship.toMap());

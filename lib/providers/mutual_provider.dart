@@ -6,6 +6,7 @@ import '../models/data/data_manager.dart';
 import '../models/objects/bubble.dart';
 import '../models/objects/friendship.dart';
 import '../utilities/constants.dart';
+import '../utilities/models.dart';
 
 class MutualProvider extends ChangeNotifier {
   List<Bubble> _filteredUsers = [];
@@ -49,7 +50,7 @@ class MutualProvider extends ChangeNotifier {
         _allLoadedUsers = _pagingController.itemList!;
       });
     } catch (e) {
-      debugPrint('(MutualProvider): Error in initState: $e');
+      debugPrint('(MutualProvider) Error in initState: $e');
     }
   }
 
@@ -95,9 +96,9 @@ class MutualProvider extends ChangeNotifier {
               friendId = user1;
             }
             DocumentSnapshot bubbleSnapshot =
-                await DataManager.getData(id: friendId);
+                await Models.dataManager.getData(id: friendId);
             ImageProvider bubbleImage =
-                await DataManager.getAvatar(bubbleSnapshot);
+                await Models.dataManager.getAvatar(bubbleSnapshot);
 
             friend = Bubble.fromDocsWithoutFriends(bubbleSnapshot, bubbleImage);
 
@@ -118,7 +119,7 @@ class MutualProvider extends ChangeNotifier {
       }
     } catch (error) {
       _pagingController.error = error;
-      debugPrint('(MutualProvider): Error fetching page: $error');
+      debugPrint('(MutualProvider) Error fetching page: $error');
     }
   }
 

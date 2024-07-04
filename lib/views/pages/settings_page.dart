@@ -4,22 +4,18 @@ import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/material_provider.dart';
+import '../../utilities/app_localizations.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
-  @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Settings',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)?.translate('sp_settings')??'Settings',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: SafeArea(
@@ -38,16 +34,16 @@ class _SettingsPageState extends State<SettingsPage> {
                         titleTextColor: ThemeData().primaryColor),
                     sections: [
                       SettingsSection(
-                        title: const Text(
-                          'Your Data',
+                        title:  Text(
+                          AppLocalizations.of(context)?.translate('sp_data')??'Your Data',
                         ),
                         tiles: [
                           SettingsTile.navigation(
                             leading: Icon(lightMode
                                 ? Icons.archive_rounded
                                 : Icons.archive_outlined),
-                            title: const Text(
-                              'Archived pictures',
+                            title:  Text(
+                              AppLocalizations.of(context)?.translate('sp_archived')??'Archived pictures',
                             ),
                             onPressed: provider.goToArchiveSettings,
                           ),
@@ -55,24 +51,24 @@ class _SettingsPageState extends State<SettingsPage> {
                             leading: Icon(lightMode
                                 ? Icons.block_rounded
                                 : Icons.block_outlined),
-                            title: const Text(
-                              'Blocked accounts',
+                            title:  Text(
+                              AppLocalizations.of(context)?.translate('sp_blocked')??'Blocked accounts',
                             ),
                             onPressed: provider.goToBlockedSettings,
                           ),
                         ],
                       ),
                       SettingsSection(
-                        title: const Text(
-                          'Privacy and confidentiality',
+                        title: Text(
+                          AppLocalizations.of(context)?.translate('sp_pc')??'Privacy and confidentiality',
                         ),
                         tiles: [
                           SettingsTile(
                             leading: Icon(lightMode
                                 ? Icons.privacy_tip_rounded
                                 : Icons.privacy_tip_outlined),
-                            title: const Text(
-                              'Privacy Policy',
+                            title:  Text(
+                              AppLocalizations.of(context)?.translate('sp_policy')??'Privacy Policy',
                             ),
                             onPressed: provider.openPrivacyPolicy,
                           ),
@@ -80,35 +76,35 @@ class _SettingsPageState extends State<SettingsPage> {
                             leading: Icon(lightMode
                                 ? Icons.lock_rounded
                                 : Icons.lock_outline_rounded),
-                            title: const Text(
-                              'Manage consent',
+                            title: Text(
+                              AppLocalizations.of(context)?.translate('sp_consent')??'Manage consent',
                             ),
                             description:
-                                const Text('Ads preferences, account deletion'),
+                                 Text(AppLocalizations.of(context)?.translate('sp_preferences')??'Ads preferences, account deletion'),
                             onPressed: provider.goToConsentSettings,
                           ),
                           SettingsTile.navigation(
                             leading: Icon(lightMode
                                 ? Icons.notifications_rounded
                                 : Icons.notifications_outlined),
-                            title: const Text(
-                              'Notifications',
+                            title:  Text(
+                              AppLocalizations.of(context)?.translate('sp_notifications')??'Notifications',
                             ),
                             onPressed: provider.goToNotificationsSettings,
                           ),
                         ],
                       ),
                       SettingsSection(
-                        title: const Text(
-                          'Appearance',
+                        title: Text(
+                          AppLocalizations.of(context)?.translate('sp_appearance')??'Appearance',
                         ),
                         tiles: [
                           SettingsTile(
                             leading: Icon(lightMode
                                 ? Icons.dark_mode_rounded
                                 : Icons.dark_mode_outlined),
-                            title: const Text(
-                              'Theme',
+                            title:  Text(
+                              AppLocalizations.of(context)?.translate('sp_theme')??'Theme',
                             ),
                             trailing: Consumer(builder: (BuildContext context,
                                 MaterialProvider materialProvider,
@@ -120,7 +116,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     const SizedBox(
                                       width: 10,
                                     ),
-                                    Text(materialProvider.themeText()),
+                                    Text(materialProvider.themeText(context)),
                                     const SizedBox(
                                       width: 5,
                                     ),
@@ -134,15 +130,15 @@ class _SettingsPageState extends State<SettingsPage> {
                                   await materialProvider.onSelected(mode);
                                 },
                                 itemBuilder: (BuildContext context) => [
-                                  const PopupMenuItem(
+                                   PopupMenuItem(
                                       value: ThemeMode.light,
-                                      child: Text('Light')),
-                                  const PopupMenuItem(
+                                      child: Text(AppLocalizations.of(context)?.translate('sp_light')??'Light')),
+                                   PopupMenuItem(
                                       value: ThemeMode.dark,
-                                      child: Text('Dark')),
-                                  const PopupMenuItem(
+                                      child: Text(AppLocalizations.of(context)?.translate('sp_dark')??'Dark')),
+                                   PopupMenuItem(
                                       value: ThemeMode.system,
-                                      child: Text('System Default')),
+                                      child: Text(AppLocalizations.of(context)?.translate('sp_default')??'System Default')),
                                 ],
                               );
                             }),
@@ -150,32 +146,32 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),
                       SettingsSection(
-                        title: const Text(
-                          'Misc',
+                        title:  Text(
+                          AppLocalizations.of(context)?.translate('sp_misc')??'Misc',
                         ),
                         tiles: [
                           SettingsTile(
                             leading: Icon(lightMode
                                 ? Icons.description_rounded
                                 : Icons.description_outlined),
-                            title: const Text(
-                              'Terms and Conditions',
+                            title:  Text(
+                              AppLocalizations.of(context)?.translate('sp_terms')??'Terms and Conditions',
                             ),
                             onPressed: provider.openTermsAndConditions,
                           ),
                         ],
                       ),
                       SettingsSection(
-                        title: const Text(
-                          'Help',
+                        title:  Text(
+                          AppLocalizations.of(context)?.translate('sp_help')??'Help',
                         ),
                         tiles: [
                           SettingsTile(
                             leading: Icon(lightMode
                                 ? Icons.help_rounded
                                 : Icons.help_outline_rounded),
-                            title: const Text(
-                              'How to use Befriend',
+                            title:  Text(
+                              AppLocalizations.of(context)?.translate('sp_how')??'How to use Befriend',
                             ),
                             onPressed: provider.openTutorial,
                           ),
@@ -183,22 +179,22 @@ class _SettingsPageState extends State<SettingsPage> {
                             leading: Icon(lightMode
                                 ? Icons.contact_support_rounded
                                 : Icons.contact_support_outlined),
-                            title: const Text(
-                              'Contact',
+                            title:  Text(
+                              AppLocalizations.of(context)?.translate('sp_contact')??'Contact',
                             ),
                             onPressed: provider.openContact,
                           ),
                         ],
                       ),
                       SettingsSection(
-                        title: const Text(
-                          'Login',
+                        title:  Text(
+                          AppLocalizations.of(context)?.translate('sp_login')??'Login',
                         ),
                         tiles: [
                           SettingsTile(
-                            title: const Text(
-                              'Log out',
-                              style: TextStyle(color: Colors.red),
+                            title:  Text(
+                              AppLocalizations.of(context)?.translate('sp_logout')??'Log out',
+                              style: const TextStyle(color: Colors.red),
                             ),
                             onPressed: provider.signOut,
                           ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
 import '../../../providers/settings_provider.dart';
+import '../../../utilities/app_localizations.dart';
 
 class ConsentSettingsWidget extends StatelessWidget {
   const ConsentSettingsWidget({super.key, required this.provider});
@@ -13,9 +14,9 @@ class ConsentSettingsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Manage consent',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title:  Text(
+          AppLocalizations.of(context)?.translate('csw_manage')??'Manage consent',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: SafeArea(
@@ -35,19 +36,19 @@ class ConsentSettingsWidget extends StatelessWidget {
                       if (snapshot.data!)
                         SettingsTile(
                           leading: const Icon(Icons.ads_click),
-                          title: const Text(
-                            'Ads preferences',
+                          title:  Text(
+                            AppLocalizations.of(context)?.translate('csw_ads')??'Ads preferences',
                           ),
-                          onPressed: (_) => provider.reloadConsentForm,
+                          onPressed: provider.reloadConsentForm,
                         ),
                       SettingsTile(
                         leading: const Icon(
                           Icons.delete_forever_outlined,
                           color: Colors.red,
                         ),
-                        title: const Text(
-                          'Delete your account',
-                          style: TextStyle(color: Colors.red),
+                        title:  Text(
+                          AppLocalizations.of(context)?.translate('csw_delete')??'Delete your account',
+                          style: const TextStyle(color: Colors.red),
                         ),
                         onPressed: (BuildContext context) async {
                           await provider.showDeleteAccountConfirmation(context);

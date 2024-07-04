@@ -1,0 +1,10 @@
+/* 
+  InfoPlist.strings
+  Runner
+
+  Created by Juniel Djossou on 2024-07-04.
+  
+*/
+NSCameraUsageDescription = "Befriend a besoin d'accéder à votre caméra pour prendre des photos pour votre profil et vos publications.";
+NSPhotoLibraryUsageDescription = "Befriend a besoin d'accéder à votre bibliothèque de photos pour télécharger des photos pour votre profil et vos publications.";
+NSUserTrackingUsageDescription = "Befriend utilise cet identifiant pour fournir des publicités personnalisées en fonction de vos intérêts.";

@@ -1,6 +1,6 @@
-import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/picture.dart';
+import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/widgets/profile/custom_native_ad.dart';
 import 'package:befriend/views/widgets/profile/picture_card.dart';
 import 'package:befriend/providers/profile_pictures_provider.dart';
@@ -16,10 +16,12 @@ class ProfilePictures extends StatefulWidget {
     super.key,
     required this.userID,
     required this.showArchived,
+    required this.showOnlyMe,
   });
 
   final String userID;
   final bool showArchived;
+  final bool showOnlyMe;
 
   @override
   State<ProfilePictures> createState() => _ProfilePicturesState();
@@ -32,7 +34,7 @@ class _ProfilePicturesState extends State<ProfilePictures> {
   void initState() {
     super.initState();
     _provider.initState(
-        showArchived: widget.showArchived, userId: widget.userID);
+        showArchived: widget.showArchived, showOnlyMe: widget.showOnlyMe,);
   }
 
   @override
@@ -69,7 +71,7 @@ class _ProfilePicturesState extends State<ProfilePictures> {
                       userID: widget.userID,
                       connectedUsername: mainBubble.data!.username,
                       isConnectedUserProfile:
-                          widget.userID == AuthenticationManager.id(),
+                          widget.userID == Models.authenticationManager.id(),
                       onArchiveSuccess: provider.handleArchiveSuccess,
                     );
                   }, noItemsFoundIndicatorBuilder: (BuildContext context) {

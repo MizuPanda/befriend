@@ -8,8 +8,6 @@ class FriendUpdate {
     try {
       await Constants.usersCollection.doc(mainUserId).update({
         Constants.friendsDoc: FieldValue.arrayUnion([friendID]),
-        Constants.powerDoc:
-            FieldValue.increment(Constants.friendshipPowerValue),
       });
       debugPrint('(FriendUpdate): Successfully added friend $friendID');
     } catch (e) {

@@ -63,7 +63,19 @@ class Privacy {
       isPublic = !sliderValuesMap.values.any((privacy) => privacy != 0);
       debugPrint('(Privacy): The picture is ${isPublic ? '' : 'not '}public');
 
-      if (!isPublic) {
+      if (isPublic) {
+        final Iterable<String> sessionUserIDS = host.friendshipsMap.keys;
+        for (MapEntry<String, List<FriendshipProgress>> sessionUser in host.friendshipsMap.entries) {
+          for (FriendshipProgress friendshipProgress in sessionUser.value) {
+            String friendID = friendshipProgress.friendId();
+
+            if (!sessionUserIDS.contains(friendID)) {
+              _friendships.add(friendshipProgress);
+              _friendsAllowed.add(friendID);
+            }
+          }
+        }
+      } else {
         // If all users have no friendships -> then the picture becomes private.
         isPrivate = host.friendshipsMap.values.isEmpty ||
             host.friendshipsMap.values.every((list) => list.isEmpty);

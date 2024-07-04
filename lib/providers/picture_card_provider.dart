@@ -1,12 +1,15 @@
+import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/dialogs/profile/delete_picture_dialog.dart';
+import 'package:befriend/views/dialogs/profile/likes_dialog.dart';
+import 'package:befriend/views/dialogs/profile/username_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 
-import '../models/data/user_manager.dart';
-import '../models/objects/bubble.dart';
 import '../models/objects/picture.dart';
 import '../models/services/post_service.dart';
+import '../utilities/app_localizations.dart';
 import '../utilities/constants.dart';
 import '../views/dialogs/profile/report_dialog.dart';
 import '../views/widgets/profile/more_button.dart';
@@ -52,7 +55,7 @@ class PictureCardProvider extends ChangeNotifier {
   }
 
   bool isArchived() {
-    return _picture.archived;
+    return _picture.hasUserArchived();
   }
 
   Future<void> onSelectPop(PopSelection value, BuildContext context,
@@ -60,14 +63,14 @@ class PictureCardProvider extends ChangeNotifier {
     switch (value) {
       case PopSelection.archive:
         if (isArchived()) {
-          await _restorePicture();
+          await _toggleArchive(false);
         } else {
-          await _archivePicture();
+          await _toggleArchive(true);
         }
-        debugPrint('(PictureCardProvider): Archive action tapped');
+        debugPrint('(PictureCardProvider) Archive action tapped');
         break;
       case PopSelection.info:
-        _showUsernamesDialog(context, usernames);
+        UsernameDialog.showUsernamesDialog(context, usernames);
         break;
       case PopSelection.report:
         _showReportDialog(context);
@@ -95,116 +98,54 @@ class PictureCardProvider extends ChangeNotifier {
 
           _onPictureActionSuccess(_picture.id);
           debugPrint(
-              '(PictureCardProvider): Picture deletion successful: ${result.data}');
+              '(PictureCardProvider) Picture deletion successful: ${result.data}');
           notifyListeners();
         } catch (e) {
-          debugPrint('(PictureCardProvider): Error deleting picture: $e');
+          debugPrint('(PictureCardProvider) Error deleting picture: $e');
           debugPrint(
-              '(PictureCardProvider): Data= {\nhostId: $_userId\npictureId: ${_picture.id}}');
+              '(PictureCardProvider) Data= {\nhostId: $_userId\npictureId: ${_picture.id}}');
         }
       },
     );
   }
-
-  Future<void> _restorePicture() async {
-    await _movePicture(false);
-  }
-
-  Future<void> _archivePicture() async {
-    await _movePicture(true);
-  }
-
-  Future<void> _movePicture(bool archived) async {
+  
+  Future<void> _toggleArchive(bool archived) async {
     try {
-      await Constants.usersCollection
-          .doc(_userId)
-          .collection(Constants.pictureSubCollection)
+      String archivedID = AuthenticationManager.archivedID();
+      String notArchivedID = AuthenticationManager.notArchivedID();
+
+      String add = archived? archivedID : notArchivedID;
+      String remove = archived? notArchivedID : archivedID;
+
+      await Constants.picturesCollection
           .doc(_picture.id)
           .update({
-        Constants.archived: archived,
+        Constants.allowedUsersDoc: FieldValue.arrayRemove([remove]),
+      });
+      await Constants.picturesCollection
+          .doc(_picture.id)
+          .update({
+        Constants.allowedUsersDoc: FieldValue.arrayUnion([add])
       });
       debugPrint(
-          "(PictureCardProvider): Picture successfully ${archived ? 'archived' : 'restored'}.");
+          "(PictureCardProvider) Picture successfully ${archived ? 'archived' : 'restored'}.");
       _onPictureActionSuccess(_picture.id);
     } catch (e) {
-      debugPrint('(PictureCardProvider): Error moving picture: $e');
+      debugPrint('(PictureCardProvider) Error moving picture: $e');
     }
   }
 
-  Future<void> _showUsernamesDialog(
-      BuildContext context, Iterable<dynamic> usernames) async {
-    try {
-      Bubble bubble = await UserManager.getInstance();
-
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return SimpleDialog(
-              title: const Text("People in this picture"),
-              children: usernames
-                  .map((username) => SimpleDialogOption(
-                        child: Text(
-                            bubble.username == username ? 'You' : username),
-                      ))
-                  .toList(),
-            );
-          },
-        );
-      }
-    } catch (e) {
-      debugPrint('(PictureCardProvider): Error showing usernames dialog: $e');
-    }
-  }
-
-  String usersThatLiked() {
+  String usersThatLiked(BuildContext context) {
     switch (_picture.likes.length) {
       case 1:
         return _picture.likes.first;
       default:
-        return '${_picture.likes.first} and others';
+        return '${_picture.likes.first} ${AppLocalizations.of(context)?.translate('pcp_others')?? 'and others'}';
     }
   }
 
   Future<void> showLikesDialog(BuildContext context) async {
-    try {
-      Bubble bubble = await UserManager.getInstance();
-
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return SimpleDialog(
-              title: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.favorite_rounded,
-                    color: Colors.red,
-                  ),
-                  Icon(
-                    Icons.favorite_rounded,
-                    color: Colors.red,
-                  ),
-                  Icon(
-                    Icons.favorite_rounded,
-                    color: Colors.red,
-                  )
-                ],
-              ),
-              children: _picture.likes
-                  .map((username) => SimpleDialogOption(
-                        child: Text(
-                            bubble.username == username ? 'You' : username),
-                      ))
-                  .toList(),
-            );
-          },
-        );
-      }
-    } catch (e) {
-      debugPrint('(PictureCardProvider): Error showing likes dialog: $e');
-    }
+    await LikesDialog.showLikesDialog(context, _picture.likes);
   }
 
   Future<bool?> onLike(bool isLiked) async {
@@ -215,14 +156,21 @@ class PictureCardProvider extends ChangeNotifier {
         Constants.likesDoc: FieldValue.arrayRemove([_connectedUsername]),
       };
     } else {
-      debugPrint('(PictureCardProvider): Is liked yet = $_isNotLikedYet');
+      debugPrint('(PictureCardProvider) Is liked yet = $_isNotLikedYet');
+      String connectedUserID = Models.authenticationManager.id();
+
       if (_isNotLikedYet) {
         data = {
           Constants.likesDoc: FieldValue.arrayUnion([_connectedUsername]),
           Constants.firstLikesDoc: FieldValue.arrayUnion([_connectedUsername])
         };
         _isNotLikedYet = true;
-        await PostService.sendPostLikeNotification(_connectedUsername, _userId);
+
+        if (true || !_picture.sessionUsers.containsKey(connectedUserID)) {
+          List<String> usersToNotify = _picture.sessionUsers.keys.toList();
+
+          PostService.sendPostLikeNotification(_connectedUsername, usersToNotify);
+        }
       } else {
         data = {
           Constants.likesDoc: FieldValue.arrayUnion([_connectedUsername]),
@@ -230,16 +178,14 @@ class PictureCardProvider extends ChangeNotifier {
       }
     }
     try {
-      await Constants.usersCollection
-          .doc(_userId)
-          .collection(Constants.pictureSubCollection)
+      await Constants.picturesCollection
           .doc(_picture.id)
           .update(data);
       debugPrint(
-          '(PictureCardProvider): Updated like to ${(!isLiked).toString()}');
+          '(PictureCardProvider) Updated like to ${(!isLiked).toString()}');
     } catch (error) {
       debugPrint(
-          '(PictureCardProvider): Error updating likes: ${error.toString()}');
+          '(PictureCardProvider) Error updating likes: ${error.toString()}');
       return null;
     }
 

@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../utilities/app_localizations.dart';
+
 class ForgotPasswordPage extends StatelessWidget {
   const ForgotPasswordPage({super.key});
 
@@ -29,7 +31,7 @@ class ForgotPasswordPage extends StatelessWidget {
                 Column(
                   children: [
                     AutoSizeText(
-                      'Forgot your password?',
+                      AppLocalizations.of(context)?.translate('fpp_forgot')??'Forgot your password?',
                       style: GoogleFonts.openSans(
                         fontSize: 25,
                       ),
@@ -38,7 +40,7 @@ class ForgotPasswordPage extends StatelessWidget {
                       height: 0.01 * height,
                     ),
                     AutoSizeText(
-                      'Please enter the email address used for registration.',
+                      AppLocalizations.of(context)?.translate('fpp_email')??'Please enter the email address used for registration.',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.openSans(
                           fontSize: 18, fontStyle: FontStyle.italic),
@@ -51,10 +53,10 @@ class ForgotPasswordPage extends StatelessWidget {
                     TextField(
                       controller: provider.emailController,
                       focusNode: provider.focusNode,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        hintText: 'Email',
-                        border: OutlineInputBorder(
+                      decoration: InputDecoration(
+                        labelText: AppLocalizations.of(context)?.translate('general_word_email')??'Email',
+                        hintText: AppLocalizations.of(context)?.translate('general_word_email')??'Email',
+                        border: const OutlineInputBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(30))),
                       ),
@@ -69,8 +71,8 @@ class ForgotPasswordPage extends StatelessWidget {
                         alignment: Alignment.center,
                         child: provider.isLoading
                             ? const CircularProgressIndicator()
-                            : const AutoSizeText(
-                                'SUBMIT',
+                            :  AutoSizeText(
+                          AppLocalizations.of(context)?.translate('general_word_submit')??'Submit',
                               ),
                       ),
                     ),
@@ -79,9 +81,9 @@ class ForgotPasswordPage extends StatelessWidget {
                       onPressed: () {
                         provider.pop(context);
                       },
-                      child: const Center(
+                      child: Center(
                           child: Text(
-                        'CANCEL',
+                            AppLocalizations.of(context)?.translate('dialog_cancel')??'Cancel',
                       )),
                     ),
                   ],

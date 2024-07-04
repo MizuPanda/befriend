@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../../models/data/picture_manager.dart';
 import '../../../models/objects/bubble.dart';
+import '../../../utilities/app_localizations.dart';
 
 class ProfileEditDialog extends StatefulWidget {
   const ProfileEditDialog(
@@ -55,9 +56,9 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Edit Profile',
-                style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+               Text(
+                 AppLocalizations.of(context)?.translate('ped_edit_profile')??'Edit Profile',
+                style: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 0.020 * height),
               SizedBox(
@@ -121,14 +122,14 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                   }
                 },
                 style: ButtonStyle(
-                  padding: MaterialStatePropertyAll(EdgeInsets.symmetric(
+                  padding: WidgetStatePropertyAll(EdgeInsets.symmetric(
                       horizontal: 0.11 * width, vertical: 0.015 * height)),
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator()
-                    : const Text(
-                        'Save',
-                        style: TextStyle(
+                    :  Text(
+                  AppLocalizations.of(context)?.translate('general_word_save')??'Save',
+                        style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
               ),
@@ -141,7 +142,7 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                       Navigator.of(context).pop();
                     }
                   },
-                  child: const Text('Remove your profile picture')),
+                  child: Text(AppLocalizations.of(context)?.translate('ped_remove')??'Remove your profile picture')),
             ],
           ),
         ),

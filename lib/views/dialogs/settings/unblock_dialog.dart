@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../utilities/app_localizations.dart';
+
 class UnblockDialog {
   static void showUnblockDialog(
       BuildContext context, String username, Function onPressed) {
@@ -13,10 +15,10 @@ class UnblockDialog {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
               title: Text(
-                'Unblock $username',
+                '${AppLocalizations.of(context)?.translate('ud_unblock')?? 'Unblock'} $username',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              content: Text("Are you sure you want to unblock $username?",
+              content: Text("${AppLocalizations.of(context)?.translate('ud_conf')?? 'Are you sure you want to unblock'} $username?",
                   style: const TextStyle(fontSize: 16)),
               actions: isLoading
                   ? [const CircularProgressIndicator()]
@@ -26,9 +28,9 @@ class UnblockDialog {
                           Navigator.of(dialogContext)
                               .pop(); // Dismiss the dialog
                         },
-                        child: const Text(
-                          "Cancel",
-                          style: TextStyle(fontSize: 15),
+                        child: Text(
+                          AppLocalizations.of(context)?.translate('dialog_cancel')??"Cancel",
+                          style: const TextStyle(fontSize: 15),
                         ),
                       ),
                       SizedBox(
@@ -51,8 +53,8 @@ class UnblockDialog {
                                 .pop(); // Dismiss the dialog
                           }
                         },
-                        child: const Text('Unblock',
-                            style: TextStyle(color: Colors.red, fontSize: 15)),
+                        child: Text(AppLocalizations.of(context)?.translate('ud_unblock')??'Unblock',
+                            style: const TextStyle(color: Colors.red, fontSize: 15)),
                       ),
                     ],
             );

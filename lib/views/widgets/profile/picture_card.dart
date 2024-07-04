@@ -3,6 +3,7 @@ import 'package:befriend/providers/picture_card_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:like_button/like_button.dart';
 import 'package:provider/provider.dart';
 
@@ -52,7 +53,7 @@ class _PictureCardState extends State<PictureCard> {
     super.didUpdateWidget(oldWidget);
     if (widget.picture.id != oldWidget.picture.id) {
       _provider.updatePicture(widget.picture);
-      debugPrint("(PictureCard): Updated with: ${widget.picture.id}");
+      debugPrint("(PictureCard) Updated with: ${widget.picture.id}");
     }
   }
 
@@ -105,7 +106,7 @@ class _PictureCardState extends State<PictureCard> {
                         SizedBox(
                           height: 0.01 * height,
                         ),
-                        if (!widget.picture.archived)
+                        if (!widget.picture.hasUserArchived())
                           Row(
                             children: [
                               LikeButton(
@@ -178,6 +179,12 @@ class _PictureCardState extends State<PictureCard> {
   String _formatDate(DateTime date) {
     // This method converts the DateTime into a more readable string
     // Adjust the formatting to fit your needs
-    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+    // Get the current locale
+    Locale currentLocale = Localizations.localeOf(context);
+
+    // Create a DateFormat instance with the current locale
+    DateFormat dateFormat = DateFormat.yMd(currentLocale.toString());
+
+    return dateFormat.format(date);
   }
 }

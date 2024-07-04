@@ -1,21 +1,27 @@
-import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/bubble.dart';
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/utilities/constants.dart';
+import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DataQuery {
-  static const int _friendsLimit = 15;
+  static const int _friendsLimit = 12;
+  static FirebaseStorage _storage = FirebaseStorage.instance;
+
+  static set storage(FirebaseStorage value) {
+    _storage = value;
+  }
+
   static Future<void> updateDocument(String fieldID, dynamic data,
       {String? userId}) async {
     try {
       await Constants.usersCollection
-          .doc(userId ?? AuthenticationManager.id())
+          .doc(userId ?? Models.authenticationManager.id())
           .update(<String, dynamic>{fieldID: data});
     } catch (e) {
       debugPrint('(DataQuery): Failed to update document: $e');
@@ -32,8 +38,8 @@ class DataQuery {
 
       DocumentSnapshot friendshipSnap =
           await Constants.friendshipsCollection.doc(friendshipID).get();
-      DocumentSnapshot bubbleSnap = await DataManager.getData(id: otherUserID);
-      ImageProvider avatar = await DataManager.getAvatar(bubbleSnap);
+      DocumentSnapshot bubbleSnap = await Models.dataManager.getData(id: otherUserID);
+      ImageProvider avatar = await Models.dataManager.getAvatar(bubbleSnap);
 
       Bubble friendBubble = Bubble.fromDocsWithoutFriends(bubbleSnap, avatar);
       return Friendship.fromDocs(currentUserID, friendBubble, friendshipSnap);
@@ -47,7 +53,7 @@ class DataQuery {
       String userID, List<dynamic> friendIDs) async {
     try {
       final List<Friendship> friendships = [];
-      final String mainID = AuthenticationManager.id();
+      final String mainID = Models.authenticationManager.id();
 
       QuerySnapshot query = await Constants.friendshipsCollection
           .where(Filter.or(
@@ -73,8 +79,8 @@ class DataQuery {
         if (mainID != userID && friendID == mainID) {
           friend = await UserManager.getInstance();
         } else {
-          DocumentSnapshot friendDocs = await DataManager.getData(id: friendID);
-          ImageProvider avatar = await DataManager.getAvatar(friendDocs);
+          DocumentSnapshot friendDocs = await Models.dataManager.getData(id: friendID);
+          ImageProvider avatar = await Models.dataManager.getAvatar(friendDocs);
 
           friend = Bubble.fromDocsWithoutFriends(friendDocs, avatar);
         }
@@ -85,17 +91,17 @@ class DataQuery {
       }
       return friendships;
     } catch (e) {
-      debugPrint('Error retrieving friend list: $e');
+      debugPrint('(DataQuery): Error retrieving friend list: $e');
       throw Exception('Failed to retrieve friend list.');
     }
   }
 
-  static Future<ImageProvider> getNetworkImage(String downloadUrl) async {
+  Future<ImageProvider> getNetworkImage(String downloadUrl) async {
     try {
       if (downloadUrl.isEmpty) {
         return Image.asset(Constants.defaultPictureAddress).image;
       }
-      final ref = FirebaseStorage.instance.refFromURL(downloadUrl);
+      final ref = _storage.refFromURL(downloadUrl);
       final url = await ref.getDownloadURL();
 
       return NetworkImage(url);
@@ -104,4 +110,6 @@ class DataQuery {
       return Image.asset(Constants.defaultPictureAddress).image;
     }
   }
+
+  DataQuery.static();
 }

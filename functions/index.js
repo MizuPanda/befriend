@@ -8,6 +8,16 @@ firestore.settings({
   ignoreUndefinedProperties: true,
 });
 
+const localizedStrings = {
+  en: require('./locales/en.json'),
+  fr: require('./locales/fr.json'),
+};
+
+// Function to get localized string
+function getLocalizedString(language, key) {
+  return localizedStrings[language] ? localizedStrings[language][key] : localizedStrings['en'][key];
+}
+
 exports.checkUsernameAvailability = functions.https
     .onCall(async (data, context) => {
       const username = data.username;
@@ -121,18 +131,22 @@ exports.sendNewPostNotification = functions.https.onCall((data, context) => {
             }
             const user = doc.data();
             const token = user.notificationToken; // Ensure you have stored the token as mentioned earlier
+            const languageCode = user.language || "en";
+
+            // Get localized message
+            const title = getLocalizedString(languageCode, 'postTitle');
+            const body = `${postCreatorName} ${getLocalizedString(languageCode, 'postDescription')}`;
 
             if (token) {
                 const message = {
                     notification: {
-                        title: "New Post",
-                        body: `${postCreatorName} has posted a new picture. Check it out!`,
+                        title: title,
+                        body: body,
                     },
                     token: token,
                     data: {
                         hostId: hostId,
                     }
-
                 };
 
                 return admin.messaging().send(message);
@@ -155,39 +169,46 @@ exports.sendNewPostNotification = functions.https.onCall((data, context) => {
 exports.sendPostLikeNotification = functions.https.onCall(async (data, context) => {
     // Ensure the user is authenticated
     if (!context.auth) {
-        throw new functions.https.HttpsError('failed-precondition', 'The function must be called while authenticated.');
+        throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
     }
 
     // Extract data passed from the client
     const likerUsername = data.likerUsername;
-    const ownerId = data.ownerId;
+    const sessionUsers = data.sessionUsers;
 
     try {
-        // Fetch the owner's notification token from Firestore
-        const ownerDoc = await admin.firestore().collection('users').doc(ownerId).get();
-        if (!ownerDoc.exists) {
-            throw new functions.https.HttpsError('not-found', 'Failed to find the post owner in Firestore.');
-        }
-        const ownerToken = ownerDoc.data().notificationToken;
-        if (!ownerToken) {
-            throw new functions.https.HttpsError('not-found', 'The post owner does not have a notification token.');
-        }
+        for (let sessionUser of sessionUsers) {
+            // Fetch the owner's notification token from Firestore
+            const sessionUserDoc = await admin.firestore().collection('users').doc(sessionUser).get();
+            if (!sessionUserDoc.exists) {
+                throw new functions.https.HttpsError('not-found', 'Failed to find the post owner in Firestore.');
+            }
+            const sessionUserToken = sessionUserDoc.data().notificationToken;
+            const sessionUserLanguage = sessionUserDoc.data().language || 'en';
+            if (!sessionUserToken) {
+                throw new functions.https.HttpsError('not-found', 'The post owner does not have a notification token.');
+            }
 
-        // Prepare the notification message
-        const message = {
-            notification: {
-                title: 'Someone liked your post!',
-                body: `${likerUsername} has liked your post!`,
-            },
-            token: ownerToken,
-        };
+            // Get localized message
+            const title = getLocalizedString(sessionUserLanguage, 'likeTitle');
+            const body = `${likerUsername} ${getLocalizedString(sessionUserLanguage, 'likeDescription')}`;
 
-        // Send the notification
-        const response = await admin.messaging().send(message);
-        console.log('Successfully sent message:', response);
+            // Prepare the notification message
+            const message = {
+                notification: {
+                    title: title,
+                    body: body,
+                },
+                token: sessionUserToken,
+            };
+
+            // Send the notification
+            const response = await admin.messaging().send(message);
+            console.log('Successfully sent message:', response);
+        }
 
         // Respond to the client indicating success
-        return { result: `Message sent to ${ownerId} successfully.` };
+        return { result: 'Message sent successfully.' };
     } catch (error) {
         console.log('Error sending message:', error);
         throw new functions.https.HttpsError('unknown', 'Failed to send notification.', error);
@@ -197,102 +218,81 @@ exports.sendPostLikeNotification = functions.https.onCall(async (data, context) 
 exports.deleteUserData = functions.https.onCall(async (data, context) => {
   // Ensure the user is authenticated
   if (!context.auth) {
-      throw new functions.https.HttpsError('failed-precondition', 'The function must be called while authenticated.');
+    throw new functions.https.HttpsError('failed-precondition', 'The function must be called while authenticated.');
   }
 
   const uid = data.uid;
   const friendshipIds = data.friendshipIds;
   const friendIds = data.friendIds;
 
-   // Reference to the user's document
+  try {
+    // Reference to the user's document
     const userDocRef = admin.firestore().collection('users').doc(uid);
-
-    // First, fetch the user document to access the avatar field
-    const userDoc = await userDocRef.get();
-    if (!userDoc.exists) {
-      console.log(`User document for UID: ${uid} does not exist.`);
-    } else {
-      // If the avatar field exists and contains a URL, delete the corresponding file in Storage
-      const avatarUrl = userDoc.data().avatar;
-      if (avatarUrl) {
-        // Parse the avatarUrl to extract the file path
-        const decodeURL = decodeURIComponent(avatarUrl);
-        const pathMatch = decodeURL.match(/\/o\/(.+)\?alt=media/);
-        if (pathMatch && pathMatch.length > 1) {
-          const filePath = pathMatch[1];
-          // Delete the file from Firebase Storage
-          await admin.storage().bucket().file(filePath).delete();
-        }
-      }
-    }
 
     // Delete the user's document
     await userDocRef.delete();
 
-  // Get a reference for the sub collection.
-  const picturesCollectionRef = userDocRef.collection('pictures');
+    // Get a reference for the picture collection.
+    const picturesCollectionRef = admin.firestore().collection('pictures');
 
-  // Find and delete all pictures where the user is the host
-  const picturesSnapshot = await picturesCollectionRef.where('hostId', '==', uid).get();
-  for (const doc of picturesSnapshot.docs) {
+    // Find and delete all pictures where the user is the host
+    const picturesSnapshot = await picturesCollectionRef.where('hostId', '==', uid).get();
+    for (const doc of picturesSnapshot.docs) {
       const pictureData = doc.data();
       await deletePicture({
-          hostId: uid,
-          pictureId: doc.id,
-          downloadUrl: pictureData.downloadUrl
+        hostId: uid,
+        pictureId: doc.id,
+        downloadUrl: pictureData.downloadUrl,
       });
-  }
+    }
 
-  // Delete the 'pictures' subcollection
-  await deleteCollection(picturesCollectionRef);
+    // Delete the user's Firebase Authentication account
+    try {
+      await admin.auth().deleteUser(uid);
+      console.log(`Successfully deleted Firebase Auth user for UID: ${uid}`);
+    } catch (error) {
+      console.error(`Error deleting Firebase Auth user for UID: ${uid}`, error);
+    }
 
-  // Delete user's document from "User" collection
-  await admin.firestore().collection('users').doc(uid).delete();
+    // Remove user's UID from each friend's 'friends' array
+    const friendPromises = friendIds.map((friendId) =>
+      admin.firestore().collection('users').doc(friendId).update({
+        friends: admin.firestore.FieldValue.arrayRemove(uid),
+      })
+    );
+    await Promise.all(friendPromises);
 
-  // Delete the user's Firebase Authentication account
-  try {
-    await admin.auth().deleteUser(uid);
-    console.log(`Successfully deleted Firebase Auth user for UID: ${uid}`);
+    // Delete all friendship documents
+    const friendshipPromises = friendshipIds.map((friendshipId) =>
+      admin.firestore().collection('friendships').doc(friendshipId).delete()
+    );
+    await Promise.all(friendshipPromises);
+
+    // Delete user's profile picture from "profile_pictures" folder
+    const profilePicPath = `profile_pictures/${uid}.jpg`;
+    try {
+      await admin.storage().bucket().file(profilePicPath).delete();
+    } catch (error) {
+      console.error(`Error deleting profile picture for UID: ${uid}`, error);
+    }
+
+    // Delete all files in user's "session_pictures" folder
+    // Note: As Firebase Admin SDK does not support direct folder deletion, list and delete each file.
+    const sessionTempPics = `session_pictures/${uid}/temp/`;
+    try {
+      const [files] = await admin.storage().bucket().getFiles({ prefix: sessionTempPics });
+      const deletePromises = files.map((file) => file.delete());
+      await Promise.all(deletePromises);
+    } catch (error) {
+      console.error(`Error deleting session pictures for UID: ${uid}`, error);
+    }
+
+    console.log(`Successfully deleted all data for user: ${uid}`);
   } catch (error) {
-    console.error(`Error deleting Firebase Auth user for UID: ${uid}`, error);
+    console.error(`Error deleting user data for UID: ${uid}`, error);
+    throw new functions.https.HttpsError('unknown', 'Error deleting user data.');
   }
-
-  // Remove user's UID from each friend's 'friends' array
-  const friendPromises = friendIds.map(friendId =>
-    admin.firestore().collection('users').doc(friendId).update({
-      friends: admin.firestore.FieldValue.arrayRemove(uid)
-    })
-  );
-  await Promise.all(friendPromises);
-
-  // Delete all friendship documents
-  const friendshipPromises = friendshipIds.map(friendshipId =>
-    admin.firestore().collection('friendships').doc(friendshipId).delete()
-  );
-  await Promise.all(friendshipPromises);
-
-  // Delete user's profile picture from "profile_pictures" folder
-  const profilePicPath = `profile_pictures/${uid}.jpg`;
-  await admin.storage().bucket().file(profilePicPath).delete().catch(error => console.log(error.message));
-
-  // Delete all files in user's "session_pictures" folder
-  // Note: As Firebase Admin SDK does not support direct folder deletion, list and delete each file.
-  const sessionPicsPath = `session_pictures/${uid}/`;
-  const files = await admin.storage().bucket().getFiles({ prefix: sessionPicsPath });
-  const deletePromises = files[0].map(file => file.delete());
-  await Promise.all(deletePromises).catch(error => console.log(error.message));
-
-  console.log(`Successfully deleted all data for user: ${uid}`);
 });
-
-async function deleteCollection(collectionRef) {
-  const snapshot = await collectionRef.get();
-  const deletionPromises = [];
-  snapshot.forEach(doc => {
-    deletionPromises.push(doc.ref.delete());
-  });
-  await Promise.all(deletionPromises);
-}
 
 // Shared logic for modifying user relationships
 async function updateUserRelationships({ userId, targetUserId, targetUsername, friendshipId, action }) {
@@ -387,39 +387,22 @@ exports.deletePictureForSessionUsers = functions.https.onCall(async (data, conte
 
 // Helper function to delete a picture and its references from session users
 async function deletePicture({hostId, pictureId, downloadUrl}) {
-  // Delete the picture from each session user's pictures subcollection
-  const pictureDoc = await admin.firestore()
-    .collection('users').doc(hostId)
-    .collection('pictures').doc(pictureId)
-    .get();
+  // Create an array to store the promises
+    const deletePromises = [];
 
-  if (!pictureDoc.exists) {
-    console.log('Picture document does not exist:', pictureId);
-    return;
-  }
+    // Delete the picture document from Firestore
+    deletePromises.push(admin.firestore().collection('pictures').doc(pictureId).delete());
 
-  const sessionUsers = pictureDoc.data().sessionUsers;
-  if (!sessionUsers) {
-    console.log('The sessionUsers field is missing in the picture document:', pictureId);
-    return;
-  }
-
-  const deletePromises = Object.keys(sessionUsers).map(userId =>
-    admin.firestore()
-      .collection('users').doc(userId)
-      .collection('pictures').doc(pictureId)
-      .delete()
-  );
-
-  // Delete the file from Firebase Storage
-  if (downloadUrl) {
-    const decodeURL = decodeURIComponent(downloadUrl);
-    const pathMatch = decodeURL.match(/\/o\/(.+)\?alt=media/);
-    if (pathMatch && pathMatch.length > 1) {
-      const filePath = pathMatch[1];
-      deletePromises.push(admin.storage().bucket().file(filePath).delete());
+    // Delete the file from Firebase Storage if downloadUrl is provided
+    if (downloadUrl) {
+      const decodeURL = decodeURIComponent(downloadUrl);
+      const pathMatch = decodeURL.match(/\/o\/(.+)\?alt=media/);
+      if (pathMatch && pathMatch.length > 1) {
+        const filePath = pathMatch[1];
+        deletePromises.push(admin.storage().bucket().file(filePath).delete());
+      }
     }
-  }
 
-  await Promise.all(deletePromises);
+    // Wait for all delete operations to complete
+    await Promise.all(deletePromises);
 }

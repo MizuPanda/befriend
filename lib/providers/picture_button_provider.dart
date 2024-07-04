@@ -1,11 +1,8 @@
+import 'package:befriend/models/qr/host_listening.dart';
 import 'package:flutter/material.dart';
 
 import '../models/authentication/authentication.dart';
-import '../models/authentication/consent_manager.dart';
 import '../views/dialogs/home/email_verified_dialog.dart';
-import '../views/dialogs/rounded_dialog.dart';
-import '../views/widgets/home/picture/hosting_widget.dart';
-import '../views/widgets/home/picture/joining_widget.dart';
 
 class PictureButtonProvider extends ChangeNotifier {
   double _dragPosition = 0.0;
@@ -39,29 +36,10 @@ class PictureButtonProvider extends ChangeNotifier {
 
   Future<void> onPressed(BuildContext context) async {
     if (AuthenticationManager.isEmailVerified()) {
-      // Allow access to the feature
-      await ConsentManager.getConsentForm(context, reload: false);
-
-      if (context.mounted) {
-        if (_isJoinMode) {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return const RoundedDialog(child: JoiningWidget());
-              });
-        } else {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return const RoundedDialog(
-                  child: HostingWidget(isHost: true, host: null),
-                );
-              });
-        }
-      }
+      await HostListening.pictureButton(context, _isJoinMode);
     } else {
       // Show a dialog or notification explaining the restriction
-      EmailVerifiedDialog.dialog(context);
+      EmailVerifiedDialog.dialog(context, _isJoinMode);
     }
   }
 }

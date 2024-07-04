@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../utilities/app_localizations.dart';
+
 class ForgotProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -22,10 +24,10 @@ class ForgotProvider extends ChangeNotifier {
 
     try {
       await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
-      const SnackBar successSnackBar = SnackBar(
+      final SnackBar successSnackBar = SnackBar(
         content: Text(
-            'If your email address is in our records, you will receive a password reset email shortly.'),
-        duration: Duration(seconds: 3),
+            context.mounted? AppLocalizations.of(context)?.translate('fp_reset')??'If your email address is in our records, you will receive a password reset email shortly.' : 'If your email address is in our records, you will receive a password reset email shortly.'),
+        duration: const Duration(seconds: 3),
         showCloseIcon: true,
       );
       if (context.mounted) {
@@ -33,9 +35,9 @@ class ForgotProvider extends ChangeNotifier {
       }
     } catch (error) {
       debugPrint('(ForgotProvider) Error: ${error.toString()}');
-      const SnackBar errorSnackBar = SnackBar(
-        content: Text('Failed to send password reset email. Please try again.'),
-        duration: Duration(seconds: 3),
+      final SnackBar errorSnackBar = SnackBar(
+        content: Text(context.mounted? AppLocalizations.of(context)?.translate('fp_reset_error')?? 'Failed to send password reset email. Please try again.' : 'Failed to send password reset email. Please try again.'),
+        duration: const Duration(seconds: 3),
         showCloseIcon: true,
       );
       if (context.mounted) {

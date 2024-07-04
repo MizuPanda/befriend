@@ -3,6 +3,7 @@ import 'package:befriend/providers/sign_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../utilities/app_localizations.dart';
 import '../../../../utilities/password_strength.dart';
 
 class PasswordStrengthIndicator extends StatelessWidget {
@@ -28,13 +29,13 @@ class PasswordStrengthIndicator extends StatelessWidget {
         text = '';
       } else if (strength <= 2) {
         indicatorColor = Colors.red;
-        text = 'Weak';
+        text = AppLocalizations.of(context)?.translate('si_weak')??'Weak';
       } else if (strength <= 3) {
         indicatorColor = Colors.orange;
-        text = 'Medium';
+        text = AppLocalizations.of(context)?.translate('si_medium')??'Medium';
       } else {
         indicatorColor = Colors.green;
-        text = 'Strong';
+        text = AppLocalizations.of(context)?.translate('si_strong')??'Strong';
       }
 
       return Column(

@@ -24,7 +24,9 @@ class EmailFormField extends StatelessWidget {
           action: TextInputAction.next,
           focusNode: provider.emailFocusNode,
           onSaved: provider.emailSaved,
-          validator: provider.emailValidator,
+          validator: (String? val) {
+            return provider.emailValidator(context, val);
+          },
           keyboardType: TextInputType.emailAddress,
           obscureText: false,
           decoration: Decorations.loginInputDecoration(

@@ -5,10 +5,11 @@ import 'package:befriend/utilities/error_handling.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../models/data/picture_query.dart';
 import '../models/data/user_manager.dart';
 import '../models/objects/home.dart';
+import '../utilities/app_localizations.dart';
 import '../utilities/constants.dart';
+import '../utilities/models.dart';
 
 class PictureSignProvider extends ChangeNotifier {
   bool _isSkipLoading = false;
@@ -37,10 +38,10 @@ class PictureSignProvider extends ChangeNotifier {
       );
       notifyListeners();
     } catch (e) {
-      debugPrint('(PictureSignProvider): Error retrieving image: $e');
+      debugPrint('(PictureSignProvider) Error retrieving image: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, 'Error retrieving image. Please try again.');
+            context, AppLocalizations.of(context)?.translate('psp_retrieve_error')??'Error retrieving image. Please try again.');
       }
     }
   }
@@ -50,15 +51,15 @@ class PictureSignProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await PictureQuery.uploadAvatar(File(_imagePath!));
+      await Models.pictureQuery.uploadAvatar(File(_imagePath!));
       if (context.mounted) {
         await _skip(context);
       }
     } catch (e) {
-      debugPrint('(PictureSignProvider): Error uploading avatar: $e');
+      debugPrint('(PictureSignProvider) Error uploading avatar: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, 'Error uploading avatar. Please try again.');
+            context, AppLocalizations.of(context)?.translate('psd_upload_error')??'Error uploading avatar. Please try again.');
       }
     } finally {
       _isContinueLoading = false;
@@ -73,10 +74,10 @@ class PictureSignProvider extends ChangeNotifier {
     try {
       await _skip(context);
     } catch (e) {
-      debugPrint('(PictureSignProvider): Error navigating to home: $e');
+      debugPrint('(PictureSignProvider) Error navigating to home: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, 'Error navigating to home. Please try again.');
+            context, AppLocalizations.of(context)?.translate('psp_skip_error')??'Error navigating to home. Please try again.');
       }
     } finally {
       _isSkipLoading = false;
@@ -93,11 +94,7 @@ class PictureSignProvider extends ChangeNotifier {
         GoRouter.of(context).push(Constants.homepageAddress, extra: user);
       }
     } catch (e) {
-      debugPrint('(PictureSignProvider): Error navigating to home: $e');
-      if (context.mounted) {
-        ErrorHandling.showError(
-            context, 'Error navigating to home. Please try again.');
-      }
+      rethrow;
     }
   }
 }

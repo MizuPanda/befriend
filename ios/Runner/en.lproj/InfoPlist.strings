@@ -1,0 +1,10 @@
+/* 
+  InfoPlist.strings
+  Runner
+
+  Created by Juniel Djossou on 2024-07-04.
+  
+*/
+NSCameraUsageDescription = "Befriend needs camera access to take photos for your profile and posts.";
+NSPhotoLibraryUsageDescription = "Befriend needs access to your photo library to upload photos for your profile and posts.";
+NSUserTrackingUsageDescription = "Befriend uses this identifier to deliver personalized ads based on your interests.";

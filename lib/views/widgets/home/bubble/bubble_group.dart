@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../models/objects/home.dart';
+import '../../../../utilities/app_localizations.dart';
 
 class BubbleGroupWidget extends StatelessWidget {
   const BubbleGroupWidget({
@@ -39,20 +40,11 @@ class BubbleGroupWidget extends StatelessWidget {
             top: heightCentered(context, provider.viewerSize,
                 bubbleHeight: provider.home.user.size, dy: 0),
             child: Showcase(
-              key: provider.one,
+              key: provider.two,
               descriptionAlignment: TextAlign.center,
-              description:
-                  'Your Character is shown here. When you make new Connections, they will appear on your Home page.',
-              child: Showcase(
-                key: provider.two,
-                description: 'Tap a Character to open their profile.',
-                child: Showcase(
-                  key: provider.three,
-                  description: 'Hold a Character to go on their Home page.',
-                  child: ShakeableBubble(
-                    specificHome: provider.home,
-                  ),
-                ),
+              description: AppLocalizations.of(context)?.translate('bg_two')??"Meet your friends in real life and take a picture together to add them to your friend list",
+              child: ShakeableBubble(
+                specificHome: provider.home,
               ),
             ),
           ),

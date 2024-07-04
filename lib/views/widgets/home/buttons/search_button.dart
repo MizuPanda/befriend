@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../models/objects/bubble.dart';
 import '../../../../models/objects/friendship.dart';
+import '../../../../utilities/app_localizations.dart';
 
 class SearchButton extends StatefulWidget {
   const SearchButton({
@@ -37,6 +38,7 @@ class _SearchButtonState extends State<SearchButton> {
             right: Constants.homeHorizontalPaddingMultiplier * width),
         child: GestureDetector(
           child: AnimSearchBar(
+            helpText: AppLocalizations.of(context)?.translate('sb_text')??"Search...",
             rtl: true,
             width: MediaQuery.of(context).size.width -
                 (provider.home.user.main() ? normalPadding : friendPadding),

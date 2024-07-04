@@ -3,6 +3,8 @@ import 'package:befriend/providers/sign_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../utilities/app_localizations.dart';
+
 class SignUpButton extends StatelessWidget {
   const SignUpButton({
     super.key,
@@ -20,7 +22,7 @@ class SignUpButton extends StatelessWidget {
       height: 0.050 * height,
       child: ElevatedButton(
         style: const ButtonStyle(
-            shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+            shape: WidgetStatePropertyAll(RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
             Radius.circular(20),
           ),
@@ -32,9 +34,9 @@ class SignUpButton extends StatelessWidget {
             if (provider.isLoading) {
               return const CircularProgressIndicator();
             }
-            return const AutoSizeText(
-              'Sign up',
-              style: TextStyle(fontSize: 17),
+            return AutoSizeText(
+              AppLocalizations.of(context)?.translate('su_sign')??'Sign up',
+              style: const TextStyle(fontSize: 17),
             );
           },
         ),

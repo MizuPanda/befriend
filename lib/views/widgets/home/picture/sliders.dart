@@ -8,6 +8,7 @@ import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../../models/objects/bubble.dart';
 import '../../../../../utilities/constants.dart';
+import '../../../../utilities/app_localizations.dart';
 import '../../users/profile_photo.dart';
 
 class UserSlidersScreen extends StatelessWidget {
@@ -30,7 +31,7 @@ class UserSlidersScreen extends StatelessWidget {
 
             return Showcase(
               key: provider.three,
-              description: 'Slide to select who you allow to see the picture.',
+              description: AppLocalizations.of(context)?.translate('s_three')??'Slide to select who you allow to see the picture.',
               child: ListView(
                 children: snapshot.data!.docs.map((userDocument) {
                   return UserSlider(
@@ -126,9 +127,9 @@ class _UserSliderState extends State<UserSlider> {
               children: [
                 Builder(builder: (context) {
                   if (provider.isUser(widget.bubble.id)) {
-                    debugPrint('(Sliders): ${provider.pointsLength() - 1}');
+                    debugPrint('(Sliders) ${provider.pointsLength() - 1}');
                     debugPrint(
-                        '(Sliders): Critical Points= ${provider.criticalPoints()}');
+                        '(Sliders) Critical Points= ${provider.criticalPoints()}');
 
                     return Slider(
                       value: provider.selectedIndex.toDouble(),
@@ -138,7 +139,7 @@ class _UserSliderState extends State<UserSlider> {
                       onChanged: (double value) {
                         setState(() {
                           provider.selectedIndex = value.toInt();
-                          debugPrint("(Sliders): Selected privacy = $value");
+                          debugPrint("(Sliders) Selected privacy = $value");
                         });
                       },
                       onChangeEnd: (double value) async {
@@ -163,7 +164,7 @@ class _UserSliderState extends State<UserSlider> {
                       padding: EdgeInsets.only(
                           left: _horizontalPaddingMultiplier * width),
                       child: AutoSizeText(
-                        'Public',
+                        AppLocalizations.of(context)?.translate('s_public')??'Public',
                         style: GoogleFonts.openSans(
                             fontSize: 12, fontStyle: FontStyle.italic),
                       ),
@@ -173,7 +174,7 @@ class _UserSliderState extends State<UserSlider> {
                       padding: EdgeInsets.only(
                           right: _horizontalPaddingMultiplier * width),
                       child: AutoSizeText(
-                        'Private',
+                        AppLocalizations.of(context)?.translate('s_private')??'Private',
                         style: GoogleFonts.openSans(
                             fontSize: 12, fontStyle: FontStyle.italic),
                       ),

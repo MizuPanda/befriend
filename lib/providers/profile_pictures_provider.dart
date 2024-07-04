@@ -1,12 +1,13 @@
 import 'dart:math';
 
+import 'package:befriend/models/authentication/authentication.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../models/authentication/authentication.dart';
 import '../models/objects/picture.dart';
 import '../utilities/constants.dart';
+import '../utilities/models.dart';
 
 class ProfilePicturesProvider extends ChangeNotifier {
   static const _pageSize = 5;
@@ -18,9 +19,9 @@ class ProfilePicturesProvider extends ChangeNotifier {
 
   PagingController<int, Picture> get pagingController => _pagingController;
 
-  void initState({required String userId, required bool showArchived}) {
+  void initState({required bool showArchived, required bool showOnlyMe}) {
     _pagingController.addPageRequestListener((pageKey) {
-      _fetchPage(pageKey, userId: userId, showArchived: showArchived);
+      _fetchPage(pageKey, showArchived: showArchived, showOnlyMe: showOnlyMe);
     });
   }
 
@@ -43,18 +44,26 @@ class ProfilePicturesProvider extends ChangeNotifier {
   }
 
   Future<void> _fetchPage(int pageKey,
-      {required String userId, required bool showArchived}) async {
+      {required bool showArchived, required bool showOnlyMe}) async {
     try {
       final Future<QuerySnapshot> query;
-      final Query q = Constants.usersCollection
-          .doc(userId)
-          .collection(Constants.pictureSubCollection)
-          .where(Constants.archived, isEqualTo: showArchived)
-          .where(Filter.or(
-              Filter(Constants.publicDoc, isEqualTo: true),
-              Filter(Constants.allowedUsersDoc,
-                  arrayContains: AuthenticationManager.id())))
-          .orderBy(Constants.timestampDoc, descending: true);
+      Query q;
+
+      final String userID = Models.authenticationManager.id();
+
+      if (showOnlyMe) {
+        q = Constants.picturesCollection
+            .where(Constants.hostId, isEqualTo: userID)
+            .where(Constants.allowedUsersDoc, arrayContains: AuthenticationManager.notArchivedID());
+      } else if (showArchived) {
+        q = Constants.picturesCollection
+            .where(Constants.allowedUsersDoc, arrayContains: AuthenticationManager.archivedID());
+      } else {
+        q = Constants.picturesCollection
+            .where(Constants.allowedUsersDoc, arrayContainsAny: [AuthenticationManager.notArchivedID(), userID]);
+      }
+
+      q = q.orderBy(Constants.timestampDoc, descending: true);
 
       if (pageKey == 0 || _lastVisible == null) {
         query = q.limit(_pageSize).get();
@@ -74,7 +83,7 @@ class ProfilePicturesProvider extends ChangeNotifier {
 
       if (_nextAdIndex == 0) {
         _nextAdIndex = _randomAdRange();
-        debugPrint('(ProfilePicturesProvider): Next ad at $_nextAdIndex');
+        debugPrint('(ProfilePicturesProvider) Next ad at $_nextAdIndex');
       }
 
       for (int i = 0; i < pictures.length; i++) {
@@ -82,7 +91,7 @@ class ProfilePicturesProvider extends ChangeNotifier {
         if (_nextAdIndex - 1 == 0) {
           newItems.add(Picture.pictureAd);
           _nextAdIndex = _randomAdRange();
-          debugPrint('(ProfilePicturesProvider): Next ad at $_nextAdIndex');
+          debugPrint('(ProfilePicturesProvider) Next ad at $_nextAdIndex');
         }
         _nextAdIndex--;
       }
@@ -95,7 +104,7 @@ class ProfilePicturesProvider extends ChangeNotifier {
         _pagingController.appendPage(newItems, nextPageKey);
       }
     } catch (error) {
-      debugPrint('(ProfilePicturesProvider): Error fetching page: $error');
+      debugPrint('(ProfilePicturesProvider) Error fetching page: $error');
       _pagingController.error = error;
     }
   }

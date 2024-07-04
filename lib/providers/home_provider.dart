@@ -1,10 +1,11 @@
-import 'package:befriend/models/data/data_query.dart';
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:showcaseview/showcaseview.dart';
 
+import '../models/data/data_query.dart';
 import '../models/objects/friendship.dart';
 import '../models/objects/home.dart';
 import '../utilities/constants.dart';
@@ -27,14 +28,11 @@ class HomeProvider extends ChangeNotifier {
   /// Swipe Picture Button*
   final GlobalKey _four = GlobalKey();
 
-  /// Tap on Befriend*
-  final GlobalKey _five = GlobalKey();
 
   GlobalKey get one => _one;
   GlobalKey get two => _two;
   GlobalKey get three => _three;
   GlobalKey get four => _four;
-  GlobalKey get five => _five;
 
   Home home;
 
@@ -44,7 +42,7 @@ class HomeProvider extends ChangeNotifier {
     if (home.user.friendshipsLoaded) {
       WidgetsBinding.instance.addPostFrameCallback((_) =>
           ShowCaseWidget.of(context)
-              .startShowCase([_one, _two, _three, _four, _five]));
+              .startShowCase([_one, _two, _three, _four,]));
     }
   }
 
@@ -83,18 +81,18 @@ class HomeProvider extends ChangeNotifier {
   }
 
   Future<List<Friendship>> loadFriendships() async {
-    debugPrint('(HomeProvider): loadFriendships()');
+    debugPrint('(HomeProvider) loadFriendships()');
     if (!home.user.friendshipsLoaded) {
-      debugPrint('(HomeProvider): Starting friendships...');
+      debugPrint('(HomeProvider) Starting friendships...');
       try {
         home.user.friendships =
             await DataQuery.friendList(home.user.id, home.user.friendIDs);
         home.user.friendshipsLoaded = true;
         home.initializePositions();
         _transformationController.value = home.middlePos();
-        debugPrint('(HomeProvider): Friendships loaded successfully.');
+        debugPrint('(HomeProvider) Friendships loaded successfully.');
       } catch (e) {
-        debugPrint('(HomeProvider): Error loading friendships: $e');
+        debugPrint('(HomeProvider) Error loading friendships: $e');
         // Optionally, handle error for user feedback
       }
     }
@@ -122,6 +120,25 @@ class HomeProvider extends ChangeNotifier {
     homeProvider._transformationController.value = home.middlePos();
 
     return homeProvider;
+  }
+
+  Future<void> initLanguage(BuildContext context) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        if (home.user.main()) {
+          final String languageCode = Localizations.localeOf(context).languageCode;
+          if (home.user.languageCode != languageCode) {
+            debugPrint('(HomeProvider) Updating language from ${home.user.languageCode} to $languageCode');
+            await DataQuery.updateDocument(Constants.languageDoc, languageCode);
+            home.user.languageCode = languageCode;
+            UserManager.setLanguageCode(languageCode);
+
+          }
+        }
+      } catch (e) {
+        debugPrint("(HomeProvider) Error updating language= $e");
+      }
+    });
   }
 
   void doDispose() {

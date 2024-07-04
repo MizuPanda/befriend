@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../utilities/app_localizations.dart';
 import '../widgets/authentication/login/icon_text_field.dart';
 import '../widgets/authentication/signup/sign_up.dart';
 
@@ -64,7 +65,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       Align(
                         alignment: Alignment.center,
                         child: AutoSizeText(
-                          'Welcome! Begin by creating an account',
+                          AppLocalizations.of(context)?.translate('sup_welcome')??'Welcome! Begin by creating an account',
                           style: GoogleFonts.openSans(
                               textStyle: const TextStyle(fontSize: 18)),
                         ),
@@ -74,18 +75,22 @@ class _SignUpPageState extends State<SignUpPage> {
                         textInputAction: TextInputAction.next,
                         textInputType: TextInputType.emailAddress,
                         iconData: Icons.email,
-                        hintText: 'Your email',
-                        onSaved: _provider.emailSaved,
-                        validator: _provider.emailValidator,
+                        hintText: AppLocalizations.of(context)?.translate('sup_email')??'Your email',
+                        onSaved: provider.emailSaved,
+                        validator: (String? val) {
+                          return provider.emailValidator(val, context);
+                        },
                       ),
                       SizedBox(height: 0.020 * height),
                       IconTextField(
                         textInputType: TextInputType.text,
                         textInputAction: TextInputAction.next,
                         iconData: Icons.account_circle,
-                        hintText: 'Your username',
-                        onSaved: _provider.usernameSaved,
-                        validator: _provider.usernameValidator,
+                        hintText: AppLocalizations.of(context)?.translate('sup_username')??'Your username',
+                        onSaved: provider.usernameSaved,
+                        validator: (String? val) {
+                         return provider.usernameValidator(val, context);
+                        },
                       ),
                       SizedBox(
                         height: 0.020 * height,
@@ -95,7 +100,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         padding: EdgeInsets.only(
                             top: 0.008 * height, left: 0.033 * width),
                         child: AutoSizeText(
-                          'This information will not be displayed on your profile.',
+                          AppLocalizations.of(context)?.translate('sup_birthday')??'This information will not be displayed on your profile.',
                           style: GoogleFonts.openSans(
                               fontSize: 12, fontStyle: FontStyle.italic),
                         ),
@@ -105,12 +110,14 @@ class _SignUpPageState extends State<SignUpPage> {
                         textInputType: TextInputType.visiblePassword,
                         textInputAction: TextInputAction.next,
                         iconData: Icons.lock,
-                        hintText: 'Your password',
-                        onChanged: _provider.onChanged,
-                        onSaved: _provider.passwordSaved,
-                        validator: _provider.passwordValidator,
-                        passwordVisible: _provider.passwordVisible,
-                        hidePassword: _provider.hidePassword,
+                        hintText: AppLocalizations.of(context)?.translate('sup_password')??'Your password',
+                        onChanged: provider.onChanged,
+                        onSaved: provider.passwordSaved,
+                        validator: (String? val) {
+                         return provider.passwordValidator(val, context);
+                        },
+                        passwordVisible: provider.passwordVisible,
+                        hidePassword: provider.hidePassword,
                       ),
                       const PasswordStrengthIndicator(),
                       SizedBox(height: height * 0.020),
@@ -118,11 +125,13 @@ class _SignUpPageState extends State<SignUpPage> {
                         textInputType: TextInputType.visiblePassword,
                         textInputAction: TextInputAction.done,
                         iconData: Icons.lock,
-                        hintText: 'Repeat your password',
+                        hintText: AppLocalizations.of(context)?.translate('sup_repeat')??'Repeat your password',
                         onSaved: (_) {},
-                        validator: _provider.repeatValidator,
-                        passwordVisible: _provider.passwordRepeatVisible,
-                        hidePassword: _provider.hideRepeat,
+                        validator: (String? val) {
+                         return provider.repeatValidator(val, context);
+                        },
+                        passwordVisible: provider.passwordRepeatVisible,
+                        hidePassword: provider.hideRepeat,
                       ),
                       SizedBox(
                         height: 0.020 * height,
@@ -134,11 +143,11 @@ class _SignUpPageState extends State<SignUpPage> {
                             child: AutoSizeText.rich(TextSpan(
                                 style: GoogleFonts.openSans(),
                                 children: [
-                                  const TextSpan(
-                                    text: "By signing up, you consent to the ",
+                                   TextSpan(
+                                    text: "${AppLocalizations.of(context)?.translate('sup_checkbox')?? 'By signing up, you consent to the'} ",
                                   ),
                                   TextSpan(
-                                      text: "privacy policy",
+                                      text: AppLocalizations.of(context)?.translate('sup_privacy')??"privacy policy",
                                       style: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme
@@ -149,9 +158,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                           await ConsentManager
                                               .showPrivacyPolicyDialog(context);
                                         }),
-                                  const TextSpan(text: " and to the "),
+                                  TextSpan(text: " ${AppLocalizations.of(context)?.translate('sup_and')?? 'and to the'} "),
                                   TextSpan(
-                                      text: "terms and conditions",
+                                      text: AppLocalizations.of(context)?.translate('sup_terms')??"terms and conditions",
                                       style: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme
@@ -177,7 +186,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       SignUpButton(
                         onPressed: () async {
-                          await _provider.signUp(context);
+                          await provider.signUp(context);
                         },
                       ),
                     ],

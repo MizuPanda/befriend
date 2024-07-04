@@ -1,8 +1,10 @@
+import 'package:befriend/utilities/error_handling.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../providers/material_provider.dart';
+import '../../utilities/app_localizations.dart';
 import '../../views/dialogs/rounded_dialog.dart';
 
 class QR {
@@ -15,12 +17,7 @@ class QR {
   static void showLobbyFull(
     BuildContext context,
   ) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("The lobby is full"),
-        duration: Duration(seconds: 3),
-      ),
-    );
+    ErrorHandling.showError(context, AppLocalizations.of(context)?.translate('qr_lobby_full')??'The lobby is full');
   }
 
   static void showUserSeenToday(
@@ -29,7 +26,7 @@ class QR {
   ) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("You have already seen $username today."),
+        content: Text("${AppLocalizations.of(context)?.translate('qr_alr_seen')?? 'You have already seen'} $username ${AppLocalizations.of(context)?.translate('qr_today')?? 'today'}."),
         duration: const Duration(seconds: 3),
       ),
     );

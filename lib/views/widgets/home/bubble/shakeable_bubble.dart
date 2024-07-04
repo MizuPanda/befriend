@@ -108,7 +108,7 @@ class _ShakeableBubbleState extends State<ShakeableBubble>
               }
 
               debugPrint(
-                  '(ShakeableBubble): ${widget.specificHome.user.username} Tapped');
+                  '(ShakeableBubble) ${widget.specificHome.user.username} Tapped');
             },
             onLongPressEnd: (LongPressEndDetails details) {
               setState(() {

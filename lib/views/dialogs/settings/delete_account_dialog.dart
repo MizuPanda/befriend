@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../utilities/app_localizations.dart';
+
 class DeleteAccountDialog {
   static Widget dialog(BuildContext context) {
     return AlertDialog(
@@ -12,17 +14,17 @@ class DeleteAccountDialog {
           fontSize: 16,
           color: Theme.of(context).primaryColor,
           fontWeight: FontWeight.bold),
-      title: const Text('Delete Account'),
-      content: const Text(
+      title:  Text(AppLocalizations.of(context)?.translate('dad_da')??'Delete Account'),
+      content: Text(AppLocalizations.of(context)?.translate('dad_conf')??
           'Are you sure you want to delete your account? This action cannot be undone.'),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Cancel'),
+          child:  Text(AppLocalizations.of(context)?.translate('dialog_cancel')??'Cancel'),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(true),
-          child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          child: Text(AppLocalizations.of(context)?.translate('dialog_delete')??'Delete', style: const TextStyle(color: Colors.red)),
         ),
       ],
     );

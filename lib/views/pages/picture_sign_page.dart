@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/picture_sign_provider.dart';
+import '../../utilities/app_localizations.dart';
 
 class PictureSignPage extends StatelessWidget {
   const PictureSignPage({super.key});
@@ -23,7 +24,7 @@ class PictureSignPage extends StatelessWidget {
           child: Scaffold(
             appBar: AppBar(
               title: Text(
-                'Last step',
+                AppLocalizations.of(context)?.translate('psp_ls')??'Last step',
                 style: GoogleFonts.openSans(),
               ),
               centerTitle: true,
@@ -57,7 +58,7 @@ class PictureSignPage extends StatelessWidget {
                                 backgroundImage: provider.image()),
                       ),
                       SizedBox(height: _heightMultiplier * 3 * height),
-                      AutoSizeText('Almost Done!',
+                      AutoSizeText(AppLocalizations.of(context)?.translate('psp_almost')??'Almost Done!',
                           style: GoogleFonts.openSans(
                             textStyle: const TextStyle(
                               fontSize: 40.0,
@@ -86,7 +87,7 @@ class PictureSignPage extends StatelessWidget {
                               color: lightMode ? Colors.black : Colors.white),
                         ),
                         child: AutoSizeText(
-                            'Add a photo to personalize your profile.',
+                            AppLocalizations.of(context)?.translate('psp_add')??'Add a photo to personalize your profile.',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.openSans(
                               textStyle: const TextStyle(
@@ -98,10 +99,10 @@ class PictureSignPage extends StatelessWidget {
                       ElevatedButton(
                         style: ButtonStyle(
                             shape:
-                                MaterialStatePropertyAll(RoundedRectangleBorder(
+                                WidgetStatePropertyAll(RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             )),
-                            padding: MaterialStatePropertyAll(
+                            padding: WidgetStatePropertyAll(
                                 EdgeInsets.symmetric(
                                     horizontal: 0.12 * width,
                                     vertical:
@@ -109,7 +110,7 @@ class PictureSignPage extends StatelessWidget {
                         onPressed: () async {
                           await provider.retrieveImage(context);
                         },
-                        child: const AutoSizeText('Capture Photo'),
+                        child: AutoSizeText(AppLocalizations.of(context)?.translate('psp_capture')??'Capture Photo'),
                       ),
                       SizedBox(
                         height: _heightMultiplier * height,
@@ -126,9 +127,9 @@ class PictureSignPage extends StatelessWidget {
                                 child: Center(
                                   child: provider.isSkipLoading
                                       ? const CircularProgressIndicator()
-                                      : const AutoSizeText(
-                                          'Skip',
-                                          style: TextStyle(fontSize: 16),
+                                      :  AutoSizeText(
+                                    AppLocalizations.of(context)?.translate('general_word_skip')??'Skip',
+                                          style: const TextStyle(fontSize: 16),
                                         ),
                                 )),
                             TextButton(
@@ -141,7 +142,7 @@ class PictureSignPage extends StatelessWidget {
                                   child: provider.isContinueLoading
                                       ? const CircularProgressIndicator()
                                       : AutoSizeText(
-                                          'Confirm',
+                                    AppLocalizations.of(context)?.translate('general_word_confirm')??'Confirm',
                                           style: TextStyle(
                                               color: provider.imageNull()
                                                   ? Colors.grey

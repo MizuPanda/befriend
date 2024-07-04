@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_settings_ui/flutter_settings_ui.dart';
 
 import '../../../models/objects/bubble.dart';
+import '../../../utilities/app_localizations.dart';
 
 class NotificationsSettingsWidget extends StatefulWidget {
   const NotificationsSettingsWidget({super.key});
@@ -20,9 +21,9 @@ class _NotificationsSettingsWidgetState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Notifications',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title:  Text(
+          AppLocalizations.of(context)?.translate('nsw_notifications')??'Notifications',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: SafeArea(
@@ -54,7 +55,7 @@ class _NotificationsSettingsWidgetState
                             });
                           } catch (e) {
                             debugPrint(
-                                '(NotificationsSettingsWidget): Error changing post notification toggle: $e');
+                                '(NotificationsSettingsWidget) Error changing post notification toggle: $e');
                           }
                         },
                         initialValue: user?.postNotificationOn,
@@ -62,9 +63,9 @@ class _NotificationsSettingsWidgetState
                           Icons.notifications_rounded,
                           color: Colors.grey,
                         ),
-                        title: const Text('New post notification'),
-                        description: const Text(
-                            'X has posted a new picture. Check it out!'),
+                        title:  Text(AppLocalizations.of(context)?.translate('nsw_post')??'New post notification'),
+                        description:  Text(
+                            AppLocalizations.of(context)?.translate('nsw_post_description')??'X has posted a new picture. Check it out!'),
                       ),
                       SettingsTile.switchTile(
                         onToggle: (value) async {
@@ -76,7 +77,7 @@ class _NotificationsSettingsWidgetState
                             });
                           } catch (e) {
                             debugPrint(
-                                '(NotificationsSettingsWidget): Error changing post notification toggle: $e');
+                                '(NotificationsSettingsWidget) Error changing post notification toggle: $e');
                           }
                         },
                         leading: const Icon(
@@ -84,8 +85,8 @@ class _NotificationsSettingsWidgetState
                           color: Colors.grey,
                         ),
                         initialValue: user?.likeNotificationOn,
-                        title: const Text('New like notification'),
-                        description: const Text('X has liked your post!'),
+                        title:  Text(AppLocalizations.of(context)?.translate('nsw_like')??'New like notification'),
+                        description:  Text(AppLocalizations.of(context)?.translate('nsw_like_description')??'X has liked your post!'),
                       ),
                     ],
                   ),

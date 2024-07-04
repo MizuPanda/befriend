@@ -1,10 +1,13 @@
 import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/authentication/date_manager.dart';
 import 'package:befriend/utilities/constants.dart';
+import 'package:befriend/utilities/error_handling.dart';
 import 'package:befriend/utilities/validators.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
+import '../utilities/app_localizations.dart';
 import '../utilities/password_strength.dart';
 
 class SignProvider extends ChangeNotifier {
@@ -50,8 +53,14 @@ class SignProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  String dateText() {
-    return '${_date.month}-${_date.day}-${_date.year}';
+  String dateText(BuildContext context) {
+    // Get the current locale
+    Locale currentLocale = Localizations.localeOf(context);
+
+    // Create a DateFormat instance with the current locale
+    DateFormat dateFormat = DateFormat.yMd(currentLocale.toString());
+
+    return dateFormat.format(_date);
   }
 
   void onChanged(String password) {
@@ -60,8 +69,8 @@ class SignProvider extends ChangeNotifier {
   }
 
   //#region VALIDATORS
-  String? emailValidator(String? email) {
-    String? validator = Validators.emailValidator(email);
+  String? emailValidator(String? email, BuildContext context) {
+    String? validator = Validators.emailValidator(email, context);
 
     if (validator != null) {
       return validator;
@@ -73,18 +82,18 @@ class SignProvider extends ChangeNotifier {
       if (_error == Constants.invalidEmail) {
         _error = null;
       }
-      return 'This email is not valid.';
+      return AppLocalizations.of(context)?.translate('snp_email_invalid')??'This email is not valid.';
     }
     if (_error == Constants.emailAlreadyInUse) {
       _error = null;
-      return "This email is already in use.";
+      return AppLocalizations.of(context)?.translate('snp_email_used')??"This email is already in use.";
     }
 
     return null;
   }
 
-  String? usernameValidator(String? username) {
-    String? validator = Validators.usernameValidator(username);
+  String? usernameValidator(String? username, BuildContext context) {
+    String? validator = Validators.usernameValidator(username, context);
 
     if (validator != null) {
       return validator;
@@ -92,28 +101,28 @@ class SignProvider extends ChangeNotifier {
 
     if (_error == Constants.usernameError) {
       _error = null;
-      return "This username is already in use.";
+      return AppLocalizations.of(context)?.translate('snp_username_used')??"This username is already in use.";
     }
 
     return null;
   }
 
-  String? passwordValidator(String? password) {
-    String? validator = Validators.passwordValidator(password);
+  String? passwordValidator(String? password, BuildContext context) {
+    String? validator = Validators.passwordValidator(password, context);
     if (validator != null) {
       return validator;
     }
 
     if (_error == Constants.weakPassword) {
       _error = null;
-      return 'Your password is too weak.';
+      return AppLocalizations.of(context)?.translate('snp_password_weak')??'Your password is too weak.';
     }
 
     return null;
   }
 
-  String? repeatValidator(String? repeat) {
-    return Validators.repeatValidator(repeat, _password);
+  String? repeatValidator(String? repeat, BuildContext context) {
+    return Validators.repeatValidator(repeat, _password, context);
   }
 
   //#endregion
@@ -149,7 +158,7 @@ class SignProvider extends ChangeNotifier {
       return isUsernameAvailable;
     } catch (error) {
       debugPrint(
-          '(SignProvider): Error checking username availability: $error');
+          '(SignProvider) Error checking username availability: $error');
       return false;
     }
   }
@@ -173,28 +182,18 @@ class SignProvider extends ChangeNotifier {
   }
 
   void _showAgeRequirementSnackBar(BuildContext context) {
-    _showError(
-        context, 'You must be at least 13 years old to create an account.');
+    ErrorHandling.showError(
+        context, AppLocalizations.of(context)?.translate('snp_age_req')??'You must be at least 13 years old to create an account.');
   }
 
   void _showConsentSnackBar(BuildContext context) {
-    _showError(context,
-        'Please agree to the Privacy Policy and to the Terms and Conditions to continue with the sign-up process.');
+    ErrorHandling.showError(context,
+        AppLocalizations.of(context)?.translate('snp_cons_req')??'Please agree to the Privacy Policy and to the Terms and Conditions to continue with the sign-up process.');
   }
 
   void _showUnknownErrorSnackBar(BuildContext context) {
-    _showError(
-        context, 'An unknown error has occurred. Please try again later.');
-  }
-
-  void _showError(BuildContext context, String message) {
-    final SnackBar snackBar = SnackBar(
-      content: Text(message),
-      duration: const Duration(seconds: 3),
-      showCloseIcon: true,
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    ErrorHandling.showError(
+        context, AppLocalizations.of(context)?.translate('general_error_message5')??'An unknown error has occurred. Please try again later.');
   }
 
   /// Sign up the user

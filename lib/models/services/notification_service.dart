@@ -13,7 +13,7 @@ import '../objects/profile.dart';
 class NotificationService {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   static final FlutterLocalNotificationsPlugin _localNotifications =
-      FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin();
   static const String _hostIdField = 'hostId';
 
   static const int newPostID = 0;
@@ -47,18 +47,21 @@ class NotificationService {
       }
 
       const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+      AndroidInitializationSettings('@mipmap/ic_launcher');
       const DarwinInitializationSettings darwinInitializationSettings =
-          DarwinInitializationSettings();
+      DarwinInitializationSettings();
 
       const InitializationSettings initializationSettings =
-          InitializationSettings(
-              android: initializationSettingsAndroid,
-              iOS: darwinInitializationSettings);
+      InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: darwinInitializationSettings);
       await _localNotifications.initialize(
         initializationSettings,
         onDidReceiveNotificationResponse: (NotificationResponse response) {
-          _selectNotification(response, key, notify);
+          if (!_isNotificationHandled()) {
+            _markNotificationAsHandled();
+            _selectNotification(response, key, notify);
+          }
         },
       );
 
@@ -67,19 +70,9 @@ class NotificationService {
       });
 
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        debugPrint('(NotificationService): Data= ${message.data}');
-        _NotificationType type = message.data.containsKey(_hostIdField)
-            ? _NotificationType.newPost
-            : _NotificationType.like;
-
-        switch (type) {
-          case _NotificationType.newPost:
-            String? friendIdPayload = message.data[_hostIdField];
-            _navigateToProfile(key, friendIdPayload, notify);
-            break;
-          case _NotificationType.like:
-            _navigateToConnectedProfile(key, notify);
-            break;
+        if (!_isNotificationHandled()) {
+          _markNotificationAsHandled();
+          _handleNotificationData(message.data, key, notify);
         }
       });
 
@@ -121,33 +114,38 @@ class NotificationService {
       GlobalKey key, Function notify) async {
     try {
       RemoteMessage? initialMessage =
-          await FirebaseMessaging.instance.getInitialMessage();
+      await FirebaseMessaging.instance.getInitialMessage();
 
-      if (initialMessage != null) {
-        _NotificationType type = initialMessage.data.containsKey(_hostIdField)
-            ? _NotificationType.newPost
-            : _NotificationType.like;
-        switch (type) {
-          case _NotificationType.newPost:
-            String? friendIdPayload = initialMessage.data[_hostIdField];
-            if (key.currentContext!.mounted) {
-              _navigateToProfile(key, friendIdPayload, notify);
-            }
-            break;
-          case _NotificationType.like:
-            _navigateToConnectedProfile(key, notify);
-            break;
-        }
+      if (initialMessage != null && !_isNotificationHandled()) {
+        _markNotificationAsHandled();
+        _handleNotificationData(initialMessage.data, key, notify);
       }
     } catch (e) {
       debugPrint('(NotificationService): Error handling initial message: $e');
     }
   }
 
+  static void _handleNotificationData(
+      Map<String, dynamic> data, GlobalKey key, Function notify) {
+    _NotificationType type = data.containsKey(_hostIdField)
+        ? _NotificationType.newPost
+        : _NotificationType.like;
+
+    switch (type) {
+      case _NotificationType.newPost:
+        String? friendIdPayload = data[_hostIdField];
+        _navigateToProfile(key, friendIdPayload, notify);
+        break;
+      case _NotificationType.like:
+        _navigateToConnectedProfile(key, notify);
+        break;
+    }
+  }
+
   static void _navigateToConnectedProfile(
       GlobalKey key, Function notify) async {
     try {
-      debugPrint("Navigating to user's profile");
+      debugPrint("(NotificationService) Navigating to user's profile");
       Bubble connectedUser = await UserManager.getInstance();
 
       if (key.currentContext!.mounted) {
@@ -162,7 +160,7 @@ class NotificationService {
       }
     } catch (e) {
       debugPrint(
-          '(NotificationService): Error navigating to connected profile: $e');
+          '(NotificationService) Error navigating to connected profile: $e');
     }
   }
 
@@ -170,7 +168,8 @@ class NotificationService {
       GlobalKey key, String? friendIdPayload, Function notify) async {
     try {
       if (friendIdPayload != null && friendIdPayload.isNotEmpty) {
-        debugPrint("Navigating to profile of $friendIdPayload");
+        debugPrint(
+            "(NotificationService) Navigating to profile of $friendIdPayload");
         Bubble connectedUser = await UserManager.getInstance();
         Friendship friendship;
 
@@ -185,7 +184,7 @@ class NotificationService {
 
         if (f == null) {
           friendship =
-              await DataQuery.getFriendship(connectedUser.id, friendIdPayload);
+          await DataQuery.getFriendship(connectedUser.id, friendIdPayload);
         } else {
           friendship = f;
         }
@@ -202,7 +201,7 @@ class NotificationService {
         }
       }
     } catch (e) {
-      debugPrint('(NotificationService): Error navigating to profile: $e');
+      debugPrint('(NotificationService) Error navigating to profile: $e');
     }
   }
 
@@ -216,9 +215,9 @@ class NotificationService {
       Bubble user = await UserManager.getInstance();
 
       _NotificationType notificationType =
-          message.data.containsKey(_hostIdField)
-              ? _NotificationType.newPost
-              : _NotificationType.like;
+      message.data.containsKey(_hostIdField)
+          ? _NotificationType.newPost
+          : _NotificationType.like;
 
       String? payload;
       int id;
@@ -246,13 +245,13 @@ class NotificationService {
       }
 
       final AndroidNotificationDetails androidPlatformChannelSpecifics =
-          AndroidNotificationDetails('befriend_id', 'befriend_name',
-              channelDescription: 'befriend',
-              importance: importance,
-              priority: priority,
-              showWhen: false);
+      AndroidNotificationDetails('befriend_id', 'befriend_name',
+          channelDescription: 'befriend',
+          importance: importance,
+          priority: priority,
+          showWhen: false);
       const DarwinNotificationDetails darwinNotificationDetails =
-          DarwinNotificationDetails();
+      DarwinNotificationDetails();
 
       final NotificationDetails platformChannelSpecifics = NotificationDetails(
           android: androidPlatformChannelSpecifics,
@@ -265,14 +264,14 @@ class NotificationService {
           platformChannelSpecifics,
           payload: payload); // Pass the hostId as payload
     } catch (e) {
-      debugPrint('(NotificationService): Error showing notification: $e');
+      debugPrint('(NotificationService) Error showing notification: $e');
     }
   }
 
   @pragma('vm:entry-point')
   static Future<void> _backgroundMessageHandler(RemoteMessage message) async {
     //debugPrint("Handling a background message: ${message.messageId}");
-    debugPrint('(NotificationService): $message');
+    debugPrint('(NotificationService) $message');
 
     _showNotification(message);
   }
@@ -282,7 +281,7 @@ class NotificationService {
     try {
       DataQuery.updateDocument(Constants.notificationToken, token);
     } catch (e) {
-      debugPrint('(NotificationService): Error saving token to database: $e');
+      debugPrint('(NotificationService) Error saving token to database: $e');
     }
   }
 }

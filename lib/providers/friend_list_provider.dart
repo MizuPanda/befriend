@@ -1,3 +1,4 @@
+import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
@@ -57,7 +58,7 @@ class FriendListProvider extends ChangeNotifier {
         _filterFriends(_searchController.text);
       });
     } catch (e) {
-      debugPrint('(FriendListProvider): Error in initState: $e');
+      debugPrint('(FriendListProvider) Error in initState: $e');
     }
   }
 
@@ -72,7 +73,9 @@ class FriendListProvider extends ChangeNotifier {
       return friendship.friend.username.toLowerCase().contains(_searchQuery);
     }).toList();
     _pagingController.itemList = filteredFriends;
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      notifyListeners();
+    });
   }
 
   Future<void> _fetchPage(int pageKey,
@@ -83,7 +86,7 @@ class FriendListProvider extends ChangeNotifier {
       List<Friendship> friendships = [];
 
       if (hasNonLoadedFriends) {
-        debugPrint('(FriendListProvider): Has non-loaded friendships');
+        debugPrint('(FriendListProvider) Has non-loaded friendships');
 
         if (pageKey == 0 || _lastDocument == null) {
           _lastDocument ??= await lastFriendshipDocument;
@@ -122,9 +125,9 @@ class FriendListProvider extends ChangeNotifier {
           }
 
           DocumentSnapshot bubbleSnapshot =
-              await DataManager.getData(id: friendId);
+              await Models.dataManager.getData(id: friendId);
           ImageProvider bubbleImage =
-              await DataManager.getAvatar(bubbleSnapshot);
+              await Models.dataManager.getAvatar(bubbleSnapshot);
 
           friend = Bubble.fromDocsWithoutFriends(bubbleSnapshot, bubbleImage);
 
@@ -148,7 +151,7 @@ class FriendListProvider extends ChangeNotifier {
       _filterFriends(_searchQuery);
     } catch (error) {
       _pagingController.error = error;
-      debugPrint('(FriendListProvider): Error fetching page: $error');
+      debugPrint('(FriendListProvider) Error fetching page: $error');
     }
   }
 }

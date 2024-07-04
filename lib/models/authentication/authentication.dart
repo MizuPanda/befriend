@@ -7,13 +7,29 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../utilities/app_localizations.dart';
 import '../objects/home.dart';
 
 class AuthenticationManager {
-  static final FirebaseAuth _auth = FirebaseAuth.instance;
+  static FirebaseAuth _auth = FirebaseAuth.instance;
 
-  static String id() {
+  AuthenticationManager.static();
+
+  /// For testing reasons
+  static set auth(FirebaseAuth value) {
+    _auth = value;
+  }
+
+  String id() {
     return _auth.currentUser?.uid ?? 'AuthenticationManager-NOT-FOUND-ID';
+  }
+
+  static String archivedID() {
+    return '${Constants.archived}${_auth.currentUser?.uid}';
+  }
+
+  static String notArchivedID() {
+    return '${Constants.notArchived}${_auth.currentUser?.uid}';
   }
 
   static bool isEmailVerified() {
@@ -24,9 +40,11 @@ class AuthenticationManager {
     try {
       _auth.currentUser?.sendEmailVerification();
     } catch (e) {
-      debugPrint('(AuthenticationManager): Error sending email verification');
-      ErrorHandling.showError(context,
-          'There was an error sending the verification email. Please try again later.');
+      debugPrint('(AuthenticationManager) Error sending email verification');
+      ErrorHandling.showError(
+          context,
+          AppLocalizations.of(context)?.translate('auth_sev_error') ??
+              'There was an error sending the verification email. Please try again later.');
     }
   }
 
@@ -42,36 +60,22 @@ class AuthenticationManager {
       BuildContext context) async {
     String? errorCode;
 
-    await _auth
-        .createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    )
-        .then((value) async {
-      User? user = value.user;
-      debugPrint("Successfully created user: ${user!.uid}");
-      await _registerUserData(username, birthYear, user, context);
-    }).onError((FirebaseAuthException error, stackTrace) {
-      //Handle every possible errors
-      debugPrint('(CreateUser) An error occurred: ${error.code}');
-      switch (error.code) {
-        case Constants.emailAlreadyInUse:
-          errorCode = error.code;
-          break;
-        case Constants.invalidEmail:
-          errorCode = error.code;
-          break;
-        // Handle invalid email
-        case Constants.weakPassword:
-          errorCode = error.code;
-          // Handle weak password
-          break;
-        default:
-          errorCode = Constants.unknownError;
-          // Handle unexpected errors
-          break;
+    try {
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      User? user = userCredential.user;
+      if (user != null) {
+        if (context.mounted) {
+          await _registerUserData(username, birthYear, user, context);
+        }
+        debugPrint(
+            "(AuthenticationManager) Successfully created user: ${user.uid}");
       }
-    });
+    } on FirebaseAuthException catch (error) {
+      debugPrint('(AuthenticationManager) An error occurred: ${error.code}');
+      errorCode = error.code;
+    }
 
     return errorCode;
   }
@@ -81,6 +85,8 @@ class AuthenticationManager {
   /// The counter is incremented by 1 and stored in the database.
   static Future<void> _registerUserData(
       String username, int birthYear, User? user, BuildContext context) async {
+    final String languageCode = Localizations.localeOf(context).languageCode;
+
     final userInfo = <String, dynamic>{
       Constants.usernameDoc: username,
       Constants.avatarDoc: '',
@@ -92,57 +98,60 @@ class AuthenticationManager {
       Constants.hostingFriendshipsDoc: {},
       'consent': {'given': true, 'when': FieldValue.serverTimestamp()},
       Constants.blockedUsersDoc: {},
+      Constants.likeNotificationOnDoc: true,
+      Constants.postNotificationOnDoc: true,
+      Constants.languageDoc: languageCode
     };
 
-    await Constants.usersCollection.doc(user!.uid).set(userInfo).then(
-      //IF COMPLETED WITHOUT ERRORS
-      (value) async {
-        await user.sendEmailVerification();
-        ConsentManager.setTagForChildrenAds(birthYear);
-        if (context.mounted) {
-          GoRouter.of(context).replace(Constants.pictureAddress);
-        }
-        debugPrint("Successfully added the data to user: $username");
-      },
-    ).catchError((error) async {
-      // If registration data fails to save, delete the user
-      debugPrint('(Authentication): An error occurred: $error');
-      if (error is FirebaseException) {
-        const SnackBar snackBar = SnackBar(
-          content: Text("Something went wrong. Please try again later..."),
-          duration: Duration(seconds: 3),
-          showCloseIcon: true,
-        );
-
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    try {
+      await Constants.usersCollection.doc(user!.uid).set(userInfo);
+      await user.sendEmailVerification();
+      ConsentManager.setTagForChildrenAds(birthYear);
+      if (context.mounted) {
+        GoRouter.of(context).replace(Constants.pictureAddress);
       }
-      await user.delete();
+
+      debugPrint("Successfully added the data to user: $username");
+    } on FirebaseException catch (error) {
+      // If registration data fails to save, delete the user
+      debugPrint('(AuthenticationManager) A Firebase error occurred: $error');
+
+      if (context.mounted) {
+        ErrorHandling.showError(
+            context,
+            AppLocalizations.of(context)?.translate('general_error_message') ??
+                "Something went wrong. Please try again later...");
+      }
+
+      await user?.delete();
       debugPrint(
-          "(Authentication): User deleted due to failure in registration data saving");
-    });
+          "(AuthenticationManager) User deleted due to failure in registration data saving");
+    } catch (error) {
+      debugPrint('(AuthenticationManager) An unknown error occurred: $error');
+    }
   }
 
   static Future<void> signIn(
       String email, String password, BuildContext context) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      Home home = await UserManager.userHome();
-
       if (context.mounted) {
+        Home home = await UserManager.userHome();
+
         ConsentManager.setTagForChildrenAds(home.user.birthYear);
-        GoRouter.of(context).go(Constants.homepageAddress, extra: home);
+
+        if (context.mounted) {
+          GoRouter.of(context).go(Constants.homepageAddress, extra: home);
+        }
       }
     } on FirebaseAuthException catch (e) {
-      debugPrint('(Authentication): ${e.code}');
-      const SnackBar snackBar = SnackBar(
-        content: Text(
-            "Something went wrong. Please check your credentials and try again"),
-        duration: Duration(seconds: 3),
-        showCloseIcon: true,
-      );
+      debugPrint('(AuthenticationManager): ${e.code}');
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        ErrorHandling.showError(
+            context,
+            AppLocalizations.of(context)?.translate('auth_sign_error') ??
+                "Something went wrong. Please check your credentials and try again");
       }
     }
   }

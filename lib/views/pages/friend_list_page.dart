@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/objects/bubble.dart';
 import '../../providers/material_provider.dart';
+import '../../utilities/app_localizations.dart';
 import '../widgets/users/progress_bar.dart';
 
 class FriendsListPage extends StatefulWidget {
@@ -30,10 +31,12 @@ class _FriendsListPageState extends State<FriendsListPage> {
   @override
   void initState() {
     super.initState();
-    _provider.initState(widget.user.friendships,
-        hasNonLoadedFriends: widget.user.hasNonLoadedFriends(),
-        lastFriendshipDocument: widget.user.getLastFriendshipDocument(),
-        id: widget.user.id);
+    if (widget.user.hasFriends()) {
+      _provider.initState(widget.user.friendships,
+          hasNonLoadedFriends: widget.user.hasNonLoadedFriends(),
+          lastFriendshipDocument: widget.user.getLastFriendshipDocument(),
+          id: widget.user.id);
+    } else {}
   }
 
   @override
@@ -54,7 +57,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Friends List',
+              AppLocalizations.of(context)?.translate('flp_list')??'Friends List',
               style: GoogleFonts.openSans(),
             ),
             const SizedBox(
@@ -78,7 +81,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                       controller: provider.searchController,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.search),
-                        hintText: 'Search by username',
+                        hintText: AppLocalizations.of(context)?.translate('flp_search')??'Search by username',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),
@@ -86,81 +89,92 @@ class _FriendsListPageState extends State<FriendsListPage> {
                     ),
                   ),
                   Expanded(
-                    child: PagedListView<int, Friendship>(
-                      pagingController: provider.pagingController,
-                      builderDelegate: PagedChildBuilderDelegate<Friendship>(
-                        noItemsFoundIndicatorBuilder: (BuildContext context) {
-                          return const Center(
-                            child: Text('No friends found'),
-                          );
-                        },
-                        itemBuilder: (context, friendship, index) {
-                          return Padding(
-                            padding: EdgeInsets.all(width * 0.02),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Consumer<MaterialProvider>(
-                                      builder: (BuildContext context,
-                                          MaterialProvider materialProvider,
-                                          Widget? child) {
-                                        return Container(
-                                          decoration:
-                                              Decorations.bubbleDecoration(
-                                                  materialProvider
-                                                      .isLightMode(context)),
-                                          child: ProfilePhoto(
-                                            user: friendship.friend,
-                                            radius: 0.1 * width,
+                    child: widget.user.hasFriends()
+                        ? PagedListView<int, Friendship>(
+                            pagingController: provider.pagingController,
+                            builderDelegate:
+                                PagedChildBuilderDelegate<Friendship>(
+                              noItemsFoundIndicatorBuilder:
+                                  (BuildContext context) {
+                                return Center(
+                                  child: Text(AppLocalizations.of(context)?.translate('flp_no')??'No friends found'),
+                                );
+                              },
+                              itemBuilder: (context, friendship, index) {
+                                return Padding(
+                                  padding: EdgeInsets.all(width * 0.02),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Consumer<MaterialProvider>(
+                                            builder: (BuildContext context,
+                                                MaterialProvider
+                                                    materialProvider,
+                                                Widget? child) {
+                                              return Container(
+                                                decoration: Decorations
+                                                    .bubbleDecoration(
+                                                        materialProvider
+                                                            .isLightMode(
+                                                                context)),
+                                                child: ProfilePhoto(
+                                                  user: friendship.friend,
+                                                  radius: 0.1 * width,
+                                                ),
+                                              );
+                                            },
                                           ),
-                                        );
-                                      },
-                                    ),
-                                    SizedBox(
-                                      width: 0.03 * width,
-                                    ),
-                                    AutoSizeText(
-                                      '@${friendship.friend.username}',
-                                      style: GoogleFonts.openSans(
-                                        fontSize: 20,
+                                          SizedBox(
+                                            width: 0.03 * width,
+                                          ),
+                                          AutoSizeText(
+                                            '@${friendship.friend.username}',
+                                            style: GoogleFonts.openSans(
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              SizedBox(
+                                                height: 0.02 * height,
+                                              ),
+                                              AutoSizeText(
+                                                '${AppLocalizations.of(context)?.translate('flp_lvl')?? 'LVL'}${friendship.level}',
+                                                style: GoogleFonts.openSans(),
+                                              ),
+                                              IconButton(
+                                                onPressed: () {
+                                                  provider.goToFriendProfile(
+                                                      context,
+                                                      friendship,
+                                                      widget.user);
+                                                },
+                                                icon: const Icon(
+                                                    Icons.house_rounded),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    const Spacer(),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        SizedBox(
-                                          height: 0.02 * height,
-                                        ),
-                                        AutoSizeText(
-                                          'LVL${friendship.level}',
-                                          style: GoogleFonts.openSans(),
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            provider.goToFriendProfile(context,
-                                                friendship, widget.user);
-                                          },
-                                          icon: const Icon(Icons.house_rounded),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 0.015 * height,
-                                ),
-                                ProgressBar(
-                                  progress: friendship.progress,
-                                ),
-                              ],
+                                      SizedBox(
+                                        height: 0.015 * height,
+                                      ),
+                                      ProgressBar(
+                                        progress: friendship.progress,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
-                    ),
+                          )
+                        : Center(
+                            child: Text(AppLocalizations.of(context)?.translate('flp_yet')??"You don't have friends yet."),
+                          ),
                   ),
                 ],
               );

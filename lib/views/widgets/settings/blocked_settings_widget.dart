@@ -7,6 +7,7 @@ import 'package:befriend/views/dialogs/settings/unblock_dialog.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/objects/bubble.dart';
+import '../../../utilities/app_localizations.dart';
 
 class BlockedSettingsWidget extends StatefulWidget {
   const BlockedSettingsWidget({
@@ -24,13 +25,13 @@ class _BlockedSettingsWidgetState extends State<BlockedSettingsWidget> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title:  Row(
           children: [
             Text(
-              "Blocked accounts ",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)?.translate('bsw_blocked')??"Blocked accounts ",
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            Icon(Icons.supervisor_account_rounded)
+            const Icon(Icons.supervisor_account_rounded)
           ],
         ),
       ),
@@ -85,16 +86,16 @@ class _BlockedSettingsWidgetState extends State<BlockedSettingsWidget> {
                                       });
                                     } catch (e) {
                                       debugPrint(
-                                          '(BlockedSettingsWidget): Error: $e');
+                                          '(BlockedSettingsWidget) Error: $e');
                                       if (context.mounted) {
-                                        ErrorHandling.showError(context,
+                                        ErrorHandling.showError(context, AppLocalizations.of(context)?.translate('general_error_message7')??
                                             'An unexpected error occurred. Please try again.');
                                       }
                                     }
                                   },
                                 );
                               },
-                              child: const Text('Unblock'))
+                              child:  Text(AppLocalizations.of(context)?.translate('bsw_unblock')??'Unblock'))
                         ],
                       ),
                     );

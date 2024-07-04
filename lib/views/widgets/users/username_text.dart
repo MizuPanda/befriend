@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../models/objects/bubble.dart';
+import '../../../utilities/app_localizations.dart';
 
 class UsernameText extends StatelessWidget {
   const UsernameText({
@@ -16,7 +17,7 @@ class UsernameText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      child: AutoSizeText(user.main() ? 'You' : user.username,
+      child: AutoSizeText(user.main() ? AppLocalizations.of(context)?.translate('general_word_you')??'You' : user.username,
           maxLines: 1,
           style: GoogleFonts.openSans(
               fontWeight: user.main() ? FontWeight.w300 : FontWeight.w500,

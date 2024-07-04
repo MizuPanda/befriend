@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/host.dart';
@@ -8,6 +7,7 @@ import 'package:befriend/models/qr/host_listening.dart';
 import 'package:befriend/models/qr/qr.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/models/services/simple_encryption_service.dart';
+import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +31,7 @@ class HostingProvider extends ChangeNotifier {
   GlobalKey get two => _two;
 
   void _initShowcase(BuildContext context) {
-    debugPrint('(HostingProvider): showTutorial= $showTutorial');
+    debugPrint('(HostingProvider) showTutorial= $showTutorial');
     if (showTutorial) {
       WidgetsBinding.instance.addPostFrameCallback((_) => showCase(context));
     }
@@ -60,7 +60,7 @@ class HostingProvider extends ChangeNotifier {
       }
 
       Bubble user = await UserManager.getInstance();
-      debugPrint('(HostingProvider): $user');
+      debugPrint('(HostingProvider) $user');
       _host = Host(host: user, joiners: [user], user: user);
 
       final Map<String, DateTime> newLastSeenMap = {};
@@ -72,7 +72,7 @@ class HostingProvider extends ChangeNotifier {
         }
       }
 
-      await Constants.usersCollection.doc(AuthenticationManager.id()).update({
+      await Constants.usersCollection.doc(Models.authenticationManager.id()).update({
         Constants.hostingDoc: List.empty(),
         Constants.lastSeenUsersMapDoc: newLastSeenMap
       });
@@ -85,7 +85,7 @@ class HostingProvider extends ChangeNotifier {
 
       return 'Completed';
     } catch (e) {
-      debugPrint('(HostingProvider): Error starting host: $e');
+      debugPrint('(HostingProvider) Error starting host: $e');
       return 'Error';
     }
   }
@@ -102,7 +102,7 @@ class HostingProvider extends ChangeNotifier {
 
       return 'Completed';
     } catch (e) {
-      debugPrint('(HostingProvider): Error starting joiner: $e');
+      debugPrint('(HostingProvider) Error starting joiner: $e');
       return 'Error';
     }
   }
@@ -137,7 +137,7 @@ class HostingProvider extends ChangeNotifier {
   void _initiateListening(BuildContext context) {
     _stream = HostListening.startListening(context, _host, notifyListeners);
     _stream?.resume();
-    debugPrint('(HostingProvider): Starting listening...');
+    debugPrint('(HostingProvider) Starting listening...');
   }
 
   Future<void> onDispose() async {
@@ -156,7 +156,7 @@ class HostingProvider extends ChangeNotifier {
       });
       notifyListeners();
     } catch (e) {
-      debugPrint('(HostingProvider): Error deleting user: $e');
+      debugPrint('(HostingProvider) Error deleting user: $e');
     }
   }
 
@@ -172,9 +172,9 @@ class HostingProvider extends ChangeNotifier {
       await _generateFriendshipMap(userIds, _host.host.id);
       await DataQuery.updateDocument(Constants.hostingDoc, sessionUsers);
 
-      debugPrint('(HostingProvider): Session started successfully.');
+      debugPrint('(HostingProvider) Session started successfully.');
     } catch (e) {
-      debugPrint('(HostingProvider): Error starting session: $e');
+      debugPrint('(HostingProvider) Error starting session: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -192,9 +192,9 @@ class HostingProvider extends ChangeNotifier {
         'hostId': hostId,
       });
 
-      debugPrint('(HostingProvider): Function call success: ${result.data}');
+      debugPrint('(HostingProvider) Function call success: ${result.data}');
     } catch (e) {
-      debugPrint('(HostingProvider): Error calling cloud function: $e');
+      debugPrint('(HostingProvider) Error calling cloud function: $e');
     }
   }
 }

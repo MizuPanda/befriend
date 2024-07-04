@@ -1,7 +1,10 @@
-import 'package:befriend/utilities/constants.dart';
+import 'dart:io';
+
+import 'package:befriend/utilities/secrets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'dart:io' show Platform;
+
+import '../../../utilities/constants.dart';
 
 class CustomNativeAd extends StatefulWidget {
   const CustomNativeAd({
@@ -17,9 +20,13 @@ class _CustomNativeAdState extends State<CustomNativeAd> {
   bool _nativeAdIsLoaded = false;
 
   // TODO: replace this test ad unit with your own ad unit.
-  final String _adUnitId = Platform.isAndroid
-      ? Constants.androidTestNativeAdUnit
-      : Constants.iosTestNativeAdUnit;
+  final String _adUnitId = /*Platform.isAndroid
+      ? Secrets.postTileUnitAndroid
+      : Secrets.postTileUnitIOS;*/
+  Platform.isAndroid
+      ? Constants.postAndroidTestAdUnit
+      : Constants.postiOSTestAdUnit;
+
 
   /// Loads a native ad.
   void loadAd() async {
@@ -27,14 +34,14 @@ class _CustomNativeAdState extends State<CustomNativeAd> {
         adUnitId: _adUnitId,
         listener: NativeAdListener(
           onAdLoaded: (ad) {
-            debugPrint('(CustomNativeAd): $NativeAd loaded.');
+            debugPrint('(CustomNativeAd) $NativeAd loaded.');
             setState(() {
               _nativeAdIsLoaded = true;
             });
           },
           onAdFailedToLoad: (ad, error) {
             // Dispose the ad here to free resources.
-            debugPrint('(CustomNativeAd): $NativeAd failed to load: $error');
+            debugPrint('(CustomNativeAd) $NativeAd failed to load: $error');
             ad.dispose();
           },
         ),

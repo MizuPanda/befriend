@@ -1,9 +1,9 @@
+import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-import '../models/authentication/authentication.dart';
 import '../models/data/data_manager.dart';
 import '../models/objects/bubble.dart';
 import '../models/qr/qr.dart';
@@ -40,7 +40,7 @@ class JoiningProvider extends ChangeNotifier {
 
   Future<void> handleBarcodeDetection(
       BarcodeCapture capture, BuildContext context) async {
-    String userId = AuthenticationManager.id();
+    String userId = Models.authenticationManager.id();
 
     if (_isProcessingBarcode) return; // Skip if already processing a barcode
     _isProcessingBarcode = true;
@@ -56,7 +56,7 @@ class JoiningProvider extends ChangeNotifier {
           value = value.substring(iv.length + Constants.dataSeparator.length);
 
           value = SimpleEncryptionService.decrypt(value, iv);
-          debugPrint('(JoiningProvider): Decrypt= $value');
+          debugPrint('(JoiningProvider) Decrypt= $value');
           if (value.contains(Constants.appID)) {
             List<String> values = value.split(Constants.dataSeparator);
             if (values.length == 3) {
@@ -72,7 +72,7 @@ class JoiningProvider extends ChangeNotifier {
 
               if (dateTime.compareTo(before) >= 0 &&
                   dateTime.compareTo(after) <= 0) {
-                DocumentSnapshot data = await DataManager.getData(id: id);
+                DocumentSnapshot data = await Models.dataManager.getData(id: id);
                 List<dynamic> joiners =
                     DataManager.getList(data, Constants.hostingDoc);
                 Map<String, DateTime> lastSeenMap = DataManager.getDateTimeMap(
@@ -89,7 +89,7 @@ class JoiningProvider extends ChangeNotifier {
                     QR.showUserSeenToday(context, username);
                   }
                 } else {
-                  ImageProvider avatar = await DataManager.getAvatar(data);
+                  ImageProvider avatar = await Models.dataManager.getAvatar(data);
 
                   Bubble selectedHost =
                       Bubble.fromDocsWithoutFriends(data, avatar);
@@ -118,7 +118,7 @@ class JoiningProvider extends ChangeNotifier {
         }
       }
     } catch (e) {
-      debugPrint('(JoiningProvider): Error processing barcode: $e');
+      debugPrint('(JoiningProvider) Error processing barcode: $e');
     } finally {
       _isProcessingBarcode = false; // Reset the flag after processing
     }

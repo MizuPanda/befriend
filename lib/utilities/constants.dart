@@ -1,5 +1,7 @@
 import 'package:befriend/router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 
 class Constants {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -23,7 +25,6 @@ class Constants {
   //FRIENDSHIPS
   static const String progressDoc = 'progress';
   static const String levelDoc = 'level';
-  static const String lastSeenDoc = 'last_seen';
   static const String user1Doc = 'user1';
   static const String user2Doc = 'user2';
   static const String username1Doc = 'username1';
@@ -34,30 +35,28 @@ class Constants {
   static const String pictureTakerDoc = 'pictureTaker';
   static const String timestampDoc = 'timestamp';
   static const String metadataDoc = 'metadata';
-  static const String publicDoc = 'public';
   static const String captionDoc = 'caption';
   static const String allowedUsersDoc = 'allowed';
   static const String sessionUsersDoc = 'sessionUsers';
   static const String likesDoc = 'likes';
   static const String firstLikesDoc = 'firstLikes';
-  static const String archived = 'archived';
-  //STORAGE
+  static const String archived = 'archived:';
+  static const String notArchived = 'notArchived:';
+  static const String languageDoc = 'language';
+  // STORAGE
   static const String profilePictureStorage = 'profile_pictures';
   static const String sessionPictureStorage = 'session_pictures';
   static const String tempPictureStorage = 'temp';
   static const String postedPictureStorage = 'posted';
   // SOCIAL LINK
   static const double pictureExpValue = 0.2;
-  static const double friendshipPowerValue = 1;
   static const int baseLevel = 1;
-  static const double baseProgress = 0;
   //COLLECTIONS
-  static final CollectionReference friendshipsCollection =
+  static CollectionReference friendshipsCollection =
       _firestore.collection('friendships');
-  static final CollectionReference usersCollection =
+  static CollectionReference usersCollection =
       _firestore.collection('users');
-  // SUB COLLECTIONS
-  static const String pictureSubCollection = 'pictures';
+  static CollectionReference picturesCollection = _firestore.collection('pictures');
   // HOME PAGE SIZES
   static const double homeButtonSize = 20;
   static const double homeButtonAddSize = 25;
@@ -66,10 +65,7 @@ class Constants {
   static const double homeButtonBottomPaddingMultiplier = 0.09;
   //PICTURE SIZES
   static const double pictureDialogWidthMultiplier = 350 / 448;
-  // 350*x = 250
-  // static const double pictureDialogWidth = 350;
   static const double pictureDialogHeightMultiplier = 0.4;
-  // static const double pictureDialogHeight = 400;
   static const double pictureDialogAvatarSize = 30;
   //PICTURE STATES
   static const String pictureState = 'picture';
@@ -86,26 +82,30 @@ class Constants {
   static const String showSessionJoinerTutorialKey =
       'showSessionJoinerTutorial';
   // MOBILE ADS
-  static const String androidTestAdUnit =
+  static const String sessionAndroidTestAdUnit =
       'ca-app-pub-3940256099942544/1033173712';
-  static const String androidTestNativeAdUnit =
+  static const String postAndroidTestAdUnit =
       'ca-app-pub-3940256099942544/2247696110';
-  static const String iosTestAdUnit = 'ca-app-pub-3940256099942544/4411468910';
-  static const String iosTestNativeAdUnit =
+  static const String sessioniOSTestAdUnit = 'ca-app-pub-3940256099942544/4411468910';
+  static const String postiOSTestAdUnit =
       'ca-app-pub-3940256099942544/3986624511';
-  static const String postAdTile = 'postTile';
   // ERRORS
   static const String unknownError = 'unknown-error';
   static const String emailAlreadyInUse = 'email-already-in-use';
   static const String weakPassword = 'weak-password';
   static const String invalidEmail = 'invalid-email';
   static const String usernameError = 'username-already-in-use';
+  // CONFIGURATIONS
+  static final RequestConfiguration coppa = RequestConfiguration(tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes);
+  static final RequestConfiguration gdrp = RequestConfiguration(tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.yes);
   // ASSETS
-  static const String termsAddress = 'assets/policies/terms_and_conditions.md';
-  static const String privacyAddress = 'assets/policies/privacy_policy.md';
+  static const String termsAddress = 'assets/policies/terms_and_conditions';
+  static const String privacyAddress = 'assets/policies/privacy_policy';
   static const String defaultPictureAddress =
       'assets/images/account_circle.png';
-
+  // LOCALS
+  static const String englishLocale = 'en';
+  static const String frenchLocale = 'fr';
   // SEPARATORS
   static const String dataSeparator = '_';
   // ADDRESSES

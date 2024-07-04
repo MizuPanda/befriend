@@ -1,11 +1,12 @@
 import 'dart:math';
 
-import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
+import '../../utilities/models.dart';
 
 class Bubble {
   final String id;
@@ -14,6 +15,7 @@ class Bubble {
   final int power;
   ImageProvider avatar;
   final int birthYear;
+  String languageCode;
 
   Map<String, dynamic> blockedUsers;
 
@@ -42,6 +44,7 @@ class Bubble {
     required this.friendIDs,
     required this.friendshipsLoaded,
     required this.blockedUsers,
+    required this.languageCode,
   });
 
   factory Bubble.fromDocsWithFriends(
@@ -75,17 +78,22 @@ class Bubble {
         friendIDs: DataManager.getList(docs, Constants.friendsDoc),
         friendshipsLoaded: friendshipsLoaded,
         blockedUsers: DataManager.getMap(docs, Constants.blockedUsersDoc),
+        languageCode: DataManager.getString(docs, Constants.languageDoc),
         avatar: avatar);
 
     return bubble;
   }
 
   bool main() {
-    return id == AuthenticationManager.id();
+    return id == Models.authenticationManager.id();
+  }
+
+  bool hasFriends() {
+    return friendships.isNotEmpty;
   }
 
   bool didBlockYou() {
-    return blockedUsers.keys.contains(AuthenticationManager.id());
+    return blockedUsers.keys.contains(Models.authenticationManager.id());
   }
 
   Iterable<String> loadedFriendIds() {

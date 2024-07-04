@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/objects/profile.dart';
+import '../../utilities/app_localizations.dart';
 import '../widgets/profile/profile_header.dart';
 import '../widgets/profile/profile_pictures.dart';
 import '../widgets/profile/profile_state.dart';
@@ -20,57 +21,114 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => ProfileProvider(profile: profile),
-        builder: (BuildContext context, Widget? child) {
-          final double height = MediaQuery.of(context).size.height;
+      create: (_) => ProfileProvider(profile: profile),
+      builder: (BuildContext context, Widget? child) {
+        final double height = MediaQuery.of(context).size.height;
 
+        if(profile.user.main()) {
+          return DefaultTabController(
+            length: 2, // Number of tabs
+            initialIndex: 1,
+            child: Scaffold(
+              appBar: AppBar(
+                title: const BefriendTitle(),
+              ),
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: padding, left: padding, right: padding),
+                    child: ProfileHeader(profile: profile),
+                  ),
+                  SizedBox(height: 0.016 * height),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: padding),
+                    child: ProfileState(profile: profile),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: padding, bottom: 8.0),
+                    child: Text(
+                      AppLocalizations.of(context)?.translate('pp_feed')??'My Feed',
+                      style: GoogleFonts.openSans(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  // TabBar
+                  const TabBar(
+                    tabs: [
+                      Tab(icon: Icon(Icons.person),),
+                      Tab(icon: Icon(Icons.people),),
+                    ],
+                  ),
+                  // Expanded TabBarView
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        ProfilePictures(
+                          userID: profile.user.id,
+                          showArchived: false,
+                          showOnlyMe: true,
+                        ),
+                        ProfilePictures(
+                          userID: profile.user.id,
+                          showArchived: false,
+                          showOnlyMe: false,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        } else {
           return Scaffold(
             appBar: AppBar(
               title: const BefriendTitle(),
-              actions: !profile.user.main()
-                  ? [
-                      Consumer(builder: (BuildContext context,
-                          ProfileProvider provider, Widget? child) {
-                        return PopupMenuButton<int>(
-                            icon: const Icon(
-                              Icons.more_vert,
-                            ),
-                            onSelected: (int selection) async {
-                              await provider.onSelectMenu(selection, context);
-                            },
-                            itemBuilder: (BuildContext context) => [
-                                  const PopupMenuItem<int>(
-                                    value: 0,
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.delete_outline_rounded,
-                                            color: Colors.red), // Archive icon
-                                        SizedBox(width: _iconTextDistance),
-                                        Text(
-                                          'Delete this user',
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                        SizedBox(width: _iconTextDistance * 2),
-                                      ],
-                                    ),
-                                  ),
-                                  const PopupMenuItem<int>(
-                                    value: 1,
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.block_rounded,
-                                        ), // Info icon
-                                        SizedBox(width: _iconTextDistance),
-                                        Text('Block this user'),
-                                        SizedBox(width: _iconTextDistance * 2),
-                                      ],
-                                    ),
-                                  ),
-                                ]);
-                      })
-                    ]
-                  : null,
+              actions: [
+                Consumer(builder: (BuildContext context,
+                    ProfileProvider provider, Widget? child) {
+                  return PopupMenuButton<int>(
+                      icon: const Icon(
+                        Icons.more_vert,
+                      ),
+                      onSelected: (int selection) async {
+                        await provider.onSelectMenu(selection, context);
+                      },
+                      itemBuilder: (BuildContext context) => [
+                         PopupMenuItem<int>(
+                          value: 0,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.delete_outline_rounded,
+                                  color: Colors.red), // Archive icon
+                              const SizedBox(width: _iconTextDistance),
+                              Text(
+                                AppLocalizations.of(context)?.translate('pp_delete')??'Delete this user',
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                              const SizedBox(width: _iconTextDistance * 2),
+                            ],
+                          ),
+                        ),
+                         PopupMenuItem<int>(
+                          value: 1,
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.block_rounded,
+                              ), // Info icon
+                              const SizedBox(width: _iconTextDistance),
+                              Text(AppLocalizations.of(context)?.translate('pp_block')??'Block this user'),
+                              const SizedBox(width: _iconTextDistance * 2),
+                            ],
+                          ),
+                        ),
+                      ]);
+                })
+              ]
             ),
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,7 +149,7 @@ class ProfilePage extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: padding, bottom: 8.0),
-                  child: Text('Pictures',
+                  child: Text(AppLocalizations.of(context)?.translate('pp_pictures')??'Pictures',
                       style: GoogleFonts.openSans(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -101,11 +159,14 @@ class ProfilePage extends StatelessWidget {
                   child: ProfilePictures(
                     userID: profile.user.id,
                     showArchived: false,
+                    showOnlyMe: false,
                   ),
                 ),
               ],
             ),
           );
-        });
+        }
+      },
+    );
   }
 }

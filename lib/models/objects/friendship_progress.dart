@@ -11,7 +11,6 @@ class FriendshipProgress {
   int level;
   double progress;
   String friendshipID;
-  DateTime lastSeen;
   int index;
 
   FriendshipProgress({
@@ -22,7 +21,6 @@ class FriendshipProgress {
     required this.friendshipID,
     required this.level,
     required this.progress,
-    required this.lastSeen,
     required this.index,
   });
 
@@ -64,9 +62,6 @@ class FriendshipProgress {
       username2: map[Constants.username2Doc] as String,
       level: map[Constants.levelDoc] as int,
       progress: (map[Constants.progressDoc] as num).toDouble(),
-      lastSeen: (map.containsKey(Constants.lastSeenDoc)
-          ? (map[Constants.lastSeenDoc] as Timestamp).toDate()
-          : DateTime.utc(0)),
       friendshipID: (map[Constants.user1Doc] as String) +
           (map[Constants.user2Doc] as String),
     );
@@ -88,7 +83,6 @@ class FriendshipProgress {
       username2: DataManager.getString(docs, '${Constants.usernameDoc}2'),
       level: DataManager.getNumber(docs, Constants.levelDoc).toInt(),
       progress: DataManager.getNumber(docs, Constants.progressDoc).toDouble(),
-      lastSeen: DataManager.getDateTime(docs, Constants.lastSeenDoc),
       user1: user1,
       user2: DataManager.getString(docs, Constants.user2Doc),
     );
@@ -100,8 +94,7 @@ class FriendshipProgress {
       String username1,
       String username2,
       int level,
-      double progress,
-      DateTime timestamp) {
+      double progress,) {
     final List<String> ids = [id1, id2];
     ids.sort();
 
@@ -121,8 +114,7 @@ class FriendshipProgress {
         username2: username2,
         friendshipID: friendshipId,
         level: level,
-        progress: 0,
-        lastSeen: timestamp);
+        progress: 0,);
   }
 
   Map<String, dynamic> toMap() {
@@ -133,12 +125,11 @@ class FriendshipProgress {
       Constants.username2Doc: username2,
       Constants.levelDoc: level,
       Constants.progressDoc: progress,
-      Constants.lastSeenDoc: lastSeen,
     };
   }
 
   @override
   String toString() {
-    return 'FriendshipProgress{user1ID: $user1, user2ID: $user2, username1: $username1, username2: $username2, level: $level, progress: $progress, friendshipID: $friendshipID, lastSeen: $lastSeen, index: $index}';
+    return 'FriendshipProgress{user1ID: $user1, user2ID: $user2, username1: $username1, username2: $username2, level: $level, progress: $progress, friendshipID: $friendshipID, index: $index}';
   }
 }

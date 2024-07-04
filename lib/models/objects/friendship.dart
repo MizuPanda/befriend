@@ -15,7 +15,6 @@ class Friendship extends FriendshipProgress {
     required super.username2,
     required super.level,
     required super.progress,
-    required super.lastSeen,
     required this.friend,
   });
 
@@ -34,7 +33,6 @@ class Friendship extends FriendshipProgress {
       friend: friendBubble,
       level: friendshipProgress.level,
       progress: friendshipProgress.progress,
-      lastSeen: friendshipProgress.lastSeen,
     );
   }
 

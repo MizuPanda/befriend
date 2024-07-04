@@ -1,3 +1,4 @@
+
 import 'package:befriend/providers/home_provider.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShowCaseWidget(
-        builder: Builder(builder: (context) => HomeView(home: home)));
+        builder: (context) => HomeView(home: home));
   }
 }
 
@@ -49,12 +50,13 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _notificationService.initTokenListener(_scaffoldKey, _provider.notify);
     MobileAds.instance.initialize();
 
-    debugPrint('(HomePage): _showTutorial=${_provider.home.showTutorial}');
-    // _provider.home.activeTutorial(); // For testing
+    debugPrint('(HomePage) _showTutorial=${_provider.home.showTutorial}');
+     //_provider.home.activeTutorial(); // For testing
     if (_provider.home.showTutorial) {
       _provider.initShowcase(context);
       _provider.home.deactivateTutorial();
     }
+    _provider.initLanguage(context);
   }
 
   @override
@@ -131,12 +133,13 @@ class HomeStack extends StatelessWidget {
           ),
         ),
         BefriendWidget(
-          five: provider.five,
+          one: provider.one,
+          four: provider.four,
         ),
         const SettingsButton(),
         const SearchButton(),
         PictureButton(
-          four: provider.four,
+          three: provider.three,
         ),
         if (!widget.home.connectedHome) const HomeButton(),
       ],

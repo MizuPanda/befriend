@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../../utilities/app_localizations.dart';
 import '../widgets/authentication/login/login_email_field.dart';
 
 class LoginPage extends StatefulWidget {
@@ -44,93 +45,95 @@ class _LoginPageState extends State<LoginPage> {
           resizeToAvoidBottomInset: false,
           body: Container(
             padding: EdgeInsets.all(width * 0.045),
-            child: Stack(
-              children: [
-                const SafeArea(
-                    child: Align(
-                        alignment: Alignment.topCenter,
-                        child: BefriendTitle(
-                          fontSize: 50,
-                        ))),
-                Consumer<LoginProvider>(builder: (BuildContext context,
-                    LoginProvider provider, Widget? child) {
+            child: SafeArea(
+              child: Consumer<LoginProvider>(
+                builder: (BuildContext context, LoginProvider provider, Widget? child) {
                   return Form(
-                    key: _provider.formKey,
+                    key: provider.formKey,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const EmailFormField(
-                          labelText: 'Enter your email',
+                        const BefriendTitle(
+                          fontSize: 50,
                         ),
-                        SizedBox(height: height * _sizedBoxHeightMultiplier),
-                        const PasswordFormField(),
-                        SizedBox(height: height * _sizedBoxHeightMultiplier),
-                        Row(
+                        Column(
                           children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                _provider.navigateToSignUp(context);
-                              },
-                              child: const AutoSizeText('Sign up'),
+                            AutoSizeText(AppLocalizations.of(context)?.translate('befriend_devise')??"~ Expand your social circle ~", style: GoogleFonts.openSans(fontSize: 20.5),),
+                            SizedBox(height: height*_sizedBoxHeightMultiplier/1.8 ,),
+                            EmailFormField(
+                              labelText: AppLocalizations.of(context)?.translate('lp_email')??'Enter your email',
                             ),
-                            const Spacer(),
-                            ElevatedButton(
-                              onPressed: () async {
-                                await _provider.login(context);
-                              },
-                              style: const ButtonStyle(enableFeedback: true),
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: _provider.isLoading
-                                    ? const CircularProgressIndicator()
-                                    : const AutoSizeText('Login'),
+                            SizedBox(height: height * _sizedBoxHeightMultiplier),
+                            const PasswordFormField(),
+                            SizedBox(height: height * _sizedBoxHeightMultiplier),
+                            Row(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    provider.navigateToSignUp(context);
+                                  },
+                                  child: AutoSizeText(AppLocalizations.of(context)?.translate('lp_sign')??'Sign up'),
+                                ),
+                                const Spacer(),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    await provider.login(context);
+                                  },
+                                  style: const ButtonStyle(enableFeedback: true),
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: provider.isLoading
+                                        ? const CircularProgressIndicator()
+                                        : AutoSizeText(AppLocalizations.of(context)?.translate('lp_login')??'Login'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                                height: MediaQuery.of(context).size.height *
+                                    _sizedBoxHeightMultiplier /
+                                    2),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  provider.openForgotPasswordPage(context);
+                                },
+                                child: AutoSizeText(AppLocalizations.of(context)?.translate('fpp_forgot')??'Forgot your password?'),
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(
-                            height: MediaQuery.of(context).size.height *
-                                _sizedBoxHeightMultiplier /
-                                2),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              _provider.openForgotPasswordPage(context);
-                            },
-                            child: const AutoSizeText('Forgot your password?'),
-                          ),
-                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            TextButton(
+                                onPressed: () async {
+                                  await provider.openPrivacyPolicy(context);
+                                },
+                                child: AutoSizeText(
+                                  textAlign: TextAlign.center,
+                                  AppLocalizations.of(context)?.translate('lp_privacy')??'Privacy Policy',
+                                  style: GoogleFonts.openSans(),
+                                )),
+                            Expanded(
+                              child: TextButton(
+                                  onPressed: () async {
+                                    await provider.openTerms(context);
+                                  },
+                                  child: AutoSizeText(
+                                    textAlign: TextAlign.center,
+                                    AppLocalizations.of(context)?.translate('lp_terms')??'Terms & Conditions',
+                                    style: GoogleFonts.openSans(),
+                                  )),
+                            )
+                          ],
+                        )
                       ],
                     ),
                   );
-                }),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      TextButton(
-                          onPressed: () async {
-                            await _provider.openPrivacyPolicy(context);
-                          },
-                          child: AutoSizeText(
-                            'Privacy Policy',
-                            style: GoogleFonts.openSans(),
-                          )),
-                      TextButton(
-                          onPressed: () async {
-                            await _provider.openTerms(context);
-                          },
-                          child: AutoSizeText(
-                            'Terms & Conditions',
-                            style: GoogleFonts.openSans(),
-                          ))
-                    ],
-                  ),
-                )
-              ],
+                }
+              ),
             ),
           ),
         ),

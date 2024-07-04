@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../utilities/app_localizations.dart';
+
 class FriendActionDialog {
   static void showFriendActionDialog(
       BuildContext context,
@@ -31,7 +33,7 @@ class FriendActionDialog {
                               .pop(); // Dismiss the dialog
                         },
                         child: Text(
-                          "Cancel",
+                          AppLocalizations.of(context)?.translate('dialog_cancel')??"Cancel",
                           style: TextStyle(fontSize: textButtonSize),
                         ),
                       ),

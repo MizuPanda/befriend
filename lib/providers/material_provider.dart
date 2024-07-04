@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utilities/app_localizations.dart';
 import '../utilities/constants.dart';
 
 class MaterialProvider extends ChangeNotifier {
@@ -18,13 +19,13 @@ class MaterialProvider extends ChangeNotifier {
 
   Future<String> initProvider() async {
     try {
-      debugPrint("(MaterialProvider): Starting initiating");
+      debugPrint("(MaterialProvider) Starting initiating");
       _themeMode = await _getThemeMode();
-      debugPrint("(MaterialProvider): Ending initiating");
+      debugPrint("(MaterialProvider) Ending initiating");
       notifyListeners();
       return 'Completed';
     } catch (e) {
-      debugPrint('(MaterialProvider): Error initializing provider: $e');
+      debugPrint('(MaterialProvider) Error initializing provider: $e');
       return 'Error';
     }
   }
@@ -40,14 +41,14 @@ class MaterialProvider extends ChangeNotifier {
     }
   }
 
-  String themeText() {
+  String themeText(BuildContext context) {
     switch (_themeMode) {
       case ThemeMode.light:
-        return 'Light';
+        return AppLocalizations.of(context)?.translate('mp_light')??'Light';
       case ThemeMode.dark:
-        return 'Dark';
+        return AppLocalizations.of(context)?.translate('mp_dark')??'Dark';
       case ThemeMode.system:
-        return 'System Default';
+        return AppLocalizations.of(context)?.translate('mp_sd')??'System Default';
     }
   }
 
@@ -70,7 +71,7 @@ class MaterialProvider extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      debugPrint('(MaterialProvider): Error saving theme mode: $e');
+      debugPrint('(MaterialProvider) Error saving theme mode: $e');
     }
   }
 
@@ -95,7 +96,7 @@ class MaterialProvider extends ChangeNotifier {
 
       return mode;
     } catch (e) {
-      debugPrint('(MaterialProvider): Error getting theme mode: $e');
+      debugPrint('(MaterialProvider) Error getting theme mode: $e');
       return ThemeMode.light;
     }
   }

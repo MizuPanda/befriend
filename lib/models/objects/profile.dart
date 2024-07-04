@@ -44,10 +44,4 @@ class Profile {
           .addAll(friendshipsInCommon.map((e) => e.friendUsername()));
     }
   }
-
-  String levelText() {
-    return user.main()
-        ? 'Connections: ${user.power}'
-        : 'Connection Strength: ${friendship!.level}';
-  }
 }

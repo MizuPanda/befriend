@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../models/objects/bubble.dart';
 import '../models/data/picture_manager.dart';
 import '../models/objects/profile.dart';
+import '../utilities/app_localizations.dart';
 import '../views/dialogs/profile/profile_edit_dialog.dart';
 
 class ProfileProvider extends ChangeNotifier {
@@ -22,17 +23,17 @@ class ProfileProvider extends ChangeNotifier {
       case 0: // Delete this user
         await _showActionConfirmation(
             context,
-            "Delete Friend",
-            "Are you sure you want to delete this friend? This action cannot be undone.",
-            "Delete",
+            AppLocalizations.of(context)?.translate('pp_df_title')??"Delete Friend",
+            AppLocalizations.of(context)?.translate('pp_df_description')??"Are you sure you want to delete this friend? This action cannot be undone.",
+            AppLocalizations.of(context)?.translate('pp_df_button')??"Delete",
             () => _deleteFriend(context));
         break;
       case 1: // Block this user
         await _showActionConfirmation(
             context,
-            "Block Friend",
-            "Are you sure you want to block this friend? This action cannot be undone.",
-            "Block",
+            AppLocalizations.of(context)?.translate('pp_bf_title')??"Block Friend",
+            AppLocalizations.of(context)?.translate('pp_bf_description')??"Are you sure you want to block this friend? This action cannot be undone.",
+            AppLocalizations.of(context)?.translate('pp_bf_button')??"Block",
             () => _blockFriend(context));
         break;
     }
@@ -53,7 +54,7 @@ class ProfileProvider extends ChangeNotifier {
         'targetUsername': profile.user.username,
         'friendshipId': ids.first + ids.last
       });
-      debugPrint('(ProfileProvider): $action successful: ${result.data}');
+      debugPrint('(ProfileProvider) $action successful: ${result.data}');
       if (context.mounted) {
         await UserManager.reloadHome(context);
 
@@ -62,10 +63,10 @@ class ProfileProvider extends ChangeNotifier {
         });
       }
     } catch (e) {
-      debugPrint('(ProfileProvider): Error $action: $e');
+      debugPrint('(ProfileProvider) Error $action: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, 'Error performing action. Please try again.');
+            context, AppLocalizations.of(context)?.translate('pp_action_error')??'Error performing action. Please try again.');
       }
     }
   }
@@ -98,14 +99,14 @@ class ProfileProvider extends ChangeNotifier {
     return profile.commonFriendUsernames.isEmpty;
   }
 
-  String friendsInCommon() {
+  String friendsInCommon(BuildContext context) {
     switch (profile.commonFriendUsernames.length) {
       case 1:
         return profile.commonFriendUsernames.first;
       case 2:
-        return '${profile.commonFriendUsernames.first} and ${profile.commonFriendUsernames.last}';
+        return '${profile.commonFriendUsernames.first} ${AppLocalizations.of(context)?.translate('pp_common_and')?? 'and'} ${profile.commonFriendUsernames.last}';
       default:
-        return '${profile.commonFriendUsernames.first}, ${profile.commonFriendUsernames[1]} and ${profile.commonFriendUsernames.length - 2} others';
+        return '${profile.commonFriendUsernames.first}, ${profile.commonFriendUsernames[1]} ${AppLocalizations.of(context)?.translate('pp_common_and')?? 'and'} ${profile.commonFriendUsernames.length - 2} ${AppLocalizations.of(context)?.translate('pp_common_others')?? 'others'}';
     }
   }
 
@@ -119,10 +120,10 @@ class ProfileProvider extends ChangeNotifier {
         await _loadPictureChange(context, _imageUrl, bubble, notifyParent);
       }
     } catch (e) {
-      debugPrint('(ProfileProvider): Error changing profile picture: $e');
+      debugPrint('(ProfileProvider) Error changing profile picture: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, 'Error changing profile picture. Please try again.');
+            context, AppLocalizations.of(context)?.translate('pp_cpf_error')??'Error changing profile picture. Please try again.');
       }
     }
   }
@@ -146,24 +147,18 @@ class ProfileProvider extends ChangeNotifier {
   Future<void> _loadPictureChange(BuildContext context, String? imageUrl,
       Bubble bubble, Function notifyParent) async {
     if (_imageUrl == null) {
-      const SnackBar snackBar = SnackBar(
-        content: Text('Picture change cancelled.'),
-        duration: Duration(seconds: 3),
-        showCloseIcon: true,
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      ErrorHandling.showError(context, AppLocalizations.of(context)?.translate('pp_load_cancel')??'Picture change cancelled.');
     } else {
       try {
-        debugPrint('Changing avatar...');
+        debugPrint('(ProfileProvider) Changing avatar...');
         await PictureManager.changeMainPicture(context, _imageUrl!, bubble);
         notifyListeners();
         notifyParent();
       } catch (e) {
-        debugPrint('(ProfileProvider): Error loading picture change: $e');
+        debugPrint('(ProfileProvider) Error loading picture change: $e');
         if (context.mounted) {
           ErrorHandling.showError(
-              context, 'Error loading picture change. Please try again.');
+              context, AppLocalizations.of(context)?.translate('pp_load_error')??'Error loading picture change. Please try again.');
         }
       }
     }

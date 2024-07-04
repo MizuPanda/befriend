@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/authentication/authentication.dart';
+import '../utilities/app_localizations.dart';
 import '../utilities/constants.dart';
 
 class LoginProvider extends ChangeNotifier {
@@ -79,22 +80,22 @@ class LoginProvider extends ChangeNotifier {
     GoRouter.of(context).push(Constants.signupAddress);
   }
 
-  String? emailValidator(String? email) {
+  String? emailValidator(BuildContext context, String? email) {
     if (email == null || email.isEmpty) {
       _isEmailError = true;
       notifyListeners();
-      return 'Please enter your email';
+      return AppLocalizations.of(context)?.translate('lp_ev')?? 'Please enter your email';
     }
     _isEmailError = false;
     notifyListeners();
     return null;
   }
 
-  String? passwordValidator(String? password) {
+  String? passwordValidator(BuildContext context,String? password) {
     if (password == null || password.isEmpty) {
       _isPassError = true;
       notifyListeners();
-      return 'Please enter your password';
+      return AppLocalizations.of(context)?.translate('lp_pv')??'Please enter your password';
     }
     _isPassError = false;
     notifyListeners();
@@ -112,7 +113,7 @@ class LoginProvider extends ChangeNotifier {
           await AuthenticationManager.signIn(_email!, _password!, context);
         }
       } catch (e) {
-        debugPrint('(LoginProvider): Error during login: $e');
+        debugPrint('(LoginProvider) Error during login: $e');
       }
     }
 

@@ -9,14 +9,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../models/objects/bubble.dart';
+import '../../utilities/app_localizations.dart';
 
 class BefriendWidget extends StatelessWidget {
   const BefriendWidget({
     super.key,
-    required this.five,
+    required this.one,
+    required this.four,
   });
 
-  final GlobalKey five;
+  final GlobalKey one;
+  final GlobalKey four;
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +35,14 @@ class BefriendWidget extends StatelessWidget {
               }
             },
             child: Showcase(
-                key: five,
-                description: "Tap on 'Befriend' to open your friend list.",
-                child: const BefriendTitle())),
+                key: one,
+                description: AppLocalizations.of(context)?.translate('bw_one')??"Welcome to Befriend! Your goal is to grow your friendships",
+                child: Showcase(
+                    key: four,
+                    descriptionAlignment: TextAlign.center,
+                    description:
+                    AppLocalizations.of(context)?.translate('bw_four')??'Your friends will gradually appear on your home page. Press here to see your friend list',
+                    child: const BefriendTitle()))),
       ),
     );
   }
@@ -54,3 +62,4 @@ class BefriendTitle extends StatelessWidget {
         ));
   }
 }
+

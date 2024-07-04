@@ -1,11 +1,17 @@
 import 'dart:async';
 
 import 'package:befriend/utilities/error_handling.dart';
+import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../utilities/app_localizations.dart';
 import '../../utilities/constants.dart';
+import '../../views/dialogs/rounded_dialog.dart';
+import '../../views/widgets/home/picture/hosting_widget.dart';
+import '../../views/widgets/home/picture/joining_widget.dart';
+import '../authentication/consent_manager.dart';
 import '../data/data_manager.dart';
 import '../objects/bubble.dart';
 import '../objects/host.dart';
@@ -23,7 +29,7 @@ class HostListening {
       onError: (error) {
         debugPrint('(HostListening): Error in Firestore subscription: $error');
         ErrorHandling.showError(
-            context, 'An error occurred. Please try again later...');
+            context, AppLocalizations.of(context)?.translate('general_error_message3')??'An error occurred. Please try again later...');
       },
     );
   }
@@ -49,7 +55,7 @@ class HostListening {
     } catch (e) {
       debugPrint('(HostListening): Error processing snapshot: $e');
       if (context.mounted) {
-        ErrorHandling.showError(context, 'An unknown error occurred...');
+        ErrorHandling.showError(context, AppLocalizations.of(context)?.translate('general_error_message4')??'An unknown error occurred...');
       }
     }
   }
@@ -83,7 +89,7 @@ class HostListening {
     } catch (e) {
       debugPrint('(HostListening): Error handling host stopped hosting: $e');
       // Optionally, show an error message to the user
-      ErrorHandling.showError(context, 'An unexpected error occurred...');
+      ErrorHandling.showError(context, AppLocalizations.of(context)?.translate('general_error_message4')?? 'An unexpected error occurred...');
     }
   }
 
@@ -103,8 +109,8 @@ class HostListening {
         if (host.joiners.every((user) => user.id != id)) {
           try {
             DocumentSnapshot newUserSnapshot =
-                await DataManager.getData(id: id);
-            ImageProvider avatar = await DataManager.getAvatar(newUserSnapshot);
+                await Models.dataManager.getData(id: id);
+            ImageProvider avatar = await Models.dataManager.getAvatar(newUserSnapshot);
             Bubble newUser =
                 Bubble.fromDocsWithoutFriends(newUserSnapshot, avatar);
             host.joiners.add(newUser);
@@ -153,6 +159,30 @@ class HostListening {
       await Constants.usersCollection.doc(host.host.id).update({
         Constants.hostingDoc: FieldValue.arrayRemove([host.user.id])
       });
+    }
+  }
+
+  static Future<void> pictureButton(
+      BuildContext context, bool isJoinMode) async {
+    // Allow access to the feature
+    await ConsentManager.getConsentForm(context, reload: false);
+
+    if (context.mounted) {
+      if (isJoinMode) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const RoundedDialog(child: JoiningWidget());
+            });
+      } else {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const RoundedDialog(
+                child: HostingWidget(isHost: true, host: null),
+              );
+            });
+      }
     }
   }
 }

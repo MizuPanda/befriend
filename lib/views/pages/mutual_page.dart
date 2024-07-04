@@ -7,6 +7,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/objects/profile.dart';
+import '../../utilities/app_localizations.dart';
 
 class MutualPage extends StatefulWidget {
   const MutualPage({
@@ -43,7 +44,7 @@ class _MutualPageState extends State<MutualPage> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: const Text('Mutual friends'),
+        title:  Text(AppLocalizations.of(context)?.translate('mp_friends')??'Mutual friends'),
       ),
       body: ChangeNotifierProvider.value(
           value: _provider,
@@ -57,7 +58,7 @@ class _MutualPageState extends State<MutualPage> {
                     child: TextField(
                       onChanged: provider.filterUsers,
                       decoration: InputDecoration(
-                        labelText: 'Search',
+                        labelText: AppLocalizations.of(context)?.translate('general_word_search')??'Search',
                         suffixIcon: const Icon(Icons.search),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),

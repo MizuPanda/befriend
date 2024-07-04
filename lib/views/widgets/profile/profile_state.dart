@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/objects/profile.dart';
+import '../../../utilities/app_localizations.dart';
 import '../users/progress_bar.dart';
 
 class ProfileState extends StatelessWidget {
@@ -30,7 +31,9 @@ class ProfileState extends StatelessWidget {
             padding: EdgeInsets.only(left: 8.0 / 448 * width),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: AutoSizeText(profile.levelText(),
+              child: AutoSizeText(profile.user.main()
+                  ? '${AppLocalizations.of(context)?.translate('prfs_fs')?? 'Friendship Score'}: ${profile.user.power}'
+                  : '${AppLocalizations.of(context)?.translate('prfs_fl')??'Friendship Level'}: ${profile.friendship!.level}',
                   style: GoogleFonts.openSans(
                     textStyle: const TextStyle(
                       fontSize: 18,
@@ -55,7 +58,7 @@ class ProfileState extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: TextButton(
                         style: ButtonStyle(
-                          overlayColor: MaterialStateProperty.all(
+                          overlayColor: WidgetStateProperty.all(
                               Colors.transparent), // Removes splash effect
                         ),
                         onPressed: () async {
@@ -69,9 +72,9 @@ class ProfileState extends StatelessWidget {
                               fontSize: 13,
                             ),
                             children: [
-                              const TextSpan(text: 'Followed by '),
+                              TextSpan(text: '${AppLocalizations.of(context)?.translate('prfs_followed')?? 'Followed by'} '),
                               TextSpan(
-                                  text: provider.friendsInCommon(),
+                                  text: provider.friendsInCommon(context),
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold))
                             ]))),

@@ -7,13 +7,14 @@ import 'package:befriend/models/services/post_service.dart';
 import 'package:befriend/models/social/friend_update.dart';
 import 'package:befriend/models/social/friendship_update.dart';
 import 'package:befriend/utilities/error_handling.dart';
+import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/dialogs/session/caption_dialog.dart';
+import 'package:befriend/views/dialogs/session/fullscreen_image_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showcaseview/showcaseview.dart';
 
@@ -21,9 +22,12 @@ import '../models/data/picture_manager.dart';
 import '../models/objects/bubble.dart';
 import '../models/objects/host.dart';
 import '../models/objects/picture.dart';
+import '../utilities/app_localizations.dart';
 import '../utilities/constants.dart';
 
 import 'dart:io' show Platform;
+
+import '../utilities/secrets.dart';
 
 class SessionProvider extends ChangeNotifier {
   bool _isLoading = false;
@@ -74,19 +78,25 @@ class SessionProvider extends ChangeNotifier {
 
   void _loadInterstitialAd() async {
     // Replace with your ad unit ID - TO CHANGE DEPENDENTLY ON PLATFORM
+    final String adUnitId = /*Platform.isAndroid
+        ? Secrets.sessionAndroidAdTile
+        : Secrets.sessioniOSAdTile;*/
+    Platform.isAndroid
+          ? Constants.sessionAndroidTestAdUnit
+          : Constants.sessioniOSTestAdUnit;
+
+    debugPrint('(SessionProvider) Ad Unit= $adUnitId');
     InterstitialAd.load(
-      adUnitId: Platform.isAndroid
-          ? Constants.androidTestAdUnit
-          : Constants.iosTestAdUnit,
+      adUnitId: adUnitId,
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (InterstitialAd ad) {
           _interstitialAd = ad;
-          debugPrint('(SessionProvider): Interstitial Ad Loaded');
+          debugPrint('(SessionProvider) Interstitial Ad Loaded');
         },
         onAdFailedToLoad: (LoadAdError error) {
           debugPrint(
-              '(SessionProvider): Interstitial Ad Failed to Load: $error');
+              '(SessionProvider) Interstitial Ad Failed to Load: $error');
           _interstitialAd = null;
         },
       ),
@@ -108,36 +118,19 @@ class SessionProvider extends ChangeNotifier {
   Future<void> showImageFullScreen(
     BuildContext context,
   ) async {
-    await showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor:
-            Colors.transparent, // Make Dialog background transparent
-        child: PhotoView(
-          tightMode: true,
-          backgroundDecoration: const BoxDecoration(
-            color: Colors.transparent, // Make PhotoView background transparent
-          ),
-          // You can adjust the min/max scale if needed
-          minScale: PhotoViewComputedScale.contained,
-          maxScale: PhotoViewComputedScale.contained,
-          enableRotation: false,
-          imageProvider: networkImage(),
-        ),
-      ),
-    );
+    await FullscreenImageDialog.showImageFullScreen(context, networkImage());
   }
 
   Future<String?> _promptForCaption(BuildContext context) async {
     try {
       return await CaptionDialog.showCaptionDialog(context, _characterLimit);
     } catch (e) {
-      debugPrint('(SessionProvider): Error prompting for caption: $e');
+      debugPrint('(SessionProvider) Error prompting for caption: $e');
       return null;
     }
   }
 
-  ImageProvider networkImage() {
+  NetworkImage networkImage() {
     return NetworkImage(
       host.imageUrl!,
     );
@@ -147,9 +140,9 @@ class SessionProvider extends ChangeNotifier {
     return host.imageUrl == null;
   }
 
-  Future<void> initPicture() async {
+  Future<void> initPicture(BuildContext context) async {
     if (host.main()) {
-      await pictureProcess();
+      await pictureProcess(context);
     }
   }
 
@@ -164,11 +157,12 @@ class SessionProvider extends ChangeNotifier {
     if (_interstitialAd != null) {
       _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (InterstitialAd ad) {
+          debugPrint('(SessionProvider) Ad showed successfully.');
           _navigateHome(context);
           ad.dispose();
         },
         onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-          debugPrint('(SessionProvider): Ad failed to show.');
+          debugPrint('(SessionProvider) Ad failed to show.');
           _navigateHome(context);
           ad.dispose();
         },
@@ -188,9 +182,9 @@ class SessionProvider extends ChangeNotifier {
     await UserManager.reloadHome(context);
   }
 
-  Future<void> pictureProcess() async {
+  Future<void> pictureProcess(BuildContext context) async {
     try {
-      await PictureManager.cameraPicture((String? url) {
+      await PictureManager.cameraPicture(context, (String? url) {
         host.imagePath = url;
       });
       if (!host.pathNull()) {
@@ -198,14 +192,14 @@ class SessionProvider extends ChangeNotifier {
         host.addCacheFile();
       }
     } catch (e) {
-      debugPrint('(SessionProvider): Error in pictureProcess: $e');
+      debugPrint('(SessionProvider) Error in pictureProcess: $e');
     }
   }
 
   void processSnapshot(QuerySnapshot snapshot, BuildContext context) {
     try {
       bool sliderValuesUpdated = false;
-      debugPrint('(SessionProvider): Processing snapshot...');
+      debugPrint('(SessionProvider) Processing snapshot...');
 
       if (_isSessionEnded) {
         return;
@@ -240,14 +234,14 @@ class SessionProvider extends ChangeNotifier {
           if (sessionUsers.isNotEmpty) {
             String picture = sessionUsers.first.toString();
             sessionUsers = sessionUsers.skip(1).toList();
-            debugPrint('(SessionProvider): Users: ${sessionUsers.toString()}');
+            debugPrint('(SessionProvider) Users: ${sessionUsers.toString()}');
 
             if (!sessionUsers.contains(host.host.id)) {
-              debugPrint('(SessionProvider): No host pop');
+              debugPrint('(SessionProvider) No host pop');
               _myPop(context);
             } else if (sessionUsers.length == 1 &&
                 sessionUsers.contains(host.user.id)) {
-              debugPrint('(SessionProvider): Only 1 user pop');
+              debugPrint('(SessionProvider) Only 1 user pop');
               _myPop(context);
             } else if (sessionUsers.length != ids.length) {
               _updateUsersList(sessionUsers, context);
@@ -260,14 +254,15 @@ class SessionProvider extends ChangeNotifier {
                 notifyListeners();
               });
               if (_interstitialAd == null) {
+                debugPrint('(SessionProvider) Interstitial Ad Not Null');
                 _loadInterstitialAd();
               }
             } else if (picture == Constants.publishingState) {
-              debugPrint('(SessionProvider): Picture published pop');
+              debugPrint('(SessionProvider) Picture published pop');
               _goHome(context);
             }
           } else {
-            debugPrint('(SessionProvider): Else pop');
+            debugPrint('(SessionProvider) Else pop');
             _myPop(context);
           }
 
@@ -275,14 +270,14 @@ class SessionProvider extends ChangeNotifier {
         }
       }
     } catch (e) {
-      debugPrint('(SessionProvider): Error processing snapshot: $e');
+      debugPrint('(SessionProvider) Error processing snapshot: $e');
     }
   }
 
   Future<String> getFriendshipsMap(BuildContext context) async {
     if (host.friendshipsMap.isEmpty) {
       DocumentSnapshot documentSnapshot =
-          await DataManager.getData(id: host.host.id);
+          await Models.dataManager.getData(id: host.host.id);
 
       Map<String, dynamic> friendshipsMap = documentSnapshot
               .data()
@@ -341,13 +336,13 @@ class SessionProvider extends ChangeNotifier {
 
   void _updateUsersList(List<dynamic> sessionUsers, BuildContext context) {
     debugPrint(
-        '(SessionProvider): Removing a user. \nList1: ${sessionUsers.toString()}\nList2: ${ids.toString()} ');
+        '(SessionProvider) Removing a user. \nList1: ${sessionUsers.toString()}\nList2: ${ids.toString()} ');
 
     // Remove users who left
     ids.removeWhere((id) => (!sessionUsers.contains(id)));
 
     if (!ids.contains(host.user.id)) {
-      debugPrint('(SessionProvider): User removed pop');
+      debugPrint('(SessionProvider) User removed pop');
       _myPop(context);
     } else {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -369,31 +364,33 @@ class SessionProvider extends ChangeNotifier {
             .where((element) => sessionUsers.contains(element.id))
             .toList();
 
-        debugPrint('(SessionProvider): Publishing to $sessionUsers');
+        debugPrint('(SessionProvider) Publishing to $sessionUsers');
         final DateTime timestamp = DateTime.timestamp();
 
         host.calculateAllowedUsers(_sliderValues, bubble);
         await _createOrUpdateFriendships(host.joiners, timestamp);
         await _uploadPicture(sessionUsers, host.joiners, timestamp);
         await _setUsersData(sessionUsers, host.joiners, timestamp);
-        _sendNotificationsToUser(sessionUsers, host.joiners);
+        if (context.mounted) {
+          _sendNotificationsToUser(sessionUsers, host.joiners, context);
+        }
 
         _isLoading = false;
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('(SessionProvider): Error publishing picture: $e');
+      debugPrint('(SessionProvider) Error publishing picture: $e');
       _isLoading = false;
       notifyListeners();
       if (context.mounted) {
         ErrorHandling.showError(
-            context, 'Error publishing picture. Please try again.');
+            context, AppLocalizations.of(context)?.translate('sp_publish_error')??'Error publishing picture. Please try again.');
       }
     }
   }
 
   void _sendNotificationsToUser(List<dynamic> sessionUsers,
-      Iterable<Bubble> joinersStillConnected) async {
+      Iterable<Bubble> joinersStillConnected, BuildContext context) async {
     Set<dynamic> usersToNotify = {};
     Map<String, List<String>> notificationMap = {};
 
@@ -427,7 +424,7 @@ class SessionProvider extends ChangeNotifier {
     // Send notifications
     notificationMap.forEach((senderId, friendsList) {
       PostService.sendPostNotification(
-          friendsList, host.host.username, senderId);
+          friendsList, host.host.username, senderId, context);
     });
   }
 
@@ -453,8 +450,10 @@ class SessionProvider extends ChangeNotifier {
           if (friendshipDoc.exists) {
             // Update existing friendship
             await FriendshipUpdate.addProgress(
-                userID1, userID2, friendshipDoc, timestamp,
-                exp: Constants.pictureExpValue);
+                userID1, userID2, friendshipDoc,
+                exp: Constants.pictureExpValue,
+
+            );
           } else {
             // Create a new friendship
             String username1 = idToBubbleMap[userID1]!.username;
@@ -466,7 +465,8 @@ class SessionProvider extends ChangeNotifier {
                 username1: username1,
                 username2: username2,
                 friendshipDocId: friendshipDocId,
-                timestamp: timestamp);
+              baseProgress: Constants.pictureExpValue
+            );
 
             // Update both users 'friendships document'
             await FriendUpdate.addFriend(userID2, mainUserId: userID1);
@@ -485,19 +485,16 @@ class SessionProvider extends ChangeNotifier {
     try {
       List<dynamic> usersAllowed = [];
 
-      if (!host.isPublic()) {
-        usersAllowed.addAll(sessionUsers);
+      Iterable<String> notArchivedUsers = sessionUsers.map((sessionUser) => '${Constants.notArchived}$sessionUser');
 
-        if (!host.isPrivate()) {
-          List<String> friendsAllowed = host.friendsAllowed().toList();
-          usersAllowed.addAll(friendsAllowed);
-        }
-      }
+      usersAllowed.addAll(notArchivedUsers);
+      List<String> friendsAllowed = host.friendsAllowed().toList();
+      usersAllowed.addAll(friendsAllowed);
 
       String? downloadUrl =
           await PictureQuery.movePictureToPermanentStorage(host);
       host.imageUrl = downloadUrl;
-      debugPrint('(SessionProvider): Moved picture to $downloadUrl');
+      debugPrint('(SessionProvider) Moved picture to $downloadUrl');
 
       Map<String, String> sessionUsersMap = {};
 
@@ -516,27 +513,12 @@ class SessionProvider extends ChangeNotifier {
           usersAllowed,
           sessionUsersMap);
 
-      String id = '';
-
-      for (String userID in sessionUsers) {
-        if (id.isEmpty) {
-          DocumentReference ref = await Constants.usersCollection
-              .doc(userID)
-              .collection(Constants.pictureSubCollection)
-              .add(picture.toMap());
-          id = ref.id;
-        } else {
-          await Constants.usersCollection
-              .doc(userID)
-              .collection(Constants.pictureSubCollection)
-              .doc(id)
-              .set(picture.toMap());
-        }
-      }
+      await Constants.picturesCollection
+          .add(picture.toMap());
     } catch (e) {
-      debugPrint('(SessionProvider): Error uploading picture: $e');
+      debugPrint('(SessionProvider) Error uploading picture: $e');
 
-      throw Exception('Error uploading picture. Please try again.');
+      rethrow;
     }
   }
 
@@ -556,7 +538,7 @@ class SessionProvider extends ChangeNotifier {
       }
 
       if (joiner == host.host) {
-        debugPrint('(SessionProvider): Resetting Host Data');
+        debugPrint('(SessionProvider) Resetting Host Data');
         // SET HOST INDEX TO PUBLISHING STATE, WHICH NOTIFIES USERS THAT THE PICTURE HAS BEEN UPLOADED
         await Constants.usersCollection.doc(joiner.id).update({
           Constants.hostingDoc: lst,
@@ -576,7 +558,7 @@ class SessionProvider extends ChangeNotifier {
   }
 
   Future<void> cancelLobby(BuildContext context) async {
-    debugPrint('(SessionProvider): Quitting lobby');
+    debugPrint('(SessionProvider) Quitting lobby');
 
     if (host.main()) {
       await _resetData();
@@ -588,7 +570,7 @@ class SessionProvider extends ChangeNotifier {
   }
 
   Future<void> _resetData() async {
-    debugPrint('(SessionProvider): Resetting Data');
+    debugPrint('(SessionProvider) Resetting Data');
 
     await Constants.usersCollection.doc(host.host.id).update({
       Constants.hostingFriendshipsDoc: {},

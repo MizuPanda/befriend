@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/data/data_manager.dart';
+import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path/path.dart' as path;
 
@@ -14,13 +16,11 @@ class Picture {
   final String pictureTaker;
   final DateTime timestamp;
   final Map<String, dynamic> metadata; //String size, String extension
-  final bool public;
   final String caption;
   final List<dynamic> allowedIDS;
   final Map<String, dynamic> sessionUsers;
   List<dynamic> likes;
   List<dynamic> firstLikes;
-  final bool archived;
 
   Picture._({
     required this.id,
@@ -29,13 +29,11 @@ class Picture {
     required this.pictureTaker,
     required this.timestamp,
     required this.metadata,
-    required this.public,
     required this.caption,
     required this.allowedIDS,
     required this.sessionUsers,
     required this.likes,
     required this.firstLikes,
-    required this.archived,
   });
 
   static final pictureAd = Picture._(
@@ -45,13 +43,12 @@ class Picture {
       pictureTaker: 'google',
       timestamp: DateTime(0),
       metadata: {},
-      public: true,
       caption: '',
       allowedIDS: [],
       sessionUsers: {},
       likes: [],
       firstLikes: [],
-      archived: false);
+  );
 
   factory Picture.newPicture(
     String fileUrl,
@@ -68,6 +65,7 @@ class Picture {
       'size': _formatBytes(file.lengthSync(), 0),
       'extension': path.extension(file.path),
     };
+
     return Picture._(
         id: '',
         hostId: hostId,
@@ -75,13 +73,12 @@ class Picture {
         pictureTaker: pictureTaker,
         timestamp: timestamp,
         metadata: metadata,
-        public: isPublic,
         caption: caption,
         allowedIDS: allowedIDS,
         sessionUsers: sessionUsers,
         likes: List.empty(),
         firstLikes: List.empty(),
-        archived: false);
+    );
   }
 
   factory Picture.fromDocument(
@@ -96,13 +93,12 @@ class Picture {
         pictureTaker: DataManager.getString(docs, Constants.pictureTakerDoc),
         timestamp: DataManager.getDateTime(docs, Constants.timestampDoc),
         metadata: DataManager.getMap(docs, Constants.metadataDoc),
-        public: DataManager.getBoolean(docs, Constants.publicDoc),
         caption: DataManager.getString(docs, Constants.captionDoc),
         allowedIDS: DataManager.getList(docs, Constants.allowedUsersDoc),
         sessionUsers: DataManager.getMap(docs, Constants.sessionUsersDoc),
         likes: DataManager.getList(docs, Constants.likesDoc),
         firstLikes: DataManager.getList(docs, Constants.firstLikesDoc),
-        archived: DataManager.getBoolean(docs, Constants.archived));
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -112,13 +108,11 @@ class Picture {
       Constants.pictureTakerDoc: pictureTaker,
       Constants.timestampDoc: timestamp,
       Constants.metadataDoc: metadata,
-      Constants.publicDoc: public,
       Constants.captionDoc: caption,
       Constants.allowedUsersDoc: allowedIDS,
       Constants.sessionUsersDoc: sessionUsers,
       Constants.likesDoc: likes,
       Constants.firstLikesDoc: firstLikes,
-      Constants.archived: archived,
     };
   }
 
@@ -127,6 +121,10 @@ class Picture {
     const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
     var i = (log(bytes) / log(1024)).floor();
     return '${(bytes / pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
+  }
+
+  bool hasUserArchived() {
+    return allowedIDS.contains(AuthenticationManager.archivedID());
   }
 
   @override

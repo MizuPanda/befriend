@@ -8,6 +8,7 @@ import 'package:showcaseview/showcaseview.dart';
 
 import '../../models/objects/host.dart';
 import '../../providers/material_provider.dart';
+import '../../utilities/app_localizations.dart';
 
 class SessionPage extends StatelessWidget {
   const SessionPage({super.key, required this.host});
@@ -15,9 +16,9 @@ class SessionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShowCaseWidget(
-      builder: Builder(builder: (context) {
+      builder: (context) {
         return _SessionPageView(host: host);
-      }),
+      },
     );
   }
 
@@ -39,7 +40,7 @@ class _SessionPageState extends State<_SessionPageView> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _provider.initPicture();
+      await _provider.initPicture(context);
     });
     super.initState();
   }
@@ -68,8 +69,8 @@ class _SessionPageState extends State<_SessionPageView> {
                       onPressed: () async {
                         await provider.cancelLobby(context);
                       },
-                      child: const AutoSizeText(
-                        'Cancel',
+                      child: AutoSizeText(
+                        AppLocalizations.of(context)?.translate('dialog_cancel')??'Cancel',
                         maxLines: 1,
                       ),
                     ),
@@ -102,7 +103,7 @@ class _SessionPageState extends State<_SessionPageView> {
                                   top: 0.005 * height,
                                 ),
                                 child: AutoSizeText(
-                                  '${provider.hostUsername()} is taking a picture!',
+                                  '${provider.hostUsername()} ${AppLocalizations.of(context)?.translate('sp_taking')?? 'is taking a picture!'}',
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.openSans(
                                       textStyle: const TextStyle(
@@ -122,15 +123,15 @@ class _SessionPageState extends State<_SessionPageView> {
                                     : null,
                                 onLongPress: provider.host.main()
                                     ? () async {
-                                        await provider.pictureProcess();
+                                        await provider.pictureProcess(context);
                                       }
                                     : null,
                                 child: Showcase(
                                   key: provider.one,
-                                  description: 'Hold the picture to retake.',
+                                  description: AppLocalizations.of(context)?.translate('sp_one')??'Hold the picture to retake.',
                                   child: Showcase(
                                     key: provider.two,
-                                    description: 'Tap the picture to zoom.',
+                                    description: AppLocalizations.of(context)?.translate('sp_two')??'Tap the picture to zoom.',
                                     child: Container(
                                       width: 0.7 * width, // for full width
                                       height: 0.7 * width,
@@ -162,7 +163,7 @@ class _SessionPageState extends State<_SessionPageView> {
                                 height: 0.025 * height,
                               ),
                               AutoSizeText(
-                                'User list',
+                                AppLocalizations.of(context)?.translate('sp_list')??'User list',
                                 style: GoogleFonts.openSans(
                                     textStyle: const TextStyle(fontSize: 18)),
                               ),
@@ -181,16 +182,21 @@ class _SessionPageState extends State<_SessionPageView> {
                                   Showcase(
                                     key: provider.four,
                                     description:
-                                        'Press to see users that will be able to see the picture.',
-                                    child: TextButton(
-                                      onPressed: () {
-                                        provider.showFriendList(context);
-                                      },
-                                      child: AutoSizeText(
-                                          'Who will see the picture',
-                                          style: GoogleFonts.openSans(
-                                              textStyle: const TextStyle(
-                                                  fontSize: 14))),
+                                    AppLocalizations.of(context)?.translate('sp_four')??'Press to see users that will be able to see the picture.',
+                                    child: Container(
+                                      alignment: Alignment.centerLeft,
+                                      width: 0.45 * width,
+                                      height: 50,
+                                      child: TextButton(
+                                        onPressed: () {
+                                          provider.showFriendList(context);
+                                        },
+                                        child: AutoSizeText(
+                                            AppLocalizations.of(context)?.translate('sp_who')??'Who will see the picture',
+                                            style: GoogleFonts.openSans(
+                                                textStyle: const TextStyle(
+                                                    fontSize: 14))),
+                                      ),
                                     ),
                                   ),
                                   const Spacer(),
@@ -198,27 +204,35 @@ class _SessionPageState extends State<_SessionPageView> {
                                     Showcase(
                                       key: provider.five,
                                       description:
-                                          'Press here to publish the picture.',
-                                      child: TextButton(
-                                        onPressed: provider.length() >= 2 &&
-                                                !provider.imageNull()
-                                            ? () async {
-                                                await provider
-                                                    .publishPicture(context);
-                                              }
-                                            : null,
-                                        child: Center(
-                                          child: provider.isLoading
-                                              ? const CircularProgressIndicator()
-                                              : AutoSizeText(
-                                                  'Publish the picture',
+                                      AppLocalizations.of(context)?.translate('sp_five')??'Press here to publish the picture.',
+                                      child: provider.isLoading
+                                          ? const CircularProgressIndicator()
+                                          : Container(
+                                              alignment: Alignment.centerRight,
+                                              width: 0.4 * width,
+                                              height: 50,
+                                              child: TextButton(
+                                                onPressed: provider.length() >=
+                                                            2 &&
+                                                        !provider.imageNull()
+                                                    ? () async {
+                                                        await provider
+                                                            .publishPicture(
+                                                                context);
+                                                      }
+                                                    : null,
+                                                child: AutoSizeText(
+                                                  AppLocalizations.of(context)?.translate('sp_publish')??'Publish the picture',
+                                                  textAlign: TextAlign.center,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   style: GoogleFonts.openSans(
                                                       textStyle:
                                                           const TextStyle(
                                                               fontSize: 16)),
                                                 ),
-                                        ),
-                                      ),
+                                              ),
+                                            ),
                                     )
                                 ],
                               ),

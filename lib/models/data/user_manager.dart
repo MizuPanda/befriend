@@ -1,16 +1,18 @@
 import 'dart:io';
 
 import 'package:befriend/models/data/data_manager.dart';
-import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/models/objects/home.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/error_handling.dart';
+import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../utilities/app_localizations.dart';
 import '../objects/bubble.dart';
+import 'data_query.dart';
 
 class UserManager {
   static Bubble? _instance;
@@ -27,7 +29,7 @@ class UserManager {
   static Future<Bubble> getInstance() async {
     if (_instance == null) {
       try {
-        DocumentSnapshot docs = await DataManager.getData();
+        DocumentSnapshot docs = await Models.dataManager.getData();
 
         List<dynamic> friendIDs =
             DataManager.getList(docs, Constants.friendsDoc);
@@ -35,7 +37,7 @@ class UserManager {
         List<Friendship> friendList =
             await DataQuery.friendList(docs.id, friendIDs);
 
-        ImageProvider avatar = await DataQuery.getNetworkImage(avatarUrl);
+        ImageProvider avatar = await Models.dataQuery.getNetworkImage(avatarUrl);
         _instance = Bubble.fromDocsWithFriends(docs, avatar, friendList);
         _instance?.postNotificationOn =
             DataManager.getBoolean(docs, Constants.postNotificationOnDoc);
@@ -68,7 +70,7 @@ class UserManager {
       // Optionally show an error message to the user
       if (context.mounted) {
         ErrorHandling.showError(
-            context, 'An unexpected error happened. Please try again later...');
+            context, AppLocalizations.of(context)?.translate('general_error_message2')??'An unexpected error happened. Please try again later...');
       }
     }
   }
@@ -80,7 +82,7 @@ class UserManager {
     _instance = null;
   }
 
-  static Future<ImageProvider> refreshAvatar(File file) async {
+  Future<ImageProvider> refreshAvatar(File file) async {
     try {
       if (_instance != null) {
         _instance!.avatar = Image.file(file).image;
@@ -104,4 +106,10 @@ class UserManager {
   static void setLikeNotification(bool value) {
     _instance?.likeNotificationOn = value;
   }
+
+  static void setLanguageCode(String value) {
+    _instance?.languageCode = value;
+  }
+
+  UserManager.static();
 }

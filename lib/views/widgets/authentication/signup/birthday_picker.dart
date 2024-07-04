@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../utilities/app_localizations.dart';
+
 /// Flutter code sample for [CupertinoDatePicker].
 
 class BirthdayPicker extends StatefulWidget {
@@ -40,7 +42,7 @@ class _BirthdayPickerState extends State<BirthdayPicker> {
             return _DatePickerItem(
               children: [
                 AutoSizeText(
-                  'Your Birthday',
+                  AppLocalizations.of(context)?.translate('bp_birthday')??'Your Birthday',
                   style: TextStyle(
                       fontSize: 18, color: Theme.of(context).hintColor),
                 ),
@@ -61,7 +63,7 @@ class _BirthdayPickerState extends State<BirthdayPicker> {
                   // use the intl package to format the value based on the
                   // user's locale settings.
                   child: AutoSizeText(
-                    provider.dateText(),
+                    provider.dateText(context),
                     style: const TextStyle(
                       fontSize: 20.0,
                     ),
