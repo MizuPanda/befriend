@@ -44,7 +44,8 @@ class _MutualPageState extends State<MutualPage> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title:  Text(AppLocalizations.of(context)?.translate('mp_friends')??'Mutual friends'),
+        title: Text(AppLocalizations.of(context)?.translate('mp_friends') ??
+            'Mutual friends'),
       ),
       body: ChangeNotifierProvider.value(
           value: _provider,
@@ -58,7 +59,9 @@ class _MutualPageState extends State<MutualPage> {
                     child: TextField(
                       onChanged: provider.filterUsers,
                       decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)?.translate('general_word_search')??'Search',
+                        labelText: AppLocalizations.of(context)
+                                ?.translate('general_word_search') ??
+                            'Search',
                         suffixIcon: const Icon(Icons.search),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),

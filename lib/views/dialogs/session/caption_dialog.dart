@@ -15,13 +15,16 @@ class CaptionDialog {
         builder: (BuildContext context) {
           return AlertDialog(
             actionsAlignment: MainAxisAlignment.spaceEvenly,
-            title:  Text(AppLocalizations.of(context)?.translate('cd_enter')??'Enter a Caption'),
+            title: Text(AppLocalizations.of(context)?.translate('cd_enter') ??
+                'Enter a Caption'),
             content: TextField(
               controller: captionController,
               decoration: InputDecoration(
-                hintText: AppLocalizations.of(context)?.translate('cd_picture')??"Caption for the picture",
+                hintText:
+                    AppLocalizations.of(context)?.translate('cd_picture') ??
+                        "Caption for the picture",
                 counterText:
-                    '${AppLocalizations.of(context)?.translate('cd_characters')?? 'Characters limit:'} $characterLimit', // Optional: Hide the counter text
+                    '${AppLocalizations.of(context)?.translate('cd_characters') ?? 'Characters limit:'} $characterLimit', // Optional: Hide the counter text
               ),
               maxLines: null,
               keyboardType: TextInputType.multiline,
@@ -29,8 +32,9 @@ class CaptionDialog {
             ),
             actions: [
               TextButton(
-                child:  Text(
-                  AppLocalizations.of(context)?.translate('dialog_cancel')??'Cancel',
+                child: Text(
+                  AppLocalizations.of(context)?.translate('dialog_cancel') ??
+                      'Cancel',
                   textAlign: TextAlign.end,
                 ),
                 onPressed: () {
@@ -39,7 +43,8 @@ class CaptionDialog {
               ),
               TextButton(
                 child: Text(
-                  AppLocalizations.of(context)?.translate('dialog_publish')??'Publish',
+                  AppLocalizations.of(context)?.translate('dialog_publish') ??
+                      'Publish',
                   textAlign: TextAlign.end,
                 ),
                 onPressed: () {

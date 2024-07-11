@@ -15,10 +15,11 @@ class UnblockDialog {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
               title: Text(
-                '${AppLocalizations.of(context)?.translate('ud_unblock')?? 'Unblock'} $username',
+                '${AppLocalizations.of(context)?.translate('ud_unblock') ?? 'Unblock'} $username',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              content: Text("${AppLocalizations.of(context)?.translate('ud_conf')?? 'Are you sure you want to unblock'} $username?",
+              content: Text(
+                  "${AppLocalizations.of(context)?.translate('ud_conf') ?? 'Are you sure you want to unblock'} $username?",
                   style: const TextStyle(fontSize: 16)),
               actions: isLoading
                   ? [const CircularProgressIndicator()]
@@ -29,7 +30,9 @@ class UnblockDialog {
                               .pop(); // Dismiss the dialog
                         },
                         child: Text(
-                          AppLocalizations.of(context)?.translate('dialog_cancel')??"Cancel",
+                          AppLocalizations.of(context)
+                                  ?.translate('dialog_cancel') ??
+                              "Cancel",
                           style: const TextStyle(fontSize: 15),
                         ),
                       ),
@@ -53,8 +56,12 @@ class UnblockDialog {
                                 .pop(); // Dismiss the dialog
                           }
                         },
-                        child: Text(AppLocalizations.of(context)?.translate('ud_unblock')??'Unblock',
-                            style: const TextStyle(color: Colors.red, fontSize: 15)),
+                        child: Text(
+                            AppLocalizations.of(context)
+                                    ?.translate('ud_unblock') ??
+                                'Unblock',
+                            style: const TextStyle(
+                                color: Colors.red, fontSize: 15)),
                       ),
                     ],
             );

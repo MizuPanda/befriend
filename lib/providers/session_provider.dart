@@ -78,12 +78,12 @@ class SessionProvider extends ChangeNotifier {
 
   void _loadInterstitialAd() async {
     // Replace with your ad unit ID - TO CHANGE DEPENDENTLY ON PLATFORM
-    final String adUnitId = /*Platform.isAndroid
+    final String adUnitId = Platform.isAndroid
         ? Secrets.sessionAndroidAdTile
-        : Secrets.sessioniOSAdTile;*/
-    Platform.isAndroid
+        : Secrets.sessioniOSAdTile;
+    /*Platform.isAndroid
           ? Constants.sessionAndroidTestAdUnit
-          : Constants.sessioniOSTestAdUnit;
+          : Constants.sessioniOSTestAdUnit;*/
 
     debugPrint('(SessionProvider) Ad Unit= $adUnitId');
     InterstitialAd.load(
@@ -384,7 +384,9 @@ class SessionProvider extends ChangeNotifier {
       notifyListeners();
       if (context.mounted) {
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('sp_publish_error')??'Error publishing picture. Please try again.');
+            context,
+            AppLocalizations.of(context)?.translate('sp_publish_error') ??
+                'Error publishing picture. Please try again.');
       }
     }
   }
@@ -450,9 +452,10 @@ class SessionProvider extends ChangeNotifier {
           if (friendshipDoc.exists) {
             // Update existing friendship
             await FriendshipUpdate.addProgress(
-                userID1, userID2, friendshipDoc,
-                exp: Constants.pictureExpValue,
-
+              userID1,
+              userID2,
+              friendshipDoc,
+              exp: Constants.pictureExpValue,
             );
           } else {
             // Create a new friendship
@@ -465,8 +468,7 @@ class SessionProvider extends ChangeNotifier {
                 username1: username1,
                 username2: username2,
                 friendshipDocId: friendshipDocId,
-              baseProgress: Constants.pictureExpValue
-            );
+                baseProgress: Constants.pictureExpValue);
 
             // Update both users 'friendships document'
             await FriendUpdate.addFriend(userID2, mainUserId: userID1);
@@ -485,7 +487,8 @@ class SessionProvider extends ChangeNotifier {
     try {
       List<dynamic> usersAllowed = [];
 
-      Iterable<String> notArchivedUsers = sessionUsers.map((sessionUser) => '${Constants.notArchived}$sessionUser');
+      Iterable<String> notArchivedUsers = sessionUsers
+          .map((sessionUser) => '${Constants.notArchived}$sessionUser');
 
       usersAllowed.addAll(notArchivedUsers);
       List<String> friendsAllowed = host.friendsAllowed().toList();
@@ -513,8 +516,7 @@ class SessionProvider extends ChangeNotifier {
           usersAllowed,
           sessionUsersMap);
 
-      await Constants.picturesCollection
-          .add(picture.toMap());
+      await Constants.picturesCollection.add(picture.toMap());
     } catch (e) {
       debugPrint('(SessionProvider) Error uploading picture: $e');
 

@@ -23,17 +23,21 @@ class ProfileProvider extends ChangeNotifier {
       case 0: // Delete this user
         await _showActionConfirmation(
             context,
-            AppLocalizations.of(context)?.translate('pp_df_title')??"Delete Friend",
-            AppLocalizations.of(context)?.translate('pp_df_description')??"Are you sure you want to delete this friend? This action cannot be undone.",
-            AppLocalizations.of(context)?.translate('pp_df_button')??"Delete",
+            AppLocalizations.of(context)?.translate('pp_df_title') ??
+                "Delete Friend",
+            AppLocalizations.of(context)?.translate('pp_df_description') ??
+                "Are you sure you want to delete this friend? This action cannot be undone.",
+            AppLocalizations.of(context)?.translate('pp_df_button') ?? "Delete",
             () => _deleteFriend(context));
         break;
       case 1: // Block this user
         await _showActionConfirmation(
             context,
-            AppLocalizations.of(context)?.translate('pp_bf_title')??"Block Friend",
-            AppLocalizations.of(context)?.translate('pp_bf_description')??"Are you sure you want to block this friend? This action cannot be undone.",
-            AppLocalizations.of(context)?.translate('pp_bf_button')??"Block",
+            AppLocalizations.of(context)?.translate('pp_bf_title') ??
+                "Block Friend",
+            AppLocalizations.of(context)?.translate('pp_bf_description') ??
+                "Are you sure you want to block this friend? This action cannot be undone.",
+            AppLocalizations.of(context)?.translate('pp_bf_button') ?? "Block",
             () => _blockFriend(context));
         break;
     }
@@ -66,7 +70,9 @@ class ProfileProvider extends ChangeNotifier {
       debugPrint('(ProfileProvider) Error $action: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('pp_action_error')??'Error performing action. Please try again.');
+            context,
+            AppLocalizations.of(context)?.translate('pp_action_error') ??
+                'Error performing action. Please try again.');
       }
     }
   }
@@ -104,9 +110,9 @@ class ProfileProvider extends ChangeNotifier {
       case 1:
         return profile.commonFriendUsernames.first;
       case 2:
-        return '${profile.commonFriendUsernames.first} ${AppLocalizations.of(context)?.translate('pp_common_and')?? 'and'} ${profile.commonFriendUsernames.last}';
+        return '${profile.commonFriendUsernames.first} ${AppLocalizations.of(context)?.translate('pp_common_and') ?? 'and'} ${profile.commonFriendUsernames.last}';
       default:
-        return '${profile.commonFriendUsernames.first}, ${profile.commonFriendUsernames[1]} ${AppLocalizations.of(context)?.translate('pp_common_and')?? 'and'} ${profile.commonFriendUsernames.length - 2} ${AppLocalizations.of(context)?.translate('pp_common_others')?? 'others'}';
+        return '${profile.commonFriendUsernames.first}, ${profile.commonFriendUsernames[1]} ${AppLocalizations.of(context)?.translate('pp_common_and') ?? 'and'} ${profile.commonFriendUsernames.length - 2} ${AppLocalizations.of(context)?.translate('pp_common_others') ?? 'others'}';
     }
   }
 
@@ -123,7 +129,9 @@ class ProfileProvider extends ChangeNotifier {
       debugPrint('(ProfileProvider) Error changing profile picture: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('pp_cpf_error')??'Error changing profile picture. Please try again.');
+            context,
+            AppLocalizations.of(context)?.translate('pp_cpf_error') ??
+                'Error changing profile picture. Please try again.');
       }
     }
   }
@@ -147,7 +155,10 @@ class ProfileProvider extends ChangeNotifier {
   Future<void> _loadPictureChange(BuildContext context, String? imageUrl,
       Bubble bubble, Function notifyParent) async {
     if (_imageUrl == null) {
-      ErrorHandling.showError(context, AppLocalizations.of(context)?.translate('pp_load_cancel')??'Picture change cancelled.');
+      ErrorHandling.showError(
+          context,
+          AppLocalizations.of(context)?.translate('pp_load_cancel') ??
+              'Picture change cancelled.');
     } else {
       try {
         debugPrint('(ProfileProvider) Changing avatar...');
@@ -158,7 +169,9 @@ class ProfileProvider extends ChangeNotifier {
         debugPrint('(ProfileProvider) Error loading picture change: $e');
         if (context.mounted) {
           ErrorHandling.showError(
-              context, AppLocalizations.of(context)?.translate('pp_load_error')??'Error loading picture change. Please try again.');
+              context,
+              AppLocalizations.of(context)?.translate('pp_load_error') ??
+                  'Error loading picture change. Please try again.');
         }
       }
     }

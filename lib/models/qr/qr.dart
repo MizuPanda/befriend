@@ -17,7 +17,10 @@ class QR {
   static void showLobbyFull(
     BuildContext context,
   ) {
-    ErrorHandling.showError(context, AppLocalizations.of(context)?.translate('qr_lobby_full')??'The lobby is full');
+    ErrorHandling.showError(
+        context,
+        AppLocalizations.of(context)?.translate('qr_lobby_full') ??
+            'The lobby is full');
   }
 
   static void showUserSeenToday(
@@ -26,7 +29,8 @@ class QR {
   ) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("${AppLocalizations.of(context)?.translate('qr_alr_seen')?? 'You have already seen'} $username ${AppLocalizations.of(context)?.translate('qr_today')?? 'today'}."),
+        content: Text(
+            "${AppLocalizations.of(context)?.translate('qr_alr_seen') ?? 'You have already seen'} $username ${AppLocalizations.of(context)?.translate('qr_today') ?? 'today'}."),
         duration: const Duration(seconds: 3),
       ),
     );

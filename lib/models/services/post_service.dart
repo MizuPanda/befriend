@@ -4,8 +4,8 @@ import 'package:flutter/cupertino.dart';
 class PostService {
   static final FirebaseFunctions _functions = FirebaseFunctions.instance;
 
-  static Future<void> sendPostNotification(
-      List<String> userIds, String postCreatorName, String hostId, BuildContext context) async {
+  static Future<void> sendPostNotification(List<String> userIds,
+      String postCreatorName, String hostId, BuildContext context) async {
     final String languageCode = Localizations.localeOf(context).languageCode;
 
     await _sendNotification('sendNewPostNotification', {

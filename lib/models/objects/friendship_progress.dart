@@ -89,12 +89,13 @@ class FriendshipProgress {
   }
 
   factory FriendshipProgress.newFriendship(
-      String id1,
-      String id2,
-      String username1,
-      String username2,
-      int level,
-      double progress,) {
+    String id1,
+    String id2,
+    String username1,
+    String username2,
+    int level,
+    double progress,
+  ) {
     final List<String> ids = [id1, id2];
     ids.sort();
 
@@ -107,14 +108,15 @@ class FriendshipProgress {
     // NO NEED TO REALLY SET AN INDEX NOW SINCE IT IS TO UPLOAD ON FIRESTORE
     String friendshipId = ids.join();
     return FriendshipProgress(
-        index: 0,
-        user1: ids.first,
-        user2: ids.last,
-        username1: username1,
-        username2: username2,
-        friendshipID: friendshipId,
-        level: level,
-        progress: 0,);
+      index: 0,
+      user1: ids.first,
+      user2: ids.last,
+      username1: username1,
+      username2: username2,
+      friendshipID: friendshipId,
+      level: level,
+      progress: 0,
+    );
   }
 
   Map<String, dynamic> toMap() {

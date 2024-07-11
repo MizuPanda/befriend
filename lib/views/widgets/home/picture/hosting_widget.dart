@@ -20,8 +20,7 @@ class HostingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ShowCaseWidget(
-        builder: (context) =>
-                _HostingWidgetView(isHost: isHost, host: host));
+        builder: (context) => _HostingWidgetView(isHost: isHost, host: host));
   }
 }
 
@@ -100,7 +99,7 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                                   width: (width - 130) *
                                       Constants.pictureDialogWidthMultiplier,
                                   child: AutoSizeText(
-                                    '${provider.hostUsername()} ${AppLocalizations.of(context)?.translate('hw_who')?? 'will take a picture!'}',
+                                    '${provider.hostUsername()} ${AppLocalizations.of(context)?.translate('hw_who') ?? 'will take a picture!'}',
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.openSans(
                                         textStyle: const TextStyle(
@@ -112,8 +111,9 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                                 Showcase(
                                   key: provider.one,
                                   descriptionAlignment: TextAlign.center,
-                                  description:
-                                  AppLocalizations.of(context)?.translate('hw_one')??"Press here to display your QR code. Your friends can scan it to join the photo session.",
+                                  description: AppLocalizations.of(context)
+                                          ?.translate('hw_one') ??
+                                      "Press here to display your QR code. Your friends can scan it to join the photo session.",
                                   child: IconButton(
                                     icon: const Icon(
                                         Icons.qr_code), // QR code icon
@@ -132,7 +132,7 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                                   width: (width - 130) *
                                       Constants.pictureDialogWidthMultiplier,
                                   child: AutoSizeText(
-                                    '${provider.hostUsername()} ${AppLocalizations.of(context)?.translate('hw_who')?? 'will take a picture!'}',
+                                    '${provider.hostUsername()} ${AppLocalizations.of(context)?.translate('hw_who') ?? 'will take a picture!'}',
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.openSans(
                                         textStyle: const TextStyle(
@@ -152,8 +152,9 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                             padding: EdgeInsets.all(0.022 * width),
                             child: Showcase(
                               key: provider.two,
-                              description:
-                              AppLocalizations.of(context)?.translate('hw_two')??"Once all users are connected, tap 'Continue' to proceed.",
+                              description: AppLocalizations.of(context)
+                                      ?.translate('hw_two') ??
+                                  "Once all users are connected, tap 'Continue' to proceed.",
                               child: TextButton(
                                 onPressed: provider.length() >= 2
                                     ? () async {
@@ -163,7 +164,9 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                                 child: provider.isLoading
                                     ? const CircularProgressIndicator()
                                     : AutoSizeText(
-                                  AppLocalizations.of(context)?.translate('general_word_continue')??'Continue',
+                                        AppLocalizations.of(context)?.translate(
+                                                'general_word_continue') ??
+                                            'Continue',
                                         style: GoogleFonts.openSans(
                                             textStyle:
                                                 const TextStyle(fontSize: 16)),

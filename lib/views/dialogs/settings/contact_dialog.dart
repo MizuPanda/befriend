@@ -8,12 +8,14 @@ class ContactDialog {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context)?.translate('cd_email')??'Contact Email'),
+          title: Text(AppLocalizations.of(context)?.translate('cd_email') ??
+              'Contact Email'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(
-                  AppLocalizations.of(context)?.translate('cd_need')??'If you need to contact us, please use the email below:',
+                  AppLocalizations.of(context)?.translate('cd_need') ??
+                      'If you need to contact us, please use the email below:',
                 ),
                 const SizedBox(height: 10),
                 const SelectableText(
@@ -26,7 +28,9 @@ class ContactDialog {
           ),
           actions: [
             TextButton(
-              child: Text(AppLocalizations.of(context)?.translate('dialog_close')??'Close'),
+              child: Text(
+                  AppLocalizations.of(context)?.translate('dialog_close') ??
+                      'Close'),
               onPressed: () {
                 Navigator.of(context).pop();
               },

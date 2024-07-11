@@ -108,23 +108,19 @@ class PictureCardProvider extends ChangeNotifier {
       },
     );
   }
-  
+
   Future<void> _toggleArchive(bool archived) async {
     try {
       String archivedID = AuthenticationManager.archivedID();
       String notArchivedID = AuthenticationManager.notArchivedID();
 
-      String add = archived? archivedID : notArchivedID;
-      String remove = archived? notArchivedID : archivedID;
+      String add = archived ? archivedID : notArchivedID;
+      String remove = archived ? notArchivedID : archivedID;
 
-      await Constants.picturesCollection
-          .doc(_picture.id)
-          .update({
+      await Constants.picturesCollection.doc(_picture.id).update({
         Constants.allowedUsersDoc: FieldValue.arrayRemove([remove]),
       });
-      await Constants.picturesCollection
-          .doc(_picture.id)
-          .update({
+      await Constants.picturesCollection.doc(_picture.id).update({
         Constants.allowedUsersDoc: FieldValue.arrayUnion([add])
       });
       debugPrint(
@@ -140,7 +136,7 @@ class PictureCardProvider extends ChangeNotifier {
       case 1:
         return _picture.likes.first;
       default:
-        return '${_picture.likes.first} ${AppLocalizations.of(context)?.translate('pcp_others')?? 'and others'}';
+        return '${_picture.likes.first} ${AppLocalizations.of(context)?.translate('pcp_others') ?? 'and others'}';
     }
   }
 
@@ -166,10 +162,13 @@ class PictureCardProvider extends ChangeNotifier {
         };
         _isNotLikedYet = true;
 
-        if (true || !_picture.sessionUsers.containsKey(connectedUserID)) {
+        if (!_picture.sessionUsers.containsKey(connectedUserID)) {
           List<String> usersToNotify = _picture.sessionUsers.keys.toList();
 
-          PostService.sendPostLikeNotification(_connectedUsername, usersToNotify);
+          debugPrint('(PictureCardProvider) Sending notification');
+
+          PostService.sendPostLikeNotification(
+              _connectedUsername, usersToNotify);
         }
       } else {
         data = {
@@ -178,9 +177,7 @@ class PictureCardProvider extends ChangeNotifier {
       }
     }
     try {
-      await Constants.picturesCollection
-          .doc(_picture.id)
-          .update(data);
+      await Constants.picturesCollection.doc(_picture.id).update(data);
       debugPrint(
           '(PictureCardProvider) Updated like to ${(!isLiked).toString()}');
     } catch (error) {

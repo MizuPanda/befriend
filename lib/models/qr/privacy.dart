@@ -65,7 +65,8 @@ class Privacy {
 
       if (isPublic) {
         final Iterable<String> sessionUserIDS = host.friendshipsMap.keys;
-        for (MapEntry<String, List<FriendshipProgress>> sessionUser in host.friendshipsMap.entries) {
+        for (MapEntry<String, List<FriendshipProgress>> sessionUser
+            in host.friendshipsMap.entries) {
           for (FriendshipProgress friendshipProgress in sessionUser.value) {
             String friendID = friendshipProgress.friendId();
 

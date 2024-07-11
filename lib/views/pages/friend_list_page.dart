@@ -57,7 +57,8 @@ class _FriendsListPageState extends State<FriendsListPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              AppLocalizations.of(context)?.translate('flp_list')??'Friends List',
+              AppLocalizations.of(context)?.translate('flp_list') ??
+                  'Friends List',
               style: GoogleFonts.openSans(),
             ),
             const SizedBox(
@@ -81,7 +82,9 @@ class _FriendsListPageState extends State<FriendsListPage> {
                       controller: provider.searchController,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.search),
-                        hintText: AppLocalizations.of(context)?.translate('flp_search')??'Search by username',
+                        hintText: AppLocalizations.of(context)
+                                ?.translate('flp_search') ??
+                            'Search by username',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),
@@ -97,7 +100,9 @@ class _FriendsListPageState extends State<FriendsListPage> {
                               noItemsFoundIndicatorBuilder:
                                   (BuildContext context) {
                                 return Center(
-                                  child: Text(AppLocalizations.of(context)?.translate('flp_no')??'No friends found'),
+                                  child: Text(AppLocalizations.of(context)
+                                          ?.translate('flp_no') ??
+                                      'No friends found'),
                                 );
                               },
                               itemBuilder: (context, friendship, index) {
@@ -143,7 +148,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                                                 height: 0.02 * height,
                                               ),
                                               AutoSizeText(
-                                                '${AppLocalizations.of(context)?.translate('flp_lvl')?? 'LVL'}${friendship.level}',
+                                                '${AppLocalizations.of(context)?.translate('flp_lvl') ?? 'LVL'}${friendship.level}',
                                                 style: GoogleFonts.openSans(),
                                               ),
                                               IconButton(
@@ -173,7 +178,9 @@ class _FriendsListPageState extends State<FriendsListPage> {
                             ),
                           )
                         : Center(
-                            child: Text(AppLocalizations.of(context)?.translate('flp_yet')??"You don't have friends yet."),
+                            child: Text(AppLocalizations.of(context)
+                                    ?.translate('flp_yet') ??
+                                "You don't have friends yet."),
                           ),
                   ),
                 ],

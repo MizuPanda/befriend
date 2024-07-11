@@ -52,8 +52,9 @@ class _PictureButtonState extends State<PictureButton> {
 
                     return Showcase(
                       key: widget.three,
-                      description:
-                      AppLocalizations.of(context)?.translate('pb_three')??'Swipe here to switch between Host and Join mode.',
+                      description: AppLocalizations.of(context)
+                              ?.translate('pb_three') ??
+                          'Swipe here to switch between Host and Join mode.',
                       child: Container(
                         width: width,
                         height: 0.054 * height,
@@ -121,8 +122,12 @@ class _PictureButtonState extends State<PictureButton> {
                               ),
                               AutoSizeText(
                                 provider.isJoinMode
-                                    ? AppLocalizations.of(context)?.translate('pb_join')??'Join a picture'
-                                    : AppLocalizations.of(context)?.translate('pb_take')??'Take a picture',
+                                    ? AppLocalizations.of(context)
+                                            ?.translate('pb_join') ??
+                                        'Join a picture'
+                                    : AppLocalizations.of(context)
+                                            ?.translate('pb_take') ??
+                                        'Take a picture',
                                 style: GoogleFonts.openSans(
                                   textStyle: const TextStyle(
                                     fontWeight: FontWeight.w500,

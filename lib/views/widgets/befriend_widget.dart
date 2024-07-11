@@ -36,12 +36,15 @@ class BefriendWidget extends StatelessWidget {
             },
             child: Showcase(
                 key: one,
-                description: AppLocalizations.of(context)?.translate('bw_one')??"Welcome to Befriend! Your goal is to grow your friendships",
+                description: AppLocalizations.of(context)
+                        ?.translate('bw_one') ??
+                    "Welcome to Befriend! Your goal is to grow your friendships",
                 child: Showcase(
                     key: four,
                     descriptionAlignment: TextAlign.center,
-                    description:
-                    AppLocalizations.of(context)?.translate('bw_four')??'Your friends will gradually appear on your home page. Press here to see your friend list',
+                    description: AppLocalizations.of(context)
+                            ?.translate('bw_four') ??
+                        'Your friends will gradually appear on your home page. Press here to see your friend list',
                     child: const BefriendTitle()))),
       ),
     );
@@ -62,4 +65,3 @@ class BefriendTitle extends StatelessWidget {
         ));
   }
 }
-

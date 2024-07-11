@@ -17,7 +17,11 @@ class UsernameText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      child: AutoSizeText(user.main() ? AppLocalizations.of(context)?.translate('general_word_you')??'You' : user.username,
+      child: AutoSizeText(
+          user.main()
+              ? AppLocalizations.of(context)?.translate('general_word_you') ??
+                  'You'
+              : user.username,
           maxLines: 1,
           style: GoogleFonts.openSans(
               fontWeight: user.main() ? FontWeight.w300 : FontWeight.w500,

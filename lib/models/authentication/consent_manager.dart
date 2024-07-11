@@ -15,6 +15,7 @@ class ConsentManager {
   static set mobileAds(MobileAds value) {
     _mobileAds = value;
   }
+
   static set consentDialog(ConsentDialog value) {
     _consentDialog = value;
   }
@@ -34,15 +35,19 @@ class ConsentManager {
 
       debugPrint("(ConsentManager) Address=$address");
 
-      await _showConsentDialog(
-          context, fileAddress: address, dialogName: AppLocalizations.of(context)?.translate('cm_tc')??'Terms & Conditions');
+      await _showConsentDialog(context,
+          fileAddress: address,
+          dialogName: AppLocalizations.of(context)?.translate('cm_tc') ??
+              'Terms & Conditions');
     } catch (e) {
       debugPrint(
           '(ConsentManager): Error displaying terms and conditions dialog: $e');
       // Provide user feedback or log error
       if (context.mounted) {
-        ErrorHandling.showError(context,
-            AppLocalizations.of(context)?.translate('cm_terms_error')??'Failed to display the terms and conditions. Please try again.');
+        ErrorHandling.showError(
+            context,
+            AppLocalizations.of(context)?.translate('cm_terms_error') ??
+                'Failed to display the terms and conditions. Please try again.');
       }
     }
   }
@@ -56,21 +61,26 @@ class ConsentManager {
 
       String address = '${Constants.privacyAddress}_$languageCode.md';
 
-      await _showConsentDialog(
-          context, fileAddress: address, dialogName: AppLocalizations.of(context)?.translate('cm_pp')??'Privacy Policy');
+      await _showConsentDialog(context,
+          fileAddress: address,
+          dialogName: AppLocalizations.of(context)?.translate('cm_pp') ??
+              'Privacy Policy');
     } catch (e) {
       debugPrint('(ConsentManager): Error displaying privacy dialog: $e');
       // Provide user feedback or log error
       if (context.mounted) {
         ErrorHandling.showError(
-              context, AppLocalizations.of(context)?.translate('cm_privacy_error')?? 'Failed to display the privacy policy. Please try again.');
+            context,
+            AppLocalizations.of(context)?.translate('cm_privacy_error') ??
+                'Failed to display the privacy policy. Please try again.');
       }
     }
   }
 
-  static Future<void> _showConsentDialog(
-      BuildContext context, {required String fileAddress, required String dialogName}) async {
-    return _consentDialog.showConsentDialog(context, dialogName: dialogName, fileAddress: fileAddress);
+  static Future<void> _showConsentDialog(BuildContext context,
+      {required String fileAddress, required String dialogName}) async {
+    return _consentDialog.showConsentDialog(context,
+        dialogName: dialogName, fileAddress: fileAddress);
   }
 
   static Future<void> setTagForChildrenAds(int birthYear) async {
@@ -119,7 +129,9 @@ class ConsentManager {
 
         // Consider adding retry logic or a user notification here
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('cm_form_error')?? "Failed to update consent information. Please try again.");
+            context,
+            AppLocalizations.of(context)?.translate('cm_form_error') ??
+                "Failed to update consent information. Please try again.");
       },
     );
   }
@@ -132,8 +144,7 @@ class ConsentManager {
   static void _loadForm(BuildContext context, bool reload) {
     ConsentForm.loadConsentForm(
       (ConsentForm consentForm) async {
-        ConsentStatus status =
-            await _consentInformation.getConsentStatus();
+        ConsentStatus status = await _consentInformation.getConsentStatus();
 
         debugPrint('(ConsentManager) Status is $status');
         if (status == ConsentStatus.required ||

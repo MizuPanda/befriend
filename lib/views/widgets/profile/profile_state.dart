@@ -31,9 +31,10 @@ class ProfileState extends StatelessWidget {
             padding: EdgeInsets.only(left: 8.0 / 448 * width),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: AutoSizeText(profile.user.main()
-                  ? '${AppLocalizations.of(context)?.translate('prfs_fs')?? 'Friendship Score'}: ${profile.user.power}'
-                  : '${AppLocalizations.of(context)?.translate('prfs_fl')??'Friendship Level'}: ${profile.friendship!.level}',
+              child: AutoSizeText(
+                  profile.user.main()
+                      ? '${AppLocalizations.of(context)?.translate('prfs_fs') ?? 'Friendship Score'}: ${profile.user.power}'
+                      : '${AppLocalizations.of(context)?.translate('prfs_fl') ?? 'Friendship Level'}: ${profile.friendship!.level}',
                   style: GoogleFonts.openSans(
                     textStyle: const TextStyle(
                       fontSize: 18,
@@ -72,7 +73,9 @@ class ProfileState extends StatelessWidget {
                               fontSize: 13,
                             ),
                             children: [
-                              TextSpan(text: '${AppLocalizations.of(context)?.translate('prfs_followed')?? 'Followed by'} '),
+                              TextSpan(
+                                  text:
+                                      '${AppLocalizations.of(context)?.translate('prfs_followed') ?? 'Followed by'} '),
                               TextSpan(
                                   text: provider.friendsInCommon(context),
                                   style: const TextStyle(

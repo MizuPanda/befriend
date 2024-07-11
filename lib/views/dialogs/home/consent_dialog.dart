@@ -4,8 +4,8 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../../utilities/app_localizations.dart';
 
 class ConsentDialog {
-  void showConsentDialog(
-      BuildContext context, {required String dialogName, required String fileAddress}) {
+  void showConsentDialog(BuildContext context,
+      {required String dialogName, required String fileAddress}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -26,7 +26,9 @@ class ConsentDialog {
           ),
           actions: [
             TextButton(
-              child: Text(AppLocalizations.of(context)?.translate('dialog_close')?? 'Close'),
+              child: Text(
+                  AppLocalizations.of(context)?.translate('dialog_close') ??
+                      'Close'),
               onPressed: () {
                 Navigator.of(context).pop();
               },

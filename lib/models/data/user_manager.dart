@@ -37,7 +37,8 @@ class UserManager {
         List<Friendship> friendList =
             await DataQuery.friendList(docs.id, friendIDs);
 
-        ImageProvider avatar = await Models.dataQuery.getNetworkImage(avatarUrl);
+        ImageProvider avatar =
+            await Models.dataQuery.getNetworkImage(avatarUrl);
         _instance = Bubble.fromDocsWithFriends(docs, avatar, friendList);
         _instance?.postNotificationOn =
             DataManager.getBoolean(docs, Constants.postNotificationOnDoc);
@@ -70,7 +71,9 @@ class UserManager {
       // Optionally show an error message to the user
       if (context.mounted) {
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('general_error_message2')??'An unexpected error happened. Please try again later...');
+            context,
+            AppLocalizations.of(context)?.translate('general_error_message2') ??
+                'An unexpected error happened. Please try again later...');
       }
     }
   }

@@ -25,10 +25,11 @@ class _BlockedSettingsWidgetState extends State<BlockedSettingsWidget> {
 
     return Scaffold(
       appBar: AppBar(
-        title:  Row(
+        title: Row(
           children: [
             Text(
-              AppLocalizations.of(context)?.translate('bsw_blocked')??"Blocked accounts ",
+              AppLocalizations.of(context)?.translate('bsw_blocked') ??
+                  "Blocked accounts ",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const Icon(Icons.supervisor_account_rounded)
@@ -88,14 +89,19 @@ class _BlockedSettingsWidgetState extends State<BlockedSettingsWidget> {
                                       debugPrint(
                                           '(BlockedSettingsWidget) Error: $e');
                                       if (context.mounted) {
-                                        ErrorHandling.showError(context, AppLocalizations.of(context)?.translate('general_error_message7')??
-                                            'An unexpected error occurred. Please try again.');
+                                        ErrorHandling.showError(
+                                            context,
+                                            AppLocalizations.of(context)?.translate(
+                                                    'general_error_message7') ??
+                                                'An unexpected error occurred. Please try again.');
                                       }
                                     }
                                   },
                                 );
                               },
-                              child:  Text(AppLocalizations.of(context)?.translate('bsw_unblock')??'Unblock'))
+                              child: Text(AppLocalizations.of(context)
+                                      ?.translate('bsw_unblock') ??
+                                  'Unblock'))
                         ],
                       ),
                     );

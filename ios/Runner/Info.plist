@@ -35,11 +35,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>$(NSCameraUsageDescription)</string>
+	<string>Befriend needs camera access to take photos for your profile and posts.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>$(NSPhotoLibraryUsageDescription)</string>
+	<string>Befriend needs access to your photo library to upload photos for your profile and posts.</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>$(NSUserTrackingUsageDescription)</string>
+	<string>Befriend uses this identifier to deliver personalized ads based on your interests.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

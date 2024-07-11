@@ -25,10 +25,10 @@ class ProfilePage extends StatelessWidget {
       builder: (BuildContext context, Widget? child) {
         final double height = MediaQuery.of(context).size.height;
 
-        if(profile.user.main()) {
+        if (profile.user.main()) {
           return DefaultTabController(
             length: 2, // Number of tabs
-            initialIndex: 1,
+            initialIndex: profile.initialIndex,
             child: Scaffold(
               appBar: AppBar(
                 title: const BefriendTitle(),
@@ -37,7 +37,8 @@ class ProfilePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(top: padding, left: padding, right: padding),
+                    padding: const EdgeInsets.only(
+                        top: padding, left: padding, right: padding),
                     child: ProfileHeader(profile: profile),
                   ),
                   SizedBox(height: 0.016 * height),
@@ -48,7 +49,8 @@ class ProfilePage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: padding, bottom: 8.0),
                     child: Text(
-                      AppLocalizations.of(context)?.translate('pp_feed')??'My Feed',
+                      AppLocalizations.of(context)?.translate('pp_feed') ??
+                          'My Feed',
                       style: GoogleFonts.openSans(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -58,8 +60,12 @@ class ProfilePage extends StatelessWidget {
                   // TabBar
                   const TabBar(
                     tabs: [
-                      Tab(icon: Icon(Icons.person),),
-                      Tab(icon: Icon(Icons.people),),
+                      Tab(
+                        icon: Icon(Icons.person),
+                      ),
+                      Tab(
+                        icon: Icon(Icons.people),
+                      ),
                     ],
                   ),
                   // Expanded TabBarView
@@ -85,51 +91,52 @@ class ProfilePage extends StatelessWidget {
           );
         } else {
           return Scaffold(
-            appBar: AppBar(
-              title: const BefriendTitle(),
-              actions: [
-                Consumer(builder: (BuildContext context,
-                    ProfileProvider provider, Widget? child) {
-                  return PopupMenuButton<int>(
-                      icon: const Icon(
-                        Icons.more_vert,
-                      ),
-                      onSelected: (int selection) async {
-                        await provider.onSelectMenu(selection, context);
-                      },
-                      itemBuilder: (BuildContext context) => [
-                         PopupMenuItem<int>(
-                          value: 0,
-                          child: Row(
-                            children: [
-                              const Icon(Icons.delete_outline_rounded,
-                                  color: Colors.red), // Archive icon
-                              const SizedBox(width: _iconTextDistance),
-                              Text(
-                                AppLocalizations.of(context)?.translate('pp_delete')??'Delete this user',
-                                style: const TextStyle(color: Colors.red),
-                              ),
-                              const SizedBox(width: _iconTextDistance * 2),
-                            ],
+            appBar: AppBar(title: const BefriendTitle(), actions: [
+              Consumer(builder: (BuildContext context, ProfileProvider provider,
+                  Widget? child) {
+                return PopupMenuButton<int>(
+                    icon: const Icon(
+                      Icons.more_vert,
+                    ),
+                    onSelected: (int selection) async {
+                      await provider.onSelectMenu(selection, context);
+                    },
+                    itemBuilder: (BuildContext context) => [
+                          PopupMenuItem<int>(
+                            value: 0,
+                            child: Row(
+                              children: [
+                                const Icon(Icons.delete_outline_rounded,
+                                    color: Colors.red), // Archive icon
+                                const SizedBox(width: _iconTextDistance),
+                                Text(
+                                  AppLocalizations.of(context)
+                                          ?.translate('pp_delete') ??
+                                      'Delete this user',
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                                const SizedBox(width: _iconTextDistance * 2),
+                              ],
+                            ),
                           ),
-                        ),
-                         PopupMenuItem<int>(
-                          value: 1,
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.block_rounded,
-                              ), // Info icon
-                              const SizedBox(width: _iconTextDistance),
-                              Text(AppLocalizations.of(context)?.translate('pp_block')??'Block this user'),
-                              const SizedBox(width: _iconTextDistance * 2),
-                            ],
+                          PopupMenuItem<int>(
+                            value: 1,
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.block_rounded,
+                                ), // Info icon
+                                const SizedBox(width: _iconTextDistance),
+                                Text(AppLocalizations.of(context)
+                                        ?.translate('pp_block') ??
+                                    'Block this user'),
+                                const SizedBox(width: _iconTextDistance * 2),
+                              ],
+                            ),
                           ),
-                        ),
-                      ]);
-                })
-              ]
-            ),
+                        ]);
+              })
+            ]),
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -149,7 +156,9 @@ class ProfilePage extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: padding, bottom: 8.0),
-                  child: Text(AppLocalizations.of(context)?.translate('pp_pictures')??'Pictures',
+                  child: Text(
+                      AppLocalizations.of(context)?.translate('pp_pictures') ??
+                          'Pictures',
                       style: GoogleFonts.openSans(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,

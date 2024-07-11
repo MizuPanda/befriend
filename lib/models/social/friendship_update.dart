@@ -6,8 +6,8 @@ import '../data/data_manager.dart';
 import '../objects/friendship_progress.dart';
 
 class FriendshipUpdate {
-  static Future<void> addProgress(String userID1, String userID2,
-      DocumentSnapshot friendshipDoc,
+  static Future<void> addProgress(
+      String userID1, String userID2, DocumentSnapshot friendshipDoc,
       {required double exp}) async {
     // Update existing friendship
     try {
@@ -49,11 +49,11 @@ class FriendshipUpdate {
       required double baseProgress}) async {
     try {
       FriendshipProgress newFriendship = FriendshipProgress.newFriendship(
-          userID1,
-          userID2,
-          username1,
-          username2,
-          Constants.baseLevel,
+        userID1,
+        userID2,
+        username1,
+        username2,
+        Constants.baseLevel,
         baseProgress,
       );
       await Constants.friendshipsCollection

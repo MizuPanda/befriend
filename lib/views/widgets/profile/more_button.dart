@@ -35,7 +35,11 @@ class MoreButton extends StatelessWidget {
                     Icons.archive_outlined,
                   ), // Archive icon
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width),
-                  Text(provider.isArchived() ? AppLocalizations.of(context)?.translate('mb_restore')??'Restore' : AppLocalizations.of(context)?.translate('mb_archive')??'Archive'),
+                  Text(provider.isArchived()
+                      ? AppLocalizations.of(context)?.translate('mb_restore') ??
+                          'Restore'
+                      : AppLocalizations.of(context)?.translate('mb_archive') ??
+                          'Archive'),
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width * 2),
                 ],
               ),
@@ -48,7 +52,10 @@ class MoreButton extends StatelessWidget {
                   const Icon(Icons.delete_outline_rounded,
                       color: Colors.red), // Archive icon
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width),
-                   Text(AppLocalizations.of(context)?.translate('mb_delete')??'Delete', style: const TextStyle(color: Colors.red)),
+                  Text(
+                      AppLocalizations.of(context)?.translate('mb_delete') ??
+                          'Delete',
+                      style: const TextStyle(color: Colors.red)),
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width * 2),
                 ],
               ),
@@ -63,7 +70,8 @@ class MoreButton extends StatelessWidget {
                   ),
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width),
                   Text(
-                    AppLocalizations.of(context)?.translate('mb_report')??'Report',
+                    AppLocalizations.of(context)?.translate('mb_report') ??
+                        'Report',
                   ),
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width * 2),
                 ],
@@ -77,7 +85,8 @@ class MoreButton extends StatelessWidget {
                   Icons.info_outline_rounded,
                 ), // Info icon
                 SizedBox(width: _iconTextDistanceWidthMultiplier * width),
-                Text(AppLocalizations.of(context)?.translate('mb_info')??'Info'),
+                Text(AppLocalizations.of(context)?.translate('mb_info') ??
+                    'Info'),
                 SizedBox(width: _iconTextDistanceWidthMultiplier * width * 2),
               ],
             ),

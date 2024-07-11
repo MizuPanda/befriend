@@ -29,7 +29,9 @@ class HostListening {
       onError: (error) {
         debugPrint('(HostListening): Error in Firestore subscription: $error');
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('general_error_message3')??'An error occurred. Please try again later...');
+            context,
+            AppLocalizations.of(context)?.translate('general_error_message3') ??
+                'An error occurred. Please try again later...');
       },
     );
   }
@@ -55,7 +57,10 @@ class HostListening {
     } catch (e) {
       debugPrint('(HostListening): Error processing snapshot: $e');
       if (context.mounted) {
-        ErrorHandling.showError(context, AppLocalizations.of(context)?.translate('general_error_message4')??'An unknown error occurred...');
+        ErrorHandling.showError(
+            context,
+            AppLocalizations.of(context)?.translate('general_error_message4') ??
+                'An unknown error occurred...');
       }
     }
   }
@@ -89,7 +94,10 @@ class HostListening {
     } catch (e) {
       debugPrint('(HostListening): Error handling host stopped hosting: $e');
       // Optionally, show an error message to the user
-      ErrorHandling.showError(context, AppLocalizations.of(context)?.translate('general_error_message4')?? 'An unexpected error occurred...');
+      ErrorHandling.showError(
+          context,
+          AppLocalizations.of(context)?.translate('general_error_message4') ??
+              'An unexpected error occurred...');
     }
   }
 
@@ -110,7 +118,8 @@ class HostListening {
           try {
             DocumentSnapshot newUserSnapshot =
                 await Models.dataManager.getData(id: id);
-            ImageProvider avatar = await Models.dataManager.getAvatar(newUserSnapshot);
+            ImageProvider avatar =
+                await Models.dataManager.getAvatar(newUserSnapshot);
             Bubble newUser =
                 Bubble.fromDocsWithoutFriends(newUserSnapshot, avatar);
             host.joiners.add(newUser);

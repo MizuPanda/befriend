@@ -5,7 +5,8 @@ import '../../../models/objects/bubble.dart';
 import '../../../utilities/app_localizations.dart';
 
 class LikesDialog {
-  static Future<void> showLikesDialog(BuildContext context, List<dynamic> likes) async {
+  static Future<void> showLikesDialog(
+      BuildContext context, List<dynamic> likes) async {
     try {
       Bubble bubble = await UserManager.getInstance();
 
@@ -33,9 +34,12 @@ class LikesDialog {
               ),
               children: likes
                   .map((username) => SimpleDialogOption(
-                child: Text(
-                    bubble.username == username ? AppLocalizations.of(context)?.translate('general_word_you')??'You' : username),
-              ))
+                        child: Text(bubble.username == username
+                            ? AppLocalizations.of(context)
+                                    ?.translate('general_word_you') ??
+                                'You'
+                            : username),
+                      ))
                   .toList(),
             );
           },

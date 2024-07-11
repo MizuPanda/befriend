@@ -33,7 +33,9 @@ class FriendActionDialog {
                               .pop(); // Dismiss the dialog
                         },
                         child: Text(
-                          AppLocalizations.of(context)?.translate('dialog_cancel')??"Cancel",
+                          AppLocalizations.of(context)
+                                  ?.translate('dialog_cancel') ??
+                              "Cancel",
                           style: TextStyle(fontSize: textButtonSize),
                         ),
                       ),

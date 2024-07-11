@@ -122,6 +122,7 @@ class Home {
 
   // Tells if a user is a friend with the main connected user.
   bool isFriendToUser() {
-    return connectedHome || user.friendIDs.contains(Models.authenticationManager.id());
+    return connectedHome ||
+        user.friendIDs.contains(Models.authenticationManager.id());
   }
 }

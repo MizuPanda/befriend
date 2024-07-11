@@ -26,8 +26,10 @@ class PictureManager {
     } catch (e) {
       debugPrint('(PictureManager): Error removing main picture: $e');
       if (context.mounted) {
-        ErrorHandling.showError(context,
-            AppLocalizations.of(context)?.translate('pm_mp_error')?? 'Failed to update your profile picture. Please try again.');
+        ErrorHandling.showError(
+            context,
+            AppLocalizations.of(context)?.translate('pm_mp_error') ??
+                'Failed to update your profile picture. Please try again.');
       }
     }
   }
@@ -43,8 +45,10 @@ class PictureManager {
     } catch (e) {
       debugPrint('(PictureManager): Error changing main picture: $e');
       if (context.mounted) {
-        ErrorHandling.showError(context,
-            AppLocalizations.of(context)?.translate('pm_mp_error')?? 'Failed to update your profile picture. Please try again.');
+        ErrorHandling.showError(
+            context,
+            AppLocalizations.of(context)?.translate('pm_mp_error') ??
+                'Failed to update your profile picture. Please try again.');
       }
     }
   }
@@ -57,12 +61,14 @@ class PictureManager {
       bool isGranted = await permission.request().isGranted;
       if (!isGranted) {
         if (context.mounted) {
-          await PermissionDeniedDialog.showPermissionDeniedDialog(context, rationale);
+          await PermissionDeniedDialog.showPermissionDeniedDialog(
+              context, rationale);
         }
       }
     } else if (status.isPermanentlyDenied) {
       if (context.mounted) {
-        await PermissionDeniedDialog.showPermissionDeniedDialog(context, rationale);
+        await PermissionDeniedDialog.showPermissionDeniedDialog(
+            context, rationale);
       }
     }
   }
@@ -108,28 +114,35 @@ class PictureManager {
       {required int imageQuality}) async {
     try {
       if (source == ImageSource.camera) {
-        await _requestPermission(Permission.camera, context,
-            AppLocalizations.of(context)?.translate('pm_cam_perm')?? 'Camera access is needed to take photos.');
+        await _requestPermission(
+            Permission.camera,
+            context,
+            AppLocalizations.of(context)?.translate('pm_cam_perm') ??
+                'Camera access is needed to take photos.');
       }
 
       if (source == ImageSource.gallery) {
-          if (Platform.isAndroid) {
-            final androidInfo = await DeviceInfoPlugin().androidInfo;
-            if (androidInfo.version.sdkInt <= 32) {
-              /// use [Permissions.storage.status]
-              if (context.mounted) {
-                await _requestPermission(Permission.storage, context,
-                    AppLocalizations.of(context)?.translate('pm_gall_perm')??'Photo library access is needed to select photos.');
-              }
-            }  else {
-              /// use [Permissions.photos.status]
-              if (context.mounted) {
-                await _requestPermission(Permission.photos, context,
-                    AppLocalizations.of(context)?.translate('pm_gall_perm')??'Photo library access is needed to select photos.');
-              }
+        if (Platform.isAndroid) {
+          final androidInfo = await DeviceInfoPlugin().androidInfo;
+          if (androidInfo.version.sdkInt <= 32) {
+            /// use [Permissions.storage.status]
+            if (context.mounted) {
+              await _requestPermission(
+                  Permission.storage,
+                  context,
+                  AppLocalizations.of(context)?.translate('pm_gall_perm') ??
+                      'Photo library access is needed to select photos.');
             }
-
-
+          } else {
+            /// use [Permissions.photos.status]
+            if (context.mounted) {
+              await _requestPermission(
+                  Permission.photos,
+                  context,
+                  AppLocalizations.of(context)?.translate('pm_gall_perm') ??
+                      'Photo library access is needed to select photos.');
+            }
+          }
         }
       }
 
@@ -143,11 +156,18 @@ class PictureManager {
           aspectRatioPresets: [CropAspectRatioPreset.square],
           uiSettings: [
             AndroidUiSettings(
-                toolbarTitle: context.mounted? AppLocalizations.of(context)?.translate('pm_edit_pic')?? 'Edit your picture' : 'Edit your picture',
+                toolbarTitle: context.mounted
+                    ? AppLocalizations.of(context)?.translate('pm_edit_pic') ??
+                        'Edit your picture'
+                    : 'Edit your picture',
                 toolbarWidgetColor: Colors.black,
                 initAspectRatio: CropAspectRatioPreset.original,
                 lockAspectRatio: false),
-            IOSUiSettings(title: context.mounted? AppLocalizations.of(context)?.translate('pm_edit_pic')?? 'Edit your picture' : 'Edit your picture'),
+            IOSUiSettings(
+                title: context.mounted
+                    ? AppLocalizations.of(context)?.translate('pm_edit_pic') ??
+                        'Edit your picture'
+                    : 'Edit your picture'),
           ],
         );
 

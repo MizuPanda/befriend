@@ -30,7 +30,8 @@ class VisibilityDialog {
           actions: [
             TextButton(
               child: Text(
-                AppLocalizations.of(context)?.translate('dialog_close')??'Close',
+                AppLocalizations.of(context)?.translate('dialog_close') ??
+                    'Close',
                 style: GoogleFonts.openSans(fontSize: 16),
               ),
               onPressed: () {
@@ -65,11 +66,12 @@ class VisibilitySettingsWidget extends StatelessWidget {
       if (isAllPublic) {
         headerIcon =
             Icon(Icons.public_rounded, color: Colors.green[900], size: 60);
-        message = AppLocalizations.of(context)?.translate('vsd_public')??'All your current friends will be able to view this picture.';
+        message = AppLocalizations.of(context)?.translate('vsd_public') ??
+            'All your current friends will be able to view this picture.';
       } else if (isPrivate) {
         headerIcon = Icon(Icons.lock_rounded, color: Colors.red[900], size: 60);
-        message =
-            AppLocalizations.of(context)?.translate('vsd_private')??'Only you and the friends in this picture can see it.';
+        message = AppLocalizations.of(context)?.translate('vsd_private') ??
+            'Only you and the friends in this picture can see it.';
       } else {
         List<FriendshipProgress> sortedFriendships = friendships.toList()
           ..sort((a, b) => a.friendUsername().compareTo(b.friendUsername()));
@@ -84,7 +86,8 @@ class VisibilitySettingsWidget extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                AppLocalizations.of(context)?.translate('vsd_protected')??'These people will be able to see this picture:',
+                AppLocalizations.of(context)?.translate('vsd_protected') ??
+                    'These people will be able to see this picture:',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.openSans(
                   fontSize: 20,

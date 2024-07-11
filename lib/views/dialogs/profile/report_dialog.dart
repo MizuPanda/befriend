@@ -31,13 +31,15 @@ class _ReportDialogState extends State<ReportDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title:  Text(AppLocalizations.of(context)?.translate('rp_report')??'Report'),
+      title: Text(
+          AppLocalizations.of(context)?.translate('rp_report') ?? 'Report'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             CheckboxListTile(
-              title: Text(AppLocalizations.of(context)?.translate('rp_inap')??'Inappropriate content'),
+              title: Text(AppLocalizations.of(context)?.translate('rp_inap') ??
+                  'Inappropriate content'),
               value: inappropriateContent,
               onChanged: (value) {
                 setState(() {
@@ -46,7 +48,9 @@ class _ReportDialogState extends State<ReportDialog> {
               },
             ),
             CheckboxListTile(
-              title: Text(AppLocalizations.of(context)?.translate('general_word_other')??'Other'),
+              title: Text(AppLocalizations.of(context)
+                      ?.translate('general_word_other') ??
+                  'Other'),
               value: other,
               onChanged: (value) {
                 setState(() {
@@ -58,7 +62,9 @@ class _ReportDialogState extends State<ReportDialog> {
               TextField(
                 controller: otherReasonController,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)?.translate('rp_reason')??'Reason',
+                  labelText:
+                      AppLocalizations.of(context)?.translate('rp_reason') ??
+                          'Reason',
                 ),
               ),
           ],
@@ -71,13 +77,17 @@ class _ReportDialogState extends State<ReportDialog> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child:  Text(AppLocalizations.of(context)?.translate('dialog_cancel')??'Cancel'),
+                child: Text(
+                    AppLocalizations.of(context)?.translate('dialog_cancel') ??
+                        'Cancel'),
               ),
               ElevatedButton(
                 onPressed: () async {
                   await _report(context);
                 },
-                child:  Text(AppLocalizations.of(context)?.translate('rp_report')??'Report'),
+                child: Text(
+                    AppLocalizations.of(context)?.translate('rp_report') ??
+                        'Report'),
               ),
             ],
     );
@@ -113,7 +123,9 @@ class _ReportDialogState extends State<ReportDialog> {
       debugPrint('(ReportDialog) Error reporting dialog: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('general_error_message6')??'There was an unexpected error. Please try again.');
+            context,
+            AppLocalizations.of(context)?.translate('general_error_message6') ??
+                'There was an unexpected error. Please try again.');
       }
     }
 

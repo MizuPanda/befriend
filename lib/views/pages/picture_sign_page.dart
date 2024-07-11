@@ -24,7 +24,8 @@ class PictureSignPage extends StatelessWidget {
           child: Scaffold(
             appBar: AppBar(
               title: Text(
-                AppLocalizations.of(context)?.translate('psp_ls')??'Last step',
+                AppLocalizations.of(context)?.translate('psp_ls') ??
+                    'Last step',
                 style: GoogleFonts.openSans(),
               ),
               centerTitle: true,
@@ -58,7 +59,10 @@ class PictureSignPage extends StatelessWidget {
                                 backgroundImage: provider.image()),
                       ),
                       SizedBox(height: _heightMultiplier * 3 * height),
-                      AutoSizeText(AppLocalizations.of(context)?.translate('psp_almost')??'Almost Done!',
+                      AutoSizeText(
+                          AppLocalizations.of(context)
+                                  ?.translate('psp_almost') ??
+                              'Almost Done!',
                           style: GoogleFonts.openSans(
                             textStyle: const TextStyle(
                               fontSize: 40.0,
@@ -87,7 +91,9 @@ class PictureSignPage extends StatelessWidget {
                               color: lightMode ? Colors.black : Colors.white),
                         ),
                         child: AutoSizeText(
-                            AppLocalizations.of(context)?.translate('psp_add')??'Add a photo to personalize your profile.',
+                            AppLocalizations.of(context)
+                                    ?.translate('psp_add') ??
+                                'Add a photo to personalize your profile.',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.openSans(
                               textStyle: const TextStyle(
@@ -110,7 +116,9 @@ class PictureSignPage extends StatelessWidget {
                         onPressed: () async {
                           await provider.retrieveImage(context);
                         },
-                        child: AutoSizeText(AppLocalizations.of(context)?.translate('psp_capture')??'Capture Photo'),
+                        child: AutoSizeText(AppLocalizations.of(context)
+                                ?.translate('psp_capture') ??
+                            'Capture Photo'),
                       ),
                       SizedBox(
                         height: _heightMultiplier * height,
@@ -127,8 +135,11 @@ class PictureSignPage extends StatelessWidget {
                                 child: Center(
                                   child: provider.isSkipLoading
                                       ? const CircularProgressIndicator()
-                                      :  AutoSizeText(
-                                    AppLocalizations.of(context)?.translate('general_word_skip')??'Skip',
+                                      : AutoSizeText(
+                                          AppLocalizations.of(context)
+                                                  ?.translate(
+                                                      'general_word_skip') ??
+                                              'Skip',
                                           style: const TextStyle(fontSize: 16),
                                         ),
                                 )),
@@ -142,7 +153,10 @@ class PictureSignPage extends StatelessWidget {
                                   child: provider.isContinueLoading
                                       ? const CircularProgressIndicator()
                                       : AutoSizeText(
-                                    AppLocalizations.of(context)?.translate('general_word_confirm')??'Confirm',
+                                          AppLocalizations.of(context)
+                                                  ?.translate(
+                                                      'general_word_confirm') ??
+                                              'Confirm',
                                           style: TextStyle(
                                               color: provider.imageNull()
                                                   ? Colors.grey

@@ -54,13 +54,14 @@ class ProfilePicturesProvider extends ChangeNotifier {
       if (showOnlyMe) {
         q = Constants.picturesCollection
             .where(Constants.hostId, isEqualTo: userID)
-            .where(Constants.allowedUsersDoc, arrayContains: AuthenticationManager.notArchivedID());
+            .where(Constants.allowedUsersDoc,
+                arrayContains: AuthenticationManager.notArchivedID());
       } else if (showArchived) {
-        q = Constants.picturesCollection
-            .where(Constants.allowedUsersDoc, arrayContains: AuthenticationManager.archivedID());
+        q = Constants.picturesCollection.where(Constants.allowedUsersDoc,
+            arrayContains: AuthenticationManager.archivedID());
       } else {
-        q = Constants.picturesCollection
-            .where(Constants.allowedUsersDoc, arrayContainsAny: [AuthenticationManager.notArchivedID(), userID]);
+        q = Constants.picturesCollection.where(Constants.allowedUsersDoc,
+            arrayContainsAny: [AuthenticationManager.notArchivedID(), userID]);
       }
 
       q = q.orderBy(Constants.timestampDoc, descending: true);

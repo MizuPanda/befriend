@@ -72,7 +72,9 @@ class HostingProvider extends ChangeNotifier {
         }
       }
 
-      await Constants.usersCollection.doc(Models.authenticationManager.id()).update({
+      await Constants.usersCollection
+          .doc(Models.authenticationManager.id())
+          .update({
         Constants.hostingDoc: List.empty(),
         Constants.lastSeenUsersMapDoc: newLastSeenMap
       });

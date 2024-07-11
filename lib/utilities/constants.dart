@@ -2,7 +2,6 @@ import 'package:befriend/router.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-
 class Constants {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -54,9 +53,9 @@ class Constants {
   //COLLECTIONS
   static CollectionReference friendshipsCollection =
       _firestore.collection('friendships');
-  static CollectionReference usersCollection =
-      _firestore.collection('users');
-  static CollectionReference picturesCollection = _firestore.collection('pictures');
+  static CollectionReference usersCollection = _firestore.collection('users');
+  static CollectionReference picturesCollection =
+      _firestore.collection('pictures');
   // HOME PAGE SIZES
   static const double homeButtonSize = 20;
   static const double homeButtonAddSize = 25;
@@ -86,7 +85,8 @@ class Constants {
       'ca-app-pub-3940256099942544/1033173712';
   static const String postAndroidTestAdUnit =
       'ca-app-pub-3940256099942544/2247696110';
-  static const String sessioniOSTestAdUnit = 'ca-app-pub-3940256099942544/4411468910';
+  static const String sessioniOSTestAdUnit =
+      'ca-app-pub-3940256099942544/4411468910';
   static const String postiOSTestAdUnit =
       'ca-app-pub-3940256099942544/3986624511';
   // ERRORS
@@ -96,8 +96,10 @@ class Constants {
   static const String invalidEmail = 'invalid-email';
   static const String usernameError = 'username-already-in-use';
   // CONFIGURATIONS
-  static final RequestConfiguration coppa = RequestConfiguration(tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes);
-  static final RequestConfiguration gdrp = RequestConfiguration(tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.yes);
+  static final RequestConfiguration coppa = RequestConfiguration(
+      tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes);
+  static final RequestConfiguration gdrp = RequestConfiguration(
+      tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.yes);
   // ASSETS
   static const String termsAddress = 'assets/policies/terms_and_conditions';
   static const String privacyAddress = 'assets/policies/privacy_policy';

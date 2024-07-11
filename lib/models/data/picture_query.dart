@@ -28,7 +28,8 @@ class PictureQuery {
 
       if (match != null) {
         final String filePath = match.group(1)!.replaceAll('%2F', '/');
-        final Reference storageReference = FirebaseStorage.instance.ref().child(filePath);
+        final Reference storageReference =
+            FirebaseStorage.instance.ref().child(filePath);
 
         // Delete the file from Firebase Storage
         await storageReference.delete();

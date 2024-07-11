@@ -38,7 +38,8 @@ class _SearchButtonState extends State<SearchButton> {
             right: Constants.homeHorizontalPaddingMultiplier * width),
         child: GestureDetector(
           child: AnimSearchBar(
-            helpText: AppLocalizations.of(context)?.translate('sb_text')??"Search...",
+            helpText: AppLocalizations.of(context)?.translate('sb_text') ??
+                "Search...",
             rtl: true,
             width: MediaQuery.of(context).size.width -
                 (provider.home.user.main() ? normalPadding : friendPadding),

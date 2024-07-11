@@ -25,8 +25,10 @@ class ForgotProvider extends ChangeNotifier {
     try {
       await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
       final SnackBar successSnackBar = SnackBar(
-        content: Text(
-            context.mounted? AppLocalizations.of(context)?.translate('fp_reset')??'If your email address is in our records, you will receive a password reset email shortly.' : 'If your email address is in our records, you will receive a password reset email shortly.'),
+        content: Text(context.mounted
+            ? AppLocalizations.of(context)?.translate('fp_reset') ??
+                'If your email address is in our records, you will receive a password reset email shortly.'
+            : 'If your email address is in our records, you will receive a password reset email shortly.'),
         duration: const Duration(seconds: 3),
         showCloseIcon: true,
       );
@@ -36,7 +38,10 @@ class ForgotProvider extends ChangeNotifier {
     } catch (error) {
       debugPrint('(ForgotProvider) Error: ${error.toString()}');
       final SnackBar errorSnackBar = SnackBar(
-        content: Text(context.mounted? AppLocalizations.of(context)?.translate('fp_reset_error')?? 'Failed to send password reset email. Please try again.' : 'Failed to send password reset email. Please try again.'),
+        content: Text(context.mounted
+            ? AppLocalizations.of(context)?.translate('fp_reset_error') ??
+                'Failed to send password reset email. Please try again.'
+            : 'Failed to send password reset email. Please try again.'),
         duration: const Duration(seconds: 3),
         showCloseIcon: true,
       );

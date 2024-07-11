@@ -42,8 +42,9 @@ class _JoiningWidgetState extends State<JoiningWidget> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                   AutoSizeText(
-                     AppLocalizations.of(context)?.translate('jw_scan')??"Scan your friend's QR Code!",
+                  AutoSizeText(
+                    AppLocalizations.of(context)?.translate('jw_scan') ??
+                        "Scan your friend's QR Code!",
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20.0,

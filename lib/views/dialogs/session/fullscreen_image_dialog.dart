@@ -3,13 +3,12 @@ import 'package:photo_view/photo_view.dart';
 
 class FullscreenImageDialog {
   static Future<void> showImageFullScreen(
-      BuildContext context, NetworkImage networkImage
-      ) async {
+      BuildContext context, NetworkImage networkImage) async {
     await showDialog(
       context: context,
       builder: (context) => Dialog(
         backgroundColor:
-        Colors.transparent, // Make Dialog background transparent
+            Colors.transparent, // Make Dialog background transparent
         child: PhotoView(
           tightMode: true,
           backgroundDecoration: const BoxDecoration(

@@ -7,15 +7,18 @@ class Profile {
   Friendship? friendship;
   Bubble currentUser;
   Function notifyParent;
+  int initialIndex;
 
   final List<String> commonFriendUsernames = [];
   final List<Bubble> commonFriends = [];
 
-  Profile(
-      {required this.user,
-      required this.friendship,
-      required this.currentUser,
-      required this.notifyParent}) {
+  Profile({
+    required this.user,
+    required this.friendship,
+    required this.currentUser,
+    required this.notifyParent,
+    this.initialIndex = 1,
+  }) {
     initializeCommonFriends();
   }
 

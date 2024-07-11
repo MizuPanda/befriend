@@ -72,7 +72,8 @@ class JoiningProvider extends ChangeNotifier {
 
               if (dateTime.compareTo(before) >= 0 &&
                   dateTime.compareTo(after) <= 0) {
-                DocumentSnapshot data = await Models.dataManager.getData(id: id);
+                DocumentSnapshot data =
+                    await Models.dataManager.getData(id: id);
                 List<dynamic> joiners =
                     DataManager.getList(data, Constants.hostingDoc);
                 Map<String, DateTime> lastSeenMap = DataManager.getDateTimeMap(
@@ -89,7 +90,8 @@ class JoiningProvider extends ChangeNotifier {
                     QR.showUserSeenToday(context, username);
                   }
                 } else {
-                  ImageProvider avatar = await Models.dataManager.getAvatar(data);
+                  ImageProvider avatar =
+                      await Models.dataManager.getAvatar(data);
 
                   Bubble selectedHost =
                       Bubble.fromDocsWithoutFriends(data, avatar);

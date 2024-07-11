@@ -31,7 +31,9 @@ class SettingsProvider extends ChangeNotifier {
       debugPrint('(SettingsProvider) Error signing out: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('stp_signOut_error')??'Error signing out. Please try again.');
+            context,
+            AppLocalizations.of(context)?.translate('stp_signOut_error') ??
+                'Error signing out. Please try again.');
       }
     }
   }
@@ -90,7 +92,9 @@ class SettingsProvider extends ChangeNotifier {
       debugPrint('(SettingsProvider) Error opening tutorial: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('stp_tut_error')??'Error opening tutorial. Please try again.');
+            context,
+            AppLocalizations.of(context)?.translate('stp_tut_error') ??
+                'Error opening tutorial. Please try again.');
       }
     }
   }
@@ -124,7 +128,9 @@ class SettingsProvider extends ChangeNotifier {
           '(SettingsProvider) Error showing delete account confirmation: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('stp_delete_error')??'Error showing confirmation. Please try again.');
+            context,
+            AppLocalizations.of(context)?.translate('stp_delete_error') ??
+                'Error showing confirmation. Please try again.');
       }
     }
   }

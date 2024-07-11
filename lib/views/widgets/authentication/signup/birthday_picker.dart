@@ -42,7 +42,8 @@ class _BirthdayPickerState extends State<BirthdayPicker> {
             return _DatePickerItem(
               children: [
                 AutoSizeText(
-                  AppLocalizations.of(context)?.translate('bp_birthday')??'Your Birthday',
+                  AppLocalizations.of(context)?.translate('bp_birthday') ??
+                      'Your Birthday',
                   style: TextStyle(
                       fontSize: 18, color: Theme.of(context).hintColor),
                 ),

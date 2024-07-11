@@ -28,7 +28,6 @@ class HomeProvider extends ChangeNotifier {
   /// Swipe Picture Button*
   final GlobalKey _four = GlobalKey();
 
-
   GlobalKey get one => _one;
   GlobalKey get two => _two;
   GlobalKey get three => _three;
@@ -40,9 +39,13 @@ class HomeProvider extends ChangeNotifier {
 
   void initShowcase(BuildContext context) {
     if (home.user.friendshipsLoaded) {
-      WidgetsBinding.instance.addPostFrameCallback((_) =>
-          ShowCaseWidget.of(context)
-              .startShowCase([_one, _two, _three, _four,]));
+      WidgetsBinding.instance.addPostFrameCallback(
+          (_) => ShowCaseWidget.of(context).startShowCase([
+                _one,
+                _two,
+                _three,
+                _four,
+              ]));
     }
   }
 
@@ -126,13 +129,14 @@ class HomeProvider extends ChangeNotifier {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         if (home.user.main()) {
-          final String languageCode = Localizations.localeOf(context).languageCode;
+          final String languageCode =
+              Localizations.localeOf(context).languageCode;
           if (home.user.languageCode != languageCode) {
-            debugPrint('(HomeProvider) Updating language from ${home.user.languageCode} to $languageCode');
+            debugPrint(
+                '(HomeProvider) Updating language from ${home.user.languageCode} to $languageCode');
             await DataQuery.updateDocument(Constants.languageDoc, languageCode);
             home.user.languageCode = languageCode;
             UserManager.setLanguageCode(languageCode);
-
           }
         }
       } catch (e) {

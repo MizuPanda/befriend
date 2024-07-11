@@ -85,6 +85,4 @@ class Host {
   bool pathNull() {
     return _imagePath == null;
   }
-
-
 }

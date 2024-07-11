@@ -29,13 +29,13 @@ class PasswordStrengthIndicator extends StatelessWidget {
         text = '';
       } else if (strength <= 2) {
         indicatorColor = Colors.red;
-        text = AppLocalizations.of(context)?.translate('si_weak')??'Weak';
+        text = AppLocalizations.of(context)?.translate('si_weak') ?? 'Weak';
       } else if (strength <= 3) {
         indicatorColor = Colors.orange;
-        text = AppLocalizations.of(context)?.translate('si_medium')??'Medium';
+        text = AppLocalizations.of(context)?.translate('si_medium') ?? 'Medium';
       } else {
         indicatorColor = Colors.green;
-        text = AppLocalizations.of(context)?.translate('si_strong')??'Strong';
+        text = AppLocalizations.of(context)?.translate('si_strong') ?? 'Strong';
       }
 
       return Column(

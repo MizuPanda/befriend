@@ -1,4 +1,3 @@
-
 import 'package:befriend/providers/home_provider.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +23,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShowCaseWidget(
-        builder: (context) => HomeView(home: home));
+    return ShowCaseWidget(builder: (context) => HomeView(home: home));
   }
 }
 
@@ -39,7 +37,6 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
-  final NotificationService _notificationService = NotificationService();
   late final HomeProvider _provider;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -47,11 +44,11 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _provider = HomeProvider.init(this, home: widget.home);
-    _notificationService.initTokenListener(_scaffoldKey, _provider.notify);
+    NotificationService.initNotifications(_scaffoldKey, _provider.notify);
     MobileAds.instance.initialize();
 
     debugPrint('(HomePage) _showTutorial=${_provider.home.showTutorial}');
-     //_provider.home.activeTutorial(); // For testing
+    //_provider.home.activeTutorial(); // For testing
     if (_provider.home.showTutorial) {
       _provider.initShowcase(context);
       _provider.home.deactivateTutorial();

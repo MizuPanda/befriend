@@ -41,7 +41,9 @@ class PictureSignProvider extends ChangeNotifier {
       debugPrint('(PictureSignProvider) Error retrieving image: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('psp_retrieve_error')??'Error retrieving image. Please try again.');
+            context,
+            AppLocalizations.of(context)?.translate('psp_retrieve_error') ??
+                'Error retrieving image. Please try again.');
       }
     }
   }
@@ -59,7 +61,9 @@ class PictureSignProvider extends ChangeNotifier {
       debugPrint('(PictureSignProvider) Error uploading avatar: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('psd_upload_error')??'Error uploading avatar. Please try again.');
+            context,
+            AppLocalizations.of(context)?.translate('psd_upload_error') ??
+                'Error uploading avatar. Please try again.');
       }
     } finally {
       _isContinueLoading = false;
@@ -77,7 +81,9 @@ class PictureSignProvider extends ChangeNotifier {
       debugPrint('(PictureSignProvider) Error navigating to home: $e');
       if (context.mounted) {
         ErrorHandling.showError(
-            context, AppLocalizations.of(context)?.translate('psp_skip_error')??'Error navigating to home. Please try again.');
+            context,
+            AppLocalizations.of(context)?.translate('psp_skip_error') ??
+                'Error navigating to home. Please try again.');
       }
     } finally {
       _isSkipLoading = false;

@@ -15,12 +15,17 @@ class UsernameDialog {
           context: context,
           builder: (BuildContext context) {
             return SimpleDialog(
-              title:  Text(AppLocalizations.of(context)?.translate('ud_people')??"People in this picture"),
+              title: Text(
+                  AppLocalizations.of(context)?.translate('ud_people') ??
+                      "People in this picture"),
               children: usernames
                   .map((username) => SimpleDialogOption(
-                child: Text(
-                    bubble.username == username ? AppLocalizations.of(context)?.translate('general_word_you')??'You' : username),
-              ))
+                        child: Text(bubble.username == username
+                            ? AppLocalizations.of(context)
+                                    ?.translate('general_word_you') ??
+                                'You'
+                            : username),
+                      ))
                   .toList(),
             );
           },

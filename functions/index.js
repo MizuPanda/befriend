@@ -115,7 +115,7 @@ async function fetchFriendshipsForUser(userId, sessionUsers) {
 exports.sendNewPostNotification = functions.https.onCall((data, context) => {
     // Ensure the user is authenticated
     if (!context.auth) {
-        throw new functions.https.HttpsError("unauthenticated", "The function must be called while authenticated.");
+        throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
     }
 
     const userIds = data.userIds; // Array of user IDs who can see the post
@@ -124,20 +124,21 @@ exports.sendNewPostNotification = functions.https.onCall((data, context) => {
 
     // Loop through each userId and send a notification
     const promises = userIds.map(userId => {
-        return admin.firestore().collection("users").doc(userId).get().then(doc => {
+        return admin.firestore().collection('users').doc(userId).get().then(doc => {
             if (!doc.exists) {
-                console.log("No such user:", userId);
+                console.log('No such user:', userId);
                 return null;
             }
             const user = doc.data();
             const token = user.notificationToken; // Ensure you have stored the token as mentioned earlier
-            const languageCode = user.language || "en";
+            const postNotificationOn = user.postNotificationOn;
+            const languageCode = user.language || 'en';
 
             // Get localized message
             const title = getLocalizedString(languageCode, 'postTitle');
             const body = `${postCreatorName} ${getLocalizedString(languageCode, 'postDescription')}`;
 
-            if (token) {
+            if (token && postNotificationOn) {
                 const message = {
                     notification: {
                         title: title,
@@ -151,7 +152,7 @@ exports.sendNewPostNotification = functions.https.onCall((data, context) => {
 
                 return admin.messaging().send(message);
             } else {
-                console.log("No notification token for user:", userId);
+                console.log('No notification token for user:', userId);
                 return null;
             }
         });
@@ -183,8 +184,12 @@ exports.sendPostLikeNotification = functions.https.onCall(async (data, context) 
             if (!sessionUserDoc.exists) {
                 throw new functions.https.HttpsError('not-found', 'Failed to find the post owner in Firestore.');
             }
-            const sessionUserToken = sessionUserDoc.data().notificationToken;
-            const sessionUserLanguage = sessionUserDoc.data().language || 'en';
+
+            const userData = sessionUserDoc.data();
+            const sessionUserToken = userData.notificationToken;
+            const sessionUserLanguage = userData.language || 'en';
+            const sessionUserLikeNotificationOn = userData.likeNotificationOn;
+
             if (!sessionUserToken) {
                 throw new functions.https.HttpsError('not-found', 'The post owner does not have a notification token.');
             }
@@ -202,9 +207,11 @@ exports.sendPostLikeNotification = functions.https.onCall(async (data, context) 
                 token: sessionUserToken,
             };
 
-            // Send the notification
-            const response = await admin.messaging().send(message);
-            console.log('Successfully sent message:', response);
+            if (sessionUserLikeNotificationOn) {
+                // Send the notification
+                const response = await admin.messaging().send(message);
+                console.log('Successfully sent message:', response);
+            }
         }
 
         // Respond to the client indicating success

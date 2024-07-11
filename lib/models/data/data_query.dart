@@ -38,7 +38,8 @@ class DataQuery {
 
       DocumentSnapshot friendshipSnap =
           await Constants.friendshipsCollection.doc(friendshipID).get();
-      DocumentSnapshot bubbleSnap = await Models.dataManager.getData(id: otherUserID);
+      DocumentSnapshot bubbleSnap =
+          await Models.dataManager.getData(id: otherUserID);
       ImageProvider avatar = await Models.dataManager.getAvatar(bubbleSnap);
 
       Bubble friendBubble = Bubble.fromDocsWithoutFriends(bubbleSnap, avatar);
@@ -79,7 +80,8 @@ class DataQuery {
         if (mainID != userID && friendID == mainID) {
           friend = await UserManager.getInstance();
         } else {
-          DocumentSnapshot friendDocs = await Models.dataManager.getData(id: friendID);
+          DocumentSnapshot friendDocs =
+              await Models.dataManager.getData(id: friendID);
           ImageProvider avatar = await Models.dataManager.getAvatar(friendDocs);
 
           friend = Bubble.fromDocsWithoutFriends(friendDocs, avatar);

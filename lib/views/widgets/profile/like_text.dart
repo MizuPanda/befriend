@@ -32,7 +32,9 @@ class LikeText extends StatelessWidget {
                       ? Theme.of(context).colorScheme.primary
                       : Theme.of(context).primaryColor),
               children: [
-                 TextSpan(text: '${AppLocalizations.of(context)?.translate('lt_liked')?? 'Liked by'} '),
+                TextSpan(
+                    text:
+                        '${AppLocalizations.of(context)?.translate('lt_liked') ?? 'Liked by'} '),
                 TextSpan(
                     text: provider.usersThatLiked(context),
                     style: const TextStyle(fontWeight: FontWeight.bold))
