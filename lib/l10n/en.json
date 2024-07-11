@@ -85,6 +85,7 @@
 
   "_comment10": "Session Provider",
   "sp_publish_error": "Error publishing picture. Please try again.",
+  "sp_caption_field": "Enter Caption",
 
   "_comment11": "Settings Provider",
   "stp_signOut_error": "Error signing out. Please try again.",
@@ -136,11 +137,6 @@
 
   "_comment19": "Username Dialog",
   "ud_people": "People in this picture",
-
-  "_comment20": "Caption Dialog",
-  "cd_enter": "Enter a Caption",
-  "cd_picture": "Caption for the picture",
-  "cd_characters": "Characters limit:",
 
   "_comment21": "Visibility Settings Dialog",
   "vsd_public": "All your current friends will be able to view this picture.",

@@ -136,17 +136,19 @@ class _PictureButtonState extends State<PictureButton> {
                                   ),
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    right: provider.dragPosition < -50
-                                        ? 22 / 448 * width
-                                        : 0),
-                                child: IconButton(
-                                  icon: const Icon(
-                                    Icons.keyboard_double_arrow_right_rounded,
-                                    color: Colors.white,
+                              Flexible(
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      right: provider.dragPosition < -50
+                                          ? 22 / 448 * width
+                                          : 0),
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.keyboard_double_arrow_right_rounded,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: provider.switchMode,
                                   ),
-                                  onPressed: provider.switchMode,
                                 ),
                               ),
                             ],

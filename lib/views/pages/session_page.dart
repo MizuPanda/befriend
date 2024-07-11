@@ -46,6 +46,12 @@ class _SessionPageState extends State<_SessionPageView> {
   }
 
   @override
+  void dispose() {
+    _provider.disposeControllers();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
@@ -61,199 +67,294 @@ class _SessionPageState extends State<_SessionPageView> {
                   MaterialProvider materialProvider, Widget? child) {
                 final bool lightMode = materialProvider.isLightMode(context);
 
-                return Scaffold(
-                  resizeToAvoidBottomInset: false,
-                  appBar: AppBar(
-                    leadingWidth: 80,
-                    leading: TextButton(
-                      onPressed: () async {
-                        await provider.cancelLobby(context);
-                      },
-                      child: AutoSizeText(
-                        AppLocalizations.of(context)
-                                ?.translate('dialog_cancel') ??
-                            'Cancel',
-                        maxLines: 1,
+                return GestureDetector(
+                  onTap: provider.unfocus,
+                  child: Scaffold(
+                    resizeToAvoidBottomInset: false,
+                    appBar: AppBar(
+                      leadingWidth: 80,
+                      leading: TextButton(
+                        onPressed: () async {
+                          await provider.cancelLobby(context);
+                        },
+                        child: AutoSizeText(
+                          AppLocalizations.of(context)
+                                  ?.translate('dialog_cancel') ??
+                              'Cancel',
+                          maxLines: 1,
+                        ),
                       ),
+                      actions: [
+                        IconButton(
+                            onPressed: () {
+                              provider.showCase(context);
+                            },
+                            icon: const Icon(Icons.help_outline_rounded))
+                      ],
                     ),
-                    actions: [
-                      IconButton(
-                          onPressed: () {
-                            provider.showCase(context);
-                          },
-                          icon: const Icon(Icons.help_outline_rounded))
-                    ],
-                  ),
-                  body: SafeArea(
-                    child: FutureBuilder(
-                        future: provider.getFriendshipsMap(context),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<String> snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
+                    body: SafeArea(
+                      child: FutureBuilder(
+                          future: provider.getFriendshipsMap(context),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<String> snapshot) {
+                            if (!snapshot.hasData) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
 
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  top: 0.005 * height,
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    top: 0.005 * height,
+                                  ),
+                                  child: AutoSizeText(
+                                    '${provider.hostUsername()} ${AppLocalizations.of(context)?.translate('sp_taking') ?? 'is taking a picture!'}',
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.openSans(
+                                        textStyle: const TextStyle(
+                                      fontSize: 20,
+                                    )),
+                                  ),
                                 ),
-                                child: AutoSizeText(
-                                  '${provider.hostUsername()} ${AppLocalizations.of(context)?.translate('sp_taking') ?? 'is taking a picture!'}',
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.openSans(
-                                      textStyle: const TextStyle(
-                                    fontSize: 20,
-                                  )),
+                                SizedBox(
+                                  height: 0.005 * height,
                                 ),
-                              ),
-                              SizedBox(
-                                height: 0.005 * height,
-                              ),
-                              GestureDetector(
-                                onTap: !provider.imageNull()
-                                    ? () async {
-                                        await provider
-                                            .showImageFullScreen(context);
-                                      }
-                                    : null,
-                                onLongPress: provider.host.main()
-                                    ? () async {
-                                        await provider.pictureProcess(context);
-                                      }
-                                    : null,
-                                child: Showcase(
-                                  key: provider.one,
-                                  description: AppLocalizations.of(context)
-                                          ?.translate('sp_one') ??
-                                      'Hold the picture to retake.',
+                                GestureDetector(
+                                  onTap: !provider.imageNull()
+                                      ? () async {
+                                          await provider
+                                              .showImageFullScreen(context);
+                                        }
+                                      : null,
+                                  onLongPress: provider.host.main()
+                                      ? () async {
+                                          await provider
+                                              .pictureProcess(context);
+                                        }
+                                      : null,
                                   child: Showcase(
-                                    key: provider.two,
+                                    key: provider.one,
                                     description: AppLocalizations.of(context)
-                                            ?.translate('sp_two') ??
-                                        'Tap the picture to zoom.',
-                                    child: Container(
-                                      width: 0.7 * width, // for full width
-                                      height: 0.7 * width,
-                                      decoration: BoxDecoration(
-                                        // Add any decoration properties here
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                        border: Border.all(
-                                            color: lightMode
-                                                ? Colors.black
-                                                : Colors.white),
+                                            ?.translate('sp_one') ??
+                                        'Hold the picture to retake.',
+                                    child: Showcase(
+                                      key: provider.two,
+                                      description: AppLocalizations.of(context)
+                                              ?.translate('sp_two') ??
+                                          'Tap the picture to zoom.',
+                                      child: Container(
+                                        width: 0.7 * width, // for full width
+                                        height: 0.7 * width,
+                                        decoration: BoxDecoration(
+                                          // Add any decoration properties here
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          border: Border.all(
+                                              color: lightMode
+                                                  ? Colors.black
+                                                  : Colors.white),
+                                        ),
+                                        child: provider.imageNull()
+                                            ? const Center(
+                                                child: Icon(Icons.camera),
+                                              )
+                                            : ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                                child: Image(
+                                                  image:
+                                                      provider.networkImage(),
+                                                  fit: BoxFit.cover,
+                                                )),
                                       ),
-                                      child: provider.imageNull()
-                                          ? const Center(
-                                              child: Icon(Icons.camera),
-                                            )
-                                          : ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
-                                              child: Image(
-                                                image: provider.networkImage(),
-                                                fit: BoxFit.cover,
-                                              )),
                                     ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 0.025 * height,
-                              ),
-                              AutoSizeText(
-                                AppLocalizations.of(context)
-                                        ?.translate('sp_list') ??
-                                    'User list',
-                                style: GoogleFonts.openSans(
-                                    textStyle: const TextStyle(fontSize: 18)),
-                              ),
-                              const Expanded(child: UserSlidersScreen()),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 0.022 * width,
-                                  ),
-                                  Icon(
-                                    Icons.people_rounded,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  Showcase(
-                                    key: provider.four,
-                                    description: AppLocalizations.of(context)
-                                            ?.translate('sp_four') ??
-                                        'Press to see users that will be able to see the picture.',
-                                    child: Container(
-                                      alignment: Alignment.centerLeft,
-                                      width: 0.45 * width,
-                                      height: 50,
-                                      child: TextButton(
-                                        onPressed: () {
-                                          provider.showFriendList(context);
-                                        },
-                                        child: AutoSizeText(
-                                            AppLocalizations.of(context)
-                                                    ?.translate('sp_who') ??
-                                                'Who will see the picture',
-                                            style: GoogleFonts.openSans(
-                                                textStyle: const TextStyle(
-                                                    fontSize: 14))),
-                                      ),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  if (provider.host.main())
-                                    Showcase(
-                                      key: provider.five,
-                                      description: AppLocalizations.of(context)
-                                              ?.translate('sp_five') ??
-                                          'Press here to publish the picture.',
-                                      child: provider.isLoading
-                                          ? const CircularProgressIndicator()
-                                          : Container(
-                                              alignment: Alignment.centerRight,
-                                              width: 0.4 * width,
-                                              height: 50,
-                                              child: TextButton(
-                                                onPressed: provider.length() >=
-                                                            2 &&
-                                                        !provider.imageNull()
-                                                    ? () async {
-                                                        await provider
-                                                            .publishPicture(
-                                                                context);
-                                                      }
-                                                    : null,
-                                                child: AutoSizeText(
-                                                  AppLocalizations.of(context)
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 32.0 / 448 * width,
+                                      vertical: 0.025 * height / 2),
+                                  child: Builder(builder: (context) {
+                                    if (provider.host.main()) {
+                                      return ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                            maxHeight: 0.2 * height -
+                                                0.2 *
+                                                    MediaQuery.of(context)
+                                                        .viewInsets
+                                                        .bottom),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Flexible(
+                                              child: TextField(
+                                                onChanged: provider.onChanged,
+                                                focusNode: provider.focusNode,
+                                                onSubmitted:
+                                                    provider.onSubmitted,
+                                                textInputAction:
+                                                    TextInputAction.done,
+                                                decoration: InputDecoration(
+                                                  hintText: AppLocalizations.of(
+                                                              context)
                                                           ?.translate(
-                                                              'sp_publish') ??
-                                                      'Publish the picture',
-                                                  textAlign: TextAlign.center,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: GoogleFonts.openSans(
-                                                      textStyle:
-                                                          const TextStyle(
-                                                              fontSize: 16)),
+                                                              'sp_caption_field') ??
+                                                      'Enter Caption',
+                                                  border:
+                                                      const OutlineInputBorder(),
+                                                  focusedBorder:
+                                                      const OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: Colors.blue),
+                                                  ),
+                                                  enabledBorder:
+                                                      const OutlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: Colors.grey),
+                                                  ),
+                                                  counterText: '',
                                                 ),
+                                                maxLines: null,
+                                                maxLength:
+                                                    provider.characterLimit,
                                               ),
                                             ),
-                                    )
-                                ],
-                              ),
-                            ],
-                          );
-                        }),
+                                            const SizedBox(height: 10),
+                                            ValueListenableBuilder(
+                                              valueListenable:
+                                                  provider.charCountNotifier,
+                                              builder:
+                                                  (context, charCount, child) {
+                                                return Text(
+                                                  '$charCount / ${provider.characterLimit}',
+                                                  style: const TextStyle(
+                                                      color: Colors.grey),
+                                                );
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      return SizedBox(
+                                        width: double.maxFinite,
+                                        child: AutoSizeText.rich(
+                                            textAlign: TextAlign.start,
+                                            maxLines: null,
+                                            TextSpan(children: [
+                                              TextSpan(
+                                                text:
+                                                    provider.host.host.username,
+                                                style: GoogleFonts.openSans(
+                                                    fontSize: 15,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              TextSpan(
+                                                  text:
+                                                      ' ${provider.caption()}',
+                                                  style: GoogleFonts.openSans(
+                                                      fontSize: 14)),
+                                            ])),
+                                      );
+                                    }
+                                  }),
+                                ),
+                                AutoSizeText(
+                                  AppLocalizations.of(context)
+                                          ?.translate('sp_list') ??
+                                      'User list',
+                                  style: GoogleFonts.openSans(
+                                      textStyle: const TextStyle(fontSize: 18)),
+                                ),
+                                const Expanded(child: UserSlidersScreen()),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 0.022 * width,
+                                    ),
+                                    Icon(
+                                      Icons.people_rounded,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                    Showcase(
+                                      key: provider.four,
+                                      description: AppLocalizations.of(context)
+                                              ?.translate('sp_four') ??
+                                          'Press to see users that will be able to see the picture.',
+                                      child: Container(
+                                        alignment: Alignment.centerLeft,
+                                        width: 0.45 * width,
+                                        height: 50,
+                                        child: TextButton(
+                                          onPressed: () {
+                                            provider.showFriendList(context);
+                                          },
+                                          child: AutoSizeText(
+                                              AppLocalizations.of(context)
+                                                      ?.translate('sp_who') ??
+                                                  'Who will see the picture',
+                                              style: GoogleFonts.openSans(
+                                                  textStyle: const TextStyle(
+                                                      fontSize: 14))),
+                                        ),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    if (provider.host.main())
+                                      Showcase(
+                                        key: provider.five,
+                                        description: AppLocalizations.of(
+                                                    context)
+                                                ?.translate('sp_five') ??
+                                            'Press here to publish the picture.',
+                                        child: provider.isLoading
+                                            ? const CircularProgressIndicator()
+                                            : Container(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                width: 0.4 * width,
+                                                height: 50,
+                                                child: TextButton(
+                                                  onPressed:
+                                                      provider.length() >= 2 &&
+                                                              !provider
+                                                                  .imageNull()
+                                                          ? () async {
+                                                              await provider
+                                                                  .publishPicture(
+                                                                      context);
+                                                            }
+                                                          : null,
+                                                  child: AutoSizeText(
+                                                    AppLocalizations.of(context)
+                                                            ?.translate(
+                                                                'sp_publish') ??
+                                                        'Publish the picture',
+                                                    textAlign: TextAlign.center,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: GoogleFonts.openSans(
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                fontSize: 16)),
+                                                  ),
+                                                ),
+                                              ),
+                                      )
+                                  ],
+                                ),
+                              ],
+                            );
+                          }),
+                    ),
                   ),
                 );
               });

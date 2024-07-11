@@ -85,6 +85,7 @@
 
   "_comment10": "Session Provider",
   "sp_publish_error": "Erreur lors de la publication de l'image. Veuillez réessayer.",
+  "sp_caption_field": "Entrez une légende",
 
   "_comment11": "Settings Provider",
   "stp_signOut_error": "Erreur de connexion. Veuillez réessayer.",
@@ -136,11 +137,6 @@
 
   "_comment19": "Username Dialog",
   "ud_people": "Personnes figurant sur cette photo",
-
-  "_comment20": "Caption Dialog",
-  "cd_enter": "Entrez une légende",
-  "cd_picture": "Légende de la photo",
-  "cd_characters": "Limite de caractères :",
 
   "_comment21": "Visibility Settings Dialog",
   "vsd_public": "Tous vos amis actuels pourront voir cette image.",

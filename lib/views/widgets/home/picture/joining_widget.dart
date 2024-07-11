@@ -35,19 +35,24 @@ class _JoiningWidgetState extends State<JoiningWidget> {
         builder: (BuildContext context, Widget? child) {
           return Consumer(builder:
               (BuildContext context, JoiningProvider provider, Widget? child) {
-            return Container(
+            return SizedBox(
               width: width * Constants.pictureDialogWidthMultiplier,
               height: height * Constants.pictureDialogHeightMultiplier,
-              padding: EdgeInsets.all(0.045 * width),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  AutoSizeText(
-                    AppLocalizations.of(context)?.translate('jw_scan') ??
-                        "Scan your friend's QR Code!",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.0,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8.0,
+                    ),
+                    child: AutoSizeText(
+                      AppLocalizations.of(context)?.translate('jw_scan') ??
+                          "Scan your friend's QR Code!",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                      ),
                     ),
                   ),
                   Container(
@@ -68,50 +73,33 @@ class _JoiningWidgetState extends State<JoiningWidget> {
                       },
                     ),
                   ),
-                  SizedBox(height: 0.020 * height),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         IconButton(
-                          icon: ValueListenableBuilder(
-                            valueListenable: provider.torchState(),
-                            builder: (context, state, child) {
-                              switch (state) {
-                                case TorchState.off:
-                                  return const Icon(
-                                    Icons.flash_off,
-                                  );
-                                case TorchState.on:
-                                  return const Icon(Icons.flash_on_outlined,
-                                      color: Colors.blue);
-                              }
-                            },
-                          ),
+                          icon: switch (provider.torchState()) {
+                            TorchState.off => const Icon(Icons.flash_off),
+                            TorchState.on => const Icon(Icons.flash_on_outlined,
+                                color: Colors.blue)
+                          },
                           iconSize: iconSize,
-                          onPressed: () => provider.toggleTorch(),
+                          onPressed: provider.toggleTorch,
                         ),
                         SizedBox(
                           width: 0.045 * width,
                         ),
                         IconButton(
-                          icon: ValueListenableBuilder(
-                            valueListenable: provider.cameraFacingState(),
-                            builder: (context, state, child) {
-                              switch (state) {
-                                case CameraFacing.front:
-                                  return const Icon(
-                                    Icons.camera_front,
-                                  );
-                                case CameraFacing.back:
-                                  return const Icon(
-                                    Icons.camera_rear,
-                                  );
-                              }
-                            },
-                          ),
-                          onPressed: () => provider.switchCamera(),
+                          icon: switch (provider.cameraFacingState()) {
+                            CameraFacing.front => const Icon(
+                                Icons.camera_front,
+                              ),
+                            CameraFacing.back => const Icon(
+                                Icons.camera_rear,
+                              )
+                          },
+                          onPressed: provider.switchCamera,
                           iconSize: iconSize,
                         ),
                       ],

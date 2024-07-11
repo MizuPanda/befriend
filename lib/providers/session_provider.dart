@@ -8,7 +8,6 @@ import 'package:befriend/models/social/friend_update.dart';
 import 'package:befriend/models/social/friendship_update.dart';
 import 'package:befriend/utilities/error_handling.dart';
 import 'package:befriend/utilities/models.dart';
-import 'package:befriend/views/dialogs/session/caption_dialog.dart';
 import 'package:befriend/views/dialogs/session/fullscreen_image_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -39,12 +38,21 @@ class SessionProvider extends ChangeNotifier {
   final Map<String, double> _sliderValues = {};
   final List<String> ids;
   String? _caption;
-  final int _characterLimit = 300; // Set your desired character limit
+  String? _lastCaptionSubmitted;
+  final int characterLimit = 300; // Set your desired character limit
   bool _isSessionEnded = false;
 
   int selectedIndex = 0;
 
   InterstitialAd? _interstitialAd;
+
+  final FocusNode _focusNode = FocusNode();
+  final ValueNotifier<int> _charCountNotifier = ValueNotifier<int>(0);
+  final ScrollController _scrollController = ScrollController();
+
+  FocusNode get focusNode => _focusNode;
+  ValueNotifier<int> get charCountNotifier => _charCountNotifier;
+  ScrollController get scrollController => _scrollController;
 
   final GlobalKey _one = GlobalKey(); // Hold picture (Host)
   final GlobalKey _two = GlobalKey(); // Press picture
@@ -59,6 +67,39 @@ class SessionProvider extends ChangeNotifier {
   GlobalKey get five => _five;
 
   bool showTutorial = false;
+
+  void disposeControllers() {
+    _focusNode.dispose();
+    _charCountNotifier.dispose();
+    _scrollController.dispose();
+  }
+
+  void unfocus() async {
+    _focusNode.unfocus();
+    await _updateCaption();
+  }
+
+  String caption() {
+    return _caption ?? '';
+  }
+
+  void onChanged(String? value) {
+    _caption = value;
+    _charCountNotifier.value = value?.length ?? 0;
+  }
+
+  void onSubmitted(String? value) async {
+    await _updateCaption();
+  }
+
+  Future<void> _updateCaption() async {
+    if (_caption != _lastCaptionSubmitted) {
+      debugPrint('(SessionProvider) Updating caption to ${caption()}');
+      _lastCaptionSubmitted = _caption;
+      await DataQuery.updateDocument(
+          Constants.captionDoc, _lastCaptionSubmitted);
+    }
+  }
 
   void _initShowcase(BuildContext context, bool showTutorial) {
     if (showTutorial) {
@@ -78,12 +119,17 @@ class SessionProvider extends ChangeNotifier {
 
   void _loadInterstitialAd() async {
     // Replace with your ad unit ID - TO CHANGE DEPENDENTLY ON PLATFORM
-    final String adUnitId = Platform.isAndroid
-        ? Secrets.sessionAndroidAdTile
-        : Secrets.sessioniOSAdTile;
-    /*Platform.isAndroid
+    final String adUnitId =
+        // /*
+        Platform.isAndroid
+            ? Secrets.sessionAndroidAdTile
+            : Secrets.sessioniOSAdTile;
+    //  */
+    /*
+    Platform.isAndroid
           ? Constants.sessionAndroidTestAdUnit
-          : Constants.sessioniOSTestAdUnit;*/
+          : Constants.sessioniOSTestAdUnit;
+          */
 
     debugPrint('(SessionProvider) Ad Unit= $adUnitId');
     InterstitialAd.load(
@@ -119,15 +165,6 @@ class SessionProvider extends ChangeNotifier {
     BuildContext context,
   ) async {
     await FullscreenImageDialog.showImageFullScreen(context, networkImage());
-  }
-
-  Future<String?> _promptForCaption(BuildContext context) async {
-    try {
-      return await CaptionDialog.showCaptionDialog(context, _characterLimit);
-    } catch (e) {
-      debugPrint('(SessionProvider) Error prompting for caption: $e');
-      return null;
-    }
   }
 
   NetworkImage networkImage() {
@@ -198,12 +235,12 @@ class SessionProvider extends ChangeNotifier {
 
   void processSnapshot(QuerySnapshot snapshot, BuildContext context) {
     try {
-      bool sliderValuesUpdated = false;
       debugPrint('(SessionProvider) Processing snapshot...');
 
       if (_isSessionEnded) {
         return;
       }
+      bool sliderValuesUpdated = false;
 
       if (_sliderValues.isEmpty) {
         for (DocumentSnapshot doc in snapshot.docs) {
@@ -231,6 +268,16 @@ class SessionProvider extends ChangeNotifier {
         }
         if (docChange.doc.id == host.host.id) {
           List<dynamic> sessionUsers = docChange.doc[Constants.hostingDoc];
+          String newCaption = docChange.doc[Constants.captionDoc];
+
+          if (!host.main() && _caption != newCaption) {
+            _caption = newCaption;
+            debugPrint("(SessionProvider) Caption=$_caption");
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              notifyListeners();
+            });
+          }
+
           if (sessionUsers.isNotEmpty) {
             String picture = sessionUsers.first.toString();
             sessionUsers = sessionUsers.skip(1).toList();
@@ -303,8 +350,6 @@ class SessionProvider extends ChangeNotifier {
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Remove data for the 'counter' key.
-
     if (host.main()) {
       // await prefs.remove(Constants.showSessionHostTutorialKey); // For testing
 
@@ -353,31 +398,28 @@ class SessionProvider extends ChangeNotifier {
 
   Future<void> publishPicture(BuildContext context) async {
     try {
-      _caption = await _promptForCaption(context);
-      if (_caption != null) {
-        _isLoading = true;
-        notifyListeners();
+      _isLoading = true;
+      notifyListeners();
 
-        List<String> sessionUsers = ids;
+      List<String> sessionUsers = ids;
 
-        host.joiners = host.joiners
-            .where((element) => sessionUsers.contains(element.id))
-            .toList();
+      host.joiners = host.joiners
+          .where((element) => sessionUsers.contains(element.id))
+          .toList();
 
-        debugPrint('(SessionProvider) Publishing to $sessionUsers');
-        final DateTime timestamp = DateTime.timestamp();
+      debugPrint('(SessionProvider) Publishing to $sessionUsers');
+      final DateTime timestamp = DateTime.timestamp();
 
-        host.calculateAllowedUsers(_sliderValues, bubble);
-        await _createOrUpdateFriendships(host.joiners, timestamp);
-        await _uploadPicture(sessionUsers, host.joiners, timestamp);
-        await _setUsersData(sessionUsers, host.joiners, timestamp);
-        if (context.mounted) {
-          _sendNotificationsToUser(sessionUsers, host.joiners, context);
-        }
-
-        _isLoading = false;
-        notifyListeners();
+      host.calculateAllowedUsers(_sliderValues, bubble);
+      await _createOrUpdateFriendships(host.joiners, timestamp);
+      await _uploadPicture(sessionUsers, host.joiners, timestamp);
+      await _setUsersData(sessionUsers, host.joiners, timestamp);
+      if (context.mounted) {
+        _sendNotificationsToUser(sessionUsers, host.joiners, context);
       }
+
+      _isLoading = false;
+      notifyListeners();
     } catch (e) {
       debugPrint('(SessionProvider) Error publishing picture: $e');
       _isLoading = false;
@@ -512,7 +554,7 @@ class SessionProvider extends ChangeNotifier {
           timestamp,
           host.tempFile(),
           host.isPublic(),
-          _caption!,
+          caption(),
           usersAllowed,
           sessionUsersMap);
 
@@ -546,6 +588,7 @@ class SessionProvider extends ChangeNotifier {
           Constants.hostingDoc: lst,
           Constants.hostingFriendshipsDoc: {},
           Constants.lastSeenUsersMapDoc: joiner.lastSeenUsersMap,
+          Constants.captionDoc: ''
         });
 
         await PictureQuery.deleteTemporaryPictures(host);
@@ -574,9 +617,8 @@ class SessionProvider extends ChangeNotifier {
   Future<void> _resetData() async {
     debugPrint('(SessionProvider) Resetting Data');
 
-    await Constants.usersCollection.doc(host.host.id).update({
-      Constants.hostingFriendshipsDoc: {},
-    });
+    await Constants.usersCollection.doc(host.host.id).update(
+        {Constants.hostingFriendshipsDoc: {}, Constants.captionDoc: ''});
     await PictureQuery.deleteTemporaryPictures(host);
 
     host.clearTemporaryFiles();

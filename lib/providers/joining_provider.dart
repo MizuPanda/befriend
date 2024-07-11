@@ -22,20 +22,22 @@ class JoiningProvider extends ChangeNotifier {
     _cameraController.dispose();
   }
 
-  ValueNotifier<TorchState> torchState() {
-    return _cameraController.torchState;
+  TorchState torchState() {
+    return _cameraController.torchState.value;
   }
 
-  ValueNotifier<CameraFacing> cameraFacingState() {
-    return _cameraController.cameraFacingState;
+  CameraFacing cameraFacingState() {
+    return _cameraController.cameraFacingState.value;
   }
 
   Future<void> switchCamera() async {
     await _cameraController.switchCamera();
+    notifyListeners();
   }
 
   Future<void> toggleTorch() async {
     await _cameraController.toggleTorch();
+    notifyListeners();
   }
 
   Future<void> handleBarcodeDetection(

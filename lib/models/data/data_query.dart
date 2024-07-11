@@ -24,8 +24,8 @@ class DataQuery {
           .doc(userId ?? Models.authenticationManager.id())
           .update(<String, dynamic>{fieldID: data});
     } catch (e) {
-      debugPrint('(DataQuery): Failed to update document: $e');
-      throw Exception('(DataQuery): Failed to update data.');
+      debugPrint('(DataQuery) Failed to update document: $e');
+      throw Exception('(DataQuery) Failed to update data.');
     }
   }
 

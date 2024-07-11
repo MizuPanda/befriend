@@ -1,6 +1,6 @@
-import 'package:befriend/models/objects/friendship.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../models/objects/friendship.dart';
 import '../../../../utilities/gradient_painter.dart';
 
 class BubbleProgressIndicator extends StatelessWidget {
@@ -11,7 +11,7 @@ class BubbleProgressIndicator extends StatelessWidget {
 
   final Friendship friendship;
 
-  static const double strokeWidth = 16 / 3;
+  static const double strokeWidth = 8;
 
   @override
   Widget build(BuildContext context) {
@@ -33,49 +33,60 @@ class BubbleGradientIndicator extends StatelessWidget {
 
   final Friendship friendship;
 
-  static const List<Color> _spectrumColors = [
-    Colors.red,
-    Colors.orange,
-    Colors.yellow,
-    Colors.green,
-    Colors.blue,
-    Colors.indigo,
-    Colors.purple,
-  ];
-
-  Color _interpolateColor(Color startColor, Color endColor, double factor) {
-    return Color.lerp(startColor, endColor, factor) ?? startColor;
-  }
-
-  List<Color> _generateGradientColors(int level, double progress) {
-    int totalColors = _spectrumColors.length;
-    int phase = level % totalColors;
-    double factor = (level % 100) / 100;
-
-    Color startColor = _interpolateColor(
-      _spectrumColors[phase],
-      _spectrumColors[(phase + 1) % totalColors],
-      factor,
-    );
-
-    // Adjust the brightness based on progress
-    Color endColor = _adjustBrightness(startColor, progress);
+  List<Color> _generateGradientColors(
+      int level, double progress, String username) {
+    Color startColor = _generateStartColor(level, progress, username);
+    Color endColor = _generateEndColor(level, progress, username);
 
     return [startColor, endColor];
   }
 
-  Color _adjustBrightness(Color color, double factor) {
-    HSVColor hsvColor = HSVColor.fromColor(color);
-    HSVColor adjustedColor =
-        hsvColor.withValue(hsvColor.value * (0.5 + factor * 0.5));
-    return adjustedColor.toColor();
+  Color _generateStartColor(int level, double progress, String username) {
+    // Ensure level is non-negative and progress is between 0 and 1
+    level = level < 0 ? 0 : level;
+    progress = progress < 0 ? 0 : (progress > 1 ? 1 : progress);
+
+    // Hash the username to get a consistent integer value
+    int hash = username.hashCode;
+
+    // Use the hash value to influence the base color calculations
+    int baseRed = (level * 30 + hash) % 256;
+    int baseGreen = (level * 50 + hash) % 256;
+    int baseBlue = (level * 70 + hash) % 256;
+
+    // Adjust color based on progress
+    int red = (baseRed + (255 - baseRed) * progress).toInt();
+    int green = (baseGreen + (255 - baseGreen) * progress).toInt();
+    int blue = (baseBlue + (255 - baseBlue) * progress).toInt();
+
+    return Color.fromARGB(255, red, green, blue);
+  }
+
+  Color _generateEndColor(int level, double progress, String username) {
+    // Adjust the level slightly to create a different color
+    int adjustedLevel = level + 5;
+
+    // Hash the username to get a consistent integer value
+    int hash = username.hashCode;
+
+    // Use the hash value to influence the base color calculations
+    int baseRed = (adjustedLevel * 30 + hash) % 256;
+    int baseGreen = (adjustedLevel * 50 + hash) % 256;
+    int baseBlue = (adjustedLevel * 70 + hash) % 256;
+
+    // Adjust color based on progress
+    int red = (baseRed + (255 - baseRed) * progress).toInt();
+    int green = (baseGreen + (255 - baseGreen) * progress).toInt();
+    int blue = (baseBlue + (255 - baseBlue) * progress).toInt();
+
+    return Color.fromARGB(255, red, green, blue);
   }
 
   @override
   Widget build(BuildContext context) {
     // Generate gradient colors based on the level
-    List<Color> gradientColors =
-        _generateGradientColors(friendship.level, friendship.progress);
+    List<Color> gradientColors = _generateGradientColors(
+        friendship.level, friendship.progress, friendship.friendUsername());
 
     final Gradient gradient = LinearGradient(
       colors: gradientColors,
