@@ -179,7 +179,6 @@ class HostingProvider extends ChangeNotifier {
       debugPrint('(HostingProvider) Error starting session: $e');
     } finally {
       _isLoading = false;
-      notifyListeners();
     }
   }
 

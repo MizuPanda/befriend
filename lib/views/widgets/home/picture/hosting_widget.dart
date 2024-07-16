@@ -28,8 +28,7 @@ class _HostingWidgetView extends StatefulWidget {
   final bool isHost;
   final Bubble? host;
 
-  const _HostingWidgetView({Key? key, required this.isHost, required this.host})
-      : super(key: key);
+  const _HostingWidgetView({required this.isHost, required this.host});
 
   @override
   State<_HostingWidgetView> createState() => _HostingWidgetState();
@@ -108,18 +107,20 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                                     maxLines: 2,
                                   ),
                                 ),
-                                Showcase(
-                                  key: provider.one,
-                                  descriptionAlignment: TextAlign.center,
-                                  description: AppLocalizations.of(context)
-                                          ?.translate('hw_one') ??
-                                      "Press here to display your QR code. Your friends can scan it to join the photo session.",
-                                  child: IconButton(
-                                    icon: const Icon(
-                                        Icons.qr_code), // QR code icon
-                                    onPressed: () {
-                                      provider.showQR(context);
-                                    },
+                                Expanded(
+                                  child: Showcase(
+                                    key: provider.one,
+                                    descriptionAlignment: TextAlign.center,
+                                    description: AppLocalizations.of(context)
+                                            ?.translate('hw_one') ??
+                                        "Press here to display your QR code. Your friends can scan it to join the photo session.",
+                                    child: IconButton(
+                                      icon: const Icon(
+                                          Icons.qr_code), // QR code icon
+                                      onPressed: () {
+                                        provider.showQR(context);
+                                      },
+                                    ),
                                   ),
                                 ),
                               ],

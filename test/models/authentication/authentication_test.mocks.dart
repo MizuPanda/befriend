@@ -247,15 +247,6 @@ class MockFirebaseAuth extends _i1.Mock implements _i4.FirebaseAuth {
         returnValueForMissingStub: <dynamic, dynamic>{},
       ) as Map<dynamic, dynamic>);
 
-  @override
-  _i10.Future<void> useEmulator(String? origin) => (super.noSuchMethod(
-        Invocation.method(
-          #useEmulator,
-          [origin],
-        ),
-        returnValue: _i10.Future<void>.value(),
-        returnValueForMissingStub: _i10.Future<void>.value(),
-      ) as _i10.Future<void>);
 
   @override
   _i10.Future<void> useAuthEmulator(
@@ -682,31 +673,6 @@ class MockFirebaseAuth extends _i1.Mock implements _i4.FirebaseAuth {
         )),
       ) as _i10.Future<_i4.UserCredential>);
 
-  @override
-  _i10.Future<_i4.UserCredential> signInWithAuthProvider(
-          _i3.AuthProvider? provider) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #signInWithAuthProvider,
-          [provider],
-        ),
-        returnValue:
-            _i10.Future<_i4.UserCredential>.value(_FakeUserCredential_2(
-          this,
-          Invocation.method(
-            #signInWithAuthProvider,
-            [provider],
-          ),
-        )),
-        returnValueForMissingStub:
-            _i10.Future<_i4.UserCredential>.value(_FakeUserCredential_2(
-          this,
-          Invocation.method(
-            #signInWithAuthProvider,
-            [provider],
-          ),
-        )),
-      ) as _i10.Future<_i4.UserCredential>);
 
   @override
   _i10.Future<_i4.UserCredential> signInWithProvider(

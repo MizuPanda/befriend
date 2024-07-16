@@ -1,13 +1,13 @@
 import 'dart:math';
 
 import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import '../models/objects/picture.dart';
 import '../utilities/constants.dart';
-import '../utilities/models.dart';
 
 class ProfilePicturesProvider extends ChangeNotifier {
   static const _pageSize = 5;
@@ -19,9 +19,9 @@ class ProfilePicturesProvider extends ChangeNotifier {
 
   PagingController<int, Picture> get pagingController => _pagingController;
 
-  void initState({required bool showArchived, required bool showOnlyMe}) {
+  void initState({required bool showArchived, required bool showOnlyMe, required String userID}) {
     _pagingController.addPageRequestListener((pageKey) {
-      _fetchPage(pageKey, showArchived: showArchived, showOnlyMe: showOnlyMe);
+      _fetchPage(pageKey, userID: userID, showArchived: showArchived, showOnlyMe: showOnlyMe);
     });
   }
 
@@ -40,28 +40,39 @@ class ProfilePicturesProvider extends ChangeNotifier {
   }
 
   int _randomAdRange() {
-    return 3 + Random().nextInt(3);
+    return 3 + Random().nextInt(2);
   }
 
   Future<void> _fetchPage(int pageKey,
-      {required bool showArchived, required bool showOnlyMe}) async {
+      {required String userID, required bool showArchived, required bool showOnlyMe}) async {
     try {
       final Future<QuerySnapshot> query;
       Query q;
 
-      final String userID = Models.authenticationManager.id();
+      String connectedID = Models.authenticationManager.id();
+      String notArchivedID = AuthenticationManager.notArchivedID();
+      String archivedID = AuthenticationManager.archivedID();
+      bool isFriendProfile = userID != connectedID;
 
+      // Part 1: When you are on your section of your profile
+      // Part 2: When you are in your everyone's part of your profile
+      // Part 3: When you are in your archives
+      // Part 4: When you are on your friends profile (Filter after simple query)
       if (showOnlyMe) {
         q = Constants.picturesCollection
             .where(Constants.hostId, isEqualTo: userID)
             .where(Constants.allowedUsersDoc,
-                arrayContains: AuthenticationManager.notArchivedID());
+                arrayContains: notArchivedID);
+
+      } else if (userID == connectedID && !showArchived) {
+        q = Constants.picturesCollection
+            .where(Constants.allowedUsersDoc, arrayContainsAny: [notArchivedID, connectedID]);
       } else if (showArchived) {
         q = Constants.picturesCollection.where(Constants.allowedUsersDoc,
-            arrayContains: AuthenticationManager.archivedID());
+            arrayContains: archivedID);
       } else {
-        q = Constants.picturesCollection.where(Constants.allowedUsersDoc,
-            arrayContainsAny: [AuthenticationManager.notArchivedID(), userID]);
+        q = Constants.picturesCollection
+            .where(Constants.allowedUsersDoc, arrayContains: '${Constants.notArchived}$userID',);
       }
 
       q = q.orderBy(Constants.timestampDoc, descending: true);
@@ -79,8 +90,15 @@ class ProfilePicturesProvider extends ChangeNotifier {
       }
 
       final List<Picture> newItems = [];
-      final List<Picture> pictures =
+      Iterable<Picture> pictures =
           querySnapshot.docs.map((doc) => Picture.fromDocument(doc)).toList();
+
+      if (isFriendProfile) {
+        pictures = pictures.where((pic) =>
+            pic.allowedIDS.contains(connectedID)
+            || pic.allowedIDS.contains(archivedID)
+            || pic.allowedIDS.contains(notArchivedID));
+      }
 
       if (_nextAdIndex == 0) {
         _nextAdIndex = _randomAdRange();
@@ -88,7 +106,7 @@ class ProfilePicturesProvider extends ChangeNotifier {
       }
 
       for (int i = 0; i < pictures.length; i++) {
-        newItems.add(pictures[i]);
+        newItems.add(pictures.elementAt(i));
         if (_nextAdIndex - 1 == 0) {
           newItems.add(Picture.pictureAd);
           _nextAdIndex = _randomAdRange();

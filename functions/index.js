@@ -1,9 +1,12 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const { getDownloadURL } = require('firebase-admin/storage');
 
 admin.initializeApp();
 
+const storage = admin.storage();
 const firestore = admin.firestore();
+
 firestore.settings({
   ignoreUndefinedProperties: true,
 });
@@ -23,7 +26,7 @@ exports.checkUsernameAvailability = functions.https
       const username = data.username;
 
       // Check if the username already exists in Firestore
-      const snapshot = await admin.firestore().collection("users")
+      const snapshot = await firestore.collection("users")
           .where("username", "==", username)
           .limit(1)
           .get();
@@ -56,7 +59,7 @@ exports.generateFriendshipMap = functions.https.onCall(async (data, context) => 
             console.log("Final friendshipMap: ", friendshipMap);
 
         // Save the friendshipMap to the host's document
-        await admin.firestore().collection("users").doc(hostId).update({
+        await firestore.collection("users").doc(hostId).update({
             hostingFriendships: friendshipMap
         });
 
@@ -89,7 +92,6 @@ async function fetchFriendshipsForUser(userId, sessionUsers) {
                   username2: docData.username2,
                   level: docData.level,
                   progress: docData.progress,
-                  lastSeen: docData.lastSeen
                 };
 
                 // Assuming `sessionUserIds` contains the IDs of users in the session
@@ -124,7 +126,7 @@ exports.sendNewPostNotification = functions.https.onCall((data, context) => {
 
     // Loop through each userId and send a notification
     const promises = userIds.map(userId => {
-        return admin.firestore().collection('users').doc(userId).get().then(doc => {
+        return firestore.collection('users').doc(userId).get().then(doc => {
             if (!doc.exists) {
                 console.log('No such user:', userId);
                 return null;
@@ -180,7 +182,7 @@ exports.sendPostLikeNotification = functions.https.onCall(async (data, context) 
     try {
         for (let sessionUser of sessionUsers) {
             // Fetch the owner's notification token from Firestore
-            const sessionUserDoc = await admin.firestore().collection('users').doc(sessionUser).get();
+            const sessionUserDoc = await firestore.collection('users').doc(sessionUser).get();
             if (!sessionUserDoc.exists) {
                 throw new functions.https.HttpsError('not-found', 'Failed to find the post owner in Firestore.');
             }
@@ -234,13 +236,13 @@ exports.deleteUserData = functions.https.onCall(async (data, context) => {
 
   try {
     // Reference to the user's document
-    const userDocRef = admin.firestore().collection('users').doc(uid);
+    const userDocRef = firestore.collection('users').doc(uid);
 
     // Delete the user's document
     await userDocRef.delete();
 
     // Get a reference for the picture collection.
-    const picturesCollectionRef = admin.firestore().collection('pictures');
+    const picturesCollectionRef = firestore.collection('pictures');
 
     // Find and delete all pictures where the user is the host
     const picturesSnapshot = await picturesCollectionRef.where('hostId', '==', uid).get();
@@ -263,7 +265,7 @@ exports.deleteUserData = functions.https.onCall(async (data, context) => {
 
     // Remove user's UID from each friend's 'friends' array
     const friendPromises = friendIds.map((friendId) =>
-      admin.firestore().collection('users').doc(friendId).update({
+      firestore.collection('users').doc(friendId).update({
         friends: admin.firestore.FieldValue.arrayRemove(uid),
       })
     );
@@ -271,14 +273,14 @@ exports.deleteUserData = functions.https.onCall(async (data, context) => {
 
     // Delete all friendship documents
     const friendshipPromises = friendshipIds.map((friendshipId) =>
-      admin.firestore().collection('friendships').doc(friendshipId).delete()
+      firestore.collection('friendships').doc(friendshipId).delete()
     );
     await Promise.all(friendshipPromises);
 
     // Delete user's profile picture from "profile_pictures" folder
     const profilePicPath = `profile_pictures/${uid}.jpg`;
     try {
-      await admin.storage().bucket().file(profilePicPath).delete();
+      await storage.bucket().file(profilePicPath).delete();
     } catch (error) {
       console.error(`Error deleting profile picture for UID: ${uid}`, error);
     }
@@ -287,7 +289,7 @@ exports.deleteUserData = functions.https.onCall(async (data, context) => {
     // Note: As Firebase Admin SDK does not support direct folder deletion, list and delete each file.
     const sessionTempPics = `session_pictures/${uid}/temp/`;
     try {
-      const [files] = await admin.storage().bucket().getFiles({ prefix: sessionTempPics });
+      const [files] = await storage.bucket().getFiles({ prefix: sessionTempPics });
       const deletePromises = files.map((file) => file.delete());
       await Promise.all(deletePromises);
     } catch (error) {
@@ -303,11 +305,11 @@ exports.deleteUserData = functions.https.onCall(async (data, context) => {
 
 // Shared logic for modifying user relationships
 async function updateUserRelationships({ userId, targetUserId, targetUsername, friendshipId, action }) {
-  const userRef = admin.firestore().collection('users').doc(userId);
-  const targetUserRef = admin.firestore().collection('users').doc(targetUserId);
-  const friendshipRef = admin.firestore().collection('friendships').doc(friendshipId);
+  const userRef = firestore.collection('users').doc(userId);
+  const targetUserRef = firestore.collection('users').doc(targetUserId);
+  const friendshipRef = firestore.collection('friendships').doc(friendshipId);
 
-  await admin.firestore().runTransaction(async (transaction) => {
+  await firestore.runTransaction(async (transaction) => {
     // Remove targetUserId from the user's 'friends' array
     transaction.update(userRef, {
       friends: admin.firestore.FieldValue.arrayRemove(targetUserId)
@@ -398,7 +400,7 @@ async function deletePicture({hostId, pictureId, downloadUrl}) {
     const deletePromises = [];
 
     // Delete the picture document from Firestore
-    deletePromises.push(admin.firestore().collection('pictures').doc(pictureId).delete());
+    deletePromises.push(firestore.collection('pictures').doc(pictureId).delete());
 
     // Delete the file from Firebase Storage if downloadUrl is provided
     if (downloadUrl) {
@@ -406,10 +408,239 @@ async function deletePicture({hostId, pictureId, downloadUrl}) {
       const pathMatch = decodeURL.match(/\/o\/(.+)\?alt=media/);
       if (pathMatch && pathMatch.length > 1) {
         const filePath = pathMatch[1];
-        deletePromises.push(admin.storage().bucket().file(filePath).delete());
+        deletePromises.push(storage.bucket().file(filePath).delete());
       }
     }
 
     // Wait for all delete operations to complete
     await Promise.all(deletePromises);
 }
+
+exports.publishPicture = functions.https.onCall(async (data, context) => {
+  const sessionUsers = data.sessionUsers;
+  const timestamp = admin.firestore.Timestamp.fromMillis(data.timestamp);
+  const caption = data.caption;
+  const hostId = data.hostId;
+  const hostUsername = data.hostUsername;
+  const imageUrl = data.imageUrl;
+  const userMap = data.userMap;
+  const usersAllowed = data.usersAllowed;
+  const metadata = data.metadata;
+
+  try {
+    // 1. Update Friendships
+    await updateFriendships(sessionUsers, userMap, timestamp);
+
+    // 2. Upload Picture
+    const permanentUrl = await movePictureToPermanentStorage(hostId, imageUrl);
+
+    // 3. Set Picture Data
+    await setPictureData(hostId, hostUsername, permanentUrl, timestamp, caption, userMap, usersAllowed, metadata);
+
+    // 4. Set User Data
+    await setUserData(sessionUsers, hostId, timestamp);
+
+    return { result: 'success' };
+  } catch (error) {
+    console.error("Error publishing picture: ", error);
+    throw new functions.https.HttpsError('internal', 'Error publishing picture.');
+  }
+});
+
+async function updateFriendships(sessionUsers, userMap, timestamp) {
+  for (let i = 0; i < sessionUsers.length; i++) {
+    for (let j = i + 1; j < sessionUsers.length; j++) {
+      const userID1 = sessionUsers[i];
+      const userID2 = sessionUsers[j];
+
+      // Skip if one user is blocking the other
+      const [userDoc1, userDoc2] = await Promise.all([
+        firestore.collection('users').doc(userID1).get(),
+        firestore.collection('users').doc(userID2).get(),
+      ]);
+
+      if (!userDoc1.exists || !userDoc2.exists) continue;
+
+      const user1Data = userDoc1.data();
+      const user2Data = userDoc2.data();
+
+      if (!user1Data || !user2Data) continue;
+
+      const user1Blocked = user1Data.blocked?.hasOwnProperty(userID2);
+      const user2Blocked = user2Data.blocked?.hasOwnProperty(userID1);
+
+      if (user1Blocked || user2Blocked) continue;
+
+      // Ensure the IDs are in alphabetical order for the document ID
+      const ids = [userID1, userID2].sort();
+      const friendshipDocId = ids.join('');
+
+      const friendshipDoc = await firestore.collection('friendships').doc(friendshipDocId).get();
+
+      if (friendshipDoc.exists) {
+        // Update existing friendship
+        const data = friendshipDoc.data();
+        let progress = data?.progress || 0;
+        progress += 0.2;
+
+        if (progress >= 1) {
+           await firestore.collection('friendships').doc(friendshipDocId).update({
+             progress: progress - 1,
+             level: admin.firestore.FieldValue.increment(1),
+           });
+
+           await Promise.all([
+              firestore.collection('users').doc(userID1).update({
+                power: admin.firestore.FieldValue.increment(1),
+              }),
+              firestore.collection('users').doc(userID2).update({
+                power: admin.firestore.FieldValue.increment(1),
+              }),
+           ]);
+        } else {
+            await firestore.collection('friendships').doc(friendshipDocId).update({
+              progress: progress,
+            });
+        }
+      } else {
+        // Create a new friendship
+        const username1 = userMap[ids[0]];
+        const username2 = userMap[ids[1]];
+
+        await firestore.collection('friendships').doc(friendshipDocId).set({
+          user1: ids[0],
+          user2: ids[1],
+          username1: username1,
+          username2: username2,
+          friendshipId: friendshipDocId,
+          level: 1,
+          progress: 0.2,
+          created: timestamp,
+        });
+
+        await Promise.all([
+          firestore.collection('users').doc(userID1).update({
+            friends: admin.firestore.FieldValue.arrayUnion(userID2),
+          }),
+          firestore.collection('users').doc(userID2).update({
+            friends: admin.firestore.FieldValue.arrayUnion(userID1),
+          }),
+        ]);
+      }
+    }
+  }
+}
+
+async function movePictureToPermanentStorage(hostId, tempDownloadUrl) {
+  try {
+    // Extract the file name from the temporary download URL
+    const url = new URL(tempDownloadUrl);
+    const filePath = decodeURIComponent(url.pathname);
+    const fileName = filePath.split('/').pop();
+
+    if (!fileName) {
+      throw new Error('Invalid file name extracted from URL');
+    }
+
+    console.log(`(movePictureToPermanentStorage): File name = ${fileName}`);
+
+    // Define the temporary and permanent file paths
+    const tempFilePath = `session_pictures/${hostId}/temp/${fileName}`;
+    const permFilePath = `session_pictures/${hostId}/posted/${fileName}`;
+
+    // Move the file from the temp path to the permanent path
+    await storage.bucket().file(tempFilePath).move(permFilePath);
+
+    // Generate a non-expiring download URL for the file
+    const fileRef = storage.bucket().file(permFilePath);
+    const downloadURL = await getDownloadURL(fileRef);
+
+    console.log(`(movePictureToPermanentStorage): Permanent URL = ${downloadURL}`);
+
+    return downloadURL;
+  } catch (error) {
+    console.error("Error moving picture to permanent storage:", error);
+    throw new functions.https.HttpsError('internal', 'Error moving picture to permanent storage');
+  }
+}
+
+async function setPictureData(hostId, hostUsername, imageUrl, timestamp, caption, userMap, usersAllowed, metadata) {
+  try {
+    const pictureDoc = {
+      hostId: hostId,
+      fileUrl: imageUrl,
+      pictureTaker: hostUsername,
+      timestamp: timestamp,
+      metadata: metadata,
+      caption: caption,
+      allowed: usersAllowed,
+      sessionUsers: userMap,
+      likes: [],
+      firstLikes: [],
+    };
+
+    await firestore.collection('pictures').add(pictureDoc);
+  } catch (error) {
+    console.error("(setPictureData) Error setting picture data:", error);
+    throw new functions.https.HttpsError('internal', 'Error setting picture data');
+  }
+}
+
+async function setUserData(sessionUsers, hostId, timestamp) {
+  try {
+    const lst = ['publishing', ...sessionUsers];
+
+    for (const userId of sessionUsers) {
+      const userDoc = await firestore.collection('users').doc(userId).get();
+      if (!userDoc.exists) continue;
+
+      const lastSeenUsersMap = userDoc.data()?.lastSeenUsersMap || {};
+
+      // Update lastSeenUsersMap for each user
+      for (const otherUserId of sessionUsers) {
+        if (otherUserId !== userId) {
+          lastSeenUsersMap[otherUserId] = timestamp;
+        }
+      }
+
+      if (userId === hostId) {
+        console.log('(SessionProvider) Resetting Host Data');
+        // Set host specific data and delete temporary pictures
+        await firestore.collection('users').doc(userId).update({
+          hosting: lst,
+          hostingFriendships: {},
+          lastSeenUsersMap: lastSeenUsersMap,
+          caption: ''
+        });
+
+        await deleteTemporaryPictures(hostId);
+      } else {
+        await firestore.collection('users').doc(userId).update({
+          lastSeenUsersMap: lastSeenUsersMap
+        });
+      }
+    }
+  } catch (error) {
+    console.error("(setUserData): Error setting user data:", error);
+    throw new functions.https.HttpsError('internal', 'Error setting user data');
+  }
+}
+
+async function deleteTemporaryPictures(hostId) {
+  try {
+    // Get reference to the bucket
+    const bucket = storage.bucket();
+
+    // List all items (files) within the temp directory
+    const [files] = await bucket.getFiles({ prefix: `session_pictures/${hostId}/temp/` });
+
+    for (const file of files) {
+      await file.delete(); // Delete each item
+      console.log(`(PictureQuery): Deleting ${file.name}`);
+    }
+  } catch (error) {
+    console.error("(deleteTemporaryPictures): Error deleting temporary pictures:", error);
+    throw new functions.https.HttpsError('internal', 'Error deleting temporary pictures');
+  }
+}
+

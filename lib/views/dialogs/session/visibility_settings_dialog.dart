@@ -51,11 +51,11 @@ class VisibilitySettingsWidget extends StatelessWidget {
   final Set<FriendshipProgress> friendships;
 
   const VisibilitySettingsWidget({
-    Key? key,
+    super.key,
     required this.isAllPublic,
     required this.isPrivate,
     required this.friendships,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

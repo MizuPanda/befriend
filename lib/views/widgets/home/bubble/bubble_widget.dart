@@ -9,9 +9,9 @@ import 'bubble_progress_indicator.dart';
 
 class BubbleWidget extends StatelessWidget {
   const BubbleWidget({
-    Key? key,
+    super.key,
     required this.specificHome,
-  }) : super(key: key);
+  });
 
   final Home specificHome;
 

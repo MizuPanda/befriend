@@ -36,6 +36,7 @@ class _ProfilePicturesState extends State<ProfilePictures> {
     _provider.initState(
       showArchived: widget.showArchived,
       showOnlyMe: widget.showOnlyMe,
+      userID: widget.userID
     );
   }
 

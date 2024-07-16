@@ -283,16 +283,6 @@ class MockFirebaseAuth extends _i1.Mock implements _i4.FirebaseAuth {
       ) as Map<dynamic, dynamic>);
 
   @override
-  _i9.Future<void> useEmulator(String? origin) => (super.noSuchMethod(
-        Invocation.method(
-          #useEmulator,
-          [origin],
-        ),
-        returnValue: _i9.Future<void>.value(),
-        returnValueForMissingStub: _i9.Future<void>.value(),
-      ) as _i9.Future<void>);
-
-  @override
   _i9.Future<void> useAuthEmulator(
     String? host,
     int? port, {
@@ -704,31 +694,6 @@ class MockFirebaseAuth extends _i1.Mock implements _i4.FirebaseAuth {
               #email: email,
               #emailLink: emailLink,
             },
-          ),
-        )),
-      ) as _i9.Future<_i4.UserCredential>);
-
-  @override
-  _i9.Future<_i4.UserCredential> signInWithAuthProvider(
-          _i3.AuthProvider? provider) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #signInWithAuthProvider,
-          [provider],
-        ),
-        returnValue: _i9.Future<_i4.UserCredential>.value(_FakeUserCredential_2(
-          this,
-          Invocation.method(
-            #signInWithAuthProvider,
-            [provider],
-          ),
-        )),
-        returnValueForMissingStub:
-            _i9.Future<_i4.UserCredential>.value(_FakeUserCredential_2(
-          this,
-          Invocation.method(
-            #signInWithAuthProvider,
-            [provider],
           ),
         )),
       ) as _i9.Future<_i4.UserCredential>);
@@ -1287,24 +1252,6 @@ class MockFirebaseStorage extends _i1.Mock implements _i7.FirebaseStorage {
         ),
         returnValueForMissingStub: null,
       );
-
-  @override
-  _i9.Future<void> useEmulator({
-    required String? host,
-    required int? port,
-  }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #useEmulator,
-          [],
-          {
-            #host: host,
-            #port: port,
-          },
-        ),
-        returnValue: _i9.Future<void>.value(),
-        returnValueForMissingStub: _i9.Future<void>.value(),
-      ) as _i9.Future<void>);
 
   @override
   _i9.Future<void> useStorageEmulator(

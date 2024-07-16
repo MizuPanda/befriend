@@ -1,16 +1,15 @@
+import 'dart:math';
+
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/data/picture_query.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/friendship_progress.dart';
 import 'package:befriend/models/services/post_service.dart';
-import 'package:befriend/models/social/friend_update.dart';
-import 'package:befriend/models/social/friendship_update.dart';
 import 'package:befriend/utilities/error_handling.dart';
 import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/dialogs/session/fullscreen_image_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -20,13 +19,14 @@ import 'package:showcaseview/showcaseview.dart';
 import '../models/data/picture_manager.dart';
 import '../models/objects/bubble.dart';
 import '../models/objects/host.dart';
-import '../models/objects/picture.dart';
 import '../utilities/app_localizations.dart';
 import '../utilities/constants.dart';
 
-import 'dart:io' show Platform;
+import 'dart:io' show File, Platform;
 
 import '../utilities/secrets.dart';
+
+import 'package:path/path.dart' as path;
 
 class SessionProvider extends ChangeNotifier {
   bool _isLoading = false;
@@ -120,16 +120,16 @@ class SessionProvider extends ChangeNotifier {
   void _loadInterstitialAd() async {
     // Replace with your ad unit ID - TO CHANGE DEPENDENTLY ON PLATFORM
     final String adUnitId =
-        // /*
+         /*
         Platform.isAndroid
             ? Secrets.sessionAndroidAdTile
             : Secrets.sessioniOSAdTile;
-    //  */
-    /*
+      */
+    // /*
     Platform.isAndroid
           ? Constants.sessionAndroidTestAdUnit
           : Constants.sessioniOSTestAdUnit;
-          */
+    //      */
 
     debugPrint('(SessionProvider) Ad Unit= $adUnitId');
     InterstitialAd.load(
@@ -333,15 +333,18 @@ class SessionProvider extends ChangeNotifier {
           ? documentSnapshot.get(Constants.hostingFriendshipsDoc)
           : {};
 
+
       // Map of users and their friendList
       for (MapEntry<String, dynamic> sessionUserData
           in friendshipsMap.entries) {
         List<FriendshipProgress> friendships = [];
         for (Map<String, dynamic> friendMap in sessionUserData.value) {
+
           FriendshipProgress friendship =
               FriendshipProgress.fromMap(friendMap, sessionUserData.key);
           friendships.add(friendship);
         }
+
         host.friendshipsMap[sessionUserData.key] = friendships;
       }
 
@@ -372,6 +375,7 @@ class SessionProvider extends ChangeNotifier {
       _initShowcase(context, showTutorial);
     }
 
+    debugPrint('(SessionProvider) Finished retrieving friendshipMap');
     return 'Completed';
   }
 
@@ -408,12 +412,33 @@ class SessionProvider extends ChangeNotifier {
           .toList();
 
       debugPrint('(SessionProvider) Publishing to $sessionUsers');
-      final DateTime timestamp = DateTime.timestamp();
 
       host.calculateAllowedUsers(_sliderValues, bubble);
-      await _createOrUpdateFriendships(host.joiners, timestamp);
-      await _uploadPicture(sessionUsers, host.joiners, timestamp);
-      await _setUsersData(sessionUsers, host.joiners, timestamp);
+
+      List<String> usersAllowed = [];
+
+      Iterable<String> notArchivedUsers = sessionUsers
+          .map((sessionUser) => '${Constants.notArchived}$sessionUser');
+
+      usersAllowed.addAll(notArchivedUsers);
+      List<String> friendsAllowed = host.friendsAllowed().toList();
+      usersAllowed.addAll(friendsAllowed);
+
+      File file = host.tempFile();
+
+      Map<String, String> metadata = {
+        'size': _formatBytes(file.lengthSync(), 0),
+        'extension': path.extension(file.path),
+      };
+
+      await PictureQuery.callPublishPicture(
+          sessionUsers: sessionUsers,
+          caption: caption(),
+          host: host,
+          userMap: idToBubbleMap.map((id, userBubble) => MapEntry(id, userBubble.username)),
+          usersAllowed: usersAllowed,
+          metadata: metadata);
+
       if (context.mounted) {
         _sendNotificationsToUser(sessionUsers, host.joiners, context);
       }
@@ -431,6 +456,13 @@ class SessionProvider extends ChangeNotifier {
                 'Error publishing picture. Please try again.');
       }
     }
+  }
+
+  static String _formatBytes(int bytes, int decimals) {
+    if (bytes <= 0) return "0 B";
+    const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    var i = (log(bytes) / log(1024)).floor();
+    return '${(bytes / pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
   }
 
   void _sendNotificationsToUser(List<dynamic> sessionUsers,
@@ -470,136 +502,6 @@ class SessionProvider extends ChangeNotifier {
       PostService.sendPostNotification(
           friendsList, host.host.username, senderId, context);
     });
-  }
-
-  Future<void> _createOrUpdateFriendships(
-      List<Bubble> joiners, DateTime timestamp) async {
-    for (int i = 0; i < joiners.length; i++) {
-      for (int j = i + 1; j < joiners.length; j++) {
-        String userID1 = joiners[i].id; // Assuming each user has an 'id' field
-        String userID2 = joiners[j].id;
-
-        // Verifying if one user is blocking the other one.
-        if (!joiners[i].blockedUsers.keys.contains(userID2) &&
-            !joiners[i].blockedUsers.keys.contains(userID1)) {
-          // Ensure the IDs are in alphabetical order for the document ID
-          List<String> ids = [userID1, userID2];
-          ids.sort();
-          String friendshipDocId = ids.join();
-
-          // Check if the friendship already exists
-          DocumentSnapshot friendshipDoc =
-              await Constants.friendshipsCollection.doc(friendshipDocId).get();
-
-          if (friendshipDoc.exists) {
-            // Update existing friendship
-            await FriendshipUpdate.addProgress(
-              userID1,
-              userID2,
-              friendshipDoc,
-              exp: Constants.pictureExpValue,
-            );
-          } else {
-            // Create a new friendship
-            String username1 = idToBubbleMap[userID1]!.username;
-            String username2 = idToBubbleMap[userID2]!.username;
-
-            await FriendshipUpdate.createFriendship(
-                userID1: userID1,
-                userID2: userID2,
-                username1: username1,
-                username2: username2,
-                friendshipDocId: friendshipDocId,
-                baseProgress: Constants.pictureExpValue);
-
-            // Update both users 'friendships document'
-            await FriendUpdate.addFriend(userID2, mainUserId: userID1);
-            await FriendUpdate.addFriend(userID1, mainUserId: userID2);
-          }
-        }
-      }
-    }
-  }
-
-  Future<void> _uploadPicture(
-    List<String> sessionUsers,
-    List<Bubble> joinersStillConnected,
-    DateTime timestamp,
-  ) async {
-    try {
-      List<dynamic> usersAllowed = [];
-
-      Iterable<String> notArchivedUsers = sessionUsers
-          .map((sessionUser) => '${Constants.notArchived}$sessionUser');
-
-      usersAllowed.addAll(notArchivedUsers);
-      List<String> friendsAllowed = host.friendsAllowed().toList();
-      usersAllowed.addAll(friendsAllowed);
-
-      String? downloadUrl =
-          await PictureQuery.movePictureToPermanentStorage(host);
-      host.imageUrl = downloadUrl;
-      debugPrint('(SessionProvider) Moved picture to $downloadUrl');
-
-      Map<String, String> sessionUsersMap = {};
-
-      for (Bubble bubble in joinersStillConnected) {
-        sessionUsersMap[bubble.id] = bubble.username;
-      }
-
-      Picture picture = Picture.newPicture(
-          host.imageUrl!,
-          host.host.id,
-          host.host.username,
-          timestamp,
-          host.tempFile(),
-          host.isPublic(),
-          caption(),
-          usersAllowed,
-          sessionUsersMap);
-
-      await Constants.picturesCollection.add(picture.toMap());
-    } catch (e) {
-      debugPrint('(SessionProvider) Error uploading picture: $e');
-
-      rethrow;
-    }
-  }
-
-  Future<void> _setUsersData(List<dynamic> sessionUsers,
-      Iterable<Bubble> joinersStillConnected, DateTime timestamp) async {
-    List<dynamic> lst = [(Constants.publishingState)];
-    lst.addAll(sessionUsers);
-
-    for (Bubble joiner in joinersStillConnected) {
-      if (!kDebugMode) {
-        for (Bubble otherJoiner in joinersStillConnected) {
-          // If another user -->
-          if (otherJoiner.id != joiner.id) {
-            joiner.lastSeenUsersMap[otherJoiner.id] = timestamp;
-          }
-        }
-      }
-
-      if (joiner == host.host) {
-        debugPrint('(SessionProvider) Resetting Host Data');
-        // SET HOST INDEX TO PUBLISHING STATE, WHICH NOTIFIES USERS THAT THE PICTURE HAS BEEN UPLOADED
-        await Constants.usersCollection.doc(joiner.id).update({
-          Constants.hostingDoc: lst,
-          Constants.hostingFriendshipsDoc: {},
-          Constants.lastSeenUsersMapDoc: joiner.lastSeenUsersMap,
-          Constants.captionDoc: ''
-        });
-
-        await PictureQuery.deleteTemporaryPictures(host);
-        host.clearTemporaryFiles();
-      } else {
-        await DataQuery.updateDocument(
-            userId: joiner.id,
-            Constants.lastSeenUsersMapDoc,
-            joiner.lastSeenUsersMap);
-      }
-    }
   }
 
   Future<void> cancelLobby(BuildContext context) async {

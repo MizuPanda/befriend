@@ -10,8 +10,8 @@ import '../../../../utilities/app_localizations.dart';
 
 class BubbleGroupWidget extends StatelessWidget {
   const BubbleGroupWidget({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   static double widthCentered(BuildContext context, double viewerSize,
       {required double size, required double dx}) {
@@ -63,7 +63,7 @@ class BubbleGroupWidget extends StatelessWidget {
                       ? Home.fromUser(friendship.friend)
                       : Home.fromFriendship(friendship)),
             );
-          }).toList(),
+          }),
         ],
       );
     });

@@ -11,6 +11,7 @@ class FriendshipProgress {
   int level;
   double progress;
   String friendshipID;
+  DateTime created;
   int index;
 
   FriendshipProgress({
@@ -22,6 +23,7 @@ class FriendshipProgress {
     required this.level,
     required this.progress,
     required this.index,
+    required this.created,
   });
 
   double strength() {
@@ -47,7 +49,8 @@ class FriendshipProgress {
   factory FriendshipProgress.fromMap(
       Map<String, dynamic> map, String currentUserID) {
     int index;
-    String user1 = map[Constants.user1Doc];
+    String user1 = map.containsKey(Constants.user1Doc)? map[Constants.user1Doc] : 'FP_MISSING_USER1';
+    String user2 = map.containsKey(Constants.user2Doc)? map[Constants.user2Doc] : 'FP_MISSING_USER2';
     if (user1 == currentUserID) {
       index = 0;
     } else {
@@ -57,13 +60,14 @@ class FriendshipProgress {
     return FriendshipProgress(
       index: index,
       user1: user1,
-      user2: map[Constants.user2Doc] as String,
-      username1: map[Constants.username1Doc] as String,
-      username2: map[Constants.username2Doc] as String,
-      level: map[Constants.levelDoc] as int,
-      progress: (map[Constants.progressDoc] as num).toDouble(),
-      friendshipID: (map[Constants.user1Doc] as String) +
-          (map[Constants.user2Doc] as String),
+      user2: user2,
+      username1: map.containsKey(Constants.username1Doc)? map[Constants.username1Doc] : 'FP_MISSING_USERNAME1',
+      username2: map.containsKey(Constants.username2Doc)? map[Constants.username2Doc] : 'FP_MISSING_USERNAME2',
+      level: map.containsKey(Constants.levelDoc)? map[Constants.levelDoc] : 0,
+      progress: map.containsKey(Constants.progressDoc)? (map[Constants.progressDoc] as num).toDouble() : 0,
+      friendshipID: user1 +
+          user2,
+      created: map.containsKey(Constants.createdDoc)? (map[Constants.createdDoc] as Timestamp).toDate() : DateTime.now()
     );
   }
 
@@ -85,6 +89,7 @@ class FriendshipProgress {
       progress: DataManager.getNumber(docs, Constants.progressDoc).toDouble(),
       user1: user1,
       user2: DataManager.getString(docs, Constants.user2Doc),
+      created: DataManager.getDateTime(docs, Constants.createdDoc),
     );
   }
 
@@ -95,6 +100,7 @@ class FriendshipProgress {
     String username2,
     int level,
     double progress,
+      DateTime timestamp,
   ) {
     final List<String> ids = [id1, id2];
     ids.sort();
@@ -115,7 +121,8 @@ class FriendshipProgress {
       username2: username2,
       friendshipID: friendshipId,
       level: level,
-      progress: 0,
+      progress: progress,
+      created: timestamp
     );
   }
 
@@ -127,6 +134,7 @@ class FriendshipProgress {
       Constants.username2Doc: username2,
       Constants.levelDoc: level,
       Constants.progressDoc: progress,
+      Constants.createdDoc: created
     };
   }
 

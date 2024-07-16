@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -60,7 +62,7 @@ class NotificationService {
       _handleInitialMessage();
     } catch (e) {
       debugPrint(
-          '(NotificationService): Error initializing token listener: $e');
+          '(NotificationService) Error initializing token listener: $e');
     }
   }
 
@@ -78,10 +80,12 @@ class NotificationService {
       iOS: darwinInitializationSettings,
     );
 
-    _localNotifications
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()!
-        .requestNotificationsPermission();
+    if (Platform.isAndroid) {
+      _localNotifications
+          .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()!
+          .requestNotificationsPermission();
+    }
 
     _localNotifications.initialize(initializationSettings,
         onDidReceiveBackgroundNotificationResponse: _onNotificationTap,

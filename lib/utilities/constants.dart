@@ -21,6 +21,7 @@ class Constants {
   static const String blockedUsersDoc = 'blocked';
   static const String postNotificationOnDoc = 'postNotificationOn';
   static const String likeNotificationOnDoc = 'likeNotificationOn';
+  static const String languageDoc = 'language';
   //FRIENDSHIPS
   static const String progressDoc = 'progress';
   static const String levelDoc = 'level';
@@ -28,6 +29,7 @@ class Constants {
   static const String user2Doc = 'user2';
   static const String username1Doc = 'username1';
   static const String username2Doc = 'username2';
+  static const String createdDoc = 'created';
   //PICTURES
   static const String urlDoc = 'fileUrl';
   static const String hostId = 'hostId';
@@ -41,7 +43,6 @@ class Constants {
   static const String firstLikesDoc = 'firstLikes';
   static const String archived = 'archived:';
   static const String notArchived = 'notArchived:';
-  static const String languageDoc = 'language';
   // STORAGE
   static const String profilePictureStorage = 'profile_pictures';
   static const String sessionPictureStorage = 'session_pictures';
@@ -63,8 +64,8 @@ class Constants {
   static const double homeButtonPadding = 60;
   static const double homeButtonBottomPaddingMultiplier = 0.09;
   //PICTURE SIZES
-  static const double pictureDialogWidthMultiplier = 350 / 448;
-  static const double pictureDialogHeightMultiplier = 0.4;
+  static const double pictureDialogWidthMultiplier = 375 / 448;
+  static const double pictureDialogHeightMultiplier = 0.45;
   static const double pictureDialogAvatarSize = 30;
   //PICTURE STATES
   static const String pictureState = 'picture';

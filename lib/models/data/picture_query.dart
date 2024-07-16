@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/objects/host.dart';
 import 'package:befriend/utilities/constants.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,6 +15,30 @@ class PictureQuery {
         .ref()
         .child(Constants.sessionPictureStorage)
         .child(host.host.id);
+  }
+
+  static Future<void> callPublishPicture({
+    required List<String> sessionUsers,
+    required String caption,
+    required Host host,
+    required Map<String, String> userMap,
+    required List<String> usersAllowed,
+    required Map<String, String> metadata,
+  }) async {
+    final DateTime timestamp = DateTime.now();
+    final int timestampMillis = timestamp.millisecondsSinceEpoch;
+
+    await FirebaseFunctions.instance.httpsCallable('publishPicture').call({
+      'sessionUsers': sessionUsers,
+      'timestamp': timestampMillis,
+      'caption': caption,
+      'hostId': host.host.id,
+      'hostUsername': host.host.username,
+      'imageUrl': host.imageUrl!,
+      'userMap': userMap,
+      'usersAllowed': usersAllowed,
+      'metadata': metadata,
+    });
   }
 
   Future<void> removeProfilePicture(String downloadUrl) async {

@@ -79,11 +79,10 @@ class _JoiningWidgetState extends State<JoiningWidget> {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         IconButton(
-                          icon: switch (provider.torchState()) {
-                            TorchState.off => const Icon(Icons.flash_off),
-                            TorchState.on => const Icon(Icons.flash_on_outlined,
-                                color: Colors.blue)
-                          },
+                          icon: provider.torchEnabled()
+                              ? const Icon(Icons.flash_on_outlined,
+                                  color: Colors.blue)
+                              : const Icon(Icons.flash_off),
                           iconSize: iconSize,
                           onPressed: provider.toggleTorch,
                         ),
@@ -91,7 +90,7 @@ class _JoiningWidgetState extends State<JoiningWidget> {
                           width: 0.045 * width,
                         ),
                         IconButton(
-                          icon: switch (provider.cameraFacingState()) {
+                          icon: switch (provider.cameraFacing()) {
                             CameraFacing.front => const Icon(
                                 Icons.camera_front,
                               ),

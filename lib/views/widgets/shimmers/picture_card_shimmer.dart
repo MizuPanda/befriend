@@ -5,8 +5,8 @@ import 'package:shimmer/shimmer.dart';
 
 class PictureCardShimmer extends StatelessWidget {
   const PictureCardShimmer({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final double _likeSizeWidthMultiplier = 35 / 448;
 

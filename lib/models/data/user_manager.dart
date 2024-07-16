@@ -22,6 +22,20 @@ class UserManager {
     return Home.fromUser(homeUser, key: key);
   }
 
+  static final Set<String> _usersDetected = {};
+
+  static void addUserDetected(String userId) {
+    _usersDetected.add(userId);
+  }
+
+  static void resetUsersDetected() {
+    _usersDetected.clear();
+  }
+
+  static bool userDetectedContains(String userId) {
+    return _usersDetected.contains(userId);
+  }
+
   /// Singleton.
   /// Returns the current player object.
   /// If the player object is not initialized, it is initialized.

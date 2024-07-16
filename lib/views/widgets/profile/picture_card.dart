@@ -21,13 +21,13 @@ class PictureCard extends StatefulWidget {
   final Function(String) onArchiveSuccess;
 
   const PictureCard({
-    Key? key,
+    super.key,
     required this.picture,
     required this.userID,
     required this.connectedUsername,
     required this.isConnectedUserProfile,
     required this.onArchiveSuccess,
-  }) : super(key: key);
+  });
 
   @override
   State<PictureCard> createState() => _PictureCardState();

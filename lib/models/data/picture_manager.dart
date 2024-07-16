@@ -15,7 +15,7 @@ import '../../utilities/app_localizations.dart';
 import '../objects/bubble.dart';
 
 class PictureManager {
-  static const int _sessionQuality = 20;
+  static const int _sessionQuality = 25;
   static const int _profilePictureQuality = 10;
 
   static Future<void> removeMainPicture(
@@ -153,7 +153,6 @@ class PictureManager {
         CroppedFile? croppedFile = await ImageCropper().cropImage(
           compressQuality: 100,
           sourcePath: pickedImage.path,
-          aspectRatioPresets: [CropAspectRatioPreset.square],
           uiSettings: [
             AndroidUiSettings(
                 toolbarTitle: context.mounted
@@ -161,13 +160,16 @@ class PictureManager {
                         'Edit your picture'
                     : 'Edit your picture',
                 toolbarWidgetColor: Colors.black,
-                initAspectRatio: CropAspectRatioPreset.original,
+                initAspectRatio: CropAspectRatioPreset.square,
+                aspectRatioPresets: [CropAspectRatioPreset.square, CropAspectRatioPreset.original],
                 lockAspectRatio: false),
             IOSUiSettings(
                 title: context.mounted
                     ? AppLocalizations.of(context)?.translate('pm_edit_pic') ??
                         'Edit your picture'
-                    : 'Edit your picture'),
+                    : 'Edit your picture',
+              aspectRatioPresets: [CropAspectRatioPreset.square, CropAspectRatioPreset.original],
+            ),
           ],
         );
 

@@ -8,9 +8,9 @@ class MoreButton extends StatelessWidget {
   final Iterable<dynamic> usernames;
 
   const MoreButton({
-    Key? key,
+    super.key,
     required this.usernames,
-  }) : super(key: key);
+  });
 
   static const double _iconTextDistanceWidthMultiplier = 16 / 448;
 

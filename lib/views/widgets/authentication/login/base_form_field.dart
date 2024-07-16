@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class BaseFormField extends StatelessWidget {
   const BaseFormField({
-    Key? key,
+    super.key,
     required this.focusNode,
     this.onChanged,
     required this.onSaved,
@@ -12,7 +12,7 @@ class BaseFormField extends StatelessWidget {
     required this.decoration,
     required this.action,
     this.controller,
-  }) : super(key: key);
+  });
 
   final FocusNode? focusNode;
   final Function(String)? onChanged;

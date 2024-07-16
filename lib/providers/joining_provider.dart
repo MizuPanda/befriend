@@ -1,3 +1,4 @@
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -18,16 +19,20 @@ class JoiningProvider extends ChangeNotifier {
 
   MobileScannerController get cameraController => _cameraController;
 
+  JoiningProvider() {
+    UserManager.resetUsersDetected();
+  }
+
   void disposeState() {
     _cameraController.dispose();
   }
 
-  TorchState torchState() {
-    return _cameraController.torchState.value;
+  bool torchEnabled() {
+    return _cameraController.torchEnabled;
   }
 
-  CameraFacing cameraFacingState() {
-    return _cameraController.cameraFacingState.value;
+  CameraFacing cameraFacing() {
+    return _cameraController.facing;
   }
 
   Future<void> switchCamera() async {
@@ -63,57 +68,60 @@ class JoiningProvider extends ChangeNotifier {
             List<String> values = value.split(Constants.dataSeparator);
             if (values.length == 3) {
               String id = values[1];
-              String dateTimeParse = values.last;
-              final DateTime dateTime = DateTime.parse(dateTimeParse);
+              if (!UserManager.userDetectedContains(id)) {
+                UserManager.addUserDetected(id);
+                String dateTimeParse = values.last;
+                final DateTime dateTime = DateTime.parse(dateTimeParse);
 
-              const Duration oneHour = Duration(hours: 1);
+                const Duration oneHour = Duration(hours: 1);
 
-              final DateTime now = DateTime.timestamp();
-              final DateTime before = now.subtract(oneHour);
-              final DateTime after = now.add(oneHour);
+                final DateTime now = DateTime.timestamp();
+                final DateTime before = now.subtract(oneHour);
+                final DateTime after = now.add(oneHour);
 
-              if (dateTime.compareTo(before) >= 0 &&
-                  dateTime.compareTo(after) <= 0) {
-                DocumentSnapshot data =
-                    await Models.dataManager.getData(id: id);
-                List<dynamic> joiners =
-                    DataManager.getList(data, Constants.hostingDoc);
-                Map<String, DateTime> lastSeenMap = DataManager.getDateTimeMap(
-                    data, Constants.lastSeenUsersMapDoc);
-                String username =
-                    DataManager.getString(data, Constants.usernameDoc);
+                if (dateTime.compareTo(before) >= 0 &&
+                    dateTime.compareTo(after) <= 0) {
+                  DocumentSnapshot data =
+                  await Models.dataManager.getData(id: id);
+                  List<dynamic> joiners =
+                  DataManager.getList(data, Constants.hostingDoc);
+                  Map<String, DateTime> lastSeenMap = DataManager.getDateTimeMap(
+                      data, Constants.lastSeenUsersMapDoc);
+                  String username =
+                  DataManager.getString(data, Constants.usernameDoc);
 
-                if (joiners.length == 10) {
-                  if (context.mounted) {
-                    QR.showLobbyFull(context);
-                  }
-                } else if (lastSeenMap.containsKey(userId)) {
-                  if (context.mounted) {
-                    QR.showUserSeenToday(context, username);
-                  }
-                } else {
-                  ImageProvider avatar =
-                      await Models.dataManager.getAvatar(data);
+                  if (joiners.length == 10) {
+                    if (context.mounted) {
+                      QR.showLobbyFull(context);
+                    }
+                  } else if (lastSeenMap.containsKey(userId)) {
+                    if (context.mounted) {
+                      QR.showUserSeenToday(context, username);
+                    }
+                  } else {
+                    ImageProvider avatar =
+                    await Models.dataManager.getAvatar(data);
 
-                  Bubble selectedHost =
-                      Bubble.fromDocsWithoutFriends(data, avatar);
+                    Bubble selectedHost =
+                    Bubble.fromDocsWithoutFriends(data, avatar);
 
-                  await Constants.usersCollection.doc(selectedHost.id).update({
-                    Constants.hostingDoc: FieldValue.arrayUnion([userId])
-                  });
+                    await Constants.usersCollection.doc(selectedHost.id).update({
+                      Constants.hostingDoc: FieldValue.arrayUnion([userId])
+                    });
 
-                  if (context.mounted) {
-                    // Check if the widget is still part of the tree
-                    // Safe to use context here
-                    context.pop();
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return RoundedDialog(
-                            child: HostingWidget(
-                                isHost: false, host: selectedHost));
-                      },
-                    );
+                    if (context.mounted) {
+                      // Check if the widget is still part of the tree
+                      // Safe to use context here
+                      context.pop();
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return RoundedDialog(
+                              child: HostingWidget(
+                                  isHost: false, host: selectedHost));
+                        },
+                      );
+                    }
                   }
                 }
               }

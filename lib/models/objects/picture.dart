@@ -55,7 +55,6 @@ class Picture {
     String pictureTaker,
     DateTime timestamp,
     File file,
-    bool isPublic,
     String caption,
     List<dynamic> allowedIDS,
     Map<String, String> sessionUsers,
