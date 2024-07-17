@@ -66,10 +66,10 @@ class DataManager {
         Timestamp timestamp = snapshot.get(id);
         return timestamp.toDate();
       }
-      return DateTime.utc(0);
+      return DateTime.now();
     } catch (e) {
       debugPrint('(DataManager): Error converting timestamp: $e');
-      return DateTime.utc(0);
+      return DateTime.now();
     }
   }
 }

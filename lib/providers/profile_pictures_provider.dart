@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,7 +10,7 @@ import '../utilities/constants.dart';
 class ProfilePicturesProvider extends ChangeNotifier {
   static const _pageSize = 5;
   DocumentSnapshot? _lastVisible;
-  int _nextAdIndex = 0;
+  int _nextAdIndex = -1;
 
   final PagingController<int, Picture> _pagingController =
       PagingController(firstPageKey: 0);
@@ -37,10 +35,6 @@ class ProfilePicturesProvider extends ChangeNotifier {
 
     // Update the paging controller with the new item list
     _pagingController.itemList = items;
-  }
-
-  int _randomAdRange() {
-    return 3 + Random().nextInt(2);
   }
 
   Future<void> _fetchPage(int pageKey,
@@ -100,16 +94,17 @@ class ProfilePicturesProvider extends ChangeNotifier {
             || pic.allowedIDS.contains(notArchivedID));
       }
 
-      if (_nextAdIndex == 0) {
-        _nextAdIndex = _randomAdRange();
+      if (_nextAdIndex == -1) {
+        _nextAdIndex = 1;
         debugPrint('(ProfilePicturesProvider) Next ad at $_nextAdIndex');
       }
 
       for (int i = 0; i < pictures.length; i++) {
         newItems.add(pictures.elementAt(i));
-        if (_nextAdIndex - 1 == 0) {
+        _nextAdIndex--;
+        if (_nextAdIndex == 0) {
           newItems.add(Picture.pictureAd);
-          _nextAdIndex = _randomAdRange();
+          _nextAdIndex = 3;
           debugPrint('(ProfilePicturesProvider) Next ad at $_nextAdIndex');
         }
         _nextAdIndex--;

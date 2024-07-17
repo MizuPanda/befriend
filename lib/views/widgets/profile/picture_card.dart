@@ -3,13 +3,13 @@ import 'package:befriend/providers/picture_card_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:like_button/like_button.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/objects/picture.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../../../utilities/app_localizations.dart';
 import 'like_text.dart';
 import 'more_button.dart';
 
@@ -41,6 +41,7 @@ class _PictureCardState extends State<PictureCard> {
       widget.isConnectedUserProfile,
       widget.onArchiveSuccess);
   final double _likeSizeWidthMultiplier = 35 / 448;
+  bool _isExpanded = false;
 
   @override
   void initState() {
@@ -137,16 +138,8 @@ class _PictureCardState extends State<PictureCard> {
                                 const LikeText()
                             ],
                           ),
-                        AutoSizeText.rich(TextSpan(children: [
-                          TextSpan(
-                            text: widget.picture.pictureTaker,
-                            style: GoogleFonts.openSans(
-                                fontSize: 15, fontWeight: FontWeight.bold),
-                          ),
-                          TextSpan(
-                              text: ' ${widget.picture.caption}',
-                              style: GoogleFonts.openSans(fontSize: 14)),
-                        ])),
+                        _buildCaption(widget.picture.caption,
+                            widget.picture.pictureTaker),
                         SizedBox(
                           height: 0.004 * height,
                         ),
@@ -159,7 +152,7 @@ class _PictureCardState extends State<PictureCard> {
                             height: 0.002 *
                                 height), // Adds a small space before the date
                         AutoSizeText(
-                          _formatDate(widget.picture.timestamp),
+                          provider.formatDate(widget.picture.timestamp, context),
                           style: GoogleFonts.openSans(
                               color: Colors.grey, fontSize: 12),
                         ),
@@ -176,15 +169,60 @@ class _PictureCardState extends State<PictureCard> {
         });
   }
 
-  String _formatDate(DateTime date) {
-    // This method converts the DateTime into a more readable string
-    // Adjust the formatting to fit your needs
-    // Get the current locale
-    Locale currentLocale = Localizations.localeOf(context);
+  Widget _buildCaption(String caption, String pictureTaker) {
+    const int truncateLength = 100; // Adjust the length as needed
 
-    // Create a DateFormat instance with the current locale
-    DateFormat dateFormat = DateFormat.yMd(currentLocale.toString());
-
-    return dateFormat.format(date);
+    if (caption.length <= truncateLength) {
+      return AutoSizeText.rich(TextSpan(children: [
+        TextSpan(
+          text: pictureTaker,
+          style:
+              GoogleFonts.openSans(fontSize: 15, fontWeight: FontWeight.bold),
+        ),
+        TextSpan(text: ' $caption', style: GoogleFonts.openSans(fontSize: 14)),
+      ]));
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AutoSizeText.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: pictureTaker,
+                  style: GoogleFonts.openSans(
+                      fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                TextSpan(
+                  text: _isExpanded
+                      ? ' $caption'
+                      : ' ${caption.substring(0, truncateLength)}...',
+                  style: GoogleFonts.openSans(fontSize: 14),
+                ),
+              ],
+            ),
+            maxLines: _isExpanded ? null : 2,
+          ),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            },
+            child: Text(
+              _isExpanded
+                  ? AppLocalizations.of(context)?.translate('pc_less') ??
+                      'See less'
+                  : AppLocalizations.of(context)?.translate('pc_more') ??
+                      'See more',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
   }
 }

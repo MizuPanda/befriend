@@ -6,6 +6,7 @@ import 'package:befriend/views/dialogs/profile/username_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../models/objects/picture.dart';
 import '../models/services/post_service.dart';
@@ -197,5 +198,17 @@ class PictureCardProvider extends ChangeNotifier {
     _isLiked = !_isLiked;
 
     return _isLiked;
+  }
+
+  String formatDate(DateTime date, BuildContext context) {
+    // This method converts the DateTime into a more readable string
+    // Adjust the formatting to fit your needs
+    // Get the current locale
+    Locale currentLocale = Localizations.localeOf(context);
+
+    // Create a DateFormat instance with the current locale
+    DateFormat dateFormat = DateFormat.yMd(currentLocale.toString());
+
+    return dateFormat.format(date);
   }
 }

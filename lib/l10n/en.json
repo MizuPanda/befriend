@@ -288,6 +288,7 @@
   "prfs_fs": "Friendship Score",
   "prfs_fl": "Friendship Level",
   "prfs_followed": "Followed by",
+  "prfs_since": "Since",
 
   "_comment48": "Archive Settings Widget",
   "asw_archives": "Archives",
@@ -310,5 +311,9 @@
 
   "_comment52": "Befriend Widget",
   "bw_one": "Welcome to Befriend! Your goal is to grow your friendships",
-  "bw_four": "Your friends will gradually appear on your home page. Press here to see your friend list"
+  "bw_four": "Your friends will gradually appear on your home page. Press here to see your friend list",
+
+  "_comment53": "Picture Card",
+  "pc_more": "See more",
+  "pc_less": "See less"
 }

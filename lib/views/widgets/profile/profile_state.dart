@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../../../models/objects/profile.dart';
 import '../../../utilities/app_localizations.dart';
 import '../users/progress_bar.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ProfileState extends StatelessWidget {
   const ProfileState({
@@ -27,22 +28,37 @@ class ProfileState extends StatelessWidget {
         (BuildContext context, ProfileProvider provider, Widget? child) {
       return Column(
         children: [
-          Padding(
-            padding: EdgeInsets.only(left: 8.0 / 448 * width),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: AutoSizeText(
-                  profile.user.main()
-                      ? '${AppLocalizations.of(context)?.translate('prfs_fs') ?? 'Friendship Score'}: ${profile.user.power}'
-                      : '${AppLocalizations.of(context)?.translate('prfs_fl') ?? 'Friendship Level'}: ${profile.friendship!.level}',
-                  style: GoogleFonts.openSans(
-                    textStyle: const TextStyle(
-                      fontSize: 18,
-                    ),
+          Row(children: [
+            Padding(
+              padding: EdgeInsets.only(left: 8.0 / 448 * width),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: AutoSizeText(
+                    profile.user.main()
+                        ? '${AppLocalizations.of(context)?.translate('prfs_fs') ?? 'Friendship Score'}: ${profile.user.power}'
+                        : '${AppLocalizations.of(context)?.translate('prfs_fl') ?? 'Friendship Level'}: ${profile.friendship!.level}',
+                    style: GoogleFonts.openSans(
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                      ),
+                    )),
+              ),
+            ),
+            const Spacer(),
+
+          ],),
+          if (!profile.user.main())
+            Padding(
+              padding: EdgeInsets.only(left: 8.0 / 448 * width),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: AutoSizeText(
+                    '${AppLocalizations.of(context)?.translate('prfs_since')?? 'Friends since'} ${timeago.format(profile.friendship?.created?? DateTime.now())}',
+                    textAlign: TextAlign.start,
+                    style: GoogleFonts.openSans(textStyle: const TextStyle(fontSize: 18)),
                   )),
             ),
-          ),
-          if (!profile.user.main())
+            if (!profile.user.main())
             Column(
               children: [
                 SizedBox(
