@@ -134,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                                     'Privacy Policy',
                                 style: GoogleFonts.openSans(),
                               )),
-                          Expanded(
+                          Flexible(
                             child: TextButton(
                                 onPressed: () async {
                                   await provider.openTerms(context);

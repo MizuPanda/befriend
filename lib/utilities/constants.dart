@@ -22,6 +22,7 @@ class Constants {
   static const String postNotificationOnDoc = 'postNotificationOn';
   static const String likeNotificationOnDoc = 'likeNotificationOn';
   static const String languageDoc = 'language';
+  static const String inviteTokensDoc = 'inviteTokens';
   //FRIENDSHIPS
   static const String progressDoc = 'progress';
   static const String levelDoc = 'level';
@@ -101,6 +102,14 @@ class Constants {
       tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes);
   static final RequestConfiguration gdrp = RequestConfiguration(
       tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.yes);
+  // URI PATHS
+  static const String joinPath = 'join';
+  static const String referralPath = 'referral';
+  static const String postSharePath = 'post_share';
+  // QUERY PARAMETERS
+  static const String dataParameter = 'data';
+  static const String referrerDataParameter = 'referrer_data';
+  static const String postShareParameter = 'post_data';
   // ASSETS
   static const String termsAddress = 'assets/policies/terms_and_conditions';
   static const String privacyAddress = 'assets/policies/privacy_policy';

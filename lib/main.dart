@@ -1,4 +1,6 @@
+import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/authentication/consent_manager.dart';
+import 'package:befriend/models/services/app_links_service.dart';
 import 'package:befriend/providers/material_provider.dart';
 import 'package:befriend/router.dart';
 import 'package:befriend/utilities/app_localizations.dart';
@@ -156,6 +158,7 @@ class _SelectPageState extends State<SelectPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    AppLinksService.initDeepLinks(context);
     if (FirebaseAuth.instance.currentUser != null) {
       _futureHome = UserManager.userHome();
     }
@@ -165,7 +168,7 @@ class _SelectPageState extends State<SelectPage> {
   Widget build(BuildContext context) {
     // return const PictureSignPage();
     // return const LoadingScreen();
-    if (FirebaseAuth.instance.currentUser != null) {
+    if (AuthenticationManager.isConnected()) {
       _futureHome ??= UserManager.userHome();
 
       return FutureBuilder(

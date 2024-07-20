@@ -6,7 +6,6 @@ import 'package:befriend/models/objects/host.dart';
 import 'package:befriend/models/qr/host_listening.dart';
 import 'package:befriend/models/qr/qr.dart';
 import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/models/services/simple_encryption_service.dart';
 import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -42,13 +41,7 @@ class HostingProvider extends ChangeNotifier {
   }
 
   void showQR(BuildContext context) {
-    String data =
-        '${Constants.appID}${Constants.dataSeparator}${_host.host.id}${Constants.dataSeparator}${DateTime.now().toIso8601String()}';
-    data = SimpleEncryptionService.encrypt64(data);
-    data =
-        '${SimpleEncryptionService.iv.base64}${Constants.dataSeparator}$data';
-
-    QR.showQRCodeDialog(context, data, _host.joiners.length);
+    QR.showQRCodeDialog(context, _host.joiners.length, _host.host.id);
   }
 
   Future<String> startingHost(BuildContext context) async {

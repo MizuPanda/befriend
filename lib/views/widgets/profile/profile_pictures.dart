@@ -34,10 +34,9 @@ class _ProfilePicturesState extends State<ProfilePictures> {
   void initState() {
     super.initState();
     _provider.initState(
-      showArchived: widget.showArchived,
-      showOnlyMe: widget.showOnlyMe,
-      userID: widget.userID
-    );
+        showArchived: widget.showArchived,
+        showOnlyMe: widget.showOnlyMe,
+        userID: widget.userID);
   }
 
   @override

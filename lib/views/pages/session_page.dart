@@ -56,7 +56,8 @@ class _SessionPageState extends State<_SessionPageView> {
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
-    final bool isSmallScreen = height < 700; // Adjust based on your criteria for small screens
+    final bool isSmallScreen =
+        height < 700; // Adjust based on your criteria for small screens
     debugPrint('(SessionPage) height=$height');
 
     return PopScope(
@@ -82,7 +83,7 @@ class _SessionPageState extends State<_SessionPageView> {
                         },
                         child: AutoSizeText(
                           AppLocalizations.of(context)
-                              ?.translate('dialog_cancel') ??
+                                  ?.translate('dialog_cancel') ??
                               'Cancel',
                           maxLines: 1,
                         ),
@@ -120,8 +121,8 @@ class _SessionPageState extends State<_SessionPageView> {
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.openSans(
                                         textStyle: const TextStyle(
-                                          fontSize: 20,
-                                        )),
+                                      fontSize: 20,
+                                    )),
                                   ),
                                 ),
                                 SizedBox(
@@ -130,25 +131,25 @@ class _SessionPageState extends State<_SessionPageView> {
                                 GestureDetector(
                                   onTap: !provider.imageNull()
                                       ? () async {
-                                    await provider
-                                        .showImageFullScreen(context);
-                                  }
+                                          await provider
+                                              .showImageFullScreen(context);
+                                        }
                                       : null,
                                   onLongPress: provider.host.main()
                                       ? () async {
-                                    await provider
-                                        .pictureProcess(context);
-                                  }
+                                          await provider
+                                              .pictureProcess(context);
+                                        }
                                       : null,
                                   child: Showcase(
                                     key: provider.one,
                                     description: AppLocalizations.of(context)
-                                        ?.translate('sp_one') ??
+                                            ?.translate('sp_one') ??
                                         'Hold the picture to retake.',
                                     child: Showcase(
                                       key: provider.two,
                                       description: AppLocalizations.of(context)
-                                          ?.translate('sp_two') ??
+                                              ?.translate('sp_two') ??
                                           'Tap the picture to zoom.',
                                       child: Container(
                                         width: 0.7 * width, // for full width
@@ -156,7 +157,7 @@ class _SessionPageState extends State<_SessionPageView> {
                                         decoration: BoxDecoration(
                                           // Add any decoration properties here
                                           borderRadius:
-                                          BorderRadius.circular(10.0),
+                                              BorderRadius.circular(10.0),
                                           border: Border.all(
                                               color: lightMode
                                                   ? Colors.black
@@ -164,16 +165,16 @@ class _SessionPageState extends State<_SessionPageView> {
                                         ),
                                         child: provider.imageNull()
                                             ? const Center(
-                                          child: Icon(Icons.camera),
-                                        )
+                                                child: Icon(Icons.camera),
+                                              )
                                             : ClipRRect(
-                                            borderRadius:
-                                            BorderRadius.circular(10.0),
-                                            child: Image(
-                                              image:
-                                              provider.networkImage(),
-                                              fit: BoxFit.cover,
-                                            )),
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                                child: Image(
+                                                  image:
+                                                      provider.networkImage(),
+                                                  fit: BoxFit.cover,
+                                                )),
                                       ),
                                     ),
                                   ),
@@ -199,24 +200,24 @@ class _SessionPageState extends State<_SessionPageView> {
                                                 onChanged: provider.onChanged,
                                                 focusNode: provider.focusNode,
                                                 onSubmitted:
-                                                provider.onSubmitted,
+                                                    provider.onSubmitted,
                                                 textInputAction:
-                                                TextInputAction.done,
+                                                    TextInputAction.done,
                                                 decoration: InputDecoration(
                                                   hintText: AppLocalizations.of(
-                                                      context)
-                                                      ?.translate(
-                                                      'sp_caption_field') ??
+                                                              context)
+                                                          ?.translate(
+                                                              'sp_caption_field') ??
                                                       'Enter Caption',
                                                   border:
-                                                  const OutlineInputBorder(),
+                                                      const OutlineInputBorder(),
                                                   focusedBorder:
-                                                  const OutlineInputBorder(
+                                                      const OutlineInputBorder(
                                                     borderSide: BorderSide(
                                                         color: Colors.blue),
                                                   ),
                                                   enabledBorder:
-                                                  const OutlineInputBorder(
+                                                      const OutlineInputBorder(
                                                     borderSide: BorderSide(
                                                         color: Colors.grey),
                                                   ),
@@ -224,13 +225,13 @@ class _SessionPageState extends State<_SessionPageView> {
                                                 ),
                                                 maxLines: null,
                                                 maxLength:
-                                                provider.characterLimit,
+                                                    provider.characterLimit,
                                               ),
                                             ),
                                             const SizedBox(height: 10),
                                             ValueListenableBuilder(
                                               valueListenable:
-                                              provider.charCountNotifier,
+                                                  provider.charCountNotifier,
                                               builder:
                                                   (context, charCount, child) {
                                                 return Text(
@@ -257,29 +258,33 @@ class _SessionPageState extends State<_SessionPageView> {
                                 if (!(isSmallScreen && _isExpanded))
                                   AutoSizeText(
                                     AppLocalizations.of(context)
-                                        ?.translate('sp_list') ??
+                                            ?.translate('sp_list') ??
                                         'User list',
                                     style: GoogleFonts.openSans(
-                                        textStyle: const TextStyle(fontSize: 18)),
+                                        textStyle:
+                                            const TextStyle(fontSize: 18)),
                                   ),
                                 if (!(isSmallScreen && _isExpanded))
                                   const Expanded(child: UserSlidersScreen()),
                                 if (!(isSmallScreen && _isExpanded))
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       SizedBox(
                                         width: 0.022 * width,
                                       ),
                                       Icon(
                                         Icons.people_rounded,
-                                        color:
-                                        Theme.of(context).colorScheme.primary,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
                                       ),
                                       Showcase(
                                         key: provider.four,
-                                        description: AppLocalizations.of(context)
-                                            ?.translate('sp_four') ??
+                                        description: AppLocalizations.of(
+                                                    context)
+                                                ?.translate('sp_four') ??
                                             'Press to see users that will be able to see the picture.',
                                         child: Container(
                                           alignment: Alignment.centerLeft,
@@ -291,7 +296,7 @@ class _SessionPageState extends State<_SessionPageView> {
                                             },
                                             child: AutoSizeText(
                                                 AppLocalizations.of(context)
-                                                    ?.translate('sp_who') ??
+                                                        ?.translate('sp_who') ??
                                                     'Who will see the picture',
                                                 style: GoogleFonts.openSans(
                                                     textStyle: const TextStyle(
@@ -304,41 +309,46 @@ class _SessionPageState extends State<_SessionPageView> {
                                         Showcase(
                                           key: provider.five,
                                           description: AppLocalizations.of(
-                                              context)
-                                              ?.translate('sp_five') ??
+                                                      context)
+                                                  ?.translate('sp_five') ??
                                               'Press here to publish the picture.',
                                           child: provider.isLoading
                                               ? const CircularProgressIndicator()
                                               : Container(
-                                            alignment:
-                                            Alignment.centerRight,
-                                            width: 0.4 * width,
-                                            height: 50,
-                                            child: TextButton(
-                                              onPressed: provider.length() >=
-                                                  2 &&
-                                                  !provider.imageNull()
-                                                  ? () async {
-                                                await provider
-                                                    .publishPicture(
-                                                    context);
-                                              }
-                                                  : null,
-                                              child: AutoSizeText(
-                                                AppLocalizations.of(context)
-                                                    ?.translate(
-                                                    'sp_publish') ??
-                                                    'Publish the picture',
-                                                textAlign: TextAlign.center,
-                                                overflow:
-                                                TextOverflow.ellipsis,
-                                                style: GoogleFonts.openSans(
-                                                    textStyle:
-                                                    const TextStyle(
-                                                        fontSize: 16)),
-                                              ),
-                                            ),
-                                          ),
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  width: 0.4 * width,
+                                                  height: 50,
+                                                  child: TextButton(
+                                                    onPressed:
+                                                        provider.length() >=
+                                                                    2 &&
+                                                                !provider
+                                                                    .imageNull()
+                                                            ? () async {
+                                                                await provider
+                                                                    .publishPicture(
+                                                                        context);
+                                                              }
+                                                            : null,
+                                                    child: AutoSizeText(
+                                                      AppLocalizations.of(
+                                                                  context)
+                                                              ?.translate(
+                                                                  'sp_publish') ??
+                                                          'Publish the picture',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: GoogleFonts.openSans(
+                                                          textStyle:
+                                                              const TextStyle(
+                                                                  fontSize:
+                                                                      16)),
+                                                    ),
+                                                  ),
+                                                ),
                                         )
                                     ],
                                   ),
@@ -392,7 +402,9 @@ class _SessionPageState extends State<_SessionPageView> {
                   ),
                 ),
                 TextSpan(
-                  text: _isExpanded ? ' $caption' : ' ${caption.substring(0, truncateLength)}...',
+                  text: _isExpanded
+                      ? ' $caption'
+                      : ' ${caption.substring(0, truncateLength)}...',
                   style: GoogleFonts.openSans(fontSize: 14),
                 ),
               ],

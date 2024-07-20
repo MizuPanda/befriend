@@ -17,9 +17,13 @@ class ProfilePicturesProvider extends ChangeNotifier {
 
   PagingController<int, Picture> get pagingController => _pagingController;
 
-  void initState({required bool showArchived, required bool showOnlyMe, required String userID}) {
+  void initState(
+      {required bool showArchived,
+      required bool showOnlyMe,
+      required String userID}) {
     _pagingController.addPageRequestListener((pageKey) {
-      _fetchPage(pageKey, userID: userID, showArchived: showArchived, showOnlyMe: showOnlyMe);
+      _fetchPage(pageKey,
+          userID: userID, showArchived: showArchived, showOnlyMe: showOnlyMe);
     });
   }
 
@@ -38,7 +42,9 @@ class ProfilePicturesProvider extends ChangeNotifier {
   }
 
   Future<void> _fetchPage(int pageKey,
-      {required String userID, required bool showArchived, required bool showOnlyMe}) async {
+      {required String userID,
+      required bool showArchived,
+      required bool showOnlyMe}) async {
     try {
       final Future<QuerySnapshot> query;
       Query q;
@@ -55,18 +61,18 @@ class ProfilePicturesProvider extends ChangeNotifier {
       if (showOnlyMe) {
         q = Constants.picturesCollection
             .where(Constants.hostId, isEqualTo: userID)
-            .where(Constants.allowedUsersDoc,
-                arrayContains: notArchivedID);
-
+            .where(Constants.allowedUsersDoc, arrayContains: notArchivedID);
       } else if (userID == connectedID && !showArchived) {
-        q = Constants.picturesCollection
-            .where(Constants.allowedUsersDoc, arrayContainsAny: [notArchivedID, connectedID]);
-      } else if (showArchived) {
         q = Constants.picturesCollection.where(Constants.allowedUsersDoc,
-            arrayContains: archivedID);
-      } else {
+            arrayContainsAny: [notArchivedID, connectedID]);
+      } else if (showArchived) {
         q = Constants.picturesCollection
-            .where(Constants.allowedUsersDoc, arrayContains: '${Constants.notArchived}$userID',);
+            .where(Constants.allowedUsersDoc, arrayContains: archivedID);
+      } else {
+        q = Constants.picturesCollection.where(
+          Constants.allowedUsersDoc,
+          arrayContains: '${Constants.notArchived}$userID',
+        );
       }
 
       q = q.orderBy(Constants.timestampDoc, descending: true);
@@ -89,9 +95,9 @@ class ProfilePicturesProvider extends ChangeNotifier {
 
       if (isFriendProfile) {
         pictures = pictures.where((pic) =>
-            pic.allowedIDS.contains(connectedID)
-            || pic.allowedIDS.contains(archivedID)
-            || pic.allowedIDS.contains(notArchivedID));
+            pic.allowedIDS.contains(connectedID) ||
+            pic.allowedIDS.contains(archivedID) ||
+            pic.allowedIDS.contains(notArchivedID));
       }
 
       if (_nextAdIndex == -1) {

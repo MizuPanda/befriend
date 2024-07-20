@@ -61,6 +61,17 @@ class SettingsPage extends StatelessWidget {
                             ),
                             onPressed: provider.goToBlockedSettings,
                           ),
+                          SettingsTile(
+                            leading: Icon(lightMode
+                                ? Icons.refresh_rounded
+                                : Icons.refresh_outlined),
+                            title: Text(
+                              AppLocalizations.of(context)
+                                      ?.translate('sp_refresh') ??
+                                  'Refresh home page',
+                            ),
+                            onPressed: provider.refreshHomePage,
+                          ),
                         ],
                       ),
                       SettingsSection(

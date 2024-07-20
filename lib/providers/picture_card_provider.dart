@@ -1,4 +1,5 @@
 import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/models/services/share_service.dart';
 import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/dialogs/profile/delete_picture_dialog.dart';
 import 'package:befriend/views/dialogs/profile/likes_dialog.dart';
@@ -178,7 +179,7 @@ class PictureCardProvider extends ChangeNotifier {
       }
     }
     try {
-      await Constants.picturesCollection.doc(_picture.id).update(data);
+      Constants.picturesCollection.doc(_picture.id).update(data);
       debugPrint(
           '(PictureCardProvider) Updated like to ${(!isLiked).toString()}');
     } catch (error) {
@@ -210,5 +211,9 @@ class PictureCardProvider extends ChangeNotifier {
     DateFormat dateFormat = DateFormat.yMd(currentLocale.toString());
 
     return dateFormat.format(date);
+  }
+
+  Uri shareLink() {
+    return ShareService.generatePostShareLink(_picture.id, _userId);
   }
 }

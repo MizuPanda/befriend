@@ -1771,16 +1771,6 @@ class MockBubble extends _i1.Mock implements _i13.Bubble {
       ) as bool);
 
   @override
-  Iterable<String> loadedFriendIds() => (super.noSuchMethod(
-        Invocation.method(
-          #loadedFriendIds,
-          [],
-        ),
-        returnValue: <String>[],
-        returnValueForMissingStub: <String>[],
-      ) as Iterable<String>);
-
-  @override
   bool hasNonLoadedFriends() => (super.noSuchMethod(
         Invocation.method(
           #hasNonLoadedFriends,

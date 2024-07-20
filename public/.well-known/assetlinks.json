@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.befriendapp.befriend",
+      "sha256_cert_fingerprints": [
+        "38:6F:DF:D2:71:7C:4A:B2:D2:75:19:B5:8E:A4:5C:7A:75:5D:72:D7:48:B4:3F:A0:62:2A:B1:51:3F:42:B7:09"
+      ]
+    }
+  }
+]

@@ -23,6 +23,8 @@
   "general_word_skip": "Skip",
   "general_word_confirm": "Confirm",
   "general_word_continue": "Continue",
+  "general_word_yes": "Yes",
+  "general_word_no": "No",
 
   "befriend_devise": "~ Expand your social circle ~",
 
@@ -206,6 +208,7 @@
   "sp_data": "Your Data",
   "sp_archived": "Archived pictures",
   "sp_blocked": "Blocked accounts",
+  "sp_refresh": "Refresh home page",
   "sp_pc": "Privacy and confidentiality",
   "sp_policy": "Privacy Policy",
   "sp_consent": "Manage consent",
@@ -315,5 +318,14 @@
 
   "_comment53": "Picture Card",
   "pc_more": "See more",
-  "pc_less": "See less"
+  "pc_less": "See less",
+
+  "_comment54": "Invalid Invitation Dialog",
+  "iid_title": "Invalid Invitation",
+  "iid_content": "The invitation link is invalid or has already been used.",
+
+  "_comment55": "Invitation Dialog",
+  "id_title": "Friend Request",
+  "id_content": "has invited you to be friends. Do you accept?"
+
 }

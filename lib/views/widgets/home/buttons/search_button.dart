@@ -26,8 +26,7 @@ class _SearchButtonState extends State<SearchButton> {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
 
-    final double normalPadding = 0.067 * width;
-    final double friendPadding = normalPadding + 0.11 * width;
+    final double friendPadding = 0.177 * width;
 
     return Consumer<HomeProvider>(
         builder: (BuildContext context, HomeProvider provider, Widget? child) {
@@ -41,8 +40,7 @@ class _SearchButtonState extends State<SearchButton> {
             helpText: AppLocalizations.of(context)?.translate('sb_text') ??
                 "Search...",
             rtl: true,
-            width: MediaQuery.of(context).size.width -
-                (provider.home.user.main() ? normalPadding : friendPadding),
+            width: MediaQuery.of(context).size.width - friendPadding,
             onSuffixTap: () {
               setState(() {
                 _textEditingController.clear();

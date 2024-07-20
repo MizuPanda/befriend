@@ -161,14 +161,20 @@ class PictureManager {
                     : 'Edit your picture',
                 toolbarWidgetColor: Colors.black,
                 initAspectRatio: CropAspectRatioPreset.square,
-                aspectRatioPresets: [CropAspectRatioPreset.square, CropAspectRatioPreset.original],
+                aspectRatioPresets: [
+                  CropAspectRatioPreset.square,
+                  CropAspectRatioPreset.original
+                ],
                 lockAspectRatio: false),
             IOSUiSettings(
-                title: context.mounted
-                    ? AppLocalizations.of(context)?.translate('pm_edit_pic') ??
-                        'Edit your picture'
-                    : 'Edit your picture',
-              aspectRatioPresets: [CropAspectRatioPreset.square, CropAspectRatioPreset.original],
+              title: context.mounted
+                  ? AppLocalizations.of(context)?.translate('pm_edit_pic') ??
+                      'Edit your picture'
+                  : 'Edit your picture',
+              aspectRatioPresets: [
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.original
+              ],
             ),
           ],
         );

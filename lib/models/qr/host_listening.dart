@@ -77,7 +77,9 @@ class HostListening {
   static void _handleHostTakingPicture(Host host, BuildContext context) {
     try {
       _isTakingPicture = true;
-      Navigator.of(context).pop();
+      if (GoRouter.of(context).canPop()) {
+        GoRouter.of(context).pop();
+      }
 
       GoRouter.of(context).go(Constants.sessionAddress, extra: host);
     } catch (e) {
@@ -88,8 +90,10 @@ class HostListening {
 
   static void _handleHostStoppedHosting(BuildContext context) {
     try {
-      if (context.mounted && !_isTakingPicture) {
-        Navigator.of(context).pop(); // Exiting the picture session
+      if (context.mounted &&
+          !_isTakingPicture &&
+          GoRouter.of(context).canPop()) {
+        GoRouter.of(context).pop(); // Exiting the picture session
       }
     } catch (e) {
       debugPrint('(HostListening): Error handling host stopped hosting: $e');
@@ -141,8 +145,9 @@ class HostListening {
   ) {
     if (!host.main() &&
         !connectedIds.contains(host.user.id) &&
-        context.mounted) {
-      Navigator.of(context).pop(); // Exiting the picture session
+        context.mounted &&
+        GoRouter.of(context).canPop()) {
+      GoRouter.of(context).pop(); // Exiting the picture session
     }
   }
 

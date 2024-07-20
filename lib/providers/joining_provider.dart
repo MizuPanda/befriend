@@ -1,17 +1,11 @@
 import 'package:befriend/models/data/user_manager.dart';
-import 'package:befriend/utilities/models.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:befriend/models/services/app_links_service.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-import '../models/data/data_manager.dart';
-import '../models/objects/bubble.dart';
 import '../models/qr/qr.dart';
 import '../models/services/simple_encryption_service.dart';
 import '../utilities/constants.dart';
-import '../views/dialogs/rounded_dialog.dart';
-import '../views/widgets/home/picture/hosting_widget.dart';
 
 class JoiningProvider extends ChangeNotifier {
   final MobileScannerController _cameraController = MobileScannerController();
@@ -47,8 +41,6 @@ class JoiningProvider extends ChangeNotifier {
 
   Future<void> handleBarcodeDetection(
       BarcodeCapture capture, BuildContext context) async {
-    String userId = Models.authenticationManager.id();
-
     if (_isProcessingBarcode) return; // Skip if already processing a barcode
     _isProcessingBarcode = true;
 
@@ -59,69 +51,22 @@ class JoiningProvider extends ChangeNotifier {
         String? value = barcode.rawValue;
 
         if (value != null && value.isNotEmpty) {
-          String iv = value.split(Constants.dataSeparator).first;
-          value = value.substring(iv.length + Constants.dataSeparator.length);
+          final Uri uri = Uri.parse(value);
 
-          value = SimpleEncryptionService.decrypt(value, iv);
-          debugPrint('(JoiningProvider) Decrypt= $value');
-          if (value.contains(Constants.appID)) {
-            List<String> values = value.split(Constants.dataSeparator);
-            if (values.length == 3) {
-              String id = values[1];
-              if (!UserManager.userDetectedContains(id)) {
-                UserManager.addUserDetected(id);
-                String dateTimeParse = values.last;
-                final DateTime dateTime = DateTime.parse(dateTimeParse);
+          if (AppLinksService.isJoinLink(uri)) {
+            value = SimpleEncryptionService.getDecryptedURI(
+                uri, Constants.dataParameter);
 
-                const Duration oneHour = Duration(hours: 1);
+            if (value.contains(Constants.appID)) {
+              List<String> values = value.split(Constants.dataSeparator);
+              if (values.length == 3) {
+                String id = values[1];
+                if (!UserManager.userDetectedContains(id)) {
+                  UserManager.addUserDetected(id);
+                  String dateTimeParse = values.last;
 
-                final DateTime now = DateTime.timestamp();
-                final DateTime before = now.subtract(oneHour);
-                final DateTime after = now.add(oneHour);
-
-                if (dateTime.compareTo(before) >= 0 &&
-                    dateTime.compareTo(after) <= 0) {
-                  DocumentSnapshot data =
-                  await Models.dataManager.getData(id: id);
-                  List<dynamic> joiners =
-                  DataManager.getList(data, Constants.hostingDoc);
-                  Map<String, DateTime> lastSeenMap = DataManager.getDateTimeMap(
-                      data, Constants.lastSeenUsersMapDoc);
-                  String username =
-                  DataManager.getString(data, Constants.usernameDoc);
-
-                  if (joiners.length == 10) {
-                    if (context.mounted) {
-                      QR.showLobbyFull(context);
-                    }
-                  } else if (lastSeenMap.containsKey(userId)) {
-                    if (context.mounted) {
-                      QR.showUserSeenToday(context, username);
-                    }
-                  } else {
-                    ImageProvider avatar =
-                    await Models.dataManager.getAvatar(data);
-
-                    Bubble selectedHost =
-                    Bubble.fromDocsWithoutFriends(data, avatar);
-
-                    await Constants.usersCollection.doc(selectedHost.id).update({
-                      Constants.hostingDoc: FieldValue.arrayUnion([userId])
-                    });
-
-                    if (context.mounted) {
-                      // Check if the widget is still part of the tree
-                      // Safe to use context here
-                      context.pop();
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return RoundedDialog(
-                              child: HostingWidget(
-                                  isHost: false, host: selectedHost));
-                        },
-                      );
-                    }
+                  if (QR.isExpired(dateTimeParse)) {
+                    QR.joinSession(id, context, fromBarcode: true);
                   }
                 }
               }

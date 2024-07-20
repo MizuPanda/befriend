@@ -120,15 +120,15 @@ class SessionProvider extends ChangeNotifier {
   void _loadInterstitialAd() async {
     // Replace with your ad unit ID - TO CHANGE DEPENDENTLY ON PLATFORM
     final String adUnitId =
-         /*
+        /*
         Platform.isAndroid
             ? Secrets.sessionAndroidAdTile
             : Secrets.sessioniOSAdTile;
       */
-    // /*
-    Platform.isAndroid
-          ? Constants.sessionAndroidTestAdUnit
-          : Constants.sessioniOSTestAdUnit;
+        // /*
+        Platform.isAndroid
+            ? Constants.sessionAndroidTestAdUnit
+            : Constants.sessioniOSTestAdUnit;
     //      */
 
     debugPrint('(SessionProvider) Ad Unit= $adUnitId');
@@ -333,13 +333,11 @@ class SessionProvider extends ChangeNotifier {
           ? documentSnapshot.get(Constants.hostingFriendshipsDoc)
           : {};
 
-
       // Map of users and their friendList
       for (MapEntry<String, dynamic> sessionUserData
           in friendshipsMap.entries) {
         List<FriendshipProgress> friendships = [];
         for (Map<String, dynamic> friendMap in sessionUserData.value) {
-
           FriendshipProgress friendship =
               FriendshipProgress.fromMap(friendMap, sessionUserData.key);
           friendships.add(friendship);
@@ -435,7 +433,8 @@ class SessionProvider extends ChangeNotifier {
           sessionUsers: sessionUsers,
           caption: caption(),
           host: host,
-          userMap: idToBubbleMap.map((id, userBubble) => MapEntry(id, userBubble.username)),
+          userMap: idToBubbleMap
+              .map((id, userBubble) => MapEntry(id, userBubble.username)),
           usersAllowed: usersAllowed,
           metadata: metadata);
 

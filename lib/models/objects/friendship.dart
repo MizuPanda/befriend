@@ -39,6 +39,9 @@ class Friendship extends FriendshipProgress {
   }
 
   double distance() {
-    return 150 / (level.toDouble() + progress / 100);
+    if (level + progress == 0) {
+      return 150;
+    }
+    return 150 / (level.toDouble() + progress);
   }
 }

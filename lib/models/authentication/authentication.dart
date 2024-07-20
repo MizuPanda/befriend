@@ -24,6 +24,10 @@ class AuthenticationManager {
     return _auth.currentUser?.uid ?? 'AuthenticationManager-NOT-FOUND-ID';
   }
 
+  static bool isConnected() {
+    return _auth.currentUser?.uid != null;
+  }
+
   static String archivedID() {
     return '${Constants.archived}${_auth.currentUser?.uid}';
   }
@@ -100,7 +104,8 @@ class AuthenticationManager {
       Constants.blockedUsersDoc: {},
       Constants.likeNotificationOnDoc: true,
       Constants.postNotificationOnDoc: true,
-      Constants.languageDoc: languageCode
+      Constants.languageDoc: languageCode,
+      Constants.inviteTokensDoc: {},
     };
 
     try {

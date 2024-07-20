@@ -80,6 +80,10 @@ class SettingsProvider extends ChangeNotifier {
     ConsentManager.showTermsConditionsDialog(context);
   }
 
+  Future<void> refreshHomePage(BuildContext context) async {
+    await UserManager.reloadHome(context);
+  }
+
   Future<void> openTutorial(BuildContext context) async {
     try {
       Home home = await UserManager.userHome();

@@ -23,6 +23,8 @@
   "general_word_skip": "Passer",
   "general_word_confirm": "Confirmer",
   "general_word_continue": "Continuer",
+  "general_word_yes": "Oui",
+  "general_word_no": "Non",
 
   "befriend_devise": "~ Élargissez votre cercle social ~",
 
@@ -206,6 +208,7 @@
   "sp_data": "Vos données",
   "sp_archived": "Photos archivées",
   "sp_blocked": "Comptes bloqués",
+  "sp_refresh": "Rafraichir la page d'accueil",
   "sp_pc": "Confidentialité",
   "sp_policy": "Politique de confidentialité",
   "sp_consent": "Gérer les paramètres de confidentialité",
@@ -311,5 +314,17 @@
 
   "_comment52": "Befriend Widget",
   "bw_one": "Bienvenue sur Befriend ! Votre objectif est de développer vos amitiés",
-  "bw_four": "Vos amis apparaîtront progressivement sur votre page d'accueil. Cliquez ici pour voir votre liste d'amis"
+  "bw_four": "Vos amis apparaîtront progressivement sur votre page d'accueil. Cliquez ici pour voir votre liste d'amis",
+
+  "_comment53": "Picture Card",
+  "pc_more": "Voir plus",
+  "pc_less": "Voir moins",
+
+  "_comment54": "Invalid Invitation Dialog",
+  "iid_title": "Invitation invalide",
+  "iid_content": "Le lien d'invitation n'est pas valide ou a déjà été utilisé.",
+
+  "_comment55": "Invitation Dialog",
+  "id_title": "Demande d'ami",
+  "id_content": "vous a invité à devenir son ami. Acceptez-vous?"
 }

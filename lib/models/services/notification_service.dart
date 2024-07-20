@@ -61,8 +61,7 @@ class NotificationService {
 
       _handleInitialMessage();
     } catch (e) {
-      debugPrint(
-          '(NotificationService) Error initializing token listener: $e');
+      debugPrint('(NotificationService) Error initializing token listener: $e');
     }
   }
 
@@ -83,7 +82,7 @@ class NotificationService {
     if (Platform.isAndroid) {
       _localNotifications
           .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()!
+              AndroidFlutterLocalNotificationsPlugin>()!
           .requestNotificationsPermission();
     }
 

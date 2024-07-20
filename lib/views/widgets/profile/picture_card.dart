@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:like_button/like_button.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../models/objects/picture.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -134,10 +135,25 @@ class _PictureCardState extends State<PictureCard> {
                                   );
                                 },
                               ),
-                              if (widget.picture.likes.isNotEmpty)
-                                const LikeText()
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              IconButton(
+                                  onPressed: () async {
+                                    final Uri uri = provider.shareLink();
+
+                                    await Share.shareUri(uri);
+                                  },
+                                  icon: Icon(
+                                    Icons.share_sharp,
+                                    size: _likeSizeWidthMultiplier * width,
+                                    color: provider.isLiked
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Colors.grey,
+                                  )),
                             ],
                           ),
+                        if (widget.picture.likes.isNotEmpty) const LikeText(),
                         _buildCaption(widget.picture.caption,
                             widget.picture.pictureTaker),
                         SizedBox(
@@ -152,7 +168,8 @@ class _PictureCardState extends State<PictureCard> {
                             height: 0.002 *
                                 height), // Adds a small space before the date
                         AutoSizeText(
-                          provider.formatDate(widget.picture.timestamp, context),
+                          provider.formatDate(
+                              widget.picture.timestamp, context),
                           style: GoogleFonts.openSans(
                               color: Colors.grey, fontSize: 12),
                         ),

@@ -96,10 +96,6 @@ class Bubble {
     return blockedUsers.keys.contains(Models.authenticationManager.id());
   }
 
-  Iterable<String> loadedFriendIds() {
-    return friendships.map((e) => e.friendId());
-  }
-
   bool hasNonLoadedFriends() {
     return friendIDs.length > friendships.length;
   }

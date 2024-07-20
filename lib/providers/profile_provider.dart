@@ -61,10 +61,6 @@ class ProfileProvider extends ChangeNotifier {
       debugPrint('(ProfileProvider) $action successful: ${result.data}');
       if (context.mounted) {
         await UserManager.reloadHome(context);
-
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-          notifyListeners();
-        });
       }
     } catch (e) {
       debugPrint('(ProfileProvider) Error $action: $e');
