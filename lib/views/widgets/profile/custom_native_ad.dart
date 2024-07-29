@@ -26,11 +26,11 @@ class _CustomNativeAdState extends State<CustomNativeAd> {
       ? Secrets.postTileUnitAndroid
       : Secrets.postTileUnitIOS;
     */
-      ///*
+      //  /*
       Platform.isAndroid
           ? Constants.postAndroidTestAdUnit
           : Constants.postiOSTestAdUnit;
-  //    */
+  //   */
 
   /// Loads a native ad.
   void loadAd() async {

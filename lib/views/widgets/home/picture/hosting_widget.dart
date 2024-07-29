@@ -98,11 +98,13 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                                   width: (width - 130) *
                                       Constants.pictureDialogWidthMultiplier,
                                   child: AutoSizeText(
-                                    '${provider.hostUsername()} ${AppLocalizations.of(context)?.translate('hw_who') ?? 'will take a picture!'}',
+                                    AppLocalizations.of(context)
+                                            ?.translate('hw_show') ??
+                                        'Show your friends your QR code to invite friends!',
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.openSans(
                                         textStyle: const TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 18,
                                     )),
                                     maxLines: 2,
                                   ),
@@ -113,7 +115,7 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                                     descriptionAlignment: TextAlign.center,
                                     description: AppLocalizations.of(context)
                                             ?.translate('hw_one') ??
-                                        "Press here to display your QR code. Your friends can scan it to join the photo session.",
+                                        "Press here to display your QR code.",
                                     child: IconButton(
                                       icon: const Icon(
                                           Icons.qr_code), // QR code icon

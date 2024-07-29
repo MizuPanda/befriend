@@ -79,12 +79,6 @@ void main() {
       expect(() => DataQuery.getFriendship('user1', 'user2'), throwsException);
     });
 
-    test('friendList should throw exception on error', () async {
-      when(mockFirebaseAuth.currentUser).thenThrow(Exception('Error'));
-
-      expect(() => DataQuery.friendList('user1', ['user2']), throwsException);
-    });
-
     test('getNetworkImage should return NetworkImage if url is valid', () async {
       DataQuery.storage = mockFirebaseStorage;
       when(mockReference.getDownloadURL()).thenAnswer((_) async => 'http://example.com/avatar.png');

@@ -73,6 +73,8 @@ class Constants {
   static const String cancelledState = 'cancelled';
   static const String pictureMarker = 'pic:';
   static const String publishingState = 'publishing';
+  // DATA
+  static const int friendsLimit = 12;
   // SHARED PREFERENCES
   static const String darkThemeValue = 'dark';
   static const String lightThemeValue = 'light';

@@ -100,7 +100,7 @@ class MutualProvider extends ChangeNotifier {
             ImageProvider bubbleImage =
                 await Models.dataManager.getAvatar(bubbleSnapshot);
 
-            friend = Bubble.fromDocsWithoutFriends(bubbleSnapshot, bubbleImage);
+            friend = Bubble.fromDocs(bubbleSnapshot, bubbleImage);
 
             Friendship friendship =
                 Friendship.fromDocs(userId, friend, snapshot);

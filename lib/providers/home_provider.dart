@@ -1,13 +1,13 @@
 import 'package:befriend/models/data/user_manager.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../models/data/data_query.dart';
 import '../models/objects/friendship.dart';
 import '../models/objects/home.dart';
+import '../models/services/notification_service.dart';
 import '../utilities/constants.dart';
 
 class HomeProvider extends ChangeNotifier {
@@ -38,7 +38,7 @@ class HomeProvider extends ChangeNotifier {
   double get viewerSize => home.viewerSize;
 
   void initShowcase(BuildContext context) {
-    if (home.user.friendshipsLoaded) {
+    if (home.connectedHome) {
       WidgetsBinding.instance.addPostFrameCallback(
           (_) => ShowCaseWidget.of(context).startShowCase([
                 _one,
@@ -46,6 +46,37 @@ class HomeProvider extends ChangeNotifier {
                 _three,
                 _four,
               ]));
+    }
+  }
+
+  Future<void> loadFriendsAsync() async {
+    try {
+      if (!home.user.friendshipsLoaded) {
+        final List<dynamic> friendsIDS = home.user.nonLoadedFriends().toList();
+        friendsIDS.shuffle();
+        final Iterable<dynamic> randomFriendIDS = friendsIDS.getRange(
+            0,
+            friendsIDS.length > Constants.friendsLimit
+                ? Constants.friendsLimit
+                : friendsIDS.length);
+
+        for (String friendID in randomFriendIDS) {
+          Friendship friend =
+              await DataQuery.getFriendship(home.user.id, friendID);
+          debugPrint(
+              '(HomeProvider) Adding ${friend.friendUsername()} to home');
+
+          UserManager.addFriend(friend);
+          home.addFriendToHome(
+              friend); // Method to dynamically add friend to the UI
+          _transformationController.value = home.middlePos();
+          notifyListeners();
+        }
+
+        UserManager.setFriendsLoaded();
+      }
+    } catch (e) {
+      debugPrint('(HomeProvider) Error loading friends asynchronously: $e');
     }
   }
 
@@ -83,26 +114,6 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<Friendship>> loadFriendships() async {
-    debugPrint('(HomeProvider) loadFriendships()');
-    if (!home.user.friendshipsLoaded) {
-      debugPrint('(HomeProvider) Starting friendships...');
-      try {
-        home.user.friendships =
-            await DataQuery.friendList(home.user.id, home.user.friendIDs);
-        home.user.friendshipsLoaded = true;
-        home.initializePositions();
-        _transformationController.value = home.middlePos();
-        debugPrint('(HomeProvider) Friendships loaded successfully.');
-      } catch (e) {
-        debugPrint('(HomeProvider) Error loading friendships: $e');
-        // Optionally, handle error for user feedback
-      }
-    }
-
-    return home.user.friendships;
-  }
-
   HomeProvider._({
     required this.home,
   });
@@ -123,6 +134,13 @@ class HomeProvider extends ChangeNotifier {
     homeProvider._transformationController.value = home.middlePos();
 
     return homeProvider;
+  }
+
+  Future<void> initServices(
+    GlobalKey<ScaffoldState> scaffoldKey,
+  ) async {
+    NotificationService.initNotifications(scaffoldKey, notify);
+    MobileAds.instance.initialize();
   }
 
   Future<void> initLanguage(BuildContext context) async {

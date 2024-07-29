@@ -266,8 +266,9 @@
 
   "_comment42": "Hosting Widget",
   "hw_who": "prendra une photo!",
-  "hw_one": "Appuyez ici pour afficher votre code QR. Vos amis peuvent le scanner pour participer à la séance photo.",
+  "hw_one": "Appuyez ici pour afficher votre code QR.",
   "hw_two": "Une fois que tous les utilisateurs sont connectés, appuyez sur \"Continuer\" pour poursuivre.",
+  "hw_show": "Montrez votre code QR à vos amis pour les inviter !",
 
   "_comment43": "Joining Widget",
   "jw_scan": "Scannez le code QR de votre ami(e) !",

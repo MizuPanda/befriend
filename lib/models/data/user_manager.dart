@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:befriend/models/data/data_manager.dart';
-import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/models/objects/home.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/error_handling.dart';
@@ -12,7 +11,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../utilities/app_localizations.dart';
 import '../objects/bubble.dart';
-import 'data_query.dart';
+import '../objects/friendship.dart';
 
 class UserManager {
   static Bubble? _instance;
@@ -45,29 +44,32 @@ class UserManager {
       try {
         DocumentSnapshot docs = await Models.dataManager.getData();
 
-        List<dynamic> friendIDs =
-            DataManager.getList(docs, Constants.friendsDoc);
         String avatarUrl = DataManager.getString(docs, Constants.avatarDoc);
-        List<Friendship> friendList =
-            await DataQuery.friendList(docs.id, friendIDs);
 
         ImageProvider avatar =
             await Models.dataQuery.getNetworkImage(avatarUrl);
-        _instance = Bubble.fromDocsWithFriends(docs, avatar, friendList);
-        _instance?.postNotificationOn =
-            DataManager.getBoolean(docs, Constants.postNotificationOnDoc);
-        _instance?.likeNotificationOn =
-            DataManager.getBoolean(docs, Constants.likeNotificationOnDoc);
+        _instance = Bubble.fromDocs(
+          docs,
+          avatar,
+        );
 
-        debugPrint("(UserManager): User data = $_instance");
+        debugPrint("(UserManager) User data = $_instance");
       } catch (e) {
         debugPrint(
-            '(UserManager): Error initializing user data: ${e.toString()}');
+            '(UserManager) Error initializing user data: ${e.toString()}');
         rethrow;
       }
     }
 
     return _instance!;
+  }
+
+  static void addFriend(Friendship friendship) {
+    _instance?.friendships.add(friendship);
+  }
+
+  static void setFriendsLoaded() {
+    _instance?.friendshipsLoaded = true;
   }
 
   static Future<void> reloadHome(BuildContext context) async {

@@ -23,10 +23,10 @@ class Bubble {
 
   List<Friendship> friendships = [];
   List<dynamic> friendIDs;
-  bool friendshipsLoaded;
+  bool friendshipsLoaded = false;
 
-  late bool postNotificationOn;
-  late bool likeNotificationOn;
+  bool postNotificationOn;
+  bool likeNotificationOn;
   //-----------------------
   double size;
   double x = 0;
@@ -42,26 +42,16 @@ class Bubble {
     required this.avatarUrl,
     required this.lastSeenUsersMap,
     required this.friendIDs,
-    required this.friendshipsLoaded,
     required this.blockedUsers,
+    required this.postNotificationOn,
+    required this.likeNotificationOn,
     required this.languageCode,
   });
 
-  factory Bubble.fromDocsWithFriends(
-      DocumentSnapshot docs, ImageProvider avatar, List<Friendship> friends) {
-    Bubble bubble = Bubble._fromDocs(docs, avatar, true);
-    bubble.friendships = friends;
-
-    return bubble;
-  }
-
-  factory Bubble.fromDocsWithoutFriends(
-      DocumentSnapshot docs, ImageProvider avatar) {
-    return Bubble._fromDocs(docs, avatar, false);
-  }
-
-  factory Bubble._fromDocs(
-      DocumentSnapshot docs, ImageProvider avatar, bool friendshipsLoaded) {
+  factory Bubble.fromDocs(
+    DocumentSnapshot docs,
+    ImageProvider avatar,
+  ) {
     int pwr = DataManager.getNumber(docs, Constants.powerDoc).toInt();
 
     double size = 60 + pwr * 11 / 3;
@@ -76,8 +66,11 @@ class Bubble {
         lastSeenUsersMap:
             DataManager.getDateTimeMap(docs, Constants.lastSeenUsersMapDoc),
         friendIDs: DataManager.getList(docs, Constants.friendsDoc),
-        friendshipsLoaded: friendshipsLoaded,
         blockedUsers: DataManager.getMap(docs, Constants.blockedUsersDoc),
+        postNotificationOn:
+            DataManager.getBoolean(docs, Constants.postNotificationOnDoc),
+        likeNotificationOn:
+            DataManager.getBoolean(docs, Constants.likeNotificationOnDoc),
         languageCode: DataManager.getString(docs, Constants.languageDoc),
         avatar: avatar);
 
@@ -94,6 +87,16 @@ class Bubble {
 
   bool didBlockYou() {
     return blockedUsers.keys.contains(Models.authenticationManager.id());
+  }
+
+  Iterable<dynamic> nonLoadedFriends() {
+    if (friendships.isEmpty) {
+      return friendIDs;
+    }
+    Iterable<String> friends =
+        friendships.map((friendship) => friendship.friendId());
+
+    return friendIDs.where((id) => friends.contains(id));
   }
 
   bool hasNonLoadedFriends() {

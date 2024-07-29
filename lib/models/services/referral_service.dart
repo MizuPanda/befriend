@@ -86,8 +86,7 @@ class ReferralService {
           // If the token is valid, prompt the user to accept the invitation
           final ImageProvider avatar =
               await Models.dataManager.getAvatar(snapshot);
-          final Bubble referrer =
-              Bubble.fromDocsWithoutFriends(snapshot, avatar);
+          final Bubble referrer = Bubble.fromDocs(snapshot, avatar);
 
           if (context.mounted) {
             InvitationDialog.dialog(

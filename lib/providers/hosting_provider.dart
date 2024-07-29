@@ -10,7 +10,6 @@ import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../models/objects/bubble.dart';
@@ -46,13 +45,7 @@ class HostingProvider extends ChangeNotifier {
 
   Future<String> startingHost(BuildContext context) async {
     try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      showTutorial = prefs.getBool(Constants.showHostTutorialKey) ?? true;
-      if (showTutorial) {
-        await prefs.setBool(Constants.showHostTutorialKey, false);
-      }
-
-      Bubble user = await UserManager.getInstance();
+      final Bubble user = await UserManager.getInstance();
       debugPrint('(HostingProvider) $user');
       _host = Host(host: user, joiners: [user], user: user);
 

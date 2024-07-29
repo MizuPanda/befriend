@@ -86,7 +86,7 @@ class QR {
       } else {
         ImageProvider avatar = await Models.dataManager.getAvatar(data);
 
-        Bubble selectedHost = Bubble.fromDocsWithoutFriends(data, avatar);
+        Bubble selectedHost = Bubble.fromDocs(data, avatar);
 
         await Constants.usersCollection.doc(selectedHost.id).update({
           Constants.hostingDoc: FieldValue.arrayUnion([userId])

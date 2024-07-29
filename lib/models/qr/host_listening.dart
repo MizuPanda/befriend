@@ -124,8 +124,7 @@ class HostListening {
                 await Models.dataManager.getData(id: id);
             ImageProvider avatar =
                 await Models.dataManager.getAvatar(newUserSnapshot);
-            Bubble newUser =
-                Bubble.fromDocsWithoutFriends(newUserSnapshot, avatar);
+            Bubble newUser = Bubble.fromDocs(newUserSnapshot, avatar);
             host.joiners.add(newUser);
           } catch (e) {
             debugPrint('(HostListening): Error adding new user: $e');

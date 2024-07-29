@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/utilities/models.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 
 import 'bubble.dart';
 
@@ -43,7 +44,7 @@ class Home {
   }
 
   void initializePositions() {
-    Random rand = Random();
+    final Random rand = Random();
 
     for (Friendship friendship in user.friendships) {
       Bubble friend = friendship.friend;
@@ -64,6 +65,63 @@ class Home {
 
     _avoidOverlapping();
     _setViewerSize();
+  }
+
+  void addFriendToHome(Friendship friendship) {
+    final Random rand = Random();
+    final Bubble friend = friendship.friend;
+    friend.x = rand.nextDouble() * friendship.distance(); // x=6
+    friend.y = sqrt(pow(friendship.distance(), 2) -
+        pow(friend.x, 2)); //100 - 36 = 64, y = 8
+
+    friend.x += (user.size + friend.size / 2) / 2;
+    friend.y += (user.size + friend.size / 2) / 2;
+
+    if (rand.nextBool()) {
+      friend.x *= -1;
+    }
+    if (rand.nextBool()) {
+      friend.y *= -1;
+    }
+
+    _avoidNewFriendOverlapping();
+    _setViewerSizeForNewFriend(friend);
+
+    // Trigger haptic feedback
+    HapticFeedback.mediumImpact();
+  }
+
+  void _avoidNewFriendOverlapping() {
+    bool overlapping = true;
+    final Bubble newFriend = user.friendships.last.friend;
+
+    while (overlapping) {
+      overlapping = false;
+      for (var i = 0; i < user.friendships.length - 1; i++) {
+        final Bubble otherFriend = user.friendships[i].friend;
+        final double dx = newFriend.x - otherFriend.x;
+        final double dy = newFriend.y - otherFriend.y;
+        final double distance = sqrt(dx * dx + dy * dy);
+
+        if (distance < newFriend.size / 2 + otherFriend.size / 2) {
+          overlapping = true;
+          // Adjust position to avoid overlap
+          newFriend.x += (dx / distance) * newFriend.size;
+          newFriend.y += (dy / distance) * newFriend.size;
+        }
+      }
+    }
+  }
+
+  void _setViewerSizeForNewFriend(Bubble newFriend) {
+    double distance =
+        sqrt(newFriend.x * newFriend.x + newFriend.y * newFriend.y);
+    distance += newFriend.size;
+
+    if (distance > _viewerSize / 6) {
+      _viewerSize = distance * 6;
+      debugPrint('(Home): Updated ViewerSize = $_viewerSize');
+    }
   }
 
   void _setViewerSize() {
