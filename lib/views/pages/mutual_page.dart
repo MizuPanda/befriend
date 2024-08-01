@@ -1,11 +1,12 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:befriend/models/objects/bubble.dart';
+import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/providers/mutual_provider.dart';
 import 'package:befriend/views/widgets/users/profile_photo.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/objects/bubble.dart';
 import '../../models/objects/profile.dart';
 import '../../utilities/app_localizations.dart';
 
@@ -29,11 +30,16 @@ class _MutualPageState extends State<MutualPage> {
     super.initState();
 
     _provider.initState(
-        commonFriends: widget.profile.commonFriends,
-        userId: widget.profile.currentUser.id,
-        hasNonLoadedFriends: widget.profile.currentUser.hasNonLoadedFriends(),
-        getLastFriendshipDocument:
-            widget.profile.currentUser.getLastFriendshipDocument());
+      loadedFriends: widget.profile.loadedFriends,
+      mainUser: widget.profile.currentUser,
+      commonIDS: widget.profile.commonIDS,
+    );
+  }
+
+  @override
+  void dispose() {
+    _provider.disposeState();
+    super.dispose();
   }
 
   @override
@@ -74,11 +80,16 @@ class _MutualPageState extends State<MutualPage> {
                         ? ListView.builder(
                             itemCount: provider.length(),
                             itemBuilder: (context, index) {
-                              final user = provider.user(index);
+                              final Friendship friendship = provider.friendshipAt(index);
+                              final Bubble user = friendship.friend;
+
                               return Padding(
                                 padding:
                                     EdgeInsets.only(bottom: 0.008 * height),
                                 child: ListTile(
+                                  onTap: () {
+                                    provider.goToFriendProfile(context, index, friendship, widget.profile.currentUser);
+                                  },
                                   leading: Container(
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
@@ -97,13 +108,20 @@ class _MutualPageState extends State<MutualPage> {
                               );
                             },
                           )
-                        : PagedListView<int, Bubble>(
+                        : PagedListView<int, Friendship>(
                             pagingController: provider.pagingController,
-                            builderDelegate: PagedChildBuilderDelegate<Bubble>(
+                            builderDelegate: PagedChildBuilderDelegate<Friendship>(
+                              noItemsFoundIndicatorBuilder:
+                                  (BuildContext context) {
+                                return const Center();
+                              },
                               itemBuilder: (context, item, index) => Padding(
                                 padding:
                                     EdgeInsets.only(bottom: 0.008 * height),
                                 child: ListTile(
+                                  onTap: () {
+                                    provider.goToFriendProfile(context, index, item, widget.profile.currentUser);
+                                  },
                                   leading: Container(
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
@@ -111,11 +129,11 @@ class _MutualPageState extends State<MutualPage> {
                                             color: Theme.of(context)
                                                 .primaryColor)),
                                     child: ProfilePhoto(
-                                      user: item,
+                                      user: item.friend,
                                     ),
                                   ),
                                   title: AutoSizeText(
-                                    item.username,
+                                    item.friend.username,
                                     maxLines: 1,
                                   ),
                                 ),

@@ -98,17 +98,44 @@ class ProfileProvider extends ChangeNotifier {
   }
 
   bool areUsernamesEmpty() {
-    return profile.commonFriendUsernames.isEmpty;
+    return profile.commonIDS.isEmpty;
+  }
+
+  String _other(int sub, BuildContext context) {
+    return profile.commonIDS.length - sub == 1
+        ? AppLocalizations.of(context)?.translate('pp_common_other') ?? 'other'
+        : AppLocalizations.of(context)?.translate('pp_common_others') ??
+            'others';
   }
 
   String friendsInCommon(BuildContext context) {
-    switch (profile.commonFriendUsernames.length) {
-      case 1:
-        return profile.commonFriendUsernames.first;
-      case 2:
-        return '${profile.commonFriendUsernames.first} ${AppLocalizations.of(context)?.translate('pp_common_and') ?? 'and'} ${profile.commonFriendUsernames.last}';
-      default:
-        return '${profile.commonFriendUsernames.first}, ${profile.commonFriendUsernames[1]} ${AppLocalizations.of(context)?.translate('pp_common_and') ?? 'and'} ${profile.commonFriendUsernames.length - 2} ${AppLocalizations.of(context)?.translate('pp_common_others') ?? 'others'}';
+    final int idsLength = profile.commonIDS.length;
+
+    if (profile.loadedFriends.isEmpty) {
+      return '$idsLength ${idsLength == 1 ? AppLocalizations.of(context)?.translate('pp_user') ?? 'common friend' : AppLocalizations.of(context)?.translate('pp_users') ?? 'common friends'}';
+    }
+
+    final bool hasNonLoadedCommons = profile.loadedFriends.length != idsLength;
+
+    final Iterable<String> commonFriendUsernames =
+        profile.loadedFriends.map((e) => e.friendUsername());
+
+    if (hasNonLoadedCommons) {
+      switch (commonFriendUsernames.length) {
+        case 1:
+          return '${commonFriendUsernames.first} ${AppLocalizations.of(context)?.translate('pp_common_and') ?? 'and'} ${idsLength - 1} ${_other(1, context)}';
+        default:
+          return '${commonFriendUsernames.first}, ${commonFriendUsernames.elementAt(1)} ${AppLocalizations.of(context)?.translate('pp_common_and') ?? 'and'} ${profile.commonIDS.length - 2} ${_other(2, context)}';
+      }
+    } else {
+      switch (commonFriendUsernames.length) {
+        case 1:
+          return commonFriendUsernames.first;
+        case 2:
+          return '${commonFriendUsernames.first} ${AppLocalizations.of(context)?.translate('pp_common_and') ?? 'and'} ${commonFriendUsernames.last}';
+        default:
+          return '${commonFriendUsernames.first}, ${commonFriendUsernames.elementAt(1)} ${AppLocalizations.of(context)?.translate('pp_common_and') ?? 'and'} ${profile.commonIDS.length - 2} ${_other(2, context)}';
+      }
     }
   }
 

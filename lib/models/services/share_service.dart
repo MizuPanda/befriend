@@ -5,6 +5,7 @@ import 'package:befriend/models/objects/picture.dart';
 import 'package:befriend/models/objects/profile.dart';
 import 'package:befriend/models/services/simple_encryption_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
@@ -27,6 +28,12 @@ class ShareService {
         Constants.postShareParameter: Uri.encodeComponent(data),
       },
     );
+
+    try {
+      FirebaseAnalytics.instance.logShare(contentType: 'Referral', itemId: profileId, method: 'Home button');
+    } catch (e) {
+      debugPrint('(ShareService) Error logging share');
+    }
 
     return referralLink;
   }

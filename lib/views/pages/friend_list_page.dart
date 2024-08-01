@@ -26,17 +26,14 @@ class FriendsListPage extends StatefulWidget {
 }
 
 class _FriendsListPageState extends State<FriendsListPage> {
-  final FriendListProvider _provider = FriendListProvider();
+  late final FriendListProvider _provider = FriendListProvider();
 
   @override
   void initState() {
     super.initState();
     if (widget.user.hasFriends()) {
-      _provider.initState(widget.user.friendships,
-          hasNonLoadedFriends: widget.user.hasNonLoadedFriends(),
-          lastFriendshipDocument: widget.user.getLastFriendshipDocument(),
-          id: widget.user.id);
-    } else {}
+      _provider.initState(mainUser: widget.user);
+    }
   }
 
   @override
@@ -108,70 +105,57 @@ class _FriendsListPageState extends State<FriendsListPage> {
                               itemBuilder: (context, friendship, index) {
                                 return Padding(
                                   padding: EdgeInsets.all(width * 0.02),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Consumer<MaterialProvider>(
-                                            builder: (BuildContext context,
-                                                MaterialProvider
-                                                    materialProvider,
-                                                Widget? child) {
-                                              return Container(
-                                                decoration: Decorations
-                                                    .bubbleDecoration(
-                                                        materialProvider
-                                                            .isLightMode(
-                                                                context)),
-                                                child: ProfilePhoto(
-                                                  user: friendship.friend,
-                                                  radius: 0.1 * width,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                          SizedBox(
-                                            width: 0.03 * width,
-                                          ),
-                                          AutoSizeText(
-                                            '@${friendship.friend.username}',
-                                            style: GoogleFonts.openSans(
-                                              fontSize: 20,
+                                  child: InkWell(
+                                    onTap: () {
+                                      provider.goToFriendProfile(
+                                          context, friendship, widget.user);
+                                    },
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Consumer<MaterialProvider>(
+                                              builder: (BuildContext context,
+                                                  MaterialProvider
+                                                      materialProvider,
+                                                  Widget? child) {
+                                                return Container(
+                                                  decoration: Decorations
+                                                      .bubbleDecoration(
+                                                          materialProvider
+                                                              .isLightMode(
+                                                                  context)),
+                                                  child: ProfilePhoto(
+                                                    user: friendship.friend,
+                                                    radius: 0.1 * width,
+                                                  ),
+                                                );
+                                              },
                                             ),
-                                          ),
-                                          const Spacer(),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              SizedBox(
-                                                height: 0.02 * height,
+                                            SizedBox(
+                                              width: 0.03 * width,
+                                            ),
+                                            AutoSizeText(
+                                              '@${friendship.friend.username}',
+                                              style: GoogleFonts.openSans(
+                                                fontSize: 20,
                                               ),
-                                              AutoSizeText(
-                                                '${AppLocalizations.of(context)?.translate('flp_lvl') ?? 'LVL'}${friendship.level}',
-                                                style: GoogleFonts.openSans(),
-                                              ),
-                                              IconButton(
-                                                onPressed: () {
-                                                  provider.goToFriendProfile(
-                                                      context,
-                                                      friendship,
-                                                      widget.user);
-                                                },
-                                                icon: const Icon(
-                                                    Icons.house_rounded),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 0.015 * height,
-                                      ),
-                                      ProgressBar(
-                                        progress: friendship.progress,
-                                      ),
-                                    ],
+                                            ),
+                                            const Spacer(),
+                                            AutoSizeText(
+                                              '${AppLocalizations.of(context)?.translate('flp_lvl') ?? 'LVL'}${friendship.level}',
+                                              style: GoogleFonts.openSans(),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 0.015 * height,
+                                        ),
+                                        ProgressBar(
+                                          progress: friendship.progress,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 );
                               },

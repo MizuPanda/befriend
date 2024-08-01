@@ -1,4 +1,5 @@
 import 'package:befriend/models/qr/host_listening.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 
 import '../models/authentication/authentication.dart';
@@ -35,11 +36,16 @@ class PictureButtonProvider extends ChangeNotifier {
   }
 
   Future<void> onPressed(BuildContext context) async {
-    if (AuthenticationManager.isEmailVerified()) {
-      await HostListening.pictureButton(context, _isJoinMode);
-    } else {
-      // Show a dialog or notification explaining the restriction
-      EmailVerifiedDialog.dialog(context, _isJoinMode);
+    try {
+      if (AuthenticationManager.isEmailVerified()) {
+        await HostListening.pictureButton(context, _isJoinMode);
+      } else {
+        // Show a dialog or notification explaining the restriction
+        EmailVerifiedDialog.dialog(context, _isJoinMode);
+      }
+      FirebaseAnalytics.instance.logEvent(name: 'Picture button press');
+    } catch (e) {
+      debugPrint('(PictureButtonProvider) Error after pressing: $e');
     }
   }
 }

@@ -6,6 +6,7 @@ import 'package:befriend/views/widgets/settings/archive_settings_widget.dart';
 import 'package:befriend/views/widgets/settings/blocked_settings_widget.dart';
 import 'package:befriend/views/widgets/settings/notifications_settings_widget.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -92,6 +93,8 @@ class SettingsProvider extends ChangeNotifier {
       if (context.mounted) {
         GoRouter.of(context).push(Constants.homepageAddress, extra: home);
       }
+
+      FirebaseAnalytics.instance.logTutorialBegin();
     } catch (e) {
       debugPrint('(SettingsProvider) Error opening tutorial: $e');
       if (context.mounted) {

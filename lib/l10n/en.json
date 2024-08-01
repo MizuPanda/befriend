@@ -81,9 +81,12 @@
   "pp_action_error": "Error performing action. Please try again.",
   "pp_common_and": "and",
   "pp_common_others": "others",
+  "pp_common_other": "other",
   "pp_cpf_error": "Error changing profile picture. Please try again.",
   "pp_load_cancel": "Picture change cancelled.",
   "pp_load_error": "Error loading picture change. Please try again.",
+  "pp_users": "common friends",
+  "pp_user": "common friend",
 
   "_comment10": "Session Provider",
   "sp_publish_error": "Error publishing picture. Please try again.",

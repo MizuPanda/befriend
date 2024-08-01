@@ -1,18 +1,19 @@
 import 'package:befriend/models/data/user_manager.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../models/data/data_query.dart';
+import '../models/objects/bubble.dart';
 import '../models/objects/friendship.dart';
 import '../models/objects/home.dart';
 import '../models/services/notification_service.dart';
 import '../utilities/constants.dart';
 
 class HomeProvider extends ChangeNotifier {
-  final TransformationController _transformationController =
-      TransformationController();
   late final AnimationController _animationController;
   Animation<Matrix4>? _animationCenter;
 
@@ -37,6 +38,9 @@ class HomeProvider extends ChangeNotifier {
 
   double get viewerSize => home.viewerSize;
 
+  TransformationController? get transformationController =>
+      home.transformationController;
+
   void initShowcase(BuildContext context) {
     if (home.connectedHome) {
       WidgetsBinding.instance.addPostFrameCallback(
@@ -52,28 +56,44 @@ class HomeProvider extends ChangeNotifier {
   Future<void> loadFriendsAsync() async {
     try {
       if (!home.user.friendshipsLoaded) {
-        final List<dynamic> friendsIDS = home.user.nonLoadedFriends().toList();
-        friendsIDS.shuffle();
-        final Iterable<dynamic> randomFriendIDS = friendsIDS.getRange(
-            0,
-            friendsIDS.length > Constants.friendsLimit
-                ? Constants.friendsLimit
-                : friendsIDS.length);
+        final List<dynamic> randomFriendsIDS = home.user.nonLoadedFriends().take(Constants.friendsLimit).toList();
 
-        for (String friendID in randomFriendIDS) {
+        randomFriendsIDS.shuffle();
+
+        final List<dynamic> nonLoadedMainFriendIDS = [];
+        if (!home.user.main()) {
+          final Bubble mainUser = await UserManager.getInstance();
+          nonLoadedMainFriendIDS.addAll(mainUser.nonLoadedFriends());
+          debugPrint(
+              '(HomeProvider) non loaded friends: $nonLoadedMainFriendIDS');
+        }
+
+        for (String friendID in randomFriendsIDS) {
           Friendship friend =
               await DataQuery.getFriendship(home.user.id, friendID);
           debugPrint(
               '(HomeProvider) Adding ${friend.friendUsername()} to home');
 
-          UserManager.addFriend(friend);
-          home.addFriendToHome(
-              friend); // Method to dynamically add friend to the UI
-          _transformationController.value = home.middlePos();
+          home.user.friendships.add(friend);
+          home.addFriendToHome(friend);
+
+          // Trigger haptic feedback
+          HapticFeedback.mediumImpact();
+          home.setPosToMid();
+
+          // If this is a friend of the connected user that was not loaded yet.
+          if (nonLoadedMainFriendIDS.contains(friendID) && !home.user.main()) {
+            final Friendship friendship =
+                await DataQuery.getFriendshipFromBubble(friend.friend);
+
+            UserManager.addFriendToMain(friendship);
+            debugPrint(
+                '(HomeProvider) Adding friend ${friendship.friendUsername()} to main user');
+          }
           notifyListeners();
         }
 
-        UserManager.setFriendsLoaded();
+        home.user.friendshipsLoaded = true;
       }
     } catch (e) {
       debugPrint('(HomeProvider) Error loading friends asynchronously: $e');
@@ -81,7 +101,8 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void _onAnimateReset() {
-    _transformationController.value = _animationCenter!.value;
+    home.transformationController?.value = _animationCenter!.value;
+
     if (!_animationController.isAnimating) {
       _animationCenter!.removeListener(_onAnimateReset);
       _animationCenter = null;
@@ -105,12 +126,10 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
-  TransformationController get transformationController =>
-      _transformationController;
-
   Animation<Matrix4>? get animation => _animationCenter;
 
   void notify() {
+    debugPrint('(HomeProvider) Notifying home page');
     notifyListeners();
   }
 
@@ -120,6 +139,8 @@ class HomeProvider extends ChangeNotifier {
 
   factory HomeProvider.init(TickerProvider vsync, {required Home home}) {
     HomeProvider homeProvider = HomeProvider._(home: home);
+
+    home.transformationController = TransformationController();
 
     // Initializing controller
     homeProvider._animationController = AnimationController(
@@ -131,7 +152,7 @@ class HomeProvider extends ChangeNotifier {
       home.initializePositions();
     }
 
-    homeProvider._transformationController.value = home.middlePos();
+    home.setPosToMid();
 
     return homeProvider;
   }
@@ -141,6 +162,13 @@ class HomeProvider extends ChangeNotifier {
   ) async {
     NotificationService.initNotifications(scaffoldKey, notify);
     MobileAds.instance.initialize();
+  }
+
+  Future<void> logAnalytics() async {
+    await FirebaseAnalytics.instance.logScreenView(
+      screenClass: 'Home',
+      screenName: 'Home Page',
+    );
   }
 
   Future<void> initLanguage(BuildContext context) async {
@@ -163,15 +191,22 @@ class HomeProvider extends ChangeNotifier {
     });
   }
 
+  void initNotify() {
+    if (home.user.main()) {
+      UserManager.setNotify(notify);
+    }
+  }
+
   void doDispose() {
-    _transformationController.dispose();
+    home.transformationController?.dispose();
+    home.transformationController = null;
     _animationController.dispose();
   }
 
   void centerToMiddle() {
     _animationController.reset();
     _animationCenter = Matrix4Tween(
-      begin: _transformationController.value,
+      begin: home.transformationController?.value,
       end: home.middlePos(),
     ).animate(
         CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
@@ -188,7 +223,7 @@ class HomeProvider extends ChangeNotifier {
 
     _animationController.reset();
     _animationCenter = Matrix4Tween(
-      begin: _transformationController.value,
+      begin: home.transformationController?.value,
       end: friendPos,
     ).animate(
         CurvedAnimation(parent: _animationController, curve: Curves.easeOut));

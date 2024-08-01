@@ -9,8 +9,8 @@ class Profile {
   Function notifyParent;
   int initialIndex;
 
-  final List<String> commonFriendUsernames = [];
-  final List<Bubble> commonFriends = [];
+  final List<Friendship> loadedFriends = [];
+  final List<dynamic> commonIDS = [];
 
   Profile({
     required this.user,
@@ -23,28 +23,16 @@ class Profile {
   }
 
   void initializeCommonFriends() {
-    commonFriends.clear();
-    commonFriendUsernames.clear();
+    loadedFriends.clear();
+    commonIDS.clear();
 
     if (!user.main()) {
-      final List<Friendship> friendshipsInCommon = [];
+      commonIDS.addAll(user.friendIDs.where((id) => currentUser.friendIDs.contains(id)));
 
-      for (String commonFriendId in user.friendIDs) {
-        for (Friendship friendship in currentUser.friendships) {
-          if (friendship.friendId() == commonFriendId) {
-            friendshipsInCommon.add(friendship);
-            commonFriends.add(friendship.friend);
-            break;
-          }
-        }
-      }
+      final List<Friendship> loadedFriendships = currentUser.friendships.where((user) => commonIDS.contains(user.friendId())).toList(growable: false);
+      loadedFriendships.sort((a, b) => a.strength().compareTo(b.strength()));
 
-      // Sort friends in common based on the power of the friendships
-      friendshipsInCommon
-          .sort((f1, f2) => f1.strength().compareTo(f2.strength()));
-
-      commonFriendUsernames
-          .addAll(friendshipsInCommon.map((e) => e.friendUsername()));
+      loadedFriends.addAll(loadedFriendships);
     }
   }
 }

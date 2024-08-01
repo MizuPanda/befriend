@@ -41,7 +41,9 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _provider = HomeProvider.init(this, home: widget.home);
+    _provider.initNotify();
     _provider.initServices(_scaffoldKey);
+    _provider.logAnalytics();
 
     if (_provider.home.showTutorial) {
       _provider.initShowcase(context);

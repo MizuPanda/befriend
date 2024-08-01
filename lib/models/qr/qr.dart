@@ -1,5 +1,6 @@
 import 'package:befriend/utilities/error_handling.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -106,6 +107,7 @@ class QR {
                   child: HostingWidget(isHost: false, host: selectedHost));
             },
           );
+          FirebaseAnalytics.instance.logJoinGroup(groupId: selectedHost.id);
         }
       }
     } catch (e) {

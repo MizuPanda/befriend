@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:befriend/models/objects/friendship.dart';
+import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/models.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 
 import 'bubble.dart';
 
@@ -13,12 +13,15 @@ class Home {
   final bool connectedHome;
   final Key? key;
   bool _showTutorial = false;
+  TransformationController? transformationController;
 
   bool get showTutorial => _showTutorial;
 
   double _viewerSize = 1500;
 
   double get viewerSize => _viewerSize;
+
+  static const double _minimumDistanceFactor = 13/20;
 
   Home(
       {required this.connectedHome,
@@ -43,24 +46,13 @@ class Home {
         connectedHome: false, user: friendship.friend, friendship: friendship);
   }
 
+  void setPosToMid() {
+    transformationController?.value = middlePos();
+  }
+
   void initializePositions() {
-    final Random rand = Random();
-
     for (Friendship friendship in user.friendships) {
-      Bubble friend = friendship.friend;
-      friend.x = rand.nextDouble() * friendship.distance(); // x=6
-      friend.y = sqrt(pow(friendship.distance(), 2) -
-          pow(friend.x, 2)); //100 - 36 = 64, y = 8
-
-      friend.x += (user.size + friend.size / 2) / 2;
-      friend.y += (user.size + friend.size / 2) / 2;
-
-      if (rand.nextBool()) {
-        friend.x *= -1;
-      }
-      if (rand.nextBool()) {
-        friend.y *= -1;
-      }
+      _setBubbleCoordinates(friendship);
     }
 
     _avoidOverlapping();
@@ -68,8 +60,15 @@ class Home {
   }
 
   void addFriendToHome(Friendship friendship) {
+    _setBubbleCoordinates(friendship);
+    _avoidNewFriendOverlapping();
+    _setViewerSizeForNewFriend(friendship.friend);
+  }
+
+  void _setBubbleCoordinates(Friendship friendship) {
     final Random rand = Random();
     final Bubble friend = friendship.friend;
+
     friend.x = rand.nextDouble() * friendship.distance(); // x=6
     friend.y = sqrt(pow(friendship.distance(), 2) -
         pow(friend.x, 2)); //100 - 36 = 64, y = 8
@@ -83,35 +82,8 @@ class Home {
     if (rand.nextBool()) {
       friend.y *= -1;
     }
-
-    _avoidNewFriendOverlapping();
-    _setViewerSizeForNewFriend(friend);
-
-    // Trigger haptic feedback
-    HapticFeedback.mediumImpact();
   }
 
-  void _avoidNewFriendOverlapping() {
-    bool overlapping = true;
-    final Bubble newFriend = user.friendships.last.friend;
-
-    while (overlapping) {
-      overlapping = false;
-      for (var i = 0; i < user.friendships.length - 1; i++) {
-        final Bubble otherFriend = user.friendships[i].friend;
-        final double dx = newFriend.x - otherFriend.x;
-        final double dy = newFriend.y - otherFriend.y;
-        final double distance = sqrt(dx * dx + dy * dy);
-
-        if (distance < newFriend.size / 2 + otherFriend.size / 2) {
-          overlapping = true;
-          // Adjust position to avoid overlap
-          newFriend.x += (dx / distance) * newFriend.size;
-          newFriend.y += (dy / distance) * newFriend.size;
-        }
-      }
-    }
-  }
 
   void _setViewerSizeForNewFriend(Bubble newFriend) {
     double distance =
@@ -126,55 +98,113 @@ class Home {
 
   void _setViewerSize() {
     double max = 0;
+    _viewerSize = 1500;
 
     for (Friendship friendship in user.friendships) {
       Bubble friend = friendship.friend;
-      double distance = sqrt(pow(friend.x, 2) + pow(friend.y, 2));
-
+      double distance = friendship.distance();
       distance += friend.size;
+
       if (distance > max) {
         max = distance;
       }
     }
 
-    max *= 6;
-    debugPrint('(Home): Max = $max');
+    max *= 10;
+    debugPrint('(Home) Max = $max');
     if (_viewerSize < max) {
       _viewerSize = max;
     }
-    debugPrint('(Home): ViewerSize = $viewerSize');
+    debugPrint('(Home) ViewerSize = $viewerSize');
   }
 
   void _avoidOverlapping() {
     bool overlapping = true;
+    int iterations = 0;
+    final int overload = 4*(user.friendIDs.length - Constants.friendsLimit);
+    final int maxIterations = 20 + overload > 0? overload : 0;
 
     user.friendships.sort((a, b) => a.distance().compareTo(b.distance()));
-    while (overlapping) {
+    while (overlapping && iterations < 20) {
       overlapping = false;
-      for (var i = 0; i < user.friendships.length; i++) {
+      iterations++;
+
+      for (int i = 0; i < user.friendships.length; i++) {
         final bubble = user.friendships[i].friend;
 
-        for (var j = i + 1; j < user.friendships.length; j++) {
+        for (int j = i + 1; j < user.friendships.length; j++) {
           final otherBubble = user.friendships[j].friend;
-          final dx = otherBubble.x - bubble.x;
-          final dy = otherBubble.y - bubble.y;
-          final distance = otherBubble.point().distanceTo(bubble.point());
-          final force = bubble.size * otherBubble.size / (distance * distance);
 
-          if (distance < bubble.size + otherBubble.size) {
+          final double dx = bubble.x - otherBubble.x;
+          final double dy = bubble.y - otherBubble.y;
+          final double distance = sqrt(dx * dx + dy * dy);
+          final double minDistance = (bubble.size  + otherBubble.size)*_minimumDistanceFactor;
+
+
+          if (_isOverlapping(distance, minDistance, bubble)) {
             overlapping = true;
 
-            otherBubble.x += (dx / distance) * force;
-            otherBubble.y += (dy / distance) * force;
+            // Adjust position to avoid overlap
+            bubble.x += (dx / distance) * bubble.size;
+            bubble.y += (dy / distance) * bubble.size;
           }
         }
       }
     }
+
+    if (iterations >= maxIterations) {
+      debugPrint('(Home) Maximum number of $iterations surpassed');
+    } else {
+      debugPrint('(Home) Finished in $iterations iterations');
+    }
+  }
+
+  void _avoidNewFriendOverlapping() {
+    bool overlapping = true;
+    final Bubble newFriend = user.friendships.last.friend;
+    int iterations = 0;
+    final int overload = 2*(user.friendIDs.length - Constants.friendsLimit);
+    final int maxIterations = 20 + overload > 0? overload : 0;
+
+    while (overlapping && iterations < maxIterations) {
+      overlapping = false;
+      iterations++;
+      for (int i = 0; i < user.friendships.length - 1; i++) {
+        final Bubble otherFriend = user.friendships[i].friend;
+        final double dx = newFriend.x - otherFriend.x;
+        final double dy = newFriend.y - otherFriend.y;
+        final double distance = sqrt(dx * dx + dy * dy);
+        final double minDistance = (newFriend.size  + otherFriend.size)*_minimumDistanceFactor;
+
+        if (_isOverlapping(distance, minDistance, newFriend)) {
+          overlapping = true;
+          // Adjust position to avoid overlap
+          newFriend.x += (dx / distance) * newFriend.size;
+          newFriend.y += (dy / distance) * newFriend.size;
+        }
+      }
+    }
+
+    if (iterations >= maxIterations) {
+      debugPrint('(Home) Error: maximum number of iterations $iterations surpassed');
+    } else {
+      debugPrint('(Home) Finished in $iterations iterations');
+    }
+  }
+
+  bool _isOverlapping(double distance, double minimumDistance, Bubble bubble,) {
+    return distance < minimumDistance || _isOverlappingCenter(bubble);
+  }
+
+  bool _isOverlappingCenter(Bubble bubble,) {
+    final double distance = sqrt(bubble.x * bubble.x + bubble.y * bubble.y);
+    final double minDistance = (bubble.size + user.size)*_minimumDistanceFactor;
+
+    return distance < minDistance;
   }
 
   Matrix4 middlePos() {
     // Calculate the initial transformation to center the content
-
     return Matrix4.identity()..translate(-_viewerSize / 4, -_viewerSize / 4);
   }
 

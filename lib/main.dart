@@ -10,8 +10,8 @@ import 'package:befriend/utilities/themes.dart';
 import 'package:befriend/views/pages/home_page.dart';
 import 'package:befriend/views/pages/login_page.dart';
 import 'package:befriend/views/widgets/shimmers/loading_screen.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -37,7 +37,7 @@ void main() async {
 
   final params = ConsentRequestParameters(
       // consentDebugSettings: Secrets.consentDebugSettings
-      );
+  );
   ConsentInformation.instance.requestConsentInfoUpdate(
     params,
     () async {
@@ -159,8 +159,9 @@ class _SelectPageState extends State<SelectPage> {
     // TODO: implement initState
     super.initState();
     AppLinksService.initDeepLinks(context);
-    if (FirebaseAuth.instance.currentUser != null) {
+    if (AuthenticationManager.isConnected()) {
       _futureHome = UserManager.userHome();
+      FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     }
   }
 

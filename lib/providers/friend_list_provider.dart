@@ -1,4 +1,5 @@
-import 'package:befriend/utilities/models.dart';
+import 'package:befriend/models/data/data_query.dart';
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
@@ -20,7 +21,6 @@ class FriendListProvider extends ChangeNotifier {
   PagingController<int, Friendship> get pagingController => _pagingController;
   TextEditingController get searchController => _searchController;
 
-  DocumentSnapshot? _lastDocument;
   List<Friendship> _allFriends = [];
   String _searchQuery = '';
 
@@ -37,22 +37,19 @@ class FriendListProvider extends ChangeNotifier {
     );
   }
 
-  void initState(List<Friendship> friendships,
-      {required bool hasNonLoadedFriends,
-      required Future<DocumentSnapshot> lastFriendshipDocument,
-      required String id}) {
+  void initState({
+    required Bubble mainUser,
+  }) {
     try {
       // Preload initial friends into the PagingController.
-      _allFriends = friendships;
+      _allFriends = mainUser.friendships;
+      _allFriends.sort((a, b) => b.strength().compareTo(a.strength()));
       if (_allFriends.isNotEmpty) {
         _pagingController.itemList = _allFriends;
       }
 
       _pagingController.addPageRequestListener((pageKey) {
-        _fetchPage(pageKey,
-            hasNonLoadedFriends: hasNonLoadedFriends,
-            lastFriendshipDocument: lastFriendshipDocument,
-            id: id);
+        _fetchPage(pageKey, mainUser: mainUser);
       });
       _searchController.addListener(() {
         _filterFriends(_searchController.text);
@@ -78,64 +75,60 @@ class FriendListProvider extends ChangeNotifier {
     });
   }
 
-  Future<void> _fetchPage(int pageKey,
-      {required bool hasNonLoadedFriends,
-      required Future<DocumentSnapshot> lastFriendshipDocument,
-      required String id}) async {
+  Future<void> _fetchPage(int pageKey, {required Bubble mainUser}) async {
     try {
       List<Friendship> friendships = [];
 
-      if (hasNonLoadedFriends) {
-        debugPrint('(FriendListProvider) Has non-loaded friendships');
+      if (mainUser.hasNonLoadedFriends()) {
+        Iterable<dynamic> nonLoadedFriends = mainUser.nonLoadedFriends();
 
-        if (pageKey == 0 || _lastDocument == null) {
-          _lastDocument ??= await lastFriendshipDocument;
-        }
+        debugPrint('(FriendListProvider) Has non-loaded friendships: $nonLoadedFriends');
 
-        QuerySnapshot querySnapshot = await Constants.friendshipsCollection
+        nonLoadedFriends = nonLoadedFriends.take(30);
+
+        final String id = mainUser.id;
+
+        final QuerySnapshot querySnapshot = await Constants.friendshipsCollection
             .where(Filter.or(
-              Filter(
-                Constants.user1Doc,
-                isEqualTo: id,
-              ),
-              Filter(
-                Constants.user2Doc,
-                isEqualTo: id,
-              ),
+              Filter.and(
+                  Filter(Constants.user1Doc, isEqualTo: id),
+                  Filter(
+                    Constants.user2Doc,
+                    whereIn: nonLoadedFriends,
+                  )),
+              Filter.and(
+                  Filter(Constants.user2Doc, isEqualTo: id),
+                  Filter(
+                    Constants.user1Doc,
+                    whereIn: nonLoadedFriends,
+                  )),
             ))
             .orderBy(Constants.levelDoc, descending: true)
-            .startAfterDocument(_lastDocument!)
             .limit(_pageSize)
             .get();
 
         if (querySnapshot.docs.isNotEmpty) {
-          _lastDocument = querySnapshot.docs.last;
-        }
+          for (QueryDocumentSnapshot snapshot in querySnapshot.docs) {
+            String user1 = DataManager.getString(snapshot, Constants.user1Doc);
+            String user2 = DataManager.getString(snapshot, Constants.user2Doc);
+            String friendId;
 
-        for (QueryDocumentSnapshot snapshot in querySnapshot.docs) {
-          String user1 = DataManager.getString(snapshot, Constants.user1Doc);
-          String user2 = DataManager.getString(snapshot, Constants.user2Doc);
-          String friendId;
-          Bubble friend;
+            if (user1 == id) {
+              friendId = user2;
+            } else {
+              friendId = user1;
+            }
 
-          if (user1 == id) {
-            friendId = user2;
-          } else {
-            friendId = user1;
+            final Friendship friendship = await DataQuery.getFriendship(id, friendId);
+
+            debugPrint('(FriendListProvider) Adding friend ${friendship.friendUsername()}');
+
+            friendships.add(friendship);
+            UserManager.addFriendToMain(friendship);
+            UserManager.notify();
           }
-
-          DocumentSnapshot bubbleSnapshot =
-              await Models.dataManager.getData(id: friendId);
-          ImageProvider bubbleImage =
-              await Models.dataManager.getAvatar(bubbleSnapshot);
-
-          friend = Bubble.fromDocs(bubbleSnapshot, bubbleImage);
-
-          Friendship friendship = Friendship.fromDocs(id, friend, snapshot);
-          friendships.add(friendship);
         }
-
-        _allFriends.addAll(friendships);
+        // _allFriends.addAll(friendships);
       }
 
       final List<Friendship> newItems = friendships;

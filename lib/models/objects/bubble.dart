@@ -32,6 +32,8 @@ class Bubble {
   double x = 0;
   double y = 0;
 
+  Function notify = () {};
+
   Bubble._({
     required this.id,
     required this.username,
@@ -96,17 +98,11 @@ class Bubble {
     Iterable<String> friends =
         friendships.map((friendship) => friendship.friendId());
 
-    return friendIDs.where((id) => friends.contains(id));
+    return friendIDs.where((id) => !friends.contains(id));
   }
 
   bool hasNonLoadedFriends() {
     return friendIDs.length > friendships.length;
-  }
-
-  Future<DocumentSnapshot> getLastFriendshipDocument() async {
-    return await Constants.friendshipsCollection
-        .doc(friendships.last.friendshipID)
-        .get();
   }
 
   @override

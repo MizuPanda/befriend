@@ -38,6 +38,16 @@ class Friendship extends FriendshipProgress {
     );
   }
 
+  @override
+  String friendUsername() {
+    return friend.username;
+  }
+
+  @override
+  String friendId() {
+    return friend.id;
+  }
+
   double distance() {
     if (level + progress == 0) {
       return 150;

@@ -26,6 +26,22 @@ class DataQuery {
     }
   }
 
+  static Future<Friendship> getFriendshipFromBubble(Bubble friend) async {
+    try {
+      List<String> ids = [Models.authenticationManager.id(), friend.id];
+      ids.sort();
+      String friendshipID = ids.first + ids.last;
+
+      DocumentSnapshot friendshipSnap =
+      await Constants.friendshipsCollection.doc(friendshipID).get();
+
+      return Friendship.fromDocs(Models.authenticationManager.id(), friend, friendshipSnap);
+    } catch (e) {
+      debugPrint('(DataQuery) Error fetching friendship data: $e');
+      throw Exception('(DataQuery) Failed to fetch friendship data.');
+    }
+  }
+
   static Future<Friendship> getFriendship(
       String currentUserID, String otherUserID) async {
     try {
@@ -42,8 +58,8 @@ class DataQuery {
       Bubble friendBubble = Bubble.fromDocs(bubbleSnap, avatar);
       return Friendship.fromDocs(currentUserID, friendBubble, friendshipSnap);
     } catch (e) {
-      debugPrint('(DataQuery): Error fetching friendship data: $e');
-      throw Exception('(DataQuery): Failed to fetch friendship data.');
+      debugPrint('(DataQuery) Error fetching friendship data: $e');
+      throw Exception('(DataQuery) Failed to fetch friendship data.');
     }
   }
 

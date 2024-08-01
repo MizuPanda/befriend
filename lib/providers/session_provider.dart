@@ -10,6 +10,7 @@ import 'package:befriend/utilities/error_handling.dart';
 import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/dialogs/session/fullscreen_image_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -197,6 +198,7 @@ class SessionProvider extends ChangeNotifier {
           debugPrint('(SessionProvider) Ad showed successfully.');
           _navigateHome(context);
           ad.dispose();
+          FirebaseAnalytics.instance.logEvent(name: 'Picture taken with ad');
         },
         onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
           debugPrint('(SessionProvider) Ad failed to show.');

@@ -3,6 +3,7 @@ import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/error_handling.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -75,6 +76,7 @@ class AuthenticationManager {
         }
         debugPrint(
             "(AuthenticationManager) Successfully created user: ${user.uid}");
+        FirebaseAnalytics.instance.logSignUp(signUpMethod: 'Email and password');
       }
     } on FirebaseAuthException catch (error) {
       debugPrint('(AuthenticationManager) An error occurred: ${error.code}');
@@ -148,6 +150,8 @@ class AuthenticationManager {
         if (context.mounted) {
           GoRouter.of(context).go(Constants.homepageAddress, extra: home);
         }
+
+        FirebaseAnalytics.instance.logLogin(loginMethod: 'Email and password');
       }
     } on FirebaseAuthException catch (e) {
       debugPrint('(AuthenticationManager): ${e.code}');

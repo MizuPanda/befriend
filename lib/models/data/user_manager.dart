@@ -15,10 +15,21 @@ import '../objects/friendship.dart';
 
 class UserManager {
   static Bubble? _instance;
+  static Home? _home;
 
   static Future<Home> userHome({Key? key}) async {
-    Bubble homeUser = await getInstance();
-    return Home.fromUser(homeUser, key: key);
+    try {
+      if (_home == null) {
+        Bubble homeUser = await getInstance();
+        _home = Home.fromUser(homeUser, key: key);
+      }
+
+      return _home!;
+    } catch (e) {
+      debugPrint('(UserManager) Error fetching user home: $e');
+
+      rethrow;
+    }
   }
 
   static final Set<String> _usersDetected = {};
@@ -64,12 +75,31 @@ class UserManager {
     return _instance!;
   }
 
-  static void addFriend(Friendship friendship) {
+  static void addFriendToMain(Friendship friendship) {
+    debugPrint('(UserManager) Added ${friendship.friendUsername()} to main user');
+    _addFriend(friendship);
+    _addFriendToHome(friendship);
+    _setPosToMid();
+  }
+
+  static void notify() {
+    _instance?.notify();
+  }
+
+  static void setNotify(Function function) {
+    _instance?.notify = function;
+  }
+
+  static void _addFriend(Friendship friendship) {
     _instance?.friendships.add(friendship);
   }
 
-  static void setFriendsLoaded() {
-    _instance?.friendshipsLoaded = true;
+  static void _addFriendToHome(Friendship friendship) {
+    _home?.addFriendToHome(friendship);
+  }
+
+  static void _setPosToMid() {
+    _home?.setPosToMid();
   }
 
   static Future<void> reloadHome(BuildContext context) async {
@@ -99,6 +129,7 @@ class UserManager {
   /// changed.
   static void refreshPlayer() {
     _instance = null;
+    _home = null;
   }
 
   Future<ImageProvider> refreshAvatar(File file) async {
