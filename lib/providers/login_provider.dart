@@ -106,6 +106,12 @@ class LoginProvider extends ChangeNotifier {
 
   Future<void> login(BuildContext context) async {
     _isLoading = true;
+    if (_emailFocusNode.hasFocus) {
+      _emailFocusNode.unfocus();
+    }
+    if (_passwordFocusNode.hasFocus) {
+      _passwordFocusNode.unfocus();
+    }
     notifyListeners();
     _formKey.currentState!.save();
 

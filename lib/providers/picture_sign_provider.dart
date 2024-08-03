@@ -5,11 +5,11 @@ import 'package:befriend/utilities/error_handling.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../models/data/picture_query.dart';
 import '../models/data/user_manager.dart';
 import '../models/objects/home.dart';
 import '../utilities/app_localizations.dart';
 import '../utilities/constants.dart';
-import '../utilities/models.dart';
 
 class PictureSignProvider extends ChangeNotifier {
   bool _isSkipLoading = false;
@@ -53,7 +53,7 @@ class PictureSignProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await Models.pictureQuery.uploadAvatar(File(_imagePath!));
+      await PictureQuery.uploadAvatar(File(_imagePath!));
       if (context.mounted) {
         await _skip(context);
       }

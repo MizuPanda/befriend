@@ -7,7 +7,6 @@ import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/friendship_progress.dart';
 import 'package:befriend/models/services/post_service.dart';
 import 'package:befriend/utilities/error_handling.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/dialogs/session/fullscreen_image_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -326,7 +325,7 @@ class SessionProvider extends ChangeNotifier {
   Future<String> getFriendshipsMap(BuildContext context) async {
     if (host.friendshipsMap.isEmpty) {
       DocumentSnapshot documentSnapshot =
-          await Models.dataManager.getData(id: host.host.id);
+          await DataManager.getData(id: host.host.id);
 
       Map<String, dynamic> friendshipsMap = documentSnapshot
               .data()

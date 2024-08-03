@@ -1,6 +1,5 @@
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/picture.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/widgets/profile/custom_native_ad.dart';
 import 'package:befriend/views/widgets/profile/picture_card.dart';
 import 'package:befriend/providers/profile_pictures_provider.dart';
@@ -73,7 +72,7 @@ class _ProfilePicturesState extends State<ProfilePictures> {
                       userID: widget.userID,
                       connectedUsername: mainBubble.data!.username,
                       isConnectedUserProfile:
-                          widget.userID == Models.authenticationManager.id(),
+                          provider.isConnectedUserProfile(widget.userID),
                       onArchiveSuccess: provider.handleArchiveSuccess,
                     );
                   }, noItemsFoundIndicatorBuilder: (BuildContext context) {

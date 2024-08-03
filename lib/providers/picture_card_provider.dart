@@ -1,6 +1,5 @@
 import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/services/share_service.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/dialogs/profile/delete_picture_dialog.dart';
 import 'package:befriend/views/dialogs/profile/likes_dialog.dart';
 import 'package:befriend/views/dialogs/profile/username_dialog.dart';
@@ -155,7 +154,7 @@ class PictureCardProvider extends ChangeNotifier {
       };
     } else {
       debugPrint('(PictureCardProvider) Is liked yet = $_isNotLikedYet');
-      String connectedUserID = Models.authenticationManager.id();
+      String connectedUserID = AuthenticationManager.id();
 
       if (_isNotLikedYet) {
         data = {

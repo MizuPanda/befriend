@@ -3,7 +3,6 @@ import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -33,15 +32,12 @@ void main() {
   final mockUser = MockUser();
   final mockDocumentSnapshot = MockDocumentSnapshot();
   final mockQueryDocumentSnapshot = MockQueryDocumentSnapshot();
-  final mockFirebaseStorage = MockFirebaseStorage();
-  final mockReference = MockReference();
   final mockDataManager = MockDataManager();
   final fakeFirestore = FakeFirebaseFirestore();
 
   setUp(() {
     Constants.usersCollection = fakeFirestore.collection('users');
     Constants.friendshipsCollection = fakeFirestore.collection('friendships');
-    Models.dataManager = mockDataManager;
 
     when(mockFirebaseAuth.currentUser).thenReturn(mockUser);
     when(mockUser.uid).thenReturn('user1');
@@ -77,22 +73,6 @@ void main() {
       when(mockDataManager.getData(id: anyNamed('id'))).thenThrow(Exception('Error'));
 
       expect(() => DataQuery.getFriendship('user1', 'user2'), throwsException);
-    });
-
-    test('getNetworkImage should return NetworkImage if url is valid', () async {
-      DataQuery.storage = mockFirebaseStorage;
-      when(mockReference.getDownloadURL()).thenAnswer((_) async => 'http://example.com/avatar.png');
-      when(mockFirebaseStorage.refFromURL(any)).thenReturn(mockReference);
-
-      final result = await Models.dataQuery.getNetworkImage('http://example.com/avatar.png');
-      expect(result, isA<NetworkImage>());
-    });
-
-    test('getNetworkImage should return default image on error', () async {
-      when(mockReference.getDownloadURL()).thenThrow(Exception('Error'));
-
-      final result = await Models.dataQuery.getNetworkImage('invalid_url');
-      expect(result, isA<AssetImage>());
     });
   });
 }

@@ -6,12 +6,12 @@ import 'package:befriend/models/objects/host.dart';
 import 'package:befriend/models/qr/host_listening.dart';
 import 'package:befriend/models/qr/qr.dart';
 import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:showcaseview/showcaseview.dart';
 
+import '../models/authentication/authentication.dart';
 import '../models/objects/bubble.dart';
 
 class HostingProvider extends ChangeNotifier {
@@ -58,9 +58,7 @@ class HostingProvider extends ChangeNotifier {
         }
       }
 
-      await Constants.usersCollection
-          .doc(Models.authenticationManager.id())
-          .update({
+      await Constants.usersCollection.doc(AuthenticationManager.id()).update({
         Constants.hostingDoc: List.empty(),
         Constants.lastSeenUsersMapDoc: newLastSeenMap
       });

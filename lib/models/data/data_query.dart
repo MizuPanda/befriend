@@ -1,11 +1,13 @@
 import 'package:befriend/models/objects/bubble.dart';
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../authentication/authentication.dart';
+import 'data_manager.dart';
 
 class DataQuery {
   static FirebaseStorage _storage = FirebaseStorage.instance;
@@ -18,7 +20,7 @@ class DataQuery {
       {String? userId}) async {
     try {
       await Constants.usersCollection
-          .doc(userId ?? Models.authenticationManager.id())
+          .doc(userId ?? AuthenticationManager.id())
           .update(<String, dynamic>{fieldID: data});
     } catch (e) {
       debugPrint('(DataQuery) Failed to update document: $e');
@@ -28,14 +30,15 @@ class DataQuery {
 
   static Future<Friendship> getFriendshipFromBubble(Bubble friend) async {
     try {
-      List<String> ids = [Models.authenticationManager.id(), friend.id];
+      final List<String> ids = [AuthenticationManager.id(), friend.id];
       ids.sort();
-      String friendshipID = ids.first + ids.last;
+      final String friendshipID = ids.first + ids.last;
 
-      DocumentSnapshot friendshipSnap =
-      await Constants.friendshipsCollection.doc(friendshipID).get();
+      final DocumentSnapshot friendshipSnap =
+          await Constants.friendshipsCollection.doc(friendshipID).get();
 
-      return Friendship.fromDocs(Models.authenticationManager.id(), friend, friendshipSnap);
+      return Friendship.fromDocs(
+          AuthenticationManager.id(), friend, friendshipSnap);
     } catch (e) {
       debugPrint('(DataQuery) Error fetching friendship data: $e');
       throw Exception('(DataQuery) Failed to fetch friendship data.');
@@ -51,9 +54,8 @@ class DataQuery {
 
       DocumentSnapshot friendshipSnap =
           await Constants.friendshipsCollection.doc(friendshipID).get();
-      DocumentSnapshot bubbleSnap =
-          await Models.dataManager.getData(id: otherUserID);
-      ImageProvider avatar = await Models.dataManager.getAvatar(bubbleSnap);
+      DocumentSnapshot bubbleSnap = await DataManager.getData(id: otherUserID);
+      ImageProvider avatar = await DataManager.getAvatar(bubbleSnap);
 
       Bubble friendBubble = Bubble.fromDocs(bubbleSnap, avatar);
       return Friendship.fromDocs(currentUserID, friendBubble, friendshipSnap);
@@ -63,7 +65,7 @@ class DataQuery {
     }
   }
 
-  Future<ImageProvider> getNetworkImage(String downloadUrl) async {
+  static Future<ImageProvider> getNetworkImage(String downloadUrl) async {
     try {
       if (downloadUrl.isEmpty) {
         return Image.asset(Constants.defaultPictureAddress).image;
@@ -77,6 +79,4 @@ class DataQuery {
       return Image.asset(Constants.defaultPictureAddress).image;
     }
   }
-
-  DataQuery.static();
 }

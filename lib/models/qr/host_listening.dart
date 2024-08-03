@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:befriend/utilities/error_handling.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -121,18 +120,17 @@ class HostListening {
         if (host.joiners.every((user) => user.id != id)) {
           try {
             DocumentSnapshot newUserSnapshot =
-                await Models.dataManager.getData(id: id);
-            ImageProvider avatar =
-                await Models.dataManager.getAvatar(newUserSnapshot);
-            Bubble newUser = Bubble.fromDocs(newUserSnapshot, avatar);
+                await DataManager.getData(id: id);
+            ImageProvider avatar = await DataManager.getAvatar(newUserSnapshot);
+            final Bubble newUser = Bubble.fromDocs(newUserSnapshot, avatar);
             host.joiners.add(newUser);
           } catch (e) {
-            debugPrint('(HostListening): Error adding new user: $e');
+            debugPrint('(HostListening) Error adding new user: $e');
           }
         }
       }
     } catch (e) {
-      debugPrint('(HostListening): Error updating users list: $e');
+      debugPrint('(HostListening) Error updating users list: $e');
       // Optionally, show an error message to the user
     }
   }

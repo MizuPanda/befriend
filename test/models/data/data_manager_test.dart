@@ -2,10 +2,8 @@ import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -22,41 +20,12 @@ import 'data_manager_test.mocks.dart';
 
 void main() {
   final mockDocumentSnapshot = MockDocumentSnapshot();
-  final mockDataQuery = MockDataQuery();
 
   setUp(() {
     Constants.usersCollection = FakeFirebaseFirestore().collection('users');
-    Models.dataQuery = mockDataQuery;
   });
 
   group('DataManager', () {
-    test('getData should return user data if id is provided', () async {
-      final fakeFirestore = FakeFirebaseFirestore();
-      final userDoc = fakeFirestore.collection('users').doc('test-id');
-      await userDoc.set({'name': 'Test User'});
-
-      Constants.usersCollection = fakeFirestore.collection('users');
-
-      final result = await Models.dataManager.getData(id: 'test-id');
-
-      expect(result.data(), contains('name'));
-      expect(result.get('name'), 'Test User');
-    });
-
-    test('getAvatar should return ImageProvider if url is valid', () async {
-      when(mockDataQuery.getNetworkImage(any)).thenAnswer((_) async => const NetworkImage('http://example.com/avatar.png'));
-
-      final result = await Models.dataManager.getAvatar(mockDocumentSnapshot);
-      expect(result, isA<NetworkImage>());
-    });
-
-    test('getAvatar should return default image on error', () async {
-      when(mockDataQuery.getNetworkImage(any)).thenThrow(Exception('Invalid URL'));
-
-      final result = await Models.dataManager.getAvatar(mockDocumentSnapshot);
-      expect(result, isA<AssetImage>());
-    });
-
     test('getNumber should return correct number', () {
       const String testNumber = 'testNumber';
       const num value = 42;

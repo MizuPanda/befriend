@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../authentication/authentication.dart';
 import 'bubble.dart';
 
 class Home {
@@ -21,7 +21,7 @@ class Home {
 
   double get viewerSize => _viewerSize;
 
-  static const double _minimumDistanceFactor = 13/20;
+  static const double _minimumDistanceFactor = 13 / 20;
 
   Home(
       {required this.connectedHome,
@@ -84,7 +84,6 @@ class Home {
     }
   }
 
-
   void _setViewerSizeForNewFriend(Bubble newFriend) {
     double distance =
         sqrt(newFriend.x * newFriend.x + newFriend.y * newFriend.y);
@@ -121,8 +120,8 @@ class Home {
   void _avoidOverlapping() {
     bool overlapping = true;
     int iterations = 0;
-    final int overload = 4*(user.friendIDs.length - Constants.friendsLimit);
-    final int maxIterations = 20 + overload > 0? overload : 0;
+    final int overload = 4 * (user.friendIDs.length - Constants.friendsLimit);
+    final int maxIterations = 20 + overload > 0 ? overload : 0;
 
     user.friendships.sort((a, b) => a.distance().compareTo(b.distance()));
     while (overlapping && iterations < 20) {
@@ -138,8 +137,8 @@ class Home {
           final double dx = bubble.x - otherBubble.x;
           final double dy = bubble.y - otherBubble.y;
           final double distance = sqrt(dx * dx + dy * dy);
-          final double minDistance = (bubble.size  + otherBubble.size)*_minimumDistanceFactor;
-
+          final double minDistance =
+              (bubble.size + otherBubble.size) * _minimumDistanceFactor;
 
           if (_isOverlapping(distance, minDistance, bubble)) {
             overlapping = true;
@@ -163,8 +162,8 @@ class Home {
     bool overlapping = true;
     final Bubble newFriend = user.friendships.last.friend;
     int iterations = 0;
-    final int overload = 2*(user.friendIDs.length - Constants.friendsLimit);
-    final int maxIterations = 20 + overload > 0? overload : 0;
+    final int overload = 2 * (user.friendIDs.length - Constants.friendsLimit);
+    final int maxIterations = 20 + overload > 0 ? overload : 0;
 
     while (overlapping && iterations < maxIterations) {
       overlapping = false;
@@ -174,7 +173,8 @@ class Home {
         final double dx = newFriend.x - otherFriend.x;
         final double dy = newFriend.y - otherFriend.y;
         final double distance = sqrt(dx * dx + dy * dy);
-        final double minDistance = (newFriend.size  + otherFriend.size)*_minimumDistanceFactor;
+        final double minDistance =
+            (newFriend.size + otherFriend.size) * _minimumDistanceFactor;
 
         if (_isOverlapping(distance, minDistance, newFriend)) {
           overlapping = true;
@@ -186,19 +186,27 @@ class Home {
     }
 
     if (iterations >= maxIterations) {
-      debugPrint('(Home) Error: maximum number of iterations $iterations surpassed');
+      debugPrint(
+          '(Home) Error: maximum number of iterations $iterations surpassed');
     } else {
       debugPrint('(Home) Finished in $iterations iterations');
     }
   }
 
-  bool _isOverlapping(double distance, double minimumDistance, Bubble bubble,) {
+  bool _isOverlapping(
+    double distance,
+    double minimumDistance,
+    Bubble bubble,
+  ) {
     return distance < minimumDistance || _isOverlappingCenter(bubble);
   }
 
-  bool _isOverlappingCenter(Bubble bubble,) {
+  bool _isOverlappingCenter(
+    Bubble bubble,
+  ) {
     final double distance = sqrt(bubble.x * bubble.x + bubble.y * bubble.y);
-    final double minDistance = (bubble.size + user.size)*_minimumDistanceFactor;
+    final double minDistance =
+        (bubble.size + user.size) * _minimumDistanceFactor;
 
     return distance < minDistance;
   }
@@ -208,9 +216,12 @@ class Home {
     return Matrix4.identity()..translate(-_viewerSize / 4, -_viewerSize / 4);
   }
 
+  Matrix4 translate(double dx, double dy) {
+    return middlePos()..translate(dx, dy);
+  }
+
   // Tells if a user is a friend with the main connected user.
   bool isFriendToUser() {
-    return connectedHome ||
-        user.friendIDs.contains(Models.authenticationManager.id());
+    return connectedHome || user.friendIDs.contains(AuthenticationManager.id());
   }
 }

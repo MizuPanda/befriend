@@ -14,14 +14,12 @@ import '../objects/home.dart';
 class AuthenticationManager {
   static FirebaseAuth _auth = FirebaseAuth.instance;
 
-  AuthenticationManager.static();
-
   /// For testing reasons
   static set auth(FirebaseAuth value) {
     _auth = value;
   }
 
-  String id() {
+  static String id() {
     return _auth.currentUser?.uid ?? 'AuthenticationManager-NOT-FOUND-ID';
   }
 
@@ -76,7 +74,8 @@ class AuthenticationManager {
         }
         debugPrint(
             "(AuthenticationManager) Successfully created user: ${user.uid}");
-        FirebaseAnalytics.instance.logSignUp(signUpMethod: 'Email and password');
+        FirebaseAnalytics.instance
+            .logSignUp(signUpMethod: 'Email and password');
       }
     } on FirebaseAuthException catch (error) {
       debugPrint('(AuthenticationManager) An error occurred: ${error.code}');

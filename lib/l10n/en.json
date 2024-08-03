@@ -192,9 +192,12 @@
 
   "_comment31": "Profile Page",
   "pp_feed": "My Feed",
-  "pp_delete": "Delete this user",
-  "pp_block": "Block this user",
+  "pp_delete": "Delete",
+  "pp_block": "Block",
   "pp_pictures": "Pictures",
+  "pp_need": "You need to add",
+  "pp_friend": "as a friend to see their pictures.",
+  "pp_become": "Take a picture with them or send them your invite link to become friends",
 
   "_comment32": "Session Page",
   "sp_taking": "is taking a picture!",

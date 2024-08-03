@@ -6,12 +6,12 @@ import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/friendship_progress.dart';
 import 'package:befriend/models/services/simple_encryption_service.dart';
 import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/dialogs/services/invalid_invitation_dialog.dart';
 import 'package:befriend/views/dialogs/services/invitation_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../authentication/authentication.dart';
 import '../objects/bubble.dart';
 
 class ReferralService {
@@ -24,7 +24,7 @@ class ReferralService {
     );
 
     String data = SimpleEncryptionService.encrypt64(
-        '${Models.authenticationManager.id()}${Constants.dataSeparator}$token');
+        '${AuthenticationManager.id()}${Constants.dataSeparator}$token');
     data =
         '${SimpleEncryptionService.iv.base64}${Constants.dataSeparator}$data';
 
@@ -55,7 +55,7 @@ class ReferralService {
     // Store the token in the database with the associated user ID
     DateTime timestamp = DateTime.timestamp();
     DocumentSnapshot snapshot =
-        await Models.dataManager.getData(id: Models.authenticationManager.id());
+        await DataManager.getData(id: AuthenticationManager.id());
     Map<String, dynamic> inviteTokens =
         DataManager.getMap(snapshot, Constants.inviteTokensDoc);
 
@@ -72,11 +72,11 @@ class ReferralService {
       String referrerId, String token, BuildContext context) async {
     try {
       final Bubble userBubble = await UserManager.getInstance();
-      String userId = Models.authenticationManager.id();
+      String userId = AuthenticationManager.id();
 
       if (referrerId != userId && !userBubble.friendIDs.contains(referrerId)) {
         final DocumentSnapshot snapshot =
-            await Models.dataManager.getData(id: referrerId);
+            await DataManager.getData(id: referrerId);
         final Map<String, dynamic> inviteTokens =
             DataManager.getMap(snapshot, Constants.inviteTokensDoc);
         final List<dynamic> friendsId =
@@ -84,8 +84,7 @@ class ReferralService {
 
         if (inviteTokens.containsKey(token) && !friendsId.contains(userId)) {
           // If the token is valid, prompt the user to accept the invitation
-          final ImageProvider avatar =
-              await Models.dataManager.getAvatar(snapshot);
+          final ImageProvider avatar = await DataManager.getAvatar(snapshot);
           final Bubble referrer = Bubble.fromDocs(snapshot, avatar);
 
           if (context.mounted) {

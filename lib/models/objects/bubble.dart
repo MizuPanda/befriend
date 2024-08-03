@@ -6,7 +6,7 @@ import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../../utilities/models.dart';
+import '../authentication/authentication.dart';
 
 class Bubble {
   final String id;
@@ -80,7 +80,7 @@ class Bubble {
   }
 
   bool main() {
-    return id == Models.authenticationManager.id();
+    return id == AuthenticationManager.id();
   }
 
   bool hasFriends() {
@@ -88,7 +88,7 @@ class Bubble {
   }
 
   bool didBlockYou() {
-    return blockedUsers.keys.contains(Models.authenticationManager.id());
+    return blockedUsers.keys.contains(AuthenticationManager.id());
   }
 
   Iterable<dynamic> nonLoadedFriends() {

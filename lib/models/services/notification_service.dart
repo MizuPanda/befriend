@@ -221,6 +221,7 @@ class NotificationService {
             currentUser: connectedUser,
             notifyParent: notify,
             friendship: null,
+            isLocked: false,
           ),
         );
       }
@@ -260,10 +261,12 @@ class NotificationService {
           GoRouter.of(key.currentContext!).push(
             Constants.profileAddress,
             extra: Profile(
-                user: friendship.friend,
-                currentUser: connectedUser,
-                notifyParent: notify,
-                friendship: friendship),
+              user: friendship.friend,
+              currentUser: connectedUser,
+              notifyParent: notify,
+              friendship: friendship,
+              isLocked: false,
+            ),
           );
         }
       }

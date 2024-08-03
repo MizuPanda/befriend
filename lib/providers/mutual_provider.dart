@@ -35,9 +35,8 @@ class MutualProvider extends ChangeNotifier {
   }
 
   void initState(
-      {
-        required List<Friendship> loadedFriends,
-        required List<dynamic> commonIDS,
+      {required List<Friendship> loadedFriends,
+      required List<dynamic> commonIDS,
       required Bubble mainUser}) {
     try {
       _allLoadedUsers = loadedFriends;
@@ -46,8 +45,9 @@ class MutualProvider extends ChangeNotifier {
       }
 
       _pagingController.addPageRequestListener((pageKey) {
-        _fetchPage(pageKey,
-            mainUser: mainUser,
+        _fetchPage(
+          pageKey,
+          mainUser: mainUser,
           commonIDS: commonIDS,
         );
       });
@@ -66,11 +66,15 @@ class MutualProvider extends ChangeNotifier {
       final List<Friendship> friendships = [];
       final String userId = mainUser.id;
 
-      final bool hasNonLoadedCommons = _allLoadedUsers.length != commonIDS.length;
+      final bool hasNonLoadedCommons =
+          _allLoadedUsers.length != commonIDS.length;
       debugPrint('(MutualProvider) Fetching page');
 
       if (hasNonLoadedCommons) {
-        Iterable<dynamic> nonLoadedMutual = commonIDS.where((id) => !_allLoadedUsers.map((friendship) => friendship.friend.id).contains(id));
+        Iterable<dynamic> nonLoadedMutual = commonIDS.where((id) =>
+            !_allLoadedUsers
+                .map((friendship) => friendship.friend.id)
+                .contains(id));
 
         debugPrint('(MutualProvider) Has non-loaded mutual: $nonLoadedMutual');
 
@@ -79,24 +83,25 @@ class MutualProvider extends ChangeNotifier {
         debugPrint('(MutualProvider) Top 30: $nonLoadedMutual');
 
         // Your Firestore query to fetch more friends, starting after the last document
-        final QuerySnapshot querySnapshot = await Constants.friendshipsCollection
-            .where(Filter.or(
-          Filter.and(
-              Filter(Constants.user1Doc, isEqualTo: userId),
-              Filter(
-                Constants.user2Doc,
-                whereIn: nonLoadedMutual,
-              )),
-          Filter.and(
-              Filter(Constants.user2Doc, isEqualTo: userId),
-              Filter(
-                Constants.user1Doc,
-                whereIn: nonLoadedMutual,
-              )),
-        ))
-            .orderBy(Constants.levelDoc, descending: true)
-            .limit(_pageSize)
-            .get();
+        final QuerySnapshot querySnapshot =
+            await Constants.friendshipsCollection
+                .where(Filter.or(
+                  Filter.and(
+                      Filter(Constants.user1Doc, isEqualTo: userId),
+                      Filter(
+                        Constants.user2Doc,
+                        whereIn: nonLoadedMutual,
+                      )),
+                  Filter.and(
+                      Filter(Constants.user2Doc, isEqualTo: userId),
+                      Filter(
+                        Constants.user1Doc,
+                        whereIn: nonLoadedMutual,
+                      )),
+                ))
+                .orderBy(Constants.levelDoc, descending: true)
+                .limit(_pageSize)
+                .get();
 
         debugPrint('(MutualProvider) ${querySnapshot.size} new mutual');
 
@@ -112,9 +117,11 @@ class MutualProvider extends ChangeNotifier {
               friendId = user1;
             }
 
-            final Friendship friendship = await DataQuery.getFriendship(userId, friendId);
+            final Friendship friendship =
+                await DataQuery.getFriendship(userId, friendId);
 
-            debugPrint('(MutualProvider) Adding mutual ${friendship.friendUsername()}');
+            debugPrint(
+                '(MutualProvider) Adding mutual ${friendship.friendUsername()}');
 
             friendships.add(friendship);
             UserManager.addFriendToMain(friendship);
@@ -141,7 +148,9 @@ class MutualProvider extends ChangeNotifier {
     final lowerCaseSearchTerm = searchTerm.toLowerCase();
 
     _filteredUsers = _allLoadedUsers.where((friendship) {
-      return friendship.friend.username.toLowerCase().contains(lowerCaseSearchTerm);
+      return friendship.friend.username
+          .toLowerCase()
+          .contains(lowerCaseSearchTerm);
     }).toList();
 
     _isSearching = searchTerm.isNotEmpty;
@@ -153,11 +162,11 @@ class MutualProvider extends ChangeNotifier {
     GoRouter.of(context).push(
       Constants.profileAddress,
       extra: Profile(
-        user: friendship.friend,
-        currentUser: mainUser,
-        notifyParent: () {},
-        friendship: friendship,
-      ),
+          user: friendship.friend,
+          currentUser: mainUser,
+          notifyParent: () {},
+          friendship: friendship,
+          isLocked: false),
     );
   }
 }

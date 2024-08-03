@@ -1,4 +1,7 @@
+import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/data/user_manager.dart';
+import 'package:befriend/models/objects/profile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +19,10 @@ import '../utilities/constants.dart';
 class HomeProvider extends ChangeNotifier {
   late final AnimationController _animationController;
   Animation<Matrix4>? _animationCenter;
+  final TextEditingController _searchEditingController =
+      TextEditingController();
+
+  TextEditingController get searchEditingController => _searchEditingController;
 
   /// Info
   final GlobalKey _one = GlobalKey();
@@ -53,10 +60,110 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
+  void disposeSearch() {
+    _searchEditingController.dispose();
+  }
+
+  void clearSearch() {
+    _searchEditingController.clear();
+    notifyListeners();
+  }
+
+  Future<void> search(String username, BuildContext context) async {
+    // Check if the username is present in the loaded friendships.
+    //    If yes -> animateToFriend
+    //    If no  -> get the user data from Firestore. If does not exist or is part of either blocked, don't do nothing
+    //       Check if searchId is present in friendsIds
+    //          If yes -> Go to the friend profile
+    //          If no  -> Open a locked instance of the profile
+    // DEVELOP THAT IT GOES TO FRIENDS PROFILE IF NOT IN THE TOP 20 LIST
+    username = username.trim();
+
+    try {
+      final Iterable<String> loadedUsernames = home.user.friendships
+          .map((friendship) => friendship.friendUsername());
+
+      if (loadedUsernames.contains(username)) {
+        debugPrint('(HomeProvider) $username is loaded');
+        final Friendship friendship = home.user.friendships
+            .firstWhere((f) => f.friendUsername() == username);
+        final Bubble searchedBubble = friendship.friend;
+        animateToFriend(context, dx: searchedBubble.x, dy: searchedBubble.y);
+      } else {
+        final QuerySnapshot result = await Constants.usersCollection
+            .where(Constants.usernameDoc, isEqualTo: username)
+            .limit(1)
+            .get();
+
+        final List<DocumentSnapshot> documents = result.docs;
+
+        if (documents.isNotEmpty) {
+          final DocumentSnapshot snapshot = documents.first;
+
+          final ImageProvider avatar = await DataManager.getAvatar(snapshot);
+          final Bubble searchedBubble =
+              Bubble.fromDocs(documents.first, avatar);
+
+          final Bubble mainUser = await UserManager.getInstance();
+
+          if (!searchedBubble.blockedUsers.keys.contains(mainUser.id) &&
+              !mainUser.blockedUsers.keys.contains(searchedBubble.id)) {
+            if (mainUser.friendIDs.contains(searchedBubble.id)) {
+              debugPrint('(HomeProvider) $username is non loaded friend');
+
+              final Friendship friendship =
+                  await DataQuery.getFriendshipFromBubble(searchedBubble);
+
+              if (context.mounted) {
+                UserManager.addFriendToMain(friendship);
+                UserManager.notify();
+
+                goToFriendProfile(
+                    context,
+                    Profile(
+                        user: friendship.friend,
+                        currentUser: mainUser,
+                        notifyParent: () {},
+                        friendship: friendship,
+                        isLocked: false));
+              }
+            } else {
+              debugPrint('(HomeProvider) $username is not friend');
+
+              final Friendship friendship =
+                  Friendship.lockedFriendship(mainUser, searchedBubble);
+
+              if (context.mounted) {
+                goToFriendProfile(
+                    context,
+                    Profile(
+                        user: searchedBubble,
+                        friendship: friendship,
+                        currentUser: mainUser,
+                        notifyParent: () {},
+                        isLocked: true));
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('(HomeProvider) Error searching for $username: $e');
+    }
+  }
+
+  Future<void> goToFriendProfile(BuildContext context, Profile profile) async {
+    await GoRouter.of(context).push(
+      Constants.profileAddress,
+      extra: profile,
+    );
+  }
+
   Future<void> loadFriendsAsync() async {
     try {
       if (!home.user.friendshipsLoaded) {
-        final List<dynamic> randomFriendsIDS = home.user.nonLoadedFriends().take(Constants.friendsLimit).toList();
+        final List<dynamic> randomFriendsIDS =
+            home.user.nonLoadedFriends().take(Constants.friendsLimit).toList();
 
         randomFriendsIDS.shuffle();
 

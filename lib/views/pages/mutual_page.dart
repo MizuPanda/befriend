@@ -80,7 +80,8 @@ class _MutualPageState extends State<MutualPage> {
                         ? ListView.builder(
                             itemCount: provider.length(),
                             itemBuilder: (context, index) {
-                              final Friendship friendship = provider.friendshipAt(index);
+                              final Friendship friendship =
+                                  provider.friendshipAt(index);
                               final Bubble user = friendship.friend;
 
                               return Padding(
@@ -88,7 +89,8 @@ class _MutualPageState extends State<MutualPage> {
                                     EdgeInsets.only(bottom: 0.008 * height),
                                 child: ListTile(
                                   onTap: () {
-                                    provider.goToFriendProfile(context, index, friendship, widget.profile.currentUser);
+                                    provider.goToFriendProfile(context, index,
+                                        friendship, widget.profile.currentUser);
                                   },
                                   leading: Container(
                                     decoration: BoxDecoration(
@@ -110,7 +112,8 @@ class _MutualPageState extends State<MutualPage> {
                           )
                         : PagedListView<int, Friendship>(
                             pagingController: provider.pagingController,
-                            builderDelegate: PagedChildBuilderDelegate<Friendship>(
+                            builderDelegate:
+                                PagedChildBuilderDelegate<Friendship>(
                               noItemsFoundIndicatorBuilder:
                                   (BuildContext context) {
                                 return const Center();
@@ -120,7 +123,8 @@ class _MutualPageState extends State<MutualPage> {
                                     EdgeInsets.only(bottom: 0.008 * height),
                                 child: ListTile(
                                   onTap: () {
-                                    provider.goToFriendProfile(context, index, item, widget.profile.currentUser);
+                                    provider.goToFriendProfile(context, index,
+                                        item, widget.profile.currentUser);
                                   },
                                   leading: Container(
                                     decoration: BoxDecoration(

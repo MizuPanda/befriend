@@ -4,7 +4,6 @@ import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/objects/home.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/error_handling.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import '../../utilities/app_localizations.dart';
 import '../objects/bubble.dart';
 import '../objects/friendship.dart';
+import 'data_query.dart';
 
 class UserManager {
   static Bubble? _instance;
@@ -53,12 +53,11 @@ class UserManager {
   static Future<Bubble> getInstance() async {
     if (_instance == null) {
       try {
-        DocumentSnapshot docs = await Models.dataManager.getData();
+        DocumentSnapshot docs = await DataManager.getData();
 
         String avatarUrl = DataManager.getString(docs, Constants.avatarDoc);
 
-        ImageProvider avatar =
-            await Models.dataQuery.getNetworkImage(avatarUrl);
+        ImageProvider avatar = await DataQuery.getNetworkImage(avatarUrl);
         _instance = Bubble.fromDocs(
           docs,
           avatar,
@@ -76,7 +75,8 @@ class UserManager {
   }
 
   static void addFriendToMain(Friendship friendship) {
-    debugPrint('(UserManager) Added ${friendship.friendUsername()} to main user');
+    debugPrint(
+        '(UserManager) Added ${friendship.friendUsername()} to main user');
     _addFriend(friendship);
     _addFriendToHome(friendship);
     _setPosToMid();
@@ -100,6 +100,12 @@ class UserManager {
 
   static void _setPosToMid() {
     _home?.setPosToMid();
+  }
+
+  static void setPosToFriend(double dx, double dy) {
+    if (_home != null) {
+      _home?.transformationController?.value = _home!.translate(dx, dy);
+    }
   }
 
   static Future<void> reloadHome(BuildContext context) async {
@@ -132,7 +138,7 @@ class UserManager {
     _home = null;
   }
 
-  Future<ImageProvider> refreshAvatar(File file) async {
+  static Future<ImageProvider> refreshAvatar(File file) async {
     try {
       if (_instance != null) {
         _instance!.avatar = Image.file(file).image;
@@ -160,6 +166,4 @@ class UserManager {
   static void setLanguageCode(String value) {
     _instance?.languageCode = value;
   }
-
-  UserManager.static();
 }

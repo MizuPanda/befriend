@@ -1,18 +1,18 @@
 import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
-class DataManager {
-  DataManager.static();
+import '../authentication/authentication.dart';
+import 'data_query.dart';
 
+class DataManager {
   /// Returns the user data of a certain user.
   /// If the id is given, it returns the user data of the user with the given id.
   /// If neither the id nor the counter is given, it returns the user data of the current user.
-  Future<DocumentSnapshot> getData({String? id}) async {
+  static Future<DocumentSnapshot> getData({String? id}) async {
     try {
       return await Constants.usersCollection
-          .doc(id ?? Models.authenticationManager.id())
+          .doc(id ?? AuthenticationManager.id())
           .get();
     } catch (e) {
       debugPrint('(DataManager): Error fetching data: $e');
@@ -21,10 +21,10 @@ class DataManager {
     }
   }
 
-  Future<ImageProvider> getAvatar(DocumentSnapshot snapshot) async {
+  static Future<ImageProvider> getAvatar(DocumentSnapshot snapshot) async {
     try {
       String avatarUrl = getString(snapshot, Constants.avatarDoc);
-      return await Models.dataQuery.getNetworkImage(avatarUrl);
+      return await DataQuery.getNetworkImage(avatarUrl);
     } catch (e) {
       debugPrint('(DataManager): Error loading avatar image: $e');
       return Image.asset('assets/images/account_circle.png').image;

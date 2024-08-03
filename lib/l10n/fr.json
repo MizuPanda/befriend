@@ -192,9 +192,12 @@
 
   "_comment31": "Profile Page",
   "pp_feed": "Mon Fil",
-  "pp_delete": "Supprimer cet utilisateur",
-  "pp_block": "Bloquer cet utilisateur",
+  "pp_delete": "Supprimer",
+  "pp_block": "Bloquer",
   "pp_pictures": "Photos",
+  "pp_need": "Vous devez ajouter",
+  "pp_friend": "en tant qu'ami pour voir leurs photos.",
+  "pp_become": "Prenez une photo ensemble ou envoyez-leur votre lien d'invitation pour devenir amis.",
 
   "_comment32": "Session Page",
   "sp_taking": "est en train de prendre la photo!",

@@ -9,9 +9,9 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../providers/material_provider.dart';
 import '../../utilities/app_localizations.dart';
 import '../../utilities/constants.dart';
-import '../../utilities/models.dart';
 import '../../views/dialogs/rounded_dialog.dart';
 import '../../views/widgets/home/picture/hosting_widget.dart';
+import '../authentication/authentication.dart';
 import '../data/data_manager.dart';
 import '../objects/bubble.dart';
 import '../services/simple_encryption_service.dart';
@@ -67,10 +67,10 @@ class QR {
       {required bool fromBarcode}) async {
     try {
       // Your existing logic to join the session using sessionId
-      String userId = Models.authenticationManager.id();
+      String userId = AuthenticationManager.id();
 
       // Fetch the session data
-      DocumentSnapshot data = await Models.dataManager.getData(id: hostId);
+      DocumentSnapshot data = await DataManager.getData(id: hostId);
       List<dynamic> joiners = DataManager.getList(data, Constants.hostingDoc);
       Map<String, DateTime> lastSeenMap =
           DataManager.getDateTimeMap(data, Constants.lastSeenUsersMapDoc);
@@ -85,7 +85,7 @@ class QR {
           QR.showUserSeenToday(context, username);
         }
       } else {
-        ImageProvider avatar = await Models.dataManager.getAvatar(data);
+        ImageProvider avatar = await DataManager.getAvatar(data);
 
         Bubble selectedHost = Bubble.fromDocs(data, avatar);
 

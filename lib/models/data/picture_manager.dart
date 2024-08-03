@@ -1,8 +1,9 @@
 import 'dart:io';
 
+import 'package:befriend/models/data/picture_query.dart';
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/error_handling.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/dialogs/permission_denied_dialog.dart';
 import 'package:befriend/views/dialogs/profile/picture_choice_dialog.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -21,7 +22,7 @@ class PictureManager {
   static Future<void> removeMainPicture(
       BuildContext context, Bubble bubble) async {
     try {
-      await Models.pictureQuery.removeProfilePicture(bubble.avatarUrl);
+      await PictureQuery.removeProfilePicture(bubble.avatarUrl);
       bubble.avatar = Image.asset(Constants.defaultPictureAddress).image;
     } catch (e) {
       debugPrint('(PictureManager): Error removing main picture: $e');
@@ -38,9 +39,9 @@ class PictureManager {
       BuildContext context, String path, Bubble bubble) async {
     try {
       File file = File(path);
-      String? downloadUrl = await Models.pictureQuery.uploadAvatar(file);
+      String? downloadUrl = await PictureQuery.uploadAvatar(file);
       if (downloadUrl != null) {
-        bubble.avatar = await Models.userManager.refreshAvatar(file);
+        bubble.avatar = await UserManager.refreshAvatar(file);
       }
     } catch (e) {
       debugPrint('(PictureManager): Error changing main picture: $e');
@@ -182,7 +183,7 @@ class PictureManager {
         onImageSelected(croppedFile?.path);
       }
     } catch (e) {
-      debugPrint('(PictureManager): Failed to pick or crop image: $e');
+      debugPrint('(PictureManager) Failed to pick or crop image: $e');
       onImageSelected(null);
     }
   }

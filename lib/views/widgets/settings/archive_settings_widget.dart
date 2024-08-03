@@ -1,7 +1,7 @@
-import 'package:befriend/utilities/models.dart';
 import 'package:befriend/views/widgets/profile/profile_pictures.dart';
 import 'package:flutter/material.dart';
 
+import '../../../models/authentication/authentication.dart';
 import '../../../utilities/app_localizations.dart';
 
 class ArchiveSettingsWidget extends StatelessWidget {
@@ -17,7 +17,7 @@ class ArchiveSettingsWidget extends StatelessWidget {
         ),
       ),
       body: ProfilePictures(
-        userID: Models.authenticationManager.id(),
+        userID: AuthenticationManager.id(),
         showArchived: true,
         showOnlyMe: false,
       ),

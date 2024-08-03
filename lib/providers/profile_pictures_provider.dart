@@ -1,5 +1,4 @@
 import 'package:befriend/models/authentication/authentication.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -31,6 +30,10 @@ class ProfilePicturesProvider extends ChangeNotifier {
     _pagingController.dispose();
   }
 
+  bool isConnectedUserProfile(String userID) {
+    return userID == AuthenticationManager.id();
+  }
+
   void handleArchiveSuccess(String archivedPictureId) {
     // Remove the archived picture from the _pagingController's item list
     final List<Picture> items =
@@ -49,7 +52,7 @@ class ProfilePicturesProvider extends ChangeNotifier {
       final Future<QuerySnapshot> query;
       Query q;
 
-      String connectedID = Models.authenticationManager.id();
+      String connectedID = AuthenticationManager.id();
       String notArchivedID = AuthenticationManager.notArchivedID();
       String archivedID = AuthenticationManager.archivedID();
       bool isFriendProfile = userID != connectedID;

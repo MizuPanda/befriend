@@ -33,6 +33,7 @@ class FriendListProvider extends ChangeNotifier {
         currentUser: user,
         notifyParent: () {},
         friendship: friendship,
+        isLocked: false,
       ),
     );
   }
@@ -82,30 +83,32 @@ class FriendListProvider extends ChangeNotifier {
       if (mainUser.hasNonLoadedFriends()) {
         Iterable<dynamic> nonLoadedFriends = mainUser.nonLoadedFriends();
 
-        debugPrint('(FriendListProvider) Has non-loaded friendships: $nonLoadedFriends');
+        debugPrint(
+            '(FriendListProvider) Has non-loaded friendships: $nonLoadedFriends');
 
         nonLoadedFriends = nonLoadedFriends.take(30);
 
         final String id = mainUser.id;
 
-        final QuerySnapshot querySnapshot = await Constants.friendshipsCollection
-            .where(Filter.or(
-              Filter.and(
-                  Filter(Constants.user1Doc, isEqualTo: id),
-                  Filter(
-                    Constants.user2Doc,
-                    whereIn: nonLoadedFriends,
-                  )),
-              Filter.and(
-                  Filter(Constants.user2Doc, isEqualTo: id),
-                  Filter(
-                    Constants.user1Doc,
-                    whereIn: nonLoadedFriends,
-                  )),
-            ))
-            .orderBy(Constants.levelDoc, descending: true)
-            .limit(_pageSize)
-            .get();
+        final QuerySnapshot querySnapshot =
+            await Constants.friendshipsCollection
+                .where(Filter.or(
+                  Filter.and(
+                      Filter(Constants.user1Doc, isEqualTo: id),
+                      Filter(
+                        Constants.user2Doc,
+                        whereIn: nonLoadedFriends,
+                      )),
+                  Filter.and(
+                      Filter(Constants.user2Doc, isEqualTo: id),
+                      Filter(
+                        Constants.user1Doc,
+                        whereIn: nonLoadedFriends,
+                      )),
+                ))
+                .orderBy(Constants.levelDoc, descending: true)
+                .limit(_pageSize)
+                .get();
 
         if (querySnapshot.docs.isNotEmpty) {
           for (QueryDocumentSnapshot snapshot in querySnapshot.docs) {
@@ -119,9 +122,11 @@ class FriendListProvider extends ChangeNotifier {
               friendId = user1;
             }
 
-            final Friendship friendship = await DataQuery.getFriendship(id, friendId);
+            final Friendship friendship =
+                await DataQuery.getFriendship(id, friendId);
 
-            debugPrint('(FriendListProvider) Adding friend ${friendship.friendUsername()}');
+            debugPrint(
+                '(FriendListProvider) Adding friend ${friendship.friendUsername()}');
 
             friendships.add(friendship);
             UserManager.addFriendToMain(friendship);

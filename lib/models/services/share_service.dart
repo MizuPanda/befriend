@@ -30,7 +30,8 @@ class ShareService {
     );
 
     try {
-      FirebaseAnalytics.instance.logShare(contentType: 'Referral', itemId: profileId, method: 'Home button');
+      FirebaseAnalytics.instance.logShare(
+          contentType: 'Referral', itemId: profileId, method: 'Home button');
     } catch (e) {
       debugPrint('(ShareService) Error logging share');
     }
@@ -68,10 +69,11 @@ class ShareService {
             if (context.mounted) {
               GoRouter.of(context).push(Constants.profileAddress,
                   extra: Profile(
-                      user: user,
-                      friendship: friendship,
-                      currentUser: userBubble,
-                      notifyParent: () {}));
+                    user: user,
+                    friendship: friendship,
+                    currentUser: userBubble,
+                    notifyParent: () {},
+                  ));
             }
           }
         }

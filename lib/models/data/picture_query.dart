@@ -41,7 +41,7 @@ class PictureQuery {
     });
   }
 
-  Future<void> removeProfilePicture(String downloadUrl) async {
+  static Future<void> removeProfilePicture(String downloadUrl) async {
     try {
       // Update the document to remove the avatar reference
       await DataQuery.updateDocument(Constants.avatarDoc, '');
@@ -67,7 +67,7 @@ class PictureQuery {
     }
   }
 
-  Future<String?> uploadAvatar(File imageFile) async {
+  static Future<String?> uploadAvatar(File imageFile) async {
     try {
       String? downloadUrl = await _uploadProfilePicture(imageFile);
       if (downloadUrl != null) {
@@ -208,6 +208,4 @@ class PictureQuery {
       debugPrint('(PictureQuery): Error deleting temporary pictures: $e');
     }
   }
-
-  PictureQuery.static();
 }

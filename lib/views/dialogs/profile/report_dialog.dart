@@ -1,8 +1,8 @@
 import 'package:befriend/utilities/error_handling.dart';
-import 'package:befriend/utilities/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../../../models/authentication/authentication.dart';
 import '../../../utilities/app_localizations.dart';
 
 class ReportDialog extends StatefulWidget {
@@ -101,7 +101,7 @@ class _ReportDialogState extends State<ReportDialog> {
       if (inappropriateContent || other) {
         // Prepare the report data
         final Map<String, dynamic> reportData = {
-          'sender': Models.authenticationManager.id(),
+          'sender': AuthenticationManager.id(),
           'timestamp': FieldValue.serverTimestamp(),
           'pictureId': widget.pictureId,
           'profileId': widget.profileId,
