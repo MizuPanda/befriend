@@ -75,7 +75,7 @@ class AuthenticationManager {
         debugPrint(
             "(AuthenticationManager) Successfully created user: ${user.uid}");
         FirebaseAnalytics.instance
-            .logSignUp(signUpMethod: 'Email and password');
+            .logSignUp(signUpMethod: 'email_and_password');
       }
     } on FirebaseAuthException catch (error) {
       debugPrint('(AuthenticationManager) An error occurred: ${error.code}');
@@ -150,7 +150,7 @@ class AuthenticationManager {
           GoRouter.of(context).go(Constants.homepageAddress, extra: home);
         }
 
-        FirebaseAnalytics.instance.logLogin(loginMethod: 'Email and password');
+        FirebaseAnalytics.instance.logLogin(loginMethod: 'email_and_password');
       }
     } on FirebaseAuthException catch (e) {
       debugPrint('(AuthenticationManager): ${e.code}');

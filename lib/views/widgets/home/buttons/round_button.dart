@@ -3,10 +3,17 @@ import 'package:flutter/material.dart';
 import '../../../../utilities/constants.dart';
 
 class RoundButton extends StatelessWidget {
-  const RoundButton({super.key, required this.onPressed, required this.data});
+  const RoundButton(
+      {super.key,
+      required this.onPressed,
+      required this.data,
+      this.alignment = Alignment.bottomLeft,
+      this.isLeft = true});
 
   final Function onPressed;
   final IconData data;
+  final Alignment alignment;
+  final bool isLeft;
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +21,13 @@ class RoundButton extends StatelessWidget {
     final double width = MediaQuery.of(context).size.width;
 
     return Container(
-      alignment: Alignment.bottomLeft,
+      alignment: alignment,
       margin: EdgeInsets.only(
-          bottom: Constants.homeButtonBottomPaddingMultiplier * height,
-          left: width * Constants.homeHorizontalPaddingMultiplier),
+        bottom: Constants.homeButtonBottomPaddingMultiplier * height,
+        left: isLeft ? width * Constants.homeHorizontalPaddingMultiplier : 0,
+        right:
+            isLeft ? 0 : width * Constants.homeHorizontalPaddingMultiplier * 5,
+      ),
       child: Container(
         width: Constants.homeButtonSize + Constants.homeButtonAddSize,
         height: Constants.homeButtonSize + Constants.homeButtonAddSize,

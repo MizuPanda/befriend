@@ -69,9 +69,13 @@ class Home {
     final Random rand = Random();
     final Bubble friend = friendship.friend;
 
+    debugPrint('(Home) ${friend.username} distance= ${friendship.distance()}');
+    debugPrint(
+        '(Home) ${friend.username} level= ${friendship.level}, progress= ${friendship.progress}');
     friend.x = rand.nextDouble() * friendship.distance(); // x=6
     friend.y = sqrt(pow(friendship.distance(), 2) -
         pow(friend.x, 2)); //100 - 36 = 64, y = 8
+    debugPrint('(Home) ${friend.username} (x, y)= (${friend.x}, ${friend.y})');
 
     friend.x += (user.size + friend.size / 2) / 2;
     friend.y += (user.size + friend.size / 2) / 2;
@@ -120,8 +124,9 @@ class Home {
   void _avoidOverlapping() {
     bool overlapping = true;
     int iterations = 0;
-    final int overload = 4 * (user.friendIDs.length - Constants.friendsLimit);
-    final int maxIterations = 20 + overload > 0 ? overload : 0;
+    int overload = 4 * (user.friendIDs.length - Constants.friendsLimit);
+    overload = overload > 0 ? overload : 0;
+    final int maxIterations = 20 + overload;
 
     user.friendships.sort((a, b) => a.distance().compareTo(b.distance()));
     while (overlapping && iterations < 20) {
@@ -152,9 +157,10 @@ class Home {
     }
 
     if (iterations >= maxIterations) {
-      debugPrint('(Home) Maximum number of $iterations surpassed');
+      debugPrint(
+          '(Home) Maximum number of $iterations/$maxIterations surpassed');
     } else {
-      debugPrint('(Home) Finished in $iterations iterations');
+      debugPrint('(Home) Finished in $iterations/$maxIterations iterations');
     }
   }
 
@@ -162,8 +168,9 @@ class Home {
     bool overlapping = true;
     final Bubble newFriend = user.friendships.last.friend;
     int iterations = 0;
-    final int overload = 2 * (user.friendIDs.length - Constants.friendsLimit);
-    final int maxIterations = 20 + overload > 0 ? overload : 0;
+    int overload = 2 * (user.friendIDs.length - Constants.friendsLimit);
+    overload = overload > 0 ? overload : 0;
+    final int maxIterations = 20 + overload;
 
     while (overlapping && iterations < maxIterations) {
       overlapping = false;
@@ -187,9 +194,9 @@ class Home {
 
     if (iterations >= maxIterations) {
       debugPrint(
-          '(Home) Error: maximum number of iterations $iterations surpassed');
+          '(Home) Error: maximum number of iterations $iterations/$maxIterations surpassed');
     } else {
-      debugPrint('(Home) Finished in $iterations iterations');
+      debugPrint('(Home) Finished in $iterations/$maxIterations iterations');
     }
   }
 

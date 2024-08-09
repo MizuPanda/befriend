@@ -42,6 +42,7 @@ class Constants {
   static const String sessionUsersDoc = 'sessionUsers';
   static const String likesDoc = 'likes';
   static const String firstLikesDoc = 'firstLikes';
+  static const String publicDoc = 'isPublic';
   static const String archived = 'archived:';
   static const String notArchived = 'notArchived:';
   // STORAGE
@@ -60,10 +61,10 @@ class Constants {
       _firestore.collection('pictures');
   // HOME PAGE SIZES
   static const double homeButtonSize = 20;
-  static const double homeButtonAddSize = 25;
+  static const double homeButtonAddSize = 28;
   static const double homeHorizontalPaddingMultiplier = 0.033;
   static const double homeButtonPadding = 60;
-  static const double homeButtonBottomPaddingMultiplier = 0.09;
+  static const double homeButtonBottomPaddingMultiplier = 0.087;
   //PICTURE SIZES
   static const double pictureDialogWidthMultiplier = 375 / 448;
   static const double pictureDialogHeightMultiplier = 0.45;
@@ -133,4 +134,5 @@ class Constants {
   static const String mutualAddress = '/${MyRouter.mutual}';
   static const String friendListAddress = '/${MyRouter.friendList}';
   static const String settingsAddress = '/${MyRouter.settings}';
+  static const String webAddress = '/${MyRouter.web}';
 }

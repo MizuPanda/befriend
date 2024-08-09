@@ -426,6 +426,7 @@ exports.publishPicture = functions.https.onCall(async (data, context) => {
   const userMap = data.userMap;
   const usersAllowed = data.usersAllowed;
   const metadata = data.metadata;
+  const isPublic = data.isPublic;
 
   try {
     // 1. Update Friendships
@@ -435,7 +436,7 @@ exports.publishPicture = functions.https.onCall(async (data, context) => {
     const permanentUrl = await movePictureToPermanentStorage(hostId, imageUrl);
 
     // 3. Set Picture Data
-    await setPictureData(hostId, hostUsername, permanentUrl, timestamp, caption, userMap, usersAllowed, metadata);
+    await setPictureData(hostId, hostUsername, permanentUrl, timestamp, caption, userMap, usersAllowed, metadata, isPublic);
 
     // 4. Set User Data
     await setUserData(sessionUsers, hostId, timestamp);
@@ -564,7 +565,7 @@ async function movePictureToPermanentStorage(hostId, tempDownloadUrl) {
   }
 }
 
-async function setPictureData(hostId, hostUsername, imageUrl, timestamp, caption, userMap, usersAllowed, metadata) {
+async function setPictureData(hostId, hostUsername, imageUrl, timestamp, caption, userMap, usersAllowed, metadata, isPublic) {
   try {
     const pictureDoc = {
       hostId: hostId,
@@ -577,6 +578,7 @@ async function setPictureData(hostId, hostUsername, imageUrl, timestamp, caption
       sessionUsers: userMap,
       likes: [],
       firstLikes: [],
+      isPublic: isPublic,
     };
 
     await firestore.collection('pictures').add(pictureDoc);

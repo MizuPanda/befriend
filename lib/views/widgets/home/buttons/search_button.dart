@@ -22,22 +22,20 @@ class SearchButton extends StatelessWidget {
     return Consumer<HomeProvider>(
         builder: (BuildContext context, HomeProvider provider, Widget? child) {
       return Container(
-        alignment: Alignment.bottomCenter,
+        alignment: Alignment.bottomRight,
         padding: EdgeInsets.only(
             bottom: 0.060 * height,
             right: Constants.homeHorizontalPaddingMultiplier * width),
-        child: GestureDetector(
-          child: AnimSearchBar(
-            helpText: AppLocalizations.of(context)?.translate('sb_text') ??
-                "Search...",
-            rtl: true,
-            width: MediaQuery.of(context).size.width - friendPadding,
-            onSuffixTap: provider.clearSearch,
-            textController: provider.searchEditingController,
-            onSubmitted: (String username) {
-              provider.search(username, context);
-            },
-          ),
+        child: AnimSearchBar(
+          helpText:
+              AppLocalizations.of(context)?.translate('sb_text') ?? "Search...",
+          rtl: true,
+          width: MediaQuery.of(context).size.width - friendPadding,
+          onSuffixTap: provider.clearSearch,
+          textController: provider.searchEditingController,
+          onSubmitted: (String username) {
+            provider.search(username, context);
+          },
         ),
       );
     });

@@ -18,7 +18,7 @@ class MoreButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
 
-    return Consumer(builder:
+    return Consumer<PictureCardProvider>(builder:
         (BuildContext context, PictureCardProvider provider, Widget? child) {
       return PopupMenuButton<PopSelection>(
         icon: Icon(
@@ -56,6 +56,23 @@ class MoreButton extends StatelessWidget {
                       AppLocalizations.of(context)?.translate('mb_delete') ??
                           'Delete',
                       style: const TextStyle(color: Colors.red)),
+                  SizedBox(width: _iconTextDistanceWidthMultiplier * width * 2),
+                ],
+              ),
+            ),
+          if (provider.isPicturePublic())
+            PopupMenuItem<PopSelection>(
+              value: PopSelection.public,
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.language_rounded,
+                  ), // Archive icon
+                  SizedBox(width: _iconTextDistanceWidthMultiplier * width),
+                  Text(
+                    AppLocalizations.of(context)?.translate('mb_public') ??
+                        'Set to private',
+                  ),
                   SizedBox(width: _iconTextDistanceWidthMultiplier * width * 2),
                 ],
               ),
@@ -100,4 +117,4 @@ class MoreButton extends StatelessWidget {
   }
 }
 
-enum PopSelection { archive, delete, report, info }
+enum PopSelection { archive, delete, report, public, info }

@@ -273,8 +273,8 @@ class HomeProvider extends ChangeNotifier {
 
   Future<void> logAnalytics() async {
     await FirebaseAnalytics.instance.logScreenView(
-      screenClass: 'Home',
-      screenName: 'Home Page',
+      screenClass: 'home',
+      screenName: 'home_page',
     );
   }
 
@@ -338,7 +338,11 @@ class HomeProvider extends ChangeNotifier {
     _animationController.forward();
   }
 
-  void goToSettings(BuildContext context) {
+  void pushToSettings(BuildContext context) {
     GoRouter.of(context).push(Constants.settingsAddress);
+  }
+
+  void pushToWeb(BuildContext context) {
+    GoRouter.of(context).push(Constants.webAddress);
   }
 }

@@ -43,7 +43,7 @@ class PictureButtonProvider extends ChangeNotifier {
         // Show a dialog or notification explaining the restriction
         EmailVerifiedDialog.dialog(context, _isJoinMode);
       }
-      FirebaseAnalytics.instance.logEvent(name: 'Picture button press');
+      FirebaseAnalytics.instance.logEvent(name: 'picture_button_press');
     } catch (e) {
       debugPrint('(PictureButtonProvider) Error after pressing: $e');
     }

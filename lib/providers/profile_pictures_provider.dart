@@ -16,14 +16,42 @@ class ProfilePicturesProvider extends ChangeNotifier {
 
   PagingController<int, Picture> get pagingController => _pagingController;
 
+  Function(int) _oldFetchPage = (_) {};
+
+  bool _isReload = false;
+
+  void _resetData() {
+    _pagingController.removePageRequestListener(_oldFetchPage);
+    _pagingController.itemList = []; // Clear the item list
+    _pagingController.refresh();
+    _lastVisible = null;
+    _nextAdIndex = -1;
+  }
+
   void initState(
       {required bool showArchived,
       required bool showOnlyMe,
-      required String userID}) {
-    _pagingController.addPageRequestListener((pageKey) {
+      required String userID,
+      required bool isWeb,
+      required String? searchTerm}) {
+    _resetData();
+
+    _oldFetchPage = (pageKey) {
       _fetchPage(pageKey,
-          userID: userID, showArchived: showArchived, showOnlyMe: showOnlyMe);
-    });
+          userID: userID,
+          showArchived: showArchived,
+          showOnlyMe: showOnlyMe,
+          isWeb: isWeb,
+          searchTerm: searchTerm);
+    };
+
+    _pagingController.addPageRequestListener(_oldFetchPage);
+
+    if (_isReload) {
+      _pagingController.notifyPageRequestListeners(0);
+    } else {
+      _isReload = true;
+    }
   }
 
   void disposeState() {
@@ -44,24 +72,36 @@ class ProfilePicturesProvider extends ChangeNotifier {
     _pagingController.itemList = items;
   }
 
-  Future<void> _fetchPage(int pageKey,
-      {required String userID,
-      required bool showArchived,
-      required bool showOnlyMe}) async {
+  Future<void> _fetchPage(
+    int pageKey, {
+    required String userID,
+    required bool showArchived,
+    required bool showOnlyMe,
+    required bool isWeb,
+    required String? searchTerm,
+  }) async {
     try {
+      debugPrint(
+          '(ProfilePicturesProvider) Fetching for userId=$userID, showArchived=$showArchived, showOnlyMe=$showOnlyMe, isWeb=$isWeb, searchTerm=$searchTerm');
       final Future<QuerySnapshot> query;
       Query q;
 
       String connectedID = AuthenticationManager.id();
       String notArchivedID = AuthenticationManager.notArchivedID();
       String archivedID = AuthenticationManager.archivedID();
-      bool isFriendProfile = userID != connectedID;
 
+      // Part 0: When you are in the web section
       // Part 1: When you are on your section of your profile
       // Part 2: When you are in your everyone's part of your profile
       // Part 3: When you are in your archives
       // Part 4: When you are on your friends profile (Filter after simple query)
-      if (showOnlyMe) {
+      if (isWeb) {
+        q = Constants.picturesCollection
+            .where(Constants.publicDoc, isEqualTo: true);
+        if (searchTerm != null && searchTerm.isNotEmpty) {
+          q = q.where(Constants.pictureTakerDoc, isEqualTo: searchTerm);
+        }
+      } else if (showOnlyMe) {
         q = Constants.picturesCollection
             .where(Constants.hostId, isEqualTo: userID)
             .where(Constants.allowedUsersDoc, arrayContains: notArchivedID);
@@ -96,7 +136,11 @@ class ProfilePicturesProvider extends ChangeNotifier {
       Iterable<Picture> pictures =
           querySnapshot.docs.map((doc) => Picture.fromDocument(doc)).toList();
 
-      if (isFriendProfile) {
+      if (isWeb) {
+        pictures = pictures.where((pic) => pic.allowedIDS.every((id) =>
+            !id.toString().contains(Constants.archived) ||
+            id.toString().contains(notArchivedID)));
+      } else if (userID != connectedID) {
         pictures = pictures.where((pic) =>
             pic.allowedIDS.contains(connectedID) ||
             pic.allowedIDS.contains(archivedID) ||
@@ -111,12 +155,12 @@ class ProfilePicturesProvider extends ChangeNotifier {
       for (int i = 0; i < pictures.length; i++) {
         newItems.add(pictures.elementAt(i));
         _nextAdIndex--;
+
         if (_nextAdIndex == 0) {
           newItems.add(Picture.pictureAd);
           _nextAdIndex = 3;
           debugPrint('(ProfilePicturesProvider) Next ad at $_nextAdIndex');
         }
-        _nextAdIndex--;
       }
 
       final bool isLastPage = pictures.length < _pageSize;

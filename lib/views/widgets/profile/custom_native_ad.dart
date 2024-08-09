@@ -21,16 +21,16 @@ class _CustomNativeAdState extends State<CustomNativeAd> {
 
   // TODO: replace this test ad unit with your own ad unit.
   final String _adUnitId =
-      /*
-  Platform.isAndroid
-      ? Secrets.postTileUnitAndroid
-      : Secrets.postTileUnitIOS;
-    */
       //  /*
+      Platform.isAndroid
+          ? Secrets.postTileUnitAndroid
+          : Secrets.postTileUnitIOS;
+  //   */
+  /*
       Platform.isAndroid
           ? Constants.postAndroidTestAdUnit
           : Constants.postiOSTestAdUnit;
-  //   */
+     */
 
   /// Loads a native ad.
   void loadAd() async {

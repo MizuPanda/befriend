@@ -2,6 +2,7 @@ import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/services/share_service.dart';
 import 'package:befriend/views/dialogs/profile/delete_picture_dialog.dart';
 import 'package:befriend/views/dialogs/profile/likes_dialog.dart';
+import 'package:befriend/views/dialogs/profile/set_private_dialog.dart';
 import 'package:befriend/views/dialogs/profile/username_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -21,9 +22,10 @@ class PictureCardProvider extends ChangeNotifier {
   final String _userId;
   final bool _isUsersProfile;
   final Function(String) _onPictureActionSuccess;
+  final bool isWeb;
 
   PictureCardProvider(this._picture, this._userId, this._connectedUsername,
-      this._isUsersProfile, this._onPictureActionSuccess);
+      this._isUsersProfile, this._onPictureActionSuccess, this.isWeb);
 
   bool _isLiked = false;
   late bool _isNotLikedYet;
@@ -42,6 +44,11 @@ class PictureCardProvider extends ChangeNotifier {
 
   bool isPictureHost() {
     return _picture.hostId == _userId && _isUsersProfile;
+  }
+
+  bool isPicturePublic() {
+    return _picture.isPublic &&
+        (_picture.sessionUsers.keys.contains(AuthenticationManager.id()));
   }
 
   void _showReportDialog(BuildContext context) {
@@ -79,7 +86,15 @@ class PictureCardProvider extends ChangeNotifier {
       case PopSelection.delete:
         await _deletePicture(context);
         break;
+      case PopSelection.public:
+        await _setToPrivate(context);
+        break;
     }
+  }
+
+  Future<void> _setToPrivate(BuildContext context) async {
+    SetPrivateDialog.dialog(
+        context, _picture.id, _onPictureActionSuccess, isWeb);
   }
 
   Future<void> _deletePicture(BuildContext context) async {

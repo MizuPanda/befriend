@@ -10,17 +10,17 @@
 	<string>Befriend</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
-    <key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>https</string>
-            </array>
-            <key>CFBundleURLName</key>
-            <string>com.befriendapp.befriend</string>
-        </dict>
-    </array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>https</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>com.befriendapp.befriend</string>
+		</dict>
+	</array>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -282,6 +282,7 @@
 		<string>en</string>
 		<string>fr</string>
 	</array>
-    <key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key><false/>
+	<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
+	<false/>
 </dict>
 </plist>

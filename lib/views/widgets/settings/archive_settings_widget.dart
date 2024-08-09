@@ -20,6 +20,8 @@ class ArchiveSettingsWidget extends StatelessWidget {
         userID: AuthenticationManager.id(),
         showArchived: true,
         showOnlyMe: false,
+        isWeb: false,
+        searchTerm: null,
       ),
     );
   }

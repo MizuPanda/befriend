@@ -11,16 +11,19 @@ import '../../../models/objects/bubble.dart';
 import '../shimmers/profile_pictures_shimmer.dart';
 
 class ProfilePictures extends StatefulWidget {
-  const ProfilePictures({
-    super.key,
-    required this.userID,
-    required this.showArchived,
-    required this.showOnlyMe,
-  });
+  const ProfilePictures(
+      {super.key,
+      required this.userID,
+      required this.showArchived,
+      required this.showOnlyMe,
+      required this.isWeb,
+      required this.searchTerm});
 
   final String userID;
   final bool showArchived;
   final bool showOnlyMe;
+  final bool isWeb;
+  final String? searchTerm;
 
   @override
   State<ProfilePictures> createState() => _ProfilePicturesState();
@@ -35,7 +38,26 @@ class _ProfilePicturesState extends State<ProfilePictures> {
     _provider.initState(
         showArchived: widget.showArchived,
         showOnlyMe: widget.showOnlyMe,
-        userID: widget.userID);
+        userID: widget.userID,
+        isWeb: widget.isWeb,
+        searchTerm: widget.searchTerm);
+  }
+
+  @override
+  void didUpdateWidget(ProfilePictures oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    debugPrint(
+        '(ProfilePictures) Old=${oldWidget.searchTerm}, new=${widget.searchTerm}');
+
+    if (widget.searchTerm != oldWidget.searchTerm) {
+      _provider.initState(
+          showArchived: widget.showArchived,
+          showOnlyMe: widget.showOnlyMe,
+          userID: widget.userID,
+          isWeb: widget.isWeb,
+          searchTerm: widget.searchTerm);
+      // Reinitialize with the new searchTerm
+    }
   }
 
   @override
@@ -74,6 +96,7 @@ class _ProfilePicturesState extends State<ProfilePictures> {
                       isConnectedUserProfile:
                           provider.isConnectedUserProfile(widget.userID),
                       onArchiveSuccess: provider.handleArchiveSuccess,
+                      isWeb: widget.isWeb,
                     );
                   }, noItemsFoundIndicatorBuilder: (BuildContext context) {
                     return const Center();

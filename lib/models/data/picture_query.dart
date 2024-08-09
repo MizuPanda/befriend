@@ -24,6 +24,7 @@ class PictureQuery {
     required Map<String, String> userMap,
     required List<String> usersAllowed,
     required Map<String, String> metadata,
+    required bool isPublic,
   }) async {
     final DateTime timestamp = DateTime.now();
     final int timestampMillis = timestamp.millisecondsSinceEpoch;
@@ -38,6 +39,7 @@ class PictureQuery {
       'userMap': userMap,
       'usersAllowed': usersAllowed,
       'metadata': metadata,
+      'isPublic': isPublic
     });
   }
 

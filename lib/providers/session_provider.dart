@@ -103,11 +103,24 @@ class SessionProvider extends ChangeNotifier {
 
   void _initShowcase(BuildContext context, bool showTutorial) {
     if (showTutorial) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => showCase(context));
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ShowCaseWidget.of(context).startShowCase(host.main()
+            ? [
+                _one,
+                _two,
+                _three,
+              ]
+            : [
+                _two,
+                _three,
+              ]);
+      });
     }
   }
 
-  void showCase(BuildContext context) {
+  void showCase(
+    BuildContext context,
+  ) {
     ShowCaseWidget.of(context).startShowCase(host.main()
         ? [_one, _two, _three, _four, _five]
         : [
@@ -120,16 +133,16 @@ class SessionProvider extends ChangeNotifier {
   void _loadInterstitialAd() async {
     // Replace with your ad unit ID - TO CHANGE DEPENDENTLY ON PLATFORM
     final String adUnitId =
-        /*
+        // /*
         Platform.isAndroid
             ? Secrets.sessionAndroidAdTile
             : Secrets.sessioniOSAdTile;
-      */
-        //   /*
+    //  */
+    /*
         Platform.isAndroid
             ? Constants.sessionAndroidTestAdUnit
             : Constants.sessioniOSTestAdUnit;
-    //    */
+        */
 
     debugPrint('(SessionProvider) Ad Unit= $adUnitId');
     InterstitialAd.load(
@@ -197,7 +210,7 @@ class SessionProvider extends ChangeNotifier {
           debugPrint('(SessionProvider) Ad showed successfully.');
           _navigateHome(context);
           ad.dispose();
-          FirebaseAnalytics.instance.logEvent(name: 'Picture taken with ad');
+          FirebaseAnalytics.instance.logEvent(name: 'picture_taken_with_ad');
         },
         onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
           debugPrint('(SessionProvider) Ad failed to show.');
@@ -431,13 +444,15 @@ class SessionProvider extends ChangeNotifier {
       };
 
       await PictureQuery.callPublishPicture(
-          sessionUsers: sessionUsers,
-          caption: caption(),
-          host: host,
-          userMap: idToBubbleMap
-              .map((id, userBubble) => MapEntry(id, userBubble.username)),
-          usersAllowed: usersAllowed,
-          metadata: metadata);
+        sessionUsers: sessionUsers,
+        caption: caption(),
+        host: host,
+        userMap: idToBubbleMap
+            .map((id, userBubble) => MapEntry(id, userBubble.username)),
+        usersAllowed: usersAllowed,
+        metadata: metadata,
+        isPublic: host.isPublic(),
+      );
 
       if (context.mounted) {
         _sendNotificationsToUser(sessionUsers, host.joiners, context);

@@ -59,7 +59,8 @@ class PictureManager {
     PermissionStatus status = await permission.status;
 
     if (status.isDenied) {
-      bool isGranted = await permission.request().isGranted;
+      final PermissionStatus permissionStatus = await permission.request();
+      final bool isGranted = permissionStatus.isGranted;
       if (!isGranted) {
         if (context.mounted) {
           await PermissionDeniedDialog.showPermissionDeniedDialog(

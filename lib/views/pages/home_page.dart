@@ -1,6 +1,7 @@
 import 'package:befriend/providers/home_provider.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
 import 'package:befriend/views/widgets/home/buttons/referral_button.dart';
+import 'package:befriend/views/widgets/home/buttons/web_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -120,6 +121,7 @@ class HomeStack extends StatelessWidget {
           four: provider.four,
         ),
         const SettingsButton(),
+        const WebButton(),
         const SearchButton(),
         PictureButton(
           three: provider.three,

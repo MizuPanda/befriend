@@ -293,6 +293,7 @@
   "mb_delete": "Delete",
   "mb_report": "Report",
   "mb_info": "Info",
+  "mb_public": "Set to private",
 
   "_comment47": "Profile State",
   "prfs_fs": "Friendship Score",
@@ -333,6 +334,12 @@
 
   "_comment55": "Invitation Dialog",
   "id_title": "Friend Request",
-  "id_content": "has invited you to be friends. Do you accept?"
+  "id_content": "has invited you to be friends. Do you accept?",
 
+  "_comment56": "Set Private Dialog",
+  "spd_title": "Set to private",
+  "spd_content": "This action cannot be undone. Only you and your friends will be able to view this picture.",
+
+  "_comment57": "Web Page",
+  "wp_search": "Search..."
 }

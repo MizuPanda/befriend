@@ -3,10 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../providers/home_provider.dart';
 
-class SettingsButton extends StatelessWidget {
-  const SettingsButton({
-    super.key,
-  });
+class WebButton extends StatelessWidget {
+  const WebButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,15 +12,15 @@ class SettingsButton extends StatelessWidget {
 
     return SafeArea(
         child: Align(
-      alignment: Alignment.topRight,
+      alignment: Alignment.topLeft,
       child: Consumer<HomeProvider>(builder:
           (BuildContext context, HomeProvider provider, Widget? child) {
         return IconButton(
             onPressed: () {
-              provider.pushToSettings(context);
+              provider.pushToWeb(context);
             },
             icon: Icon(
-              Icons.settings_outlined,
+              Icons.language_rounded,
               size: 0.078 * width,
             ));
       }),

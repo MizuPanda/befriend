@@ -293,6 +293,7 @@
   "mb_delete": "Supprimer",
   "mb_report": "Signaler",
   "mb_info": "Info",
+  "mb_public": "Définir comme privé",
 
   "_comment47": "Profile State",
   "prfs_fs": "Score d'amitié",
@@ -333,5 +334,12 @@
 
   "_comment55": "Invitation Dialog",
   "id_title": "Demande d'ami",
-  "id_content": "vous a invité à devenir son ami. Acceptez-vous?"
+  "id_content": "vous a invité à devenir son ami. Acceptez-vous?",
+
+  "_comment56": "Set Private Dialog",
+  "spd_title": "Définir comme privé",
+  "spd_content": "Cette action ne peut être annulée. Seuls vous et vos amis pourront voir cette image.",
+
+  "_comment57": "Web Page",
+  "wp_search": "Rechercher..."
 }

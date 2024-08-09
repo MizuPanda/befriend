@@ -31,7 +31,7 @@ class ShareService {
 
     try {
       FirebaseAnalytics.instance.logShare(
-          contentType: 'Referral', itemId: profileId, method: 'Home button');
+          contentType: 'referral', itemId: profileId, method: 'home_button');
     } catch (e) {
       debugPrint('(ShareService) Error logging share');
     }
