@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:befriend/models/authentication/authentication.dart';
-import 'package:befriend/models/services/referral_service.dart';
 import 'package:befriend/models/services/share_service.dart';
 import 'package:befriend/models/services/simple_encryption_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -28,7 +27,9 @@ class AppLinksService {
       // Handle link when app is in warm state (front or background)
       _linkSubscription = _appLinks.uriLinkStream.listen((uriValue) {
         debugPrint(' (AppLinksService) you will listen any url updates ');
-        _handleDeepLink(uriValue, context);
+        if (context.mounted) {
+          _handleDeepLink(uriValue, context);
+        }
       }, onDone: () {
         _linkSubscription?.cancel();
       });
@@ -58,17 +59,6 @@ class AppLinksService {
             }
           }
         }
-      } else if (_isReferralLink(uri) && AuthenticationManager.isConnected()) {
-        final String referrerData = SimpleEncryptionService.getDecryptedURI(
-            uri, Constants.referrerDataParameter);
-        final List<String> data = referrerData.split(Constants.dataSeparator);
-        final String referrerId = data.first;
-        final String token = data.last;
-
-        debugPrint('(AppLinksService) referrerId=$referrerId, token=$token');
-
-        // Validate the token
-        await ReferralService.validateToken(referrerId, token, context);
       } else if (_isPostShareLink(uri) && AuthenticationManager.isConnected()) {
         final String postShareData = SimpleEncryptionService.getDecryptedURI(
             uri, Constants.postShareParameter);
@@ -91,11 +81,6 @@ class AppLinksService {
   static bool isJoinLink(Uri uri) {
     return uri.path == '/${Constants.joinPath}' &&
         uri.queryParameters.containsKey('data');
-  }
-
-  static bool _isReferralLink(Uri uri) {
-    return uri.path == '/${Constants.referralPath}' &&
-        uri.queryParameters.containsKey(Constants.referrerDataParameter);
   }
 
   static bool _isPostShareLink(Uri uri) {

@@ -144,9 +144,9 @@
   "ud_people": "People in this picture",
 
   "_comment21": "Visibility Settings Dialog",
-  "vsd_public": "All your current friends will be able to view this picture.",
+  "vsd_public": "Everyone will be able to view this picture.",
   "vsd_private": "Only you and the friends in this picture can see it.",
-  "vsd_protected": "These people will be able to see this picture:",
+  "vsd_protected": "These people will be able to see the picture:",
 
   "_comment22": "Contact Dialog",
   "cd_email": "Contact Email",
@@ -197,7 +197,7 @@
   "pp_pictures": "Pictures",
   "pp_need": "You need to add",
   "pp_friend": "as a friend to see their pictures.",
-  "pp_become": "Take a picture with them or send them your invite link to become friends",
+  "pp_become": "Take a picture with them to become friends",
 
   "_comment32": "Session Page",
   "sp_taking": "is taking a picture!",
@@ -264,8 +264,8 @@
 
   "_comment40": "Picture Button",
   "pb_three": "Swipe here to switch between Host and Join mode.",
-  "pb_join": "Join a picture",
-  "pb_take": "Take a picture",
+  "pb_join": "Join a group photo",
+  "pb_take": "Start a group photo",
 
   "_comment41": "Search Button",
   "sb_text": "Search...",
@@ -328,18 +328,11 @@
   "pc_more": "See more",
   "pc_less": "See less",
 
-  "_comment54": "Invalid Invitation Dialog",
-  "iid_title": "Invalid Invitation",
-  "iid_content": "The invitation link is invalid or has already been used.",
-
-  "_comment55": "Invitation Dialog",
-  "id_title": "Friend Request",
-  "id_content": "has invited you to be friends. Do you accept?",
-
   "_comment56": "Set Private Dialog",
   "spd_title": "Set to private",
   "spd_content": "This action cannot be undone. Only you and your friends will be able to view this picture.",
 
-  "_comment57": "Web Page",
-  "wp_search": "Search..."
+  "_comment57": "Delete History Dialog",
+  "dhd_title": "Clear search history?",
+  "dhd_content": "Are you sure you want to clear your search history? This action cannot be undone."
 }

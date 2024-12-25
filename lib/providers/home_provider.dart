@@ -74,9 +74,7 @@ class HomeProvider extends ChangeNotifier {
     //    If yes -> animateToFriend
     //    If no  -> get the user data from Firestore. If does not exist or is part of either blocked, don't do nothing
     //       Check if searchId is present in friendsIds
-    //          If yes -> Go to the friend profile
-    //          If no  -> Open a locked instance of the profile
-    // DEVELOP THAT IT GOES TO FRIENDS PROFILE IF NOT IN THE TOP 20 LIST
+    //          If yes -> Add the friend to the profile and animateToFriend
     username = username.trim();
 
     try {
@@ -106,43 +104,17 @@ class HomeProvider extends ChangeNotifier {
 
           final Bubble mainUser = await UserManager.getInstance();
 
-          if (!searchedBubble.blockedUsers.keys.contains(mainUser.id) &&
-              !mainUser.blockedUsers.keys.contains(searchedBubble.id)) {
-            if (mainUser.friendIDs.contains(searchedBubble.id)) {
-              debugPrint('(HomeProvider) $username is non loaded friend');
+          if (mainUser.friendIDs.contains(searchedBubble.id)) {
+            debugPrint('(HomeProvider) $username is non loaded friend');
 
-              final Friendship friendship =
-                  await DataQuery.getFriendshipFromBubble(searchedBubble);
+            final Friendship friendship =
+                await DataQuery.getFriendshipFromBubble(searchedBubble);
 
-              if (context.mounted) {
-                UserManager.addFriendToMain(friendship);
-                UserManager.notify();
-
-                goToFriendProfile(
-                    context,
-                    Profile(
-                        user: friendship.friend,
-                        currentUser: mainUser,
-                        notifyParent: () {},
-                        friendship: friendship,
-                        isLocked: false));
-              }
-            } else {
-              debugPrint('(HomeProvider) $username is not friend');
-
-              final Friendship friendship =
-                  Friendship.lockedFriendship(mainUser, searchedBubble);
-
-              if (context.mounted) {
-                goToFriendProfile(
-                    context,
-                    Profile(
-                        user: searchedBubble,
-                        friendship: friendship,
-                        currentUser: mainUser,
-                        notifyParent: () {},
-                        isLocked: true));
-              }
+            UserManager.addFriendToList(friendship);
+            UserManager.notify();
+            if (context.mounted) {
+              animateToFriend(context,
+                  dx: searchedBubble.x, dy: searchedBubble.y);
             }
           }
         }
@@ -342,7 +314,7 @@ class HomeProvider extends ChangeNotifier {
     GoRouter.of(context).push(Constants.settingsAddress);
   }
 
-  void pushToWeb(BuildContext context) {
-    GoRouter.of(context).push(Constants.webAddress);
+  void pushToWideSearch(BuildContext context) {
+    GoRouter.of(context).push(Constants.wideSearchAddress);
   }
 }

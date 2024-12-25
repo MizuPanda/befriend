@@ -32,8 +32,7 @@ class ProfilePicturesProvider extends ChangeNotifier {
       {required bool showArchived,
       required bool showOnlyMe,
       required String userID,
-      required bool isWeb,
-      required String? searchTerm}) {
+      required bool isLocked}) {
     _resetData();
 
     _oldFetchPage = (pageKey) {
@@ -41,8 +40,7 @@ class ProfilePicturesProvider extends ChangeNotifier {
           userID: userID,
           showArchived: showArchived,
           showOnlyMe: showOnlyMe,
-          isWeb: isWeb,
-          searchTerm: searchTerm);
+          isLocked: isLocked);
     };
 
     _pagingController.addPageRequestListener(_oldFetchPage);
@@ -72,36 +70,27 @@ class ProfilePicturesProvider extends ChangeNotifier {
     _pagingController.itemList = items;
   }
 
-  Future<void> _fetchPage(
-    int pageKey, {
-    required String userID,
-    required bool showArchived,
-    required bool showOnlyMe,
-    required bool isWeb,
-    required String? searchTerm,
-  }) async {
+  Future<void> _fetchPage(int pageKey,
+      {required String userID,
+      required bool showArchived,
+      required bool showOnlyMe,
+      required bool isLocked}) async {
     try {
       debugPrint(
-          '(ProfilePicturesProvider) Fetching for userId=$userID, showArchived=$showArchived, showOnlyMe=$showOnlyMe, isWeb=$isWeb, searchTerm=$searchTerm');
+          '(ProfilePicturesProvider) Fetching for userId=$userID, showArchived=$showArchived, showOnlyMe=$showOnlyMe, isLocked=$isLocked');
       final Future<QuerySnapshot> query;
       Query q;
 
-      String connectedID = AuthenticationManager.id();
-      String notArchivedID = AuthenticationManager.notArchivedID();
-      String archivedID = AuthenticationManager.archivedID();
+      final String connectedID = AuthenticationManager.id();
+      final String notArchivedID = AuthenticationManager.notArchivedID();
+      final String archivedID = AuthenticationManager.archivedID();
 
-      // Part 0: When you are in the web section
       // Part 1: When you are on your section of your profile
       // Part 2: When you are in your everyone's part of your profile
       // Part 3: When you are in your archives
       // Part 4: When you are on your friends profile (Filter after simple query)
-      if (isWeb) {
-        q = Constants.picturesCollection
-            .where(Constants.publicDoc, isEqualTo: true);
-        if (searchTerm != null && searchTerm.isNotEmpty) {
-          q = q.where(Constants.pictureTakerDoc, isEqualTo: searchTerm);
-        }
-      } else if (showOnlyMe) {
+      // Part 5: When you are on a non-friend profile
+      if (showOnlyMe) {
         q = Constants.picturesCollection
             .where(Constants.hostId, isEqualTo: userID)
             .where(Constants.allowedUsersDoc, arrayContains: notArchivedID);
@@ -111,11 +100,16 @@ class ProfilePicturesProvider extends ChangeNotifier {
       } else if (showArchived) {
         q = Constants.picturesCollection
             .where(Constants.allowedUsersDoc, arrayContains: archivedID);
-      } else {
+      } else if (!isLocked) {
         q = Constants.picturesCollection.where(
           Constants.allowedUsersDoc,
           arrayContains: '${Constants.notArchived}$userID',
         );
+      } else {
+        q = Constants.picturesCollection
+            .where(Constants.allowedUsersDoc,
+                arrayContains: '${Constants.notArchived}$userID')
+            .where(Constants.publicDoc, isEqualTo: true);
       }
 
       q = q.orderBy(Constants.timestampDoc, descending: true);
@@ -136,15 +130,13 @@ class ProfilePicturesProvider extends ChangeNotifier {
       Iterable<Picture> pictures =
           querySnapshot.docs.map((doc) => Picture.fromDocument(doc)).toList();
 
-      if (isWeb) {
-        pictures = pictures.where((pic) => pic.allowedIDS.every((id) =>
-            !id.toString().contains(Constants.archived) ||
-            id.toString().contains(notArchivedID)));
-      } else if (userID != connectedID) {
+      // Filtering part to filter pictures you are allowed to see
+      if (userID != connectedID && !isLocked) {
         pictures = pictures.where((pic) =>
             pic.allowedIDS.contains(connectedID) ||
             pic.allowedIDS.contains(archivedID) ||
-            pic.allowedIDS.contains(notArchivedID));
+            pic.allowedIDS.contains(notArchivedID) ||
+            pic.isPublic);
       }
 
       if (_nextAdIndex == -1) {

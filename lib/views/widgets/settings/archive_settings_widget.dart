@@ -17,11 +17,11 @@ class ArchiveSettingsWidget extends StatelessWidget {
         ),
       ),
       body: ProfilePictures(
+        profileUsername: "",
         userID: AuthenticationManager.id(),
         showArchived: true,
         showOnlyMe: false,
-        isWeb: false,
-        searchTerm: null,
+        isLocked: false,
       ),
     );
   }

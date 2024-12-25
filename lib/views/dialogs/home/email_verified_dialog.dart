@@ -2,10 +2,11 @@ import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/qr/host_listening.dart';
 import 'package:flutter/material.dart';
 
+import '../../../providers/picture_button_provider.dart';
 import '../../../utilities/app_localizations.dart';
 
 class EmailVerifiedDialog {
-  static void dialog(BuildContext context, bool isJoinMode) {
+  static void dialog(BuildContext context, ButtonMode isJoinMode) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

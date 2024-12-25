@@ -106,7 +106,6 @@ class AuthenticationManager {
       Constants.likeNotificationOnDoc: true,
       Constants.postNotificationOnDoc: true,
       Constants.languageDoc: languageCode,
-      Constants.inviteTokensDoc: {},
     };
 
     try {

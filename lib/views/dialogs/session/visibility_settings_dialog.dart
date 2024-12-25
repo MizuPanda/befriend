@@ -67,7 +67,7 @@ class VisibilitySettingsWidget extends StatelessWidget {
         headerIcon =
             Icon(Icons.public_rounded, color: Colors.green[900], size: 60);
         message = AppLocalizations.of(context)?.translate('vsd_public') ??
-            'All your current friends will be able to view this picture.';
+            'Everyone will be able to view this picture.';
       } else if (isPrivate) {
         headerIcon = Icon(Icons.lock_rounded, color: Colors.red[900], size: 60);
         message = AppLocalizations.of(context)?.translate('vsd_private') ??
@@ -87,7 +87,7 @@ class VisibilitySettingsWidget extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 AppLocalizations.of(context)?.translate('vsd_protected') ??
-                    'These people will be able to see this picture:',
+                    'These people will be able to see the picture:',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.openSans(
                   fontSize: 20,

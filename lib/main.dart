@@ -37,7 +37,7 @@ void main() async {
 
   final params = ConsentRequestParameters(
       // consentDebugSettings: Secrets.consentDebugSettings
-  );
+      );
   ConsentInformation.instance.requestConsentInfoUpdate(
     params,
     () async {
@@ -62,11 +62,12 @@ void main() async {
 
   // Set up test devices
   if (kDebugMode) {
-    configuration = RequestConfiguration(testDeviceIds: <String>[
+    configuration = RequestConfiguration(testDeviceIds: [
       Secrets.requestConfigurationDeviceID
     ]); // Replace with your actual device ID
 
     await MobileAds.instance.updateRequestConfiguration(configuration);
+    debugPrint('(Main) Settings ads for device as test');
   } else {
     // Pass all uncaught "fatal" errors from the framework to Crashlytics
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;

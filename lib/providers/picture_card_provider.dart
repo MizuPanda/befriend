@@ -22,10 +22,14 @@ class PictureCardProvider extends ChangeNotifier {
   final String _userId;
   final bool _isUsersProfile;
   final Function(String) _onPictureActionSuccess;
-  final bool isWeb;
 
-  PictureCardProvider(this._picture, this._userId, this._connectedUsername,
-      this._isUsersProfile, this._onPictureActionSuccess, this.isWeb);
+  PictureCardProvider(
+    this._picture,
+    this._userId,
+    this._connectedUsername,
+    this._isUsersProfile,
+    this._onPictureActionSuccess,
+  );
 
   bool _isLiked = false;
   late bool _isNotLikedYet;
@@ -93,8 +97,7 @@ class PictureCardProvider extends ChangeNotifier {
   }
 
   Future<void> _setToPrivate(BuildContext context) async {
-    SetPrivateDialog.dialog(
-        context, _picture.id, _onPictureActionSuccess, isWeb);
+    SetPrivateDialog.dialog(context, _picture.id, _onPictureActionSuccess);
   }
 
   Future<void> _deletePicture(BuildContext context) async {

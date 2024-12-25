@@ -20,7 +20,6 @@ class PictureCard extends StatefulWidget {
   final String connectedUsername;
   final bool isConnectedUserProfile;
   final Function(String) onArchiveSuccess;
-  final bool isWeb;
 
   const PictureCard({
     super.key,
@@ -29,7 +28,6 @@ class PictureCard extends StatefulWidget {
     required this.connectedUsername,
     required this.isConnectedUserProfile,
     required this.onArchiveSuccess,
-    required this.isWeb,
   });
 
   @override
@@ -42,8 +40,7 @@ class _PictureCardState extends State<PictureCard> {
       widget.userID,
       widget.connectedUsername,
       widget.isConnectedUserProfile,
-      widget.onArchiveSuccess,
-      widget.isWeb);
+      widget.onArchiveSuccess);
   final double _likeSizeWidthMultiplier = 35 / 448;
   bool _isExpanded = false;
 

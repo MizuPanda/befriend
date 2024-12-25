@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Befriend - Your Social Circle</title>
-  <link href="https://fonts.googleapis.com/css2?family=Coming+Soon&display=swap" rel="stylesheet">
+  <title>Home</title>
   <style>
     body {
       display: flex;
@@ -20,91 +19,35 @@
       text-align: center;
       color: #333;
       margin-top: 20px;
-      font-family: 'Coming Soon', cursive;
-      font-size: 36px;
     }
-    p {
-      text-align: center;
-      color: #555;
-      font-size: 20px;
-      max-width: 600px;
-      margin: 20px auto;
-    }
-    .app-screenshots {
+    .center-nav, .bottom-nav {
       display: flex;
       justify-content: center;
-      gap: 20px;
-      margin: 30px 0;
     }
-    .app-screenshots img {
-      width: 250px;
-      height: auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    .center-nav {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 30px;
-    }
-    .store-link {
-      display: inline-block;
-      text-decoration: none;
-    }
-    .store-link img {
-      display: inline-block; /* Ensure images are treated as inline-block elements */
-      height: 60px; /* Set consistent height */
-      width: auto; /* Maintain aspect ratio */
-    }
-    .bottom-nav {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-    .bottom-nav a {
+    .center-nav a, .bottom-nav a {
       text-decoration: none;
       color: #007BFF;
+      margin: 0 15px;
       font-size: 18px;
     }
-    .bottom-nav a:hover {
+    .center-nav a:hover, .bottom-nav a:hover {
       text-decoration: underline;
     }
-    /* Spacing between store buttons and the bottom links */
-    .store-section {
-      margin-bottom: 50px; /* Add space before the bottom links */
+    .bottom-nav {
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-
 <h1>Befriend - Expand Your Social Circle</h1>
-
-<p>Befriend helps you connect with people nearby who share your interests. Whether you're looking to make new friends, join local communities, or simply expand your social circle, Befriend is the app for you!</p>
-
-<div class="app-screenshots">
-  <img src="assets/screenshot1.png" alt="App Screenshot 1">
-  <img src="assets/screenshot2.png" alt="App Screenshot 2">
-  <img src="assets/screenshot3.png" alt="App Screenshot 3">
-  <img src="assets/screenshot4.png" alt="App Screenshot 4">
+<div class="center-nav">
+  <a href="https://play.google.com/store/apps/details?id=com.befriendapp.befriend&hl=en_CA">Google Play Store</a>
+  <a href="https://apps.apple.com/ca/app/befriend-your-social-circle/id6502918911">Apple App Store</a>
 </div>
-
-<!-- Store Section with space before bottom links -->
-<div class="center-nav store-section">
-  <a class="store-link" href="https://play.google.com/store/apps/details?id=com.befriendapp.befriend&hl=en_CA">
-    <img src="assets/google-play-icon.png" alt="Get it on Google Play">
-  </a>
-  <a class="store-link" href="https://apps.apple.com/ca/app/befriend-your-social-circle/id6502918911">
-    <img src="assets/apple-store-icon.png" alt="Get it on the App Store">
-  </a>
-</div>
-
 <div class="bottom-nav">
   <a href="pages/privacy.html">Privacy</a>
   <a href="pages/terms.html">Terms & Conditions</a>
   <a href="pages/support.html">Support</a>
 </div>
-
 </body>
 </html>

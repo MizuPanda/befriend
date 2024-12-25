@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../providers/home_provider.dart';
 
-class WebButton extends StatelessWidget {
-  const WebButton({super.key});
+class WideSearchButton extends StatelessWidget {
+  const WideSearchButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class WebButton extends StatelessWidget {
           (BuildContext context, HomeProvider provider, Widget? child) {
         return IconButton(
             onPressed: () {
-              provider.pushToWeb(context);
+              provider.pushToWideSearch(context);
             },
             icon: Icon(
               Icons.language_rounded,

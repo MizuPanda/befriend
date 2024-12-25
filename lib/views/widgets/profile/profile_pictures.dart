@@ -4,26 +4,28 @@ import 'package:befriend/views/widgets/profile/custom_native_ad.dart';
 import 'package:befriend/views/widgets/profile/picture_card.dart';
 import 'package:befriend/providers/profile_pictures_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/objects/bubble.dart';
+import '../../../utilities/app_localizations.dart';
 import '../shimmers/profile_pictures_shimmer.dart';
 
 class ProfilePictures extends StatefulWidget {
   const ProfilePictures(
       {super.key,
+      required this.profileUsername,
       required this.userID,
       required this.showArchived,
       required this.showOnlyMe,
-      required this.isWeb,
-      required this.searchTerm});
+      required this.isLocked});
 
   final String userID;
   final bool showArchived;
   final bool showOnlyMe;
-  final bool isWeb;
-  final String? searchTerm;
+  final bool isLocked;
+  final String profileUsername;
 
   @override
   State<ProfilePictures> createState() => _ProfilePicturesState();
@@ -39,26 +41,26 @@ class _ProfilePicturesState extends State<ProfilePictures> {
         showArchived: widget.showArchived,
         showOnlyMe: widget.showOnlyMe,
         userID: widget.userID,
-        isWeb: widget.isWeb,
-        searchTerm: widget.searchTerm);
+        isLocked: widget.isLocked);
   }
 
+  /*
   @override
   void didUpdateWidget(ProfilePictures oldWidget) {
     super.didUpdateWidget(oldWidget);
     debugPrint(
-        '(ProfilePictures) Old=${oldWidget.searchTerm}, new=${widget.searchTerm}');
+        '(ProfilePictures) Old=${oldWidget.isFriend}, new=${widget.isFriend}');
 
     if (widget.searchTerm != oldWidget.searchTerm) {
       _provider.initState(
           showArchived: widget.showArchived,
           showOnlyMe: widget.showOnlyMe,
           userID: widget.userID,
-          isWeb: widget.isWeb,
           searchTerm: widget.searchTerm);
       // Reinitialize with the new searchTerm
     }
   }
+   */
 
   @override
   void dispose() {
@@ -96,9 +98,44 @@ class _ProfilePicturesState extends State<ProfilePictures> {
                       isConnectedUserProfile:
                           provider.isConnectedUserProfile(widget.userID),
                       onArchiveSuccess: provider.handleArchiveSuccess,
-                      isWeb: widget.isWeb,
                     );
                   }, noItemsFoundIndicatorBuilder: (BuildContext context) {
+                    if (widget.isLocked) {
+                      final double height = MediaQuery.of(context).size.height;
+                      final double width = MediaQuery.of(context).size.width;
+
+                      return Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10.0 / 448 * width),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '${AppLocalizations.of(context)?.translate('pp_need') ?? 'You need to add'} ${widget.profileUsername} ${AppLocalizations.of(context)?.translate('pp_friend') ?? 'as a friend to see their pictures.'}',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.openSans(
+                                fontSize: 17,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                            Text(
+                              AppLocalizations.of(context)
+                                      ?.translate('pp_become') ??
+                                  'Take a picture with them to become friends',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.openSans(
+                                  fontSize: 15, color: Colors.grey),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                            SizedBox(
+                              height: 0.1 * height,
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                     return const Center();
                   }, firstPageProgressIndicatorBuilder: (BuildContext context) {
                     return const ProfilePicturesShimmer();

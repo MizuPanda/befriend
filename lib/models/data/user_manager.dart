@@ -75,11 +75,15 @@ class UserManager {
   }
 
   static void addFriendToMain(Friendship friendship) {
+    addFriendToList(friendship);
+    _setPosToMid();
+  }
+
+  static void addFriendToList(Friendship friendship) {
     debugPrint(
         '(UserManager) Added ${friendship.friendUsername()} to main user');
     _addFriend(friendship);
     _addFriendToHome(friendship);
-    _setPosToMid();
   }
 
   static void notify() {
@@ -100,12 +104,6 @@ class UserManager {
 
   static void _setPosToMid() {
     _home?.setPosToMid();
-  }
-
-  static void setPosToFriend(double dx, double dy) {
-    if (_home != null) {
-      _home?.transformationController?.value = _home!.translate(dx, dy);
-    }
   }
 
   static Future<void> reloadHome(BuildContext context) async {

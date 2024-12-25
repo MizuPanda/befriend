@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../providers/picture_button_provider.dart';
 import '../../utilities/app_localizations.dart';
 import '../../utilities/constants.dart';
 import '../../views/dialogs/rounded_dialog.dart';
@@ -24,13 +25,21 @@ class HostListening {
     String hostUserId = host.host.id;
 
     return Constants.usersCollection.doc(hostUserId).snapshots().listen(
-      (snapshot) => _processSnapshot(snapshot, context, host, notifyListeners),
+      (snapshot) {
+        if (context.mounted) {
+          return _processSnapshot(snapshot, context, host, notifyListeners);
+        }
+      },
       onError: (error) {
         debugPrint('(HostListening): Error in Firestore subscription: $error');
-        ErrorHandling.showError(
-            context,
-            AppLocalizations.of(context)?.translate('general_error_message3') ??
-                'An error occurred. Please try again later...');
+
+        if (context.mounted) {
+          ErrorHandling.showError(
+              context,
+              AppLocalizations.of(context)
+                      ?.translate('general_error_message3') ??
+                  'An error occurred. Please try again later...');
+        }
       },
     );
   }
@@ -174,25 +183,27 @@ class HostListening {
   }
 
   static Future<void> pictureButton(
-      BuildContext context, bool isJoinMode) async {
+      BuildContext context, ButtonMode buttonMode) async {
     // Allow access to the feature
     await ConsentManager.getConsentForm(context, reload: false);
 
     if (context.mounted) {
-      if (isJoinMode) {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const RoundedDialog(child: JoiningWidget());
-            });
-      } else {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const RoundedDialog(
-                child: HostingWidget(isHost: true, host: null),
-              );
-            });
+      switch (buttonMode) {
+        case ButtonMode.host:
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return const RoundedDialog(
+                  child: HostingWidget(isHost: true, host: null),
+                );
+              });
+        case ButtonMode.join:
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return const RoundedDialog(child: JoiningWidget());
+              });
+          break;
       }
     }
   }

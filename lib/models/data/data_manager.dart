@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../authentication/authentication.dart';
+import '../objects/bubble.dart';
 import 'data_query.dart';
 
 class DataManager {
@@ -71,5 +72,10 @@ class DataManager {
       debugPrint('(DataManager): Error converting timestamp: $e');
       return DateTime.now();
     }
+  }
+
+  static bool isBlocked(Bubble bubble1, Bubble bubble2) {
+    return bubble2.blockedUsers.keys.contains(bubble1.id) ||
+        bubble1.blockedUsers.keys.contains(bubble2.id);
   }
 }

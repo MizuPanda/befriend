@@ -10,7 +10,7 @@ import 'package:befriend/views/pages/profile_page.dart';
 import 'package:befriend/views/pages/settings_page.dart';
 import 'package:befriend/views/pages/sign_up_page.dart';
 import 'package:befriend/views/pages/session_page.dart';
-import 'package:befriend/views/pages/web_page.dart';
+import 'package:befriend/views/pages/wide_search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -29,7 +29,7 @@ class MyRouter {
   static const String mutual = 'mutual';
   static const String friendList = 'friendList';
   static const String settings = 'settings';
-  static const String web = 'web';
+  static const String wideSearch = 'wiseSearch';
 
   static final GoRouter router = GoRouter(
     routes: <RouteBase>[
@@ -107,9 +107,14 @@ class MyRouter {
                   return const SettingsPage();
                 }),
             GoRoute(
-                path: web,
+                path: settings,
                 builder: (BuildContext context, GoRouterState state) {
-                  return const WebPage();
+                  return const SettingsPage();
+                }),
+            GoRoute(
+                path: wideSearch,
+                builder: (BuildContext context, GoRouterState state) {
+                  return const WideSearchPage();
                 }),
           ]),
     ],

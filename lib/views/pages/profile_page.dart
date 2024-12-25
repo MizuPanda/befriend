@@ -75,18 +75,18 @@ class ProfilePage extends StatelessWidget {
                     child: TabBarView(
                       children: [
                         ProfilePictures(
+                          profileUsername: profile.user.username,
                           userID: profile.user.id,
                           showArchived: false,
                           showOnlyMe: true,
-                          isWeb: false,
-                          searchTerm: null,
+                          isLocked: false,
                         ),
                         ProfilePictures(
+                          profileUsername: profile.user.username,
                           userID: profile.user.id,
                           showArchived: false,
                           showOnlyMe: false,
-                          isWeb: false,
-                          searchTerm: null,
+                          isLocked: false,
                         ),
                       ],
                     ),
@@ -183,41 +183,13 @@ class ProfilePage extends StatelessWidget {
                       )),
                 ),
                 Expanded(
-                  child: profile.isLocked
-                      ? Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10.0 / 448 * width),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              AutoSizeText(
-                                '${AppLocalizations.of(context)?.translate('pp_need') ?? 'You need to add'} ${profile.user.username} ${AppLocalizations.of(context)?.translate('pp_friend') ?? 'as a friend to see their pictures.'}',
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.openSans(
-                                  fontSize: 17,
-                                ),
-                              ),
-                              AutoSizeText(
-                                AppLocalizations.of(context)
-                                        ?.translate('pp_become') ??
-                                    'Take a picture with them or send them your invite link to become friends',
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.openSans(
-                                    fontSize: 15, color: Colors.grey),
-                              ),
-                              SizedBox(
-                                height: 0.1 * height,
-                              ),
-                            ],
-                          ),
-                        )
-                      : ProfilePictures(
-                          userID: profile.user.id,
-                          showArchived: false,
-                          isWeb: false,
-                          showOnlyMe: false,
-                          searchTerm: null,
-                        ),
+                  child: ProfilePictures(
+                    profileUsername: profile.user.username,
+                    userID: profile.user.id,
+                    showArchived: false,
+                    showOnlyMe: false,
+                    isLocked: profile.isLocked,
+                  ),
                 ),
               ],
             ),

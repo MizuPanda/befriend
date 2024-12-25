@@ -133,16 +133,16 @@ class SessionProvider extends ChangeNotifier {
   void _loadInterstitialAd() async {
     // Replace with your ad unit ID - TO CHANGE DEPENDENTLY ON PLATFORM
     final String adUnitId =
-        // /*
+        /*
         Platform.isAndroid
             ? Secrets.sessionAndroidAdTile
             : Secrets.sessioniOSAdTile;
-    //  */
-    /*
+      */
+        // /*
         Platform.isAndroid
             ? Constants.sessionAndroidTestAdUnit
             : Constants.sessioniOSTestAdUnit;
-        */
+    //   */
 
     debugPrint('(SessionProvider) Ad Unit= $adUnitId');
     InterstitialAd.load(

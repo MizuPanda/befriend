@@ -22,7 +22,6 @@ class Constants {
   static const String postNotificationOnDoc = 'postNotificationOn';
   static const String likeNotificationOnDoc = 'likeNotificationOn';
   static const String languageDoc = 'language';
-  static const String inviteTokensDoc = 'inviteTokens';
   //FRIENDSHIPS
   static const String progressDoc = 'progress';
   static const String levelDoc = 'level';
@@ -50,6 +49,9 @@ class Constants {
   static const String sessionPictureStorage = 'session_pictures';
   static const String tempPictureStorage = 'temp';
   static const String postedPictureStorage = 'posted';
+  // HISTORY
+  static const String userIdDoc = 'userId';
+  static const String searchedIdDoc = 'searchedId';
   // SOCIAL LINK
   static const double pictureExpValue = 0.2;
   static const int baseLevel = 1;
@@ -59,7 +61,8 @@ class Constants {
   static CollectionReference usersCollection = _firestore.collection('users');
   static CollectionReference picturesCollection =
       _firestore.collection('pictures');
-  // HOME PAGE SIZES
+  static CollectionReference searchHistoryCollection =
+      _firestore.collection('searchHistory'); // HOME PAGE SIZES
   static const double homeButtonSize = 20;
   static const double homeButtonAddSize = 28;
   static const double homeHorizontalPaddingMultiplier = 0.033;
@@ -134,5 +137,5 @@ class Constants {
   static const String mutualAddress = '/${MyRouter.mutual}';
   static const String friendListAddress = '/${MyRouter.friendList}';
   static const String settingsAddress = '/${MyRouter.settings}';
-  static const String webAddress = '/${MyRouter.web}';
+  static const String wideSearchAddress = '/${MyRouter.wideSearch}';
 }

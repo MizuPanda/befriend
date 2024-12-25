@@ -18,6 +18,7 @@ class SearchButton extends StatelessWidget {
     final double height = MediaQuery.of(context).size.height;
 
     final double friendPadding = 0.177 * width;
+    final double normalPadding = 0.067 * width;
 
     return Consumer<HomeProvider>(
         builder: (BuildContext context, HomeProvider provider, Widget? child) {
@@ -30,7 +31,8 @@ class SearchButton extends StatelessWidget {
           helpText:
               AppLocalizations.of(context)?.translate('sb_text') ?? "Search...",
           rtl: true,
-          width: MediaQuery.of(context).size.width - friendPadding,
+          width: MediaQuery.of(context).size.width -
+              (provider.home.user.main() ? normalPadding : friendPadding),
           onSuffixTap: provider.clearSearch,
           textController: provider.searchEditingController,
           onSubmitted: (String username) {

@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -48,6 +45,16 @@ class DefaultFirebaseOptions {
         );
     }
   }
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDiCdjOcnRgKIl-bE5699G3xqXFPodXDIQ',
+    appId: '1:513327974218:web:538a4e9faa322db1fd23b3',
+    messagingSenderId: '513327974218',
+    projectId: 'befriend-b14ca',
+    authDomain: 'befriend-b14ca.firebaseapp.com',
+    storageBucket: 'befriend-b14ca.appspot.com',
+    measurementId: 'G-16FGZQE832',
+  );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyD7k2haC__y8fe3hygsffOYZWbTB6mICfk',

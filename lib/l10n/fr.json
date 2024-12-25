@@ -144,9 +144,9 @@
   "ud_people": "Personnes figurant sur cette photo",
 
   "_comment21": "Visibility Settings Dialog",
-  "vsd_public": "Tous vos amis actuels pourront voir cette image.",
+  "vsd_public": "Tout le monde pourra voir cette photo.",
   "vsd_private": "Seuls vous et les amis présents sur cette photo peuvent la voir.",
-  "vsd_protected": "Ces personnes pourront voir cette image :",
+  "vsd_protected": "Ces personnes pourront voir la photo :",
 
   "_comment22": "Contact Dialog",
   "cd_email": "Email à contacter",
@@ -197,7 +197,7 @@
   "pp_pictures": "Photos",
   "pp_need": "Vous devez ajouter",
   "pp_friend": "en tant qu'ami pour voir leurs photos.",
-  "pp_become": "Prenez une photo ensemble ou envoyez-leur votre lien d'invitation pour devenir amis.",
+  "pp_become": "Prenez une photo ensemble pour devenir amis.",
 
   "_comment32": "Session Page",
   "sp_taking": "est en train de prendre la photo!",
@@ -264,8 +264,8 @@
 
   "_comment40": "Picture Button",
   "pb_three": "Glissez ici pour basculer entre le mode Hôte et le mode Rejoindre.",
-  "pb_join": "Rejoindre une photo",
-  "pb_take": "Prendre une photo",
+  "pb_join": "Rejoindre une photo de groupe",
+  "pb_take": "Prendre une photo de groupe",
 
   "_comment41": "Search Button",
   "sb_text": "Recherche...",
@@ -328,18 +328,11 @@
   "pc_more": "Voir plus",
   "pc_less": "Voir moins",
 
-  "_comment54": "Invalid Invitation Dialog",
-  "iid_title": "Invitation invalide",
-  "iid_content": "Le lien d'invitation n'est pas valide ou a déjà été utilisé.",
-
-  "_comment55": "Invitation Dialog",
-  "id_title": "Demande d'ami",
-  "id_content": "vous a invité à devenir son ami. Acceptez-vous?",
-
   "_comment56": "Set Private Dialog",
   "spd_title": "Définir comme privé",
   "spd_content": "Cette action ne peut être annulée. Seuls vous et vos amis pourront voir cette image.",
 
-  "_comment57": "Web Page",
-  "wp_search": "Rechercher..."
+  "_comment57": "Delete History Dialog",
+  "dhd_title": "Effacer l'historique?",
+  "dhd_content": "Êtes vous sûr de vouloir effacer votre historique? Cette action ne peut pas être annulée."
 }

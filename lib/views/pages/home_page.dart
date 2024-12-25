@@ -1,7 +1,5 @@
 import 'package:befriend/providers/home_provider.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
-import 'package:befriend/views/widgets/home/buttons/referral_button.dart';
-import 'package:befriend/views/widgets/home/buttons/web_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +11,7 @@ import '../widgets/home/buttons/home_button.dart';
 import '../widgets/home/buttons/picture_button.dart';
 import '../widgets/home/buttons/search_button.dart';
 import '../widgets/home/buttons/settings_button.dart';
+import '../widgets/home/buttons/wide_search_button.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key, required this.home});
@@ -121,12 +120,12 @@ class HomeStack extends StatelessWidget {
           four: provider.four,
         ),
         const SettingsButton(),
-        const WebButton(),
+        const WideSearchButton(),
         const SearchButton(),
         PictureButton(
           three: provider.three,
         ),
-        connectedHome ? const ReferralButton() : const HomeButton(),
+        if (!connectedHome) const HomeButton(),
       ],
     );
   }

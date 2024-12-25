@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import '../../../utilities/app_localizations.dart';
 
 class SetPrivateDialog {
-  static void dialog(BuildContext context, String pictureId,
-      Function(String) onSuccess, bool isWeb) {
+  static void dialog(
+      BuildContext context, String pictureId, Function(String) onSuccess) {
     final double width = MediaQuery.of(context).size.width;
     const double textButtonSize = 15.0;
 
@@ -42,9 +42,6 @@ class SetPrivateDialog {
                     await Constants.picturesCollection.doc(pictureId).update({
                       Constants.publicDoc: false,
                     });
-                    if (isWeb) {
-                      onSuccess(pictureId);
-                    }
                   } catch (e) {
                     debugPrint(
                         '(SetPrivateDialog) Error setting public to private: $e');

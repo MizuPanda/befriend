@@ -133,7 +133,6 @@ class FriendListProvider extends ChangeNotifier {
             UserManager.notify();
           }
         }
-        // _allFriends.addAll(friendships);
       }
 
       final List<Friendship> newItems = friendships;

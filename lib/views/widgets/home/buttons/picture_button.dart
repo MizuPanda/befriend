@@ -60,29 +60,7 @@ class _PictureButtonState extends State<PictureButton> {
                         height: 0.054 * height,
                         decoration: BoxDecoration(
                             gradient: RadialGradient(
-                              colors: provider.isJoinMode
-                                  ? (lightMode
-                                      ? const [
-                                          Color.fromRGBO(203, 98, 98, 1.0),
-                                          Color.fromRGBO(213, 18, 18, 1.0),
-                                          Color.fromRGBO(203, 98, 98, 1.0),
-                                        ]
-                                      : const [
-                                          Color.fromRGBO(138, 67, 67, 1.0),
-                                          Color.fromRGBO(155, 15, 15, 1.0),
-                                          Color.fromRGBO(138, 67, 67, 1.0),
-                                        ])
-                                  : (lightMode
-                                      ? const [
-                                          Color.fromRGBO(109, 130, 208, 1.0),
-                                          Color.fromRGBO(0, 73, 243, 1.0),
-                                          Color.fromRGBO(109, 130, 208, 1.0),
-                                        ]
-                                      : const [
-                                          Color.fromRGBO(76, 102, 141, 1.0),
-                                          Color.fromRGBO(0, 49, 171, 1.0),
-                                          Color.fromRGBO(76, 102, 141, 1.0),
-                                        ]),
+                              colors: provider.getGradient(lightMode),
                               radius: 20,
                             ),
                             borderRadius: const BorderRadius.all(
@@ -90,11 +68,7 @@ class _PictureButtonState extends State<PictureButton> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: provider.isJoinMode
-                                    ? const Color.fromRGBO(213, 18, 18, 1.0)
-                                        .withOpacity(0.2)
-                                    : const Color.fromRGBO(0, 73, 243, 1.0)
-                                        .withOpacity(0.2),
+                                color: provider.getShadowColor(),
                                 spreadRadius: 4,
                                 blurRadius: 10,
                                 offset: const Offset(0, 3),
@@ -120,35 +94,29 @@ class _PictureButtonState extends State<PictureButton> {
                                   onPressed: provider.switchMode,
                                 ),
                               ),
-                              AutoSizeText(
-                                provider.isJoinMode
-                                    ? AppLocalizations.of(context)
-                                            ?.translate('pb_join') ??
-                                        'Join a picture'
-                                    : AppLocalizations.of(context)
-                                            ?.translate('pb_take') ??
-                                        'Take a picture',
-                                style: GoogleFonts.openSans(
-                                  textStyle: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
-                                    fontSize: 26,
+                              Flexible(
+                                child: AutoSizeText(
+                                  provider.getText(context),
+                                  style: GoogleFonts.openSans(
+                                    textStyle: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                      fontSize: 26,
+                                    ),
                                   ),
                                 ),
                               ),
-                              Flexible(
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                      right: provider.dragPosition < -50
-                                          ? 22 / 448 * width
-                                          : 0),
-                                  child: IconButton(
-                                    icon: const Icon(
-                                      Icons.keyboard_double_arrow_right_rounded,
-                                      color: Colors.white,
-                                    ),
-                                    onPressed: provider.switchMode,
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    right: provider.dragPosition < -50
+                                        ? 22 / 448 * width
+                                        : 0),
+                                child: IconButton(
+                                  icon: const Icon(
+                                    Icons.keyboard_double_arrow_right_rounded,
+                                    color: Colors.white,
                                   ),
+                                  onPressed: provider.switchMode,
                                 ),
                               ),
                             ],
