@@ -46,6 +46,15 @@ class ProfileState extends StatelessWidget {
                 ),
               ),
               const Spacer(),
+              if (profile.friendship?.isBestFriend ?? false)
+                AutoSizeText(
+                  AppLocalizations.of(context)?.translate("prfs_best") ??
+                      "Your Best Friend",
+                  style: GoogleFonts.openSans(
+                      textStyle: const TextStyle(
+                    fontSize: 18,
+                  )),
+                )
             ],
           ),
           if (!profile.user.main())
@@ -70,6 +79,7 @@ class ProfileState extends StatelessWidget {
                   padding: EdgeInsets.only(bottom: 0.005 * height),
                   child: ProgressBar(
                     progress: profile.friendship!.progress,
+                    isBestFriend: profile.friendship!.isBestFriend,
                   ),
                 ),
                 if (!provider.areUsernamesEmpty())

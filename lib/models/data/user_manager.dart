@@ -164,4 +164,12 @@ class UserManager {
   static void setLanguageCode(String value) {
     _instance?.languageCode = value;
   }
+
+  static String getBestFriendID() {
+    return _instance?.bestFriendID ?? '';
+  }
+
+  static void setBestFriendID(String id) {
+    _instance?.bestFriendID = id;
+  }
 }

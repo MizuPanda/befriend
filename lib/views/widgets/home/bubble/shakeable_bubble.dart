@@ -80,8 +80,11 @@ class _ShakeableBubbleState extends State<ShakeableBubble>
                     .selectionClick(); // Optionally provide haptic feedback
                 Future.delayed(const Duration(milliseconds: 275), () {
                   if (_isPressed) {
-                    GoRouter.of(context).push(Constants.homepageAddress,
-                        extra: widget.specificHome);
+                    if (context.mounted) {
+                      GoRouter.of(context).push(Constants.homepageAddress,
+                          extra: widget.specificHome);
+                    }
+
                     _animationController.reset();
                   }
                 });
@@ -128,7 +131,10 @@ class _ShakeableBubbleState extends State<ShakeableBubble>
                   }),
             ),
           ),
-          UsernameText(user: widget.specificHome.user)
+          UsernameText(
+            user: widget.specificHome.user,
+            isBestFriend: widget.specificHome.friendship?.isBestFriend ?? false,
+          )
         ],
       );
     });

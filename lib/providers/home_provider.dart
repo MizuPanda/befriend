@@ -137,8 +137,6 @@ class HomeProvider extends ChangeNotifier {
         final List<dynamic> randomFriendsIDS =
             home.user.nonLoadedFriends().take(Constants.friendsLimit).toList();
 
-        randomFriendsIDS.shuffle();
-
         final List<dynamic> nonLoadedMainFriendIDS = [];
         if (!home.user.main()) {
           final Bubble mainUser = await UserManager.getInstance();
@@ -147,20 +145,23 @@ class HomeProvider extends ChangeNotifier {
               '(HomeProvider) non loaded friends: $nonLoadedMainFriendIDS');
         }
 
+        final Friendship? bestFriend = await _getBestFriend();
+
+        if (bestFriend != null) {
+          _loadFriend(bestFriend);
+
+          randomFriendsIDS.remove(bestFriend.friend.id);
+          notifyListeners();
+        }
+
         for (String friendID in randomFriendsIDS) {
           Friendship friend =
               await DataQuery.getFriendship(home.user.id, friendID);
-          debugPrint(
-              '(HomeProvider) Adding ${friend.friendUsername()} to home');
 
-          home.user.friendships.add(friend);
-          home.addFriendToHome(friend);
-
-          // Trigger haptic feedback
-          HapticFeedback.mediumImpact();
-          home.setPosToMid();
+          _loadFriend(friend);
 
           // If this is a friend of the connected user that was not loaded yet.
+          // --> Add it to main.
           if (nonLoadedMainFriendIDS.contains(friendID) && !home.user.main()) {
             final Friendship friendship =
                 await DataQuery.getFriendshipFromBubble(friend.friend);
@@ -177,6 +178,58 @@ class HomeProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('(HomeProvider) Error loading friends asynchronously: $e');
     }
+  }
+
+  Future<Friendship?> _getBestFriend() async {
+    try {
+      // Get best friend.
+      // load friend into friendships and then set isBestFriend to true
+      // Return friend id
+      Query query = Constants.friendshipsCollection
+          .where(Filter.or(Filter(Constants.user1Doc, isEqualTo: home.user.id),
+              Filter(Constants.user2Doc, isEqualTo: home.user.id)))
+          .orderBy(Constants.levelDoc, descending: true)
+          .orderBy(Constants.progressDoc, descending: true)
+          .limit(1);
+
+      QuerySnapshot snapshot = await query.get();
+
+      if (snapshot.size == 1) {
+        final DocumentSnapshot doc = snapshot.docs.first;
+        final String user1 = DataManager.getString(doc, Constants.user1Doc);
+        final String user2 = DataManager.getString(doc, Constants.user2Doc);
+
+        final String friendId = user1 == home.user.id ? user2 : user1;
+        UserManager.setBestFriendID(friendId);
+
+        final DocumentSnapshot bubbleDoc =
+            await DataManager.getData(id: friendId);
+        final ImageProvider avatar = await DataManager.getAvatar(bubbleDoc);
+
+        final Bubble friendBubble = Bubble.fromDocs(bubbleDoc, avatar);
+        final Friendship friendship =
+            Friendship.fromDocs(home.user.id, friendBubble, doc);
+
+        friendship.isBestFriend = true;
+        return friendship;
+      }
+
+      return null;
+    } catch (e) {
+      debugPrint('(HomeProvider) Error in fetching best friend: $e');
+      return null;
+    }
+  }
+
+  Future<void> _loadFriend(Friendship friend) async {
+    debugPrint('(HomeProvider) Adding ${friend.friendUsername()} to home');
+
+    home.user.friendships.add(friend);
+    home.addFriendToHome(friend);
+
+    // Trigger haptic feedback
+    HapticFeedback.mediumImpact();
+    home.setPosToMid();
   }
 
   void _onAnimateReset() {

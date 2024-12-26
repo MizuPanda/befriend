@@ -13,6 +13,7 @@ class FriendshipProgress {
   String friendshipID;
   DateTime created;
   int index;
+  bool isBestFriend = false;
 
   FriendshipProgress({
     required this.user1,

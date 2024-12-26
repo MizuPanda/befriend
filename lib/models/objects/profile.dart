@@ -22,6 +22,10 @@ class Profile {
     this.isLocked = false,
     this.initialIndex = 1,
   }) {
+    if (friendship != null && !friendship!.isBestFriend) {
+      friendship?.isBestFriend =
+          currentUser.bestFriendID == friendship!.friendId();
+    }
     initializeCommonFriends();
   }
 

@@ -153,6 +153,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                                         ),
                                         ProgressBar(
                                           progress: friendship.progress,
+                                          isBestFriend: friendship.isBestFriend,
                                         ),
                                       ],
                                     ),

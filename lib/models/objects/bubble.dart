@@ -27,6 +27,8 @@ class Bubble {
 
   bool postNotificationOn;
   bool likeNotificationOn;
+
+  String bestFriendID = '';
   //-----------------------
   double size;
   double x = 0;

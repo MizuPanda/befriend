@@ -35,6 +35,12 @@ class BubbleGradientIndicator extends StatelessWidget {
 
   List<Color> _generateGradientColors(
       int level, double progress, String username) {
+    if (friendship.isBestFriend) {
+      return [
+        const Color.fromRGBO(235, 209, 151, 1),
+        const Color.fromRGBO(187, 155, 73, 1)
+      ];
+    }
     Color startColor = _generateStartColor(level, progress, username);
     Color endColor = _generateEndColor(level, progress, username);
 
