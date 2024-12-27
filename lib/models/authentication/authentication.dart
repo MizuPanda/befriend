@@ -102,7 +102,7 @@ class AuthenticationManager {
       Constants.sliderDoc: 0,
       Constants.hostingFriendshipsDoc: {},
       'consent': {'given': true, 'when': FieldValue.serverTimestamp()},
-      Constants.blockedUsersDoc: {},
+      Constants.blockedUsersDoc: [],
       Constants.likeNotificationOnDoc: true,
       Constants.postNotificationOnDoc: true,
       Constants.languageDoc: languageCode,
@@ -113,7 +113,7 @@ class AuthenticationManager {
       await user.sendEmailVerification();
       ConsentManager.setTagForChildrenAds(birthYear);
       if (context.mounted) {
-        GoRouter.of(context).replace(Constants.pictureAddress);
+        GoRouter.of(context).pushReplacement(Constants.pictureAddress);
       }
 
       debugPrint("Successfully added the data to user: $username");

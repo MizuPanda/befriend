@@ -34,7 +34,6 @@ class PictureQuery {
       'timestamp': timestampMillis,
       'caption': caption,
       'hostId': host.host.id,
-      'hostUsername': host.host.username,
       'imageUrl': host.imageUrl!,
       'userMap': userMap,
       'usersAllowed': usersAllowed,

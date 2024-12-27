@@ -6,8 +6,6 @@ import '../data/data_manager.dart';
 class FriendshipProgress {
   String user1;
   String user2;
-  String username1;
-  String username2;
   int level;
   double progress;
   String friendshipID;
@@ -18,8 +16,6 @@ class FriendshipProgress {
   FriendshipProgress({
     required this.user1,
     required this.user2,
-    required this.username1,
-    required this.username2,
     required this.friendshipID,
     required this.level,
     required this.progress,
@@ -37,14 +33,6 @@ class FriendshipProgress {
       return user2;
     }
     return user1;
-  }
-
-  String friendUsername() {
-    // If current user id is 0, then friend index is 1;
-    if (index == 0) {
-      return username2;
-    }
-    return username1;
   }
 
   factory FriendshipProgress.fromMap(
@@ -66,12 +54,6 @@ class FriendshipProgress {
         index: index,
         user1: user1,
         user2: user2,
-        username1: map.containsKey(Constants.username1Doc)
-            ? map[Constants.username1Doc]
-            : 'FP_MISSING_USERNAME1',
-        username2: map.containsKey(Constants.username2Doc)
-            ? map[Constants.username2Doc]
-            : 'FP_MISSING_USERNAME2',
         level:
             map.containsKey(Constants.levelDoc) ? map[Constants.levelDoc] : 0,
         progress: map.containsKey(Constants.progressDoc)
@@ -95,8 +77,6 @@ class FriendshipProgress {
     return FriendshipProgress(
       index: index,
       friendshipID: docs.id,
-      username1: DataManager.getString(docs, '${Constants.usernameDoc}1'),
-      username2: DataManager.getString(docs, '${Constants.usernameDoc}2'),
       level: DataManager.getNumber(docs, Constants.levelDoc).toInt(),
       progress: DataManager.getNumber(docs, Constants.progressDoc).toDouble(),
       user1: user1,
@@ -129,8 +109,6 @@ class FriendshipProgress {
         index: 0,
         user1: ids.first,
         user2: ids.last,
-        username1: username1,
-        username2: username2,
         friendshipID: friendshipId,
         level: level,
         progress: progress,
@@ -141,8 +119,6 @@ class FriendshipProgress {
     return {
       Constants.user1Doc: user1,
       Constants.user2Doc: user2,
-      Constants.username1Doc: username1,
-      Constants.username2Doc: username2,
       Constants.levelDoc: level,
       Constants.progressDoc: progress,
       Constants.createdDoc: created
@@ -151,6 +127,6 @@ class FriendshipProgress {
 
   @override
   String toString() {
-    return 'FriendshipProgress{user1ID: $user1, user2ID: $user2, username1: $username1, username2: $username2, level: $level, progress: $progress, friendshipID: $friendshipID, index: $index}';
+    return 'FriendshipProgress{user1ID: $user1, user2ID: $user2, level: $level, progress: $progress, friendshipID: $friendshipID, index: $index}';
   }
 }

@@ -105,7 +105,7 @@ class Privacy {
             // Check for every friendship that the user have which friends are allowed
             for (FriendshipProgress friendship in sessionUser.value) {
               debugPrint(
-                  '(Privacy):     Friendship with ${friendship.friendUsername()}');
+                  '(Privacy):     Friendship with ${friendship.friendId()}');
               String friendId = friendship.friendId();
 
               debugPrint(
@@ -115,17 +115,17 @@ class Privacy {
                 debugPrint('(Privacy):     Friend not checked yet.');
                 usersAlreadyChecked.add(friendId);
 
-                if (!host.joiners.any(
-                    (joiner) => joiner.blockedUsers.keys.contains(friendId))) {
+                if (!host.joiners
+                    .any((joiner) => joiner.blockedUsers.contains(friendId))) {
                   if (_isUserAllowed(host, friendship, sliderValuesMap)) {
                     debugPrint(
-                        '(Privacy):  ${friendship.friendUsername()} is allowed to see the picture.');
+                        '(Privacy):  ${friendship.friendId()} is allowed to see the picture.');
                     _friendsAllowed.add(friendId);
                     _friendships.add(friendship);
                   }
                 } else {
                   debugPrint(
-                      '(Privacy):  ${friendship.friendUsername()} is blocked by a user.');
+                      '(Privacy):  ${friendship.friendId()} is blocked by a user.');
                 }
               }
             }
@@ -145,7 +145,7 @@ class Privacy {
       // If that user has set his parameters to 0, then return true for this session user
       if (sliderValue == null || sliderValue == 0) {
         debugPrint(
-            '(Privacy): ${sessionUser.key} allows ${friendship.friendUsername()}. Reason: Public');
+            '(Privacy): ${sessionUser.key} allows ${friendship.friendId()}. Reason: Public');
         return true;
       }
 
@@ -161,7 +161,7 @@ class Privacy {
       // If they are not friend, then return false which ends the function
       if (sessionUserFriendship == null) {
         debugPrint(
-            "(Privacy): ${sessionUser.key} doesn't allow ${friendship.friendUsername()}. Reason: Not friends");
+            "(Privacy): ${sessionUser.key} doesn't allow ${friendship.friendId()}. Reason: Not friends");
         return false;
       }
 

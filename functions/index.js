@@ -88,8 +88,6 @@ async function fetchFriendshipsForUser(userId, sessionUsers) {
                 const progress = {
                   user1: docData.user1,
                   user2: docData.user2,
-                  username1: docData.username1,
-                  username2: docData.username2,
                   level: docData.level,
                   progress: docData.progress,
                 };
@@ -304,7 +302,7 @@ exports.deleteUserData = functions.https.onCall(async (data, context) => {
 });
 
 // Shared logic for modifying user relationships
-async function updateUserRelationships({ userId, targetUserId, targetUsername, friendshipId, action }) {
+async function updateUserRelationships({ userId, targetUserId, friendshipId, action }) {
   const userRef = firestore.collection('users').doc(userId);
   const targetUserRef = firestore.collection('users').doc(targetUserId);
   const friendshipRef = firestore.collection('friendships').doc(friendshipId);
@@ -320,10 +318,9 @@ async function updateUserRelationships({ userId, targetUserId, targetUsername, f
 
     // Depending on the action, block the user
     if (action === 'block') {
-      let updates = {};
-      updates[`blocked.${targetUserId}`] = targetUsername; // Dynamically create the property path
-
-      transaction.update(userRef, updates);
+      transaction.update(userRef, {
+            blocked: admin.firestore.FieldValue.arrayUnion(targetUserId)
+          });
     }
 
     // Delete the friendship document
@@ -337,13 +334,13 @@ exports.deleteFriendship = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
   }
 
-  const { userId, targetUserId, targetUsername, friendshipId } = data;
-  if (!userId || !targetUserId || !targetUsername || !friendshipId) {
+  const { userId, targetUserId, friendshipId } = data;
+  if (!userId || !targetUserId || !friendshipId) {
     throw new functions.https.HttpsError('invalid-argument', 'The function must be called with userId, targetUserId and friendshipId.');
   }
 
   try {
-    await updateUserRelationships({ userId, targetUserId, targetUsername, friendshipId, action: 'delete' });
+    await updateUserRelationships({ userId, targetUserId, friendshipId, action: 'delete' });
     return { success: true, message: 'Friendship deleted successfully.' };
   } catch (error) {
     console.error('Error in deleteFriendship:', error);
@@ -357,13 +354,13 @@ exports.blockUser = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
   }
 
-  const { userId, targetUserId, targetUsername, friendshipId } = data;
-  if (!userId || !targetUserId || !targetUsername || !friendshipId) {
+  const { userId, targetUserId, friendshipId } = data;
+  if (!userId || !targetUserId || !friendshipId) {
     throw new functions.https.HttpsError('invalid-argument', 'The function must be called with userId, targetUserId, friendshipId.');
   }
 
   try {
-    await updateUserRelationships({ userId, targetUserId, targetUsername, friendshipId, action: 'block' });
+    await updateUserRelationships({ userId, targetUserId, friendshipId, action: 'block' });
     return { success: true, message: 'User blocked successfully.' };
   } catch (error) {
     console.error('Error in blockUser:', error);
@@ -421,7 +418,6 @@ exports.publishPicture = functions.https.onCall(async (data, context) => {
   const timestamp = admin.firestore.Timestamp.fromMillis(data.timestamp);
   const caption = data.caption;
   const hostId = data.hostId;
-  const hostUsername = data.hostUsername;
   const imageUrl = data.imageUrl;
   const userMap = data.userMap;
   const usersAllowed = data.usersAllowed;
@@ -436,7 +432,7 @@ exports.publishPicture = functions.https.onCall(async (data, context) => {
     const permanentUrl = await movePictureToPermanentStorage(hostId, imageUrl);
 
     // 3. Set Picture Data
-    await setPictureData(hostId, hostUsername, permanentUrl, timestamp, caption, userMap, usersAllowed, metadata, isPublic);
+    await setPictureData(hostId, permanentUrl, timestamp, caption, userMap, usersAllowed, metadata, isPublic);
 
     // 4. Set User Data
     await setUserData(sessionUsers, hostId, timestamp);
@@ -504,15 +500,9 @@ async function updateFriendships(sessionUsers, userMap, timestamp) {
             });
         }
       } else {
-        // Create a new friendship
-        const username1 = userMap[ids[0]];
-        const username2 = userMap[ids[1]];
-
         await firestore.collection('friendships').doc(friendshipDocId).set({
           user1: ids[0],
           user2: ids[1],
-          username1: username1,
-          username2: username2,
           friendshipId: friendshipDocId,
           level: 1,
           progress: 0.2,
@@ -565,12 +555,11 @@ async function movePictureToPermanentStorage(hostId, tempDownloadUrl) {
   }
 }
 
-async function setPictureData(hostId, hostUsername, imageUrl, timestamp, caption, userMap, usersAllowed, metadata, isPublic) {
+async function setPictureData(hostId, imageUrl, timestamp, caption, userMap, usersAllowed, metadata, isPublic) {
   try {
     const pictureDoc = {
       hostId: hostId,
       fileUrl: imageUrl,
-      pictureTaker: hostUsername,
       timestamp: timestamp,
       metadata: metadata,
       caption: caption,

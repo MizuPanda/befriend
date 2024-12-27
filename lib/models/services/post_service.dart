@@ -17,7 +17,7 @@ class PostService {
   }
 
   static Future<void> sendPostLikeNotification(
-      String likerUsername, List<String> sessionUsers) async {
+      String likerUsername, List<dynamic> sessionUsers) async {
     await _sendNotification('sendPostLikeNotification', {
       'likerUsername': likerUsername,
       'sessionUsers': sessionUsers,

@@ -1,7 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:befriend/models/objects/bubble.dart';
+import 'package:befriend/providers/visibility_settings_provider.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:provider/provider.dart';
 
 import '../../../models/objects/friendship_progress.dart';
 import '../../../utilities/app_localizations.dart';
@@ -45,7 +49,7 @@ class VisibilityDialog {
   }
 }
 
-class VisibilitySettingsWidget extends StatelessWidget {
+class VisibilitySettingsWidget extends StatefulWidget {
   final bool isAllPublic;
   final bool isPrivate;
   final Set<FriendshipProgress> friendships;
@@ -58,24 +62,42 @@ class VisibilitySettingsWidget extends StatelessWidget {
   });
 
   @override
+  State<VisibilitySettingsWidget> createState() =>
+      _VisibilitySettingsWidgetState();
+}
+
+class _VisibilitySettingsWidgetState extends State<VisibilitySettingsWidget> {
+  final VisibilitySettingsProvider _provider = VisibilitySettingsProvider();
+
+  @override
+  void initState() {
+    _provider.initWidgetState(
+        widget.friendships.map((progress) => progress.friendId()));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _provider.disposeWidgetState();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Builder(builder: (BuildContext context) {
       Widget headerIcon;
       String message;
 
-      if (isAllPublic) {
+      if (widget.isAllPublic) {
         headerIcon =
             Icon(Icons.public_rounded, color: Colors.green[900], size: 60);
         message = AppLocalizations.of(context)?.translate('vsd_public') ??
-            'Everyone will be able to view this picture.';
-      } else if (isPrivate) {
+            'Visible to everyone';
+      } else if (widget.isPrivate) {
         headerIcon = Icon(Icons.lock_rounded, color: Colors.red[900], size: 60);
         message = AppLocalizations.of(context)?.translate('vsd_private') ??
-            'Only you and the friends in this picture can see it.';
+            'Visible only to you and the friends you took it with';
       } else {
-        List<FriendshipProgress> sortedFriendships = friendships.toList()
-          ..sort((a, b) => a.friendUsername().compareTo(b.friendUsername()));
-
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -87,7 +109,7 @@ class VisibilitySettingsWidget extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 AppLocalizations.of(context)?.translate('vsd_protected') ??
-                    'These people will be able to see the picture:',
+                    'These friends will be able to see the picture:',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.openSans(
                   fontSize: 20,
@@ -95,21 +117,40 @@ class VisibilitySettingsWidget extends StatelessWidget {
                 ),
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: sortedFriendships.length,
-                itemBuilder: (context, index) {
-                  final friendship = sortedFriendships[index];
-                  return ListTile(
-                    leading: const Icon(Icons.person),
-                    title: Text(
-                      friendship.friendUsername(),
-                      style: GoogleFonts.openSans(),
-                    ),
-                  );
-                },
-              ),
-            ),
+            ChangeNotifierProvider.value(
+                value: _provider,
+                builder: (BuildContext context, Widget? child) {
+                  return Consumer<VisibilitySettingsProvider>(builder:
+                      (BuildContext context,
+                          VisibilitySettingsProvider provider, Widget? child) {
+                    return Expanded(
+                      child: PagedListView<int, Bubble>(
+                        pagingController: provider.pagingController,
+                        builderDelegate: PagedChildBuilderDelegate<Bubble>(
+                          itemBuilder: (context, user, index) => ListTile(
+                            leading: CircleAvatar(backgroundImage: user.avatar),
+                            title: Text(
+                              user.username,
+                              style: GoogleFonts.openSans(),
+                            ),
+                          ),
+                          firstPageProgressIndicatorBuilder: (context) =>
+                              const Center(child: CircularProgressIndicator()),
+                          newPageProgressIndicatorBuilder: (context) =>
+                              const Center(child: CircularProgressIndicator()),
+                          noItemsFoundIndicatorBuilder: (context) => Center(
+                            child: Text(
+                              AppLocalizations.of(context)
+                                      ?.translate('vsd_none') ??
+                                  'No friends found.',
+                              style: GoogleFonts.openSans(fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  });
+                }),
           ],
         );
       }
@@ -127,7 +168,7 @@ class VisibilitySettingsWidget extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: GoogleFonts.openSans(
-                fontSize: isPrivate ? 18 : 20,
+                fontSize: widget.isPrivate ? 18 : 20,
                 fontWeight: FontWeight.bold,
               ),
             ),

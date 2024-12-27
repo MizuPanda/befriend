@@ -15,10 +15,10 @@ class UsernameText extends StatelessWidget {
   final Bubble user;
   final bool isBestFriend;
 
-  static const double _size = 24;
-
   @override
   Widget build(BuildContext context) {
+    double iconSize = 24 / 84 * user.size;
+
     return Row(
       children: [
         AutoSizeText(
@@ -41,15 +41,15 @@ class UsernameText extends StatelessWidget {
                 left: 0.5,
                 child: Icon(
                   Icons.star_rounded,
-                  size: _size,
+                  size: iconSize,
                   color: Colors.black.withOpacity(0.5),
                 ),
               ),
 
               // Yellow Star on top
-              const Icon(
+              Icon(
                 Icons.star_rounded,
-                size: _size,
+                size: iconSize,
                 color: Colors.yellowAccent,
               ),
             ],

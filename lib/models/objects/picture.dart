@@ -13,7 +13,7 @@ class Picture {
   final Map<String, dynamic> metadata; //String size, String extension
   final String caption;
   final List<dynamic> allowedIDS;
-  final Map<String, dynamic> sessionUsers;
+  final List<dynamic> sessionUsers;
   final bool isPublic;
   List<dynamic> likes;
   List<dynamic> firstLikes;
@@ -42,27 +42,25 @@ class Picture {
     metadata: {},
     caption: '',
     allowedIDS: [],
-    sessionUsers: {},
+    sessionUsers: [],
     likes: [],
     firstLikes: [],
     isPublic: false,
   );
 
-  factory Picture.fromDocument(
-    DocumentSnapshot docs,
-  ) {
+  factory Picture.fromDocument(DocumentSnapshot docs, String hostUsername) {
     String url = DataManager.getString(docs, Constants.urlDoc);
 
     return Picture._(
         id: docs.id,
-        hostId: DataManager.getString(docs, Constants.hostId),
+        hostId: DataManager.getString(docs, Constants.hostIdDoc),
         fileUrl: url,
-        pictureTaker: DataManager.getString(docs, Constants.pictureTakerDoc),
+        pictureTaker: hostUsername,
         timestamp: DataManager.getDateTime(docs, Constants.timestampDoc),
         metadata: DataManager.getMap(docs, Constants.metadataDoc),
         caption: DataManager.getString(docs, Constants.captionDoc),
         allowedIDS: DataManager.getList(docs, Constants.allowedUsersDoc),
-        sessionUsers: DataManager.getMap(docs, Constants.sessionUsersDoc),
+        sessionUsers: DataManager.getList(docs, Constants.sessionUsersDoc),
         likes: DataManager.getList(docs, Constants.likesDoc),
         firstLikes: DataManager.getList(docs, Constants.firstLikesDoc),
         isPublic: DataManager.getBoolean(docs, Constants.publicDoc));

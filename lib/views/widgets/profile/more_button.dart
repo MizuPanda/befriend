@@ -5,12 +5,9 @@ import '../../../providers/picture_card_provider.dart';
 import '../../../utilities/app_localizations.dart';
 
 class MoreButton extends StatelessWidget {
-  final Iterable<dynamic> usernames;
+  final List<dynamic> sessionUsers;
 
-  const MoreButton({
-    super.key,
-    required this.usernames,
-  });
+  const MoreButton({super.key, required this.sessionUsers});
 
   static const double _iconTextDistanceWidthMultiplier = 16 / 448;
 
@@ -110,7 +107,7 @@ class MoreButton extends StatelessWidget {
           ),
         ],
         onSelected: (PopSelection value) async {
-          await provider.onSelectPop(value, context, usernames);
+          await provider.onSelectPop(value, context, sessionUsers);
         },
       );
     });

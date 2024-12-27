@@ -144,9 +144,10 @@
   "ud_people": "Personnes figurant sur cette photo",
 
   "_comment21": "Visibility Settings Dialog",
-  "vsd_public": "Tout le monde pourra voir cette photo.",
-  "vsd_private": "Seuls vous et les amis présents sur cette photo peuvent la voir.",
-  "vsd_protected": "Ces personnes pourront voir la photo :",
+  "vsd_public": "Visible à tous",
+  "vsd_private": "Visible uniquement par vous et les amis avec qui vous l'avez prise",
+  "vsd_protected": "Ces amis pourront voir la photo :",
+  "vsd_none": "Aucun ami trouvé",
 
   "_comment22": "Contact Dialog",
   "cd_email": "Email à contacter",
@@ -268,7 +269,7 @@
   "pb_take": "Prendre une photo de groupe",
 
   "_comment41": "Search Button",
-  "sb_text": "Recherche...",
+  "sb_text": "Chercher...",
 
   "_comment42": "Hosting Widget",
   "hw_who": "prendra une photo!",
@@ -308,6 +309,7 @@
   "_comment49": "Blocked Settings Widget",
   "bsw_blocked": "Comptes bloqués",
   "bsw_unblock": "Débloquer",
+  "bsw_none": "Aucun utilisateur bloqué",
 
   "_comment50": "Consent Settings Widget",
   "csw_manage": "Gérer les paramètres de consentement",
@@ -335,5 +337,8 @@
 
   "_comment57": "Delete History Dialog",
   "dhd_title": "Effacer l'historique?",
-  "dhd_content": "Êtes vous sûr de vouloir effacer votre historique? Cette action ne peut pas être annulée."
+  "dhd_content": "Êtes vous sûr de vouloir effacer votre historique? Cette action ne peut pas être annulée.",
+
+  "_comment58": "Likes Dialog",
+  "ld_none": "Pas de likes"
 }

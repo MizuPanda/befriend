@@ -1,10 +1,8 @@
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:befriend/models/data/data_query.dart';
-import 'package:befriend/models/data/user_manager.dart';
-import 'package:befriend/utilities/constants.dart';
-import 'package:befriend/utilities/error_handling.dart';
-import 'package:befriend/views/dialogs/settings/unblock_dialog.dart';
+import 'package:befriend/providers/blocked_settings_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:provider/provider.dart';
 
 import '../../../models/objects/bubble.dart';
 import '../../../utilities/app_localizations.dart';
@@ -19,95 +17,69 @@ class BlockedSettingsWidget extends StatefulWidget {
 }
 
 class _BlockedSettingsWidgetState extends State<BlockedSettingsWidget> {
+  final BlockedSettingsProvider _provider = BlockedSettingsProvider();
+
+  @override
+  void initState() {
+    _provider.initWidgetState();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _provider.disposeWidgetState();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Text(
-              AppLocalizations.of(context)?.translate('bsw_blocked') ??
-                  "Blocked accounts ",
-              style: const TextStyle(fontWeight: FontWeight.bold),
+    return ChangeNotifierProvider.value(
+      value: _provider,
+      child: Consumer<BlockedSettingsProvider>(builder: (BuildContext context,
+          BlockedSettingsProvider provider, Widget? child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Row(
+              children: [
+                Text(
+                  AppLocalizations.of(context)?.translate('bsw_blocked') ??
+                      "Blocked accounts ",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const Icon(Icons.supervisor_account_rounded)
+              ],
             ),
-            const Icon(Icons.supervisor_account_rounded)
-          ],
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 15.0 / 448 * width),
-        child: FutureBuilder(
-            future: UserManager.getInstance(),
-            builder: (
-              BuildContext context,
-              AsyncSnapshot<Bubble> instance,
-            ) {
-              if (!instance.hasData) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              Bubble bubble = instance.data!;
-              Iterable<dynamic> usernames = bubble.blockedUsers.values;
-
-              return ListView.builder(
-                  itemCount: usernames.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    String username = usernames.elementAt(index);
-                    return SizedBox(
-                      child: Row(
-                        children: [
-                          const Icon(Icons.person),
-                          SizedBox(
-                            width: 20 / 448 * width,
-                          ),
-                          AutoSizeText(username,
-                              style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          const Spacer(),
-                          TextButton(
-                              onPressed: () async {
-                                UnblockDialog.showUnblockDialog(
-                                  context,
-                                  username,
-                                  () async {
-                                    try {
-                                      bubble.blockedUsers.remove(bubble
-                                          .blockedUsers.entries
-                                          .elementAt(index)
-                                          .key);
-                                      await DataQuery.updateDocument(
-                                          Constants.blockedUsersDoc,
-                                          bubble.blockedUsers);
-                                      WidgetsBinding.instance
-                                          .addPostFrameCallback((timeStamp) {
-                                        setState(() {});
-                                      });
-                                    } catch (e) {
-                                      debugPrint(
-                                          '(BlockedSettingsWidget) Error: $e');
-                                      if (context.mounted) {
-                                        ErrorHandling.showError(
-                                            context,
-                                            AppLocalizations.of(context)?.translate(
-                                                    'general_error_message7') ??
-                                                'An unexpected error occurred. Please try again.');
-                                      }
-                                    }
-                                  },
-                                );
-                              },
-                              child: Text(AppLocalizations.of(context)
-                                      ?.translate('bsw_unblock') ??
-                                  'Unblock'))
-                        ],
-                      ),
-                    );
-                  });
-            }),
-      ),
+          ),
+          body: PagedListView<int, Bubble>(
+            pagingController: provider.pagingController,
+            builderDelegate: PagedChildBuilderDelegate<Bubble>(
+              itemBuilder: (context, user, index) => ListTile(
+                leading: CircleAvatar(backgroundImage: user.avatar),
+                title: Text(
+                  user.username,
+                  style: GoogleFonts.openSans(),
+                ),
+                trailing: TextButton(
+                    onPressed: () => provider.unblockUser(user, context),
+                    child: Text(AppLocalizations.of(context)
+                            ?.translate('bsw_unblock') ??
+                        'Unblock')),
+              ),
+              firstPageProgressIndicatorBuilder: (context) =>
+                  const Center(child: CircularProgressIndicator()),
+              newPageProgressIndicatorBuilder: (context) =>
+                  const Center(child: CircularProgressIndicator()),
+              noItemsFoundIndicatorBuilder: (context) => Center(
+                child: Text(
+                  AppLocalizations.of(context)?.translate('bsw_none') ??
+                      'No users blocked',
+                  style: GoogleFonts.openSans(fontSize: 16),
+                ),
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 }

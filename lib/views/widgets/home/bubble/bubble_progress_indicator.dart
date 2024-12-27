@@ -92,7 +92,7 @@ class BubbleGradientIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     // Generate gradient colors based on the level
     List<Color> gradientColors = _generateGradientColors(
-        friendship.level, friendship.progress, friendship.friendUsername());
+        friendship.level, friendship.progress, friendship.friend.username);
 
     final Gradient gradient = LinearGradient(
       colors: gradientColors,

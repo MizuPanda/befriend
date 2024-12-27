@@ -35,12 +35,8 @@ class PictureCard extends StatefulWidget {
 }
 
 class _PictureCardState extends State<PictureCard> {
-  late final PictureCardProvider _provider = PictureCardProvider(
-      widget.picture,
-      widget.userID,
-      widget.connectedUsername,
-      widget.isConnectedUserProfile,
-      widget.onArchiveSuccess);
+  late final PictureCardProvider _provider = PictureCardProvider(widget.picture,
+      widget.userID, widget.isConnectedUserProfile, widget.onArchiveSuccess);
   final double _likeSizeWidthMultiplier = 35 / 448;
   bool _isExpanded = false;
 
@@ -96,7 +92,7 @@ class _PictureCardState extends State<PictureCard> {
                           padding: EdgeInsets.only(
                               right: 8 / 448 * width, top: 0.01 * height),
                           child: MoreButton(
-                            usernames: widget.picture.sessionUsers.values,
+                            sessionUsers: widget.picture.sessionUsers,
                           )),
                     ],
                   ), // Check if the image is fully loaded

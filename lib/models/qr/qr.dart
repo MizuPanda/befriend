@@ -97,8 +97,8 @@ class QR {
           // Check if the widget is still part of the tree
           // Safe to use context here
 
-          if (fromBarcode && GoRouter.of(context).canPop()) {
-            GoRouter.of(context).pop();
+          if (fromBarcode && Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
           }
           showDialog(
             context: context,

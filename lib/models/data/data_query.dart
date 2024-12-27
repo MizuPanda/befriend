@@ -1,3 +1,4 @@
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/bubble.dart';
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/utilities/constants.dart';
@@ -78,5 +79,17 @@ class DataQuery {
       debugPrint('(DataQuery): Error loading network image: $e');
       return Image.asset(Constants.defaultPictureAddress).image;
     }
+  }
+
+  static Future<String> getUsername(String id) async {
+    if (id == AuthenticationManager.id()) {
+      final Bubble player = await UserManager.getInstance();
+
+      return player.username;
+    }
+
+    final DocumentSnapshot snapshot = await DataManager.getData(id: id);
+
+    return DataManager.getString(snapshot, Constants.usernameDoc);
   }
 }

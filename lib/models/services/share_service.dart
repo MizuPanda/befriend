@@ -1,4 +1,5 @@
 import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/data/data_query.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/picture.dart';
@@ -47,7 +48,11 @@ class ShareService {
           userBubble.friendIDs.contains(profileId)) {
         final DocumentSnapshot snapshot =
             await Constants.picturesCollection.doc(pictureId).get();
-        final Picture picture = Picture.fromDocument(snapshot);
+        final String hostId =
+            DataManager.getString(snapshot, Constants.hostIdDoc);
+        final String hostUsername = await DataQuery.getUsername(hostId);
+
+        final Picture picture = Picture.fromDocument(snapshot, hostUsername);
 
         if (picture.allowedIDS
                 .contains(AuthenticationManager.notArchivedID()) ||

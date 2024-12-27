@@ -44,24 +44,6 @@ class _ProfilePicturesState extends State<ProfilePictures> {
         isLocked: widget.isLocked);
   }
 
-  /*
-  @override
-  void didUpdateWidget(ProfilePictures oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    debugPrint(
-        '(ProfilePictures) Old=${oldWidget.isFriend}, new=${widget.isFriend}');
-
-    if (widget.searchTerm != oldWidget.searchTerm) {
-      _provider.initState(
-          showArchived: widget.showArchived,
-          showOnlyMe: widget.showOnlyMe,
-          userID: widget.userID,
-          searchTerm: widget.searchTerm);
-      // Reinitialize with the new searchTerm
-    }
-  }
-   */
-
   @override
   void dispose() {
     _provider.disposeState();

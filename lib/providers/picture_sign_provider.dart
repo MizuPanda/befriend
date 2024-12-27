@@ -97,7 +97,7 @@ class PictureSignProvider extends ChangeNotifier {
       user.activeTutorial();
 
       if (context.mounted) {
-        GoRouter.of(context).push(Constants.homepageAddress, extra: user);
+        GoRouter.of(context).go(Constants.homepageAddress, extra: user);
       }
     } catch (e) {
       rethrow;

@@ -106,7 +106,7 @@ class HomeStack extends StatelessWidget {
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
             onDoubleTap: () async {
-              provider.centerToMiddle();
+              provider.centerToMiddle(context);
               await HapticFeedback.mediumImpact();
             },
             child: SizedBox(

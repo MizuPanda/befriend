@@ -118,7 +118,7 @@ class ProfileProvider extends ChangeNotifier {
     final bool hasNonLoadedCommons = profile.loadedFriends.length != idsLength;
 
     final Iterable<String> commonFriendUsernames =
-        profile.loadedFriends.map((e) => e.friendUsername());
+        profile.loadedFriends.map((e) => e.friend.username);
 
     if (hasNonLoadedCommons) {
       switch (commonFriendUsernames.length) {

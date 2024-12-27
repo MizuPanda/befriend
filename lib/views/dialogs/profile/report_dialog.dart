@@ -8,7 +8,7 @@ import '../../../utilities/app_localizations.dart';
 class ReportDialog extends StatefulWidget {
   final String pictureId;
   final String profileId;
-  final Map<String, dynamic> sessionUsers;
+  final List<dynamic> sessionUsers;
 
   const ReportDialog({
     super.key,

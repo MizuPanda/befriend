@@ -126,7 +126,7 @@ class FriendListProvider extends ChangeNotifier {
                 await DataQuery.getFriendship(id, friendId);
 
             debugPrint(
-                '(FriendListProvider) Adding friend ${friendship.friendUsername()}');
+                '(FriendListProvider) Adding friend ${friendship.friend.username}');
 
             friendships.add(friendship);
             UserManager.addFriendToMain(friendship);

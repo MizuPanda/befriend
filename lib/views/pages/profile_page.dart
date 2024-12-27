@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:befriend/providers/profile_provider.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +24,6 @@ class ProfilePage extends StatelessWidget {
       create: (_) => ProfileProvider(profile: profile),
       builder: (BuildContext context, Widget? child) {
         final double height = MediaQuery.of(context).size.height;
-        final double width = MediaQuery.of(context).size.width;
 
         if (profile.user.main()) {
           return DefaultTabController(
@@ -97,63 +95,53 @@ class ProfilePage extends StatelessWidget {
           );
         } else {
           return Scaffold(
-            appBar: AppBar(
-                title: const BefriendTitle(),
-                actions: !profile.isLocked
-                    ? [
-                        Consumer(builder: (BuildContext context,
-                            ProfileProvider provider, Widget? child) {
-                          return PopupMenuButton<int>(
-                              icon: const Icon(
-                                Icons.more_vert,
+            appBar: AppBar(title: const BefriendTitle(), actions: [
+              Consumer(builder: (BuildContext context, ProfileProvider provider,
+                  Widget? child) {
+                return PopupMenuButton<int>(
+                    icon: const Icon(
+                      Icons.more_vert,
+                    ),
+                    onSelected: (int selection) async {
+                      await provider.onSelectMenu(selection, context);
+                    },
+                    itemBuilder: (BuildContext context) => [
+                          if (!profile.isLocked)
+                            PopupMenuItem<int>(
+                              value: 0,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.delete_outline_rounded,
+                                      color: Colors.red), // Archive icon
+                                  const SizedBox(width: _iconTextDistance),
+                                  Text(
+                                    AppLocalizations.of(context)
+                                            ?.translate('pp_delete') ??
+                                        'Delete',
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
+                                  const SizedBox(width: _iconTextDistance * 2),
+                                ],
                               ),
-                              onSelected: (int selection) async {
-                                await provider.onSelectMenu(selection, context);
-                              },
-                              itemBuilder: (BuildContext context) => [
-                                    PopupMenuItem<int>(
-                                      value: 0,
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                              Icons.delete_outline_rounded,
-                                              color:
-                                                  Colors.red), // Archive icon
-                                          const SizedBox(
-                                              width: _iconTextDistance),
-                                          Text(
-                                            AppLocalizations.of(context)
-                                                    ?.translate('pp_delete') ??
-                                                'Delete',
-                                            style: const TextStyle(
-                                                color: Colors.red),
-                                          ),
-                                          const SizedBox(
-                                              width: _iconTextDistance * 2),
-                                        ],
-                                      ),
-                                    ),
-                                    PopupMenuItem<int>(
-                                      value: 1,
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.block_rounded,
-                                          ), // Info icon
-                                          const SizedBox(
-                                              width: _iconTextDistance),
-                                          Text(AppLocalizations.of(context)
-                                                  ?.translate('pp_block') ??
-                                              'Block'),
-                                          const SizedBox(
-                                              width: _iconTextDistance * 2),
-                                        ],
-                                      ),
-                                    ),
-                                  ]);
-                        })
-                      ]
-                    : null),
+                            ),
+                          PopupMenuItem<int>(
+                            value: 1,
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.block_rounded,
+                                ), // Info icon
+                                const SizedBox(width: _iconTextDistance),
+                                Text(AppLocalizations.of(context)
+                                        ?.translate('pp_block') ??
+                                    'Block'),
+                                const SizedBox(width: _iconTextDistance * 2),
+                              ],
+                            ),
+                          ),
+                        ]);
+              })
+            ]),
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

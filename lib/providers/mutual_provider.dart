@@ -121,7 +121,7 @@ class MutualProvider extends ChangeNotifier {
                 await DataQuery.getFriendship(userId, friendId);
 
             debugPrint(
-                '(MutualProvider) Adding mutual ${friendship.friendUsername()}');
+                '(MutualProvider) Adding mutual ${friendship.friend.username}');
 
             friendships.add(friendship);
             UserManager.addFriendToMain(friendship);

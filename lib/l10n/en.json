@@ -144,9 +144,10 @@
   "ud_people": "People in this picture",
 
   "_comment21": "Visibility Settings Dialog",
-  "vsd_public": "Everyone will be able to view this picture.",
-  "vsd_private": "Only you and the friends in this picture can see it.",
-  "vsd_protected": "These people will be able to see the picture:",
+  "vsd_public": "Visible to everyone",
+  "vsd_private": "Visible only to you and the friends you took it with",
+  "vsd_protected": "These friends will be able to see the picture:",
+  "vsd_none": "No friends found",
 
   "_comment22": "Contact Dialog",
   "cd_email": "Contact Email",
@@ -308,6 +309,7 @@
   "_comment49": "Blocked Settings Widget",
   "bsw_blocked": "Blocked accounts",
   "bsw_unblock": "Unblock",
+  "bsw_none": "No users blocked",
 
   "_comment50": "Consent Settings Widget",
   "csw_manage": "Manage consent",
@@ -335,5 +337,8 @@
 
   "_comment57": "Delete History Dialog",
   "dhd_title": "Clear search history?",
-  "dhd_content": "Are you sure you want to clear your search history? This action cannot be undone."
+  "dhd_content": "Are you sure you want to clear your search history? This action cannot be undone.",
+
+  "_comment58": "Likes Dialog",
+  "ld_none": "No likes."
 }

@@ -1,4 +1,6 @@
 import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/models/data/data_manager.dart';
+import 'package:befriend/models/data/data_query.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -92,7 +94,7 @@ class ProfilePicturesProvider extends ChangeNotifier {
       // Part 5: When you are on a non-friend profile
       if (showOnlyMe) {
         q = Constants.picturesCollection
-            .where(Constants.hostId, isEqualTo: userID)
+            .where(Constants.hostIdDoc, isEqualTo: userID)
             .where(Constants.allowedUsersDoc, arrayContains: notArchivedID);
       } else if (userID == connectedID && !showArchived) {
         q = Constants.picturesCollection.where(Constants.allowedUsersDoc,
@@ -127,16 +129,27 @@ class ProfilePicturesProvider extends ChangeNotifier {
       }
 
       final List<Picture> newItems = [];
-      Iterable<Picture> pictures =
-          querySnapshot.docs.map((doc) => Picture.fromDocument(doc)).toList();
+      List<Picture> pictures = [];
+
+      for (DocumentSnapshot snapshot in querySnapshot.docs) {
+        final String hostId =
+            DataManager.getString(snapshot, Constants.hostIdDoc);
+        final String hostUsername = await DataQuery.getUsername(hostId);
+
+        final Picture picture = Picture.fromDocument(snapshot, hostUsername);
+
+        pictures.add(picture);
+      }
 
       // Filtering part to filter pictures you are allowed to see
       if (userID != connectedID && !isLocked) {
-        pictures = pictures.where((pic) =>
-            pic.allowedIDS.contains(connectedID) ||
-            pic.allowedIDS.contains(archivedID) ||
-            pic.allowedIDS.contains(notArchivedID) ||
-            pic.isPublic);
+        pictures = pictures
+            .where((pic) =>
+                pic.allowedIDS.contains(connectedID) ||
+                pic.allowedIDS.contains(archivedID) ||
+                pic.allowedIDS.contains(notArchivedID) ||
+                pic.isPublic)
+            .toList();
       }
 
       if (_nextAdIndex == -1) {

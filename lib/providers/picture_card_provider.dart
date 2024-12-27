@@ -1,4 +1,7 @@
 import 'package:befriend/models/authentication/authentication.dart';
+import 'package:befriend/models/data/data_manager.dart';
+import 'package:befriend/models/data/data_query.dart';
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/services/share_service.dart';
 import 'package:befriend/views/dialogs/profile/delete_picture_dialog.dart';
 import 'package:befriend/views/dialogs/profile/likes_dialog.dart';
@@ -9,6 +12,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../models/objects/bubble.dart';
 import '../models/objects/picture.dart';
 import '../models/services/post_service.dart';
 import '../utilities/app_localizations.dart';
@@ -18,7 +22,6 @@ import '../views/widgets/profile/more_button.dart';
 
 class PictureCardProvider extends ChangeNotifier {
   Picture _picture;
-  final String _connectedUsername;
   final String _userId;
   final bool _isUsersProfile;
   final Function(String) _onPictureActionSuccess;
@@ -26,7 +29,6 @@ class PictureCardProvider extends ChangeNotifier {
   PictureCardProvider(
     this._picture,
     this._userId,
-    this._connectedUsername,
     this._isUsersProfile,
     this._onPictureActionSuccess,
   );
@@ -38,8 +40,8 @@ class PictureCardProvider extends ChangeNotifier {
   bool get isUsersProfile => _isUsersProfile;
 
   void initLikes() {
-    _isLiked = _picture.likes.contains(_connectedUsername);
-    _isNotLikedYet = !_picture.firstLikes.contains(_connectedUsername);
+    _isLiked = _picture.likes.contains(AuthenticationManager.id());
+    _isNotLikedYet = !_picture.firstLikes.contains(AuthenticationManager.id());
   }
 
   void updatePicture(Picture picture) {
@@ -52,7 +54,7 @@ class PictureCardProvider extends ChangeNotifier {
 
   bool isPicturePublic() {
     return _picture.isPublic &&
-        (_picture.sessionUsers.keys.contains(AuthenticationManager.id()));
+        (_picture.sessionUsers.contains(AuthenticationManager.id()));
   }
 
   void _showReportDialog(BuildContext context) {
@@ -71,7 +73,7 @@ class PictureCardProvider extends ChangeNotifier {
   }
 
   Future<void> onSelectPop(PopSelection value, BuildContext context,
-      Iterable<dynamic> usernames) async {
+      List<dynamic> sessionUsers) async {
     switch (value) {
       case PopSelection.archive:
         if (isArchived()) {
@@ -82,7 +84,25 @@ class PictureCardProvider extends ChangeNotifier {
         debugPrint('(PictureCardProvider) Archive action tapped');
         break;
       case PopSelection.info:
-        UsernameDialog.showUsernamesDialog(context, usernames);
+        final List<Bubble> users = [];
+
+        for (String id in sessionUsers) {
+          Bubble bubble;
+          if (id == AuthenticationManager.id()) {
+            bubble = await UserManager.getInstance();
+          } else {
+            final DocumentSnapshot doc = await DataManager.getData(id: id);
+            final ImageProvider avatar = await DataManager.getAvatar(doc);
+
+            bubble = Bubble.fromDocs(doc, avatar);
+          }
+
+          users.add(bubble);
+        }
+
+        if (context.mounted) {
+          UsernameDialog.showUsernamesDialog(context, users);
+        }
         break;
       case PopSelection.report:
         _showReportDialog(context);
@@ -150,12 +170,12 @@ class PictureCardProvider extends ChangeNotifier {
     }
   }
 
-  String usersThatLiked(BuildContext context) {
+  Future<String> usersThatLiked(BuildContext context) async {
     switch (_picture.likes.length) {
       case 1:
-        return _picture.likes.first;
+        return await DataQuery.getUsername(_picture.likes.first);
       default:
-        return '${_picture.likes.first} ${AppLocalizations.of(context)?.translate('pcp_others') ?? 'and others'}';
+        return '${await DataQuery.getUsername(_picture.likes.first)} ${context.mounted ? AppLocalizations.of(context)?.translate('pcp_others') ?? 'and others' : 'and others'}';
     }
   }
 
@@ -168,7 +188,8 @@ class PictureCardProvider extends ChangeNotifier {
 
     if (isLiked) {
       data = {
-        Constants.likesDoc: FieldValue.arrayRemove([_connectedUsername]),
+        Constants.likesDoc:
+            FieldValue.arrayRemove([AuthenticationManager.id()]),
       };
     } else {
       debugPrint('(PictureCardProvider) Is liked yet = $_isNotLikedYet');
@@ -176,22 +197,24 @@ class PictureCardProvider extends ChangeNotifier {
 
       if (_isNotLikedYet) {
         data = {
-          Constants.likesDoc: FieldValue.arrayUnion([_connectedUsername]),
-          Constants.firstLikesDoc: FieldValue.arrayUnion([_connectedUsername])
+          Constants.likesDoc: FieldValue.arrayUnion([connectedUserID]),
+          Constants.firstLikesDoc: FieldValue.arrayUnion([connectedUserID])
         };
         _isNotLikedYet = true;
 
-        if (!_picture.sessionUsers.containsKey(connectedUserID)) {
-          List<String> usersToNotify = _picture.sessionUsers.keys.toList();
+        if (!_picture.sessionUsers.contains(connectedUserID)) {
+          List<dynamic> usersToNotify = _picture.sessionUsers;
 
           debugPrint('(PictureCardProvider) Sending notification');
 
+          final Bubble currentUser = await UserManager.getInstance();
+
           PostService.sendPostLikeNotification(
-              _connectedUsername, usersToNotify);
+              currentUser.username, usersToNotify);
         }
       } else {
         data = {
-          Constants.likesDoc: FieldValue.arrayUnion([_connectedUsername]),
+          Constants.likesDoc: FieldValue.arrayUnion([connectedUserID]),
         };
       }
     }
@@ -207,9 +230,9 @@ class PictureCardProvider extends ChangeNotifier {
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (isLiked) {
-        _picture.likes.remove(_connectedUsername);
+        _picture.likes.remove(AuthenticationManager.id());
       } else {
-        _picture.likes.add(_connectedUsername);
+        _picture.likes.add(AuthenticationManager.id());
       }
       notifyListeners();
     });

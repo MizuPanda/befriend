@@ -78,13 +78,13 @@ class HomeProvider extends ChangeNotifier {
     username = username.trim();
 
     try {
-      final Iterable<String> loadedUsernames = home.user.friendships
-          .map((friendship) => friendship.friendUsername());
+      final Iterable<String> loadedUsernames =
+          home.user.friendships.map((friendship) => friendship.friend.username);
 
       if (loadedUsernames.contains(username)) {
         debugPrint('(HomeProvider) $username is loaded');
         final Friendship friendship = home.user.friendships
-            .firstWhere((f) => f.friendUsername() == username);
+            .firstWhere((f) => f.friend.username == username);
         final Bubble searchedBubble = friendship.friend;
         animateToFriend(context, dx: searchedBubble.x, dy: searchedBubble.y);
       } else {
@@ -168,7 +168,7 @@ class HomeProvider extends ChangeNotifier {
 
             UserManager.addFriendToMain(friendship);
             debugPrint(
-                '(HomeProvider) Adding friend ${friendship.friendUsername()} to main user');
+                '(HomeProvider) Adding friend ${friendship.friend.username} to main user');
           }
           notifyListeners();
         }
@@ -222,7 +222,7 @@ class HomeProvider extends ChangeNotifier {
   }
 
   Future<void> _loadFriend(Friendship friend) async {
-    debugPrint('(HomeProvider) Adding ${friend.friendUsername()} to home');
+    debugPrint('(HomeProvider) Adding ${friend.friend.username} to home');
 
     home.user.friendships.add(friend);
     home.addFriendToHome(friend);
@@ -335,7 +335,7 @@ class HomeProvider extends ChangeNotifier {
     _animationController.dispose();
   }
 
-  void centerToMiddle() {
+  void centerToMiddle(BuildContext context) {
     _animationController.reset();
     _animationCenter = Matrix4Tween(
       begin: home.transformationController?.value,

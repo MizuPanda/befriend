@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/objects/home.dart';
 import 'package:befriend/utilities/constants.dart';
@@ -81,7 +82,7 @@ class UserManager {
 
   static void addFriendToList(Friendship friendship) {
     debugPrint(
-        '(UserManager) Added ${friendship.friendUsername()} to main user');
+        '(UserManager) Added ${friendship.friend.username} to main user');
     _addFriend(friendship);
     _addFriendToHome(friendship);
   }
@@ -112,7 +113,8 @@ class UserManager {
       Home home = await UserManager.userHome(key: UniqueKey());
 
       if (context.mounted) {
-        debugPrint('(UserManager): Going Home');
+        debugPrint(
+            '(UserManager): Going Home for ${AuthenticationManager.id()}');
 
         GoRouter.of(context).go(Constants.homepageAddress, extra: home);
       }
@@ -171,5 +173,9 @@ class UserManager {
 
   static void setBestFriendID(String id) {
     _instance?.bestFriendID = id;
+  }
+
+  static void removeBlockedUser(String id) {
+    _instance?.blockedUsers.remove(id);
   }
 }

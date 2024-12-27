@@ -27,13 +27,10 @@ class Constants {
   static const String levelDoc = 'level';
   static const String user1Doc = 'user1';
   static const String user2Doc = 'user2';
-  static const String username1Doc = 'username1';
-  static const String username2Doc = 'username2';
   static const String createdDoc = 'created';
   //PICTURES
   static const String urlDoc = 'fileUrl';
-  static const String hostId = 'hostId';
-  static const String pictureTakerDoc = 'pictureTaker';
+  static const String hostIdDoc = 'hostId';
   static const String timestampDoc = 'timestamp';
   static const String metadataDoc = 'metadata';
   static const String captionDoc = 'caption';

@@ -17,7 +17,7 @@ class HomeButton extends StatelessWidget {
       onPressed: () async {
         Home home = await UserManager.userHome();
         if (context.mounted) {
-          GoRouter.of(context).push(Constants.homepageAddress, extra: home);
+          GoRouter.of(context).go(Constants.homepageAddress, extra: home);
         }
       },
       data: Icons.home_rounded,

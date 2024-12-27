@@ -75,7 +75,7 @@ class DataManager {
   }
 
   static bool isBlocked(Bubble bubble1, Bubble bubble2) {
-    return bubble2.blockedUsers.keys.contains(bubble1.id) ||
-        bubble1.blockedUsers.keys.contains(bubble2.id);
+    return bubble2.blockedUsers.contains(bubble1.id) ||
+        bubble1.blockedUsers.contains(bubble2.id);
   }
 }

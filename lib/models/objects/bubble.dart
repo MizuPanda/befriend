@@ -17,7 +17,7 @@ class Bubble {
   final int birthYear;
   String languageCode;
 
-  Map<String, dynamic> blockedUsers;
+  List<dynamic> blockedUsers;
 
   Map<String, DateTime> lastSeenUsersMap;
 
@@ -70,7 +70,7 @@ class Bubble {
         lastSeenUsersMap:
             DataManager.getDateTimeMap(docs, Constants.lastSeenUsersMapDoc),
         friendIDs: DataManager.getList(docs, Constants.friendsDoc),
-        blockedUsers: DataManager.getMap(docs, Constants.blockedUsersDoc),
+        blockedUsers: DataManager.getList(docs, Constants.blockedUsersDoc),
         postNotificationOn:
             DataManager.getBoolean(docs, Constants.postNotificationOnDoc),
         likeNotificationOn:
@@ -90,7 +90,7 @@ class Bubble {
   }
 
   bool didBlockYou() {
-    return blockedUsers.keys.contains(AuthenticationManager.id());
+    return blockedUsers.contains(AuthenticationManager.id());
   }
 
   Iterable<dynamic> nonLoadedFriends() {

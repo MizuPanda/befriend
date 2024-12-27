@@ -86,9 +86,7 @@ class ForgotPasswordPage extends StatelessWidget {
                     ),
                     SizedBox(height: 0.02 * height),
                     ElevatedButton(
-                      onPressed: () {
-                        provider.pop(context);
-                      },
+                      onPressed: () => provider.pop(context),
                       child: Center(
                           child: Text(
                         AppLocalizations.of(context)
