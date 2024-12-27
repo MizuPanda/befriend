@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/objects/friendship.dart';
@@ -76,7 +75,8 @@ class Bubble {
         likeNotificationOn:
             DataManager.getBoolean(docs, Constants.likeNotificationOnDoc),
         languageCode: DataManager.getString(docs, Constants.languageDoc),
-        avatar: avatar);
+        avatar: avatar,
+    );
 
     return bubble;
   }
@@ -114,10 +114,6 @@ class Bubble {
 
   @override
   int get hashCode => id.hashCode;
-
-  Point<double> point() {
-    return Point(x, y);
-  }
 
   @override
   String toString() {

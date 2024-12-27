@@ -344,6 +344,8 @@ class HomeProvider extends ChangeNotifier {
         CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
     _animationCenter!.addListener(_onAnimateReset);
     _animationController.forward();
+
+    HapticFeedback.mediumImpact();
   }
 
   void animateToFriend(BuildContext context,

@@ -1,7 +1,8 @@
 import 'package:befriend/providers/home_provider.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
+import 'package:befriend/views/widgets/home/buttons/action_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:provider/provider.dart';
 import 'package:showcaseview/showcaseview.dart';
 
@@ -9,7 +10,6 @@ import '../../models/objects/home.dart';
 import '../widgets/home/bubble/bubble_group.dart';
 import '../widgets/home/buttons/home_button.dart';
 import '../widgets/home/buttons/picture_button.dart';
-import '../widgets/home/buttons/search_button.dart';
 import '../widgets/home/buttons/settings_button.dart';
 import '../widgets/home/buttons/wide_search_button.dart';
 
@@ -61,17 +61,25 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final double height = MediaQuery.of(context).size.height;
+
     return PopScope(
       canPop: widget.home.connectedHome ? false : true,
       child: ChangeNotifierProvider.value(
         value: _provider,
-        child: Scaffold(
-          key: _scaffoldKey,
-          body: Consumer<HomeProvider>(builder:
-              (BuildContext context, HomeProvider provider, Widget? child) {
-            return HomeStack(
-                connectedHome: widget.home.connectedHome, provider: provider);
-          }),
+        child: Consumer<HomeProvider>(
+          builder: (BuildContext context, HomeProvider provider, Widget? child) {
+            return Scaffold(
+              key: _scaffoldKey,
+              floatingActionButtonLocation: ExpandableFab.location,
+              floatingActionButton: Padding(
+                padding: EdgeInsets.only(bottom: 0.065 * height),
+                child: ActionButton(home: widget.home, notifyParent: provider.notify,),
+              ),
+              body: HomeStack(
+                  connectedHome: widget.home.connectedHome, provider: provider),
+            );
+          }
         ),
       ),
     );
@@ -105,10 +113,7 @@ class HomeStack extends StatelessWidget {
           constrained: false,
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
-            onDoubleTap: () async {
-              provider.centerToMiddle(context);
-              await HapticFeedback.mediumImpact();
-            },
+            onDoubleTap: () => provider.centerToMiddle(context),
             child: SizedBox(
                 height: provider.viewerSize,
                 width: provider.viewerSize,
@@ -121,7 +126,7 @@ class HomeStack extends StatelessWidget {
         ),
         const SettingsButton(),
         const WideSearchButton(),
-        const SearchButton(),
+        // const SearchButton(),
         PictureButton(
           three: provider.three,
         ),

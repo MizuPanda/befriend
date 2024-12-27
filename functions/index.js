@@ -308,23 +308,28 @@ async function updateUserRelationships({ userId, targetUserId, friendshipId, act
   const friendshipRef = firestore.collection('friendships').doc(friendshipId);
 
   await firestore.runTransaction(async (transaction) => {
-    // Remove targetUserId from the user's 'friends' array
+    // Remove targetUserId from the user's 'friends' array if they are friends
     transaction.update(userRef, {
       friends: admin.firestore.FieldValue.arrayRemove(targetUserId)
     });
     transaction.update(targetUserRef, {
-          friends: admin.firestore.FieldValue.arrayRemove(userId)
-        });
+      friends: admin.firestore.FieldValue.arrayRemove(userId)
+    });
 
-    // Depending on the action, block the user
+    // Handle blocking
     if (action === 'block') {
       transaction.update(userRef, {
-            blocked: admin.firestore.FieldValue.arrayUnion(targetUserId)
-          });
+        blocked: admin.firestore.FieldValue.arrayUnion(targetUserId)
+      });
     }
 
-    // Delete the friendship document
-    transaction.delete(friendshipRef);
+    // Delete the friendship document only if it exists and friendshipId is provided
+    if (friendshipId) {
+      const friendshipSnapshot = await friendshipRef.get();
+      if (friendshipSnapshot.exists) {
+        transaction.delete(friendshipRef);
+      }
+    }
   });
 }
 
@@ -336,7 +341,7 @@ exports.deleteFriendship = functions.https.onCall(async (data, context) => {
 
   const { userId, targetUserId, friendshipId } = data;
   if (!userId || !targetUserId || !friendshipId) {
-    throw new functions.https.HttpsError('invalid-argument', 'The function must be called with userId, targetUserId and friendshipId.');
+    throw new functions.https.HttpsError('invalid-argument', 'The function must be called with userId, targetUserId, and friendshipId.');
   }
 
   try {
@@ -355,8 +360,8 @@ exports.blockUser = functions.https.onCall(async (data, context) => {
   }
 
   const { userId, targetUserId, friendshipId } = data;
-  if (!userId || !targetUserId || !friendshipId) {
-    throw new functions.https.HttpsError('invalid-argument', 'The function must be called with userId, targetUserId, friendshipId.');
+  if (!userId || !targetUserId) {
+    throw new functions.https.HttpsError('invalid-argument', 'The function must be called with userId and targetUserId.');
   }
 
   try {
