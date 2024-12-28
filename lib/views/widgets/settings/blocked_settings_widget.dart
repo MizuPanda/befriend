@@ -42,8 +42,8 @@ class _BlockedSettingsWidgetState extends State<BlockedSettingsWidget> {
             title: Row(
               children: [
                 Text(
-                  AppLocalizations.of(context)?.translate('bsw_blocked') ??
-                      "Blocked accounts ",
+                  AppLocalizations.translate(context,
+                      key: 'bsw_blocked', defaultString: "Blocked accounts"),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const Icon(Icons.supervisor_account_rounded)
@@ -61,9 +61,8 @@ class _BlockedSettingsWidgetState extends State<BlockedSettingsWidget> {
                 ),
                 trailing: TextButton(
                     onPressed: () => provider.unblockUser(user, context),
-                    child: Text(AppLocalizations.of(context)
-                            ?.translate('bsw_unblock') ??
-                        'Unblock')),
+                    child: Text(AppLocalizations.translate(context,
+                        key: 'bsw_unblock', defaultString: 'Unblock'))),
               ),
               firstPageProgressIndicatorBuilder: (context) =>
                   const Center(child: CircularProgressIndicator()),
@@ -71,8 +70,8 @@ class _BlockedSettingsWidgetState extends State<BlockedSettingsWidget> {
                   const Center(child: CircularProgressIndicator()),
               noItemsFoundIndicatorBuilder: (context) => Center(
                 child: Text(
-                  AppLocalizations.of(context)?.translate('bsw_none') ??
-                      'No users blocked',
+                  AppLocalizations.translate(context,
+                      key: 'bsw_none', defaultString: 'No users blocked'),
                   style: GoogleFonts.openSans(fontSize: 16),
                 ),
               ),

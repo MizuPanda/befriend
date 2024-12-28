@@ -44,12 +44,14 @@ class MaterialProvider extends ChangeNotifier {
   String themeText(BuildContext context) {
     switch (_themeMode) {
       case ThemeMode.light:
-        return AppLocalizations.of(context)?.translate('mp_light') ?? 'Light';
+        return AppLocalizations.translate(context,
+            key: 'mp_light', defaultString: 'Light');
       case ThemeMode.dark:
-        return AppLocalizations.of(context)?.translate('mp_dark') ?? 'Dark';
+        return AppLocalizations.translate(context,
+            key: 'mp_dark', defaultString: 'Dark');
       case ThemeMode.system:
-        return AppLocalizations.of(context)?.translate('mp_sd') ??
-            'System Default';
+        return AppLocalizations.translate(context,
+            key: 'mp_sd', defaultString: 'System Default');
     }
   }
 

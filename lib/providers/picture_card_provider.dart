@@ -175,7 +175,7 @@ class PictureCardProvider extends ChangeNotifier {
       case 1:
         return await DataQuery.getUsername(_picture.likes.first);
       default:
-        return '${await DataQuery.getUsername(_picture.likes.first)} ${context.mounted ? AppLocalizations.of(context)?.translate('pcp_others') ?? 'and others' : 'and others'}';
+        return '${await DataQuery.getUsername(_picture.likes.first)} ${context.mounted ? AppLocalizations.translate(context, key: 'pcp_others', defaultString: 'and others') : 'and others'}';
     }
   }
 

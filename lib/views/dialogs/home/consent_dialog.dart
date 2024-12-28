@@ -26,9 +26,8 @@ class ConsentDialog {
           ),
           actions: [
             TextButton(
-              child: Text(
-                  AppLocalizations.of(context)?.translate('dialog_close') ??
-                      'Close'),
+              child: Text(AppLocalizations.translate(context,
+                  key: 'dialog_close', defaultString: 'Close')),
               onPressed: () {
                 Navigator.of(context).pop();
               },

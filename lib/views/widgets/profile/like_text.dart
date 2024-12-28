@@ -63,7 +63,7 @@ class LikeText extends StatelessWidget {
                   children: [
                     TextSpan(
                         text:
-                            '${AppLocalizations.of(context)?.translate('lt_liked') ?? 'Liked by'} '),
+                            '${AppLocalizations.translate(context, key: 'lt_liked', defaultString: 'Liked by')} '),
                     TextSpan(
                         text: data.data,
                         style: const TextStyle(fontWeight: FontWeight.bold))

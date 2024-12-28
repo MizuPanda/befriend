@@ -82,13 +82,14 @@ class SignProvider extends ChangeNotifier {
       if (_error == Constants.invalidEmail) {
         _error = null;
       }
-      return AppLocalizations.of(context)?.translate('snp_email_invalid') ??
-          'This email is not valid.';
+      return AppLocalizations.translate(context,
+          key: 'snp_email_invalid', defaultString: 'This email is not valid.');
     }
     if (_error == Constants.emailAlreadyInUse) {
       _error = null;
-      return AppLocalizations.of(context)?.translate('snp_email_used') ??
-          "This email is already in use.";
+      return AppLocalizations.translate(context,
+          key: 'snp_email_used',
+          defaultString: "This email is already in use.");
     }
 
     return null;
@@ -103,8 +104,9 @@ class SignProvider extends ChangeNotifier {
 
     if (_error == Constants.usernameError) {
       _error = null;
-      return AppLocalizations.of(context)?.translate('snp_username_used') ??
-          "This username is already in use.";
+      return AppLocalizations.translate(context,
+          key: 'snp_username_used',
+          defaultString: "This username is already in use.");
     }
 
     return null;
@@ -118,8 +120,9 @@ class SignProvider extends ChangeNotifier {
 
     if (_error == Constants.weakPassword) {
       _error = null;
-      return AppLocalizations.of(context)?.translate('snp_password_weak') ??
-          'Your password is too weak.';
+      return AppLocalizations.translate(context,
+          key: 'snp_password_weak',
+          defaultString: 'Your password is too weak.');
     }
 
     return null;
@@ -187,22 +190,28 @@ class SignProvider extends ChangeNotifier {
   void _showAgeRequirementSnackBar(BuildContext context) {
     ErrorHandling.showError(
         context,
-        AppLocalizations.of(context)?.translate('snp_age_req') ??
-            'You must be at least 13 years old to create an account.');
+        AppLocalizations.translate(context,
+            key: 'snp_age_req',
+            defaultString:
+                'You must be at least 13 years old to create an account.'));
   }
 
   void _showConsentSnackBar(BuildContext context) {
     ErrorHandling.showError(
         context,
-        AppLocalizations.of(context)?.translate('snp_cons_req') ??
-            'Please agree to the Privacy Policy and to the Terms and Conditions to continue with the sign-up process.');
+        AppLocalizations.translate(context,
+            key: 'snp_cons_req',
+            defaultString:
+                'Please agree to the Privacy Policy and to the Terms and Conditions to continue with the sign-up process.'));
   }
 
   void _showUnknownErrorSnackBar(BuildContext context) {
     ErrorHandling.showError(
         context,
-        AppLocalizations.of(context)?.translate('general_error_message5') ??
-            'An unknown error has occurred. Please try again later.');
+        AppLocalizations.translate(context,
+            key: 'general_error_message5',
+            defaultString:
+                'An unknown error has occurred. Please try again later.'));
   }
 
   /// Sign up the user

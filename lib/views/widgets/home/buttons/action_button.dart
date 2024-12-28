@@ -4,9 +4,11 @@ import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../models/objects/home.dart';
+import '../../../../utilities/app_localizations.dart';
 
 class ActionButton extends StatelessWidget {
-  const ActionButton({super.key, required this.home, required this.notifyParent});
+  const ActionButton(
+      {super.key, required this.home, required this.notifyParent});
 
   final Home home;
   final Function notifyParent;
@@ -14,14 +16,16 @@ class ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (BuildContext context) => ActionProvider(),
-      builder: (BuildContext context, Widget? child) {
-        return Consumer<ActionProvider>(
-          builder: (BuildContext context, ActionProvider provider, Widget? child) {
+        create: (BuildContext context) => ActionProvider(),
+        builder: (BuildContext context, Widget? child) {
+          return Consumer<ActionProvider>(builder:
+              (BuildContext context, ActionProvider provider, Widget? child) {
+            final double height = MediaQuery.of(context).size.height;
+
             return ExpandableFab(
               type: ExpandableFabType.up,
               childrenAnimation: ExpandableFabAnimation.none,
-              distance: 70,
+              distance: 0.07 * height,
               openButtonBuilder: RotateFloatingActionButtonBuilder(
                 child: const Icon(Icons.menu_rounded),
                 fabSize: ExpandableFabSize.regular,
@@ -39,7 +43,8 @@ class ActionButton extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Text('Refresh'),
+                    Text(AppLocalizations.translate(context,
+                        key: 'ab_refresh', defaultString: 'Refresh')),
                     const SizedBox(width: 20),
                     FloatingActionButton.small(
                       heroTag: 'refresh_users',
@@ -52,7 +57,8 @@ class ActionButton extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    const Text('Load more'),
+                    Text(AppLocalizations.translate(context,
+                        key: 'ab_load', defaultString: 'Load more')),
                     const SizedBox(width: 20),
                     FloatingActionButton.small(
                       heroTag: 'load_more',
@@ -65,9 +71,7 @@ class ActionButton extends StatelessWidget {
                 ),
               ],
             );
-          }
-        );
-      }
-    );
+          });
+        });
   }
 }

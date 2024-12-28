@@ -16,19 +16,22 @@ class DeletePictureDialog {
           return StatefulBuilder(builder: (BuildContext context, setState) {
             return AlertDialog(
               title: Text(
-                AppLocalizations.of(context)?.translate('dpd_title') ??
-                    'Delete this picture',
+                AppLocalizations.translate(context,
+                    key: 'dpd_title', defaultString: 'Delete this picture'),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               content: Text.rich(TextSpan(children: [
                 TextSpan(
-                    text: AppLocalizations.of(context)
-                            ?.translate('dpd_content') ??
-                        "Are you sure you want to delete this picture. This will also delete the picture on your friends profile. This action cannot be undone.\n\n",
+                    text: AppLocalizations.translate(context,
+                        key: 'dpd_content',
+                        defaultString:
+                            "Are you sure you want to delete this picture. This will also delete the picture on your friends profile. This action cannot be undone.\n\n"),
                     style: const TextStyle(fontSize: 15)),
                 TextSpan(
-                    text: AppLocalizations.of(context)?.translate('dpd_note') ??
-                        "Note: You are able to delete this picture because it was taken with your device. Please archive the picture if you only want to hide it from your profile.",
+                    text: AppLocalizations.translate(context,
+                        key: 'dpd_note',
+                        defaultString:
+                            "Note: You are able to delete this picture because it was taken with your device. Please archive the picture if you only want to hide it from your profile."),
                     style: const TextStyle(
                         fontSize: 12, fontStyle: FontStyle.italic))
               ])),
@@ -41,9 +44,8 @@ class DeletePictureDialog {
                               .pop(); // Dismiss the dialog
                         },
                         child: Text(
-                          AppLocalizations.of(context)
-                                  ?.translate('dialog_cancel') ??
-                              "Cancel",
+                          AppLocalizations.translate(context,
+                              key: 'dialog_cancel', defaultString: "Cancel"),
                           style: const TextStyle(fontSize: textButtonSize),
                         ),
                       ),
@@ -69,9 +71,8 @@ class DeletePictureDialog {
                           }
                         },
                         child: Text(
-                            AppLocalizations.of(context)
-                                    ?.translate('dialog_delete') ??
-                                'Delete',
+                            AppLocalizations.translate(context,
+                                key: 'dialog_delete', defaultString: 'Delete'),
                             style: const TextStyle(
                                 color: Colors.red, fontSize: textButtonSize)),
                       ),

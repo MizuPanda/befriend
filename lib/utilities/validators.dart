@@ -10,8 +10,8 @@ class Validators {
 
   static String? emailValidator(String? email, BuildContext context) {
     if (email == null || email.isEmpty) {
-      return AppLocalizations.of(context)?.translate('val_email') ??
-          'Please enter an email.';
+      return AppLocalizations.translate(context,
+          key: 'val_email', defaultString: 'Please enter an email.');
     }
 
     return null;
@@ -19,21 +19,24 @@ class Validators {
 
   static String? usernameValidator(String? username, BuildContext context) {
     if (username == null || username.isEmpty) {
-      return AppLocalizations.of(context)?.translate('val_username_empty') ??
-          "Please enter a username.";
+      return AppLocalizations.translate(context,
+          key: 'val_username_empty', defaultString: "Please enter a username.");
     }
     username.trim();
     // Minimum and maximum length requirements
     if (username.length < 2 || username.length > 20) {
-      return AppLocalizations.of(context)?.translate('val_username_length') ??
-          'This username is too short or too lengthy.';
+      return AppLocalizations.translate(context,
+          key: 'val_username_length',
+          defaultString: 'This username is too short or too lengthy.');
     }
 
     // Allowed characters (alphanumeric, underscores, periods)
     final RegExp allowedCharacters = RegExp(r'^[a-zA-Z0-9_.]+$');
     if (!allowedCharacters.hasMatch(username)) {
-      return AppLocalizations.of(context)?.translate('val_username_char') ??
-          'This username contains characters that are not allowed.';
+      return AppLocalizations.translate(context,
+          key: 'val_username_char',
+          defaultString:
+              'This username contains characters that are not allowed.');
     }
 
     return null;
@@ -41,16 +44,18 @@ class Validators {
 
   static String? passwordValidator(String? password, BuildContext context) {
     if (password == null || password.isEmpty) {
-      return AppLocalizations.of(context)?.translate('val_password_empty') ??
-          'Please enter a password';
+      return AppLocalizations.translate(context,
+          key: 'val_password_empty', defaultString: 'Please enter a password');
     }
     if (password.length < 8) {
-      return AppLocalizations.of(context)?.translate('val_password_short') ??
-          'This password is too short.';
+      return AppLocalizations.translate(context,
+          key: 'val_password_short',
+          defaultString: 'This password is too short.');
     }
     if (strength(password) <= 3) {
-      return AppLocalizations.of(context)?.translate('val_password_weak') ??
-          'This password is not strong enough.';
+      return AppLocalizations.translate(context,
+          key: 'val_password_weak',
+          defaultString: 'This password is not strong enough.');
     }
 
     return null;
@@ -59,12 +64,14 @@ class Validators {
   static String? repeatValidator(
       String? repeat, String? password, BuildContext context) {
     if (repeat == null || repeat.isEmpty) {
-      return AppLocalizations.of(context)?.translate('val_repeat_empty') ??
-          'Please repeat your password.';
+      return AppLocalizations.translate(context,
+          key: 'val_repeat_empty',
+          defaultString: 'Please repeat your password.');
     }
     return repeat == password
         ? null
-        : AppLocalizations.of(context)?.translate('val_repeat_incorrect') ??
-            'This password does not match with the first one.';
+        : AppLocalizations.translate(context,
+            key: 'val_repeat_incorrect',
+            defaultString: 'This password does not match with the first one.');
   }
 }

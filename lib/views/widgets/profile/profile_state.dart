@@ -36,8 +36,8 @@ class ProfileState extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: AutoSizeText(
                       profile.user.main()
-                          ? '${AppLocalizations.of(context)?.translate('prfs_fs') ?? 'Friendship Score'}: ${profile.user.power}'
-                          : '${AppLocalizations.of(context)?.translate('prfs_fl') ?? 'Friendship Level'}: ${profile.friendship!.level}',
+                          ? '${AppLocalizations.translate(context, key: 'prfs_fs', defaultString: 'Friendship Score')}: ${profile.user.power}'
+                          : '${AppLocalizations.translate(context, key: 'prfs_fl', defaultString: 'Friendship Level')}: ${profile.friendship!.level}',
                       style: GoogleFonts.openSans(
                         textStyle: const TextStyle(
                           fontSize: 18,
@@ -48,8 +48,8 @@ class ProfileState extends StatelessWidget {
               const Spacer(),
               if (profile.friendship?.isBestFriend ?? false)
                 AutoSizeText(
-                  AppLocalizations.of(context)?.translate("prfs_best") ??
-                      "Your Best Friend",
+                  AppLocalizations.translate(context,
+                      key: "prfs_best", defaultString: "Your Best Friend"),
                   style: GoogleFonts.openSans(
                       textStyle: const TextStyle(
                     fontSize: 18,
@@ -63,7 +63,7 @@ class ProfileState extends StatelessWidget {
               child: Align(
                   alignment: Alignment.centerLeft,
                   child: AutoSizeText(
-                    '${AppLocalizations.of(context)?.translate('prfs_since') ?? 'Friends since'} ${timeago.format(profile.friendship?.created ?? DateTime.now())}',
+                    '${AppLocalizations.translate(context, key: 'prfs_since', defaultString: 'Since')} ${profile.friendship != null ? timeago.format(profile.friendship!.created) : AppLocalizations.translate(context, key: 'prfs_never', defaultString: 'never')}',
                     textAlign: TextAlign.start,
                     style: GoogleFonts.openSans(
                         textStyle: const TextStyle(fontSize: 18)),
@@ -103,7 +103,7 @@ class ProfileState extends StatelessWidget {
                             children: [
                               TextSpan(
                                   text:
-                                      '${AppLocalizations.of(context)?.translate('prfs_followed') ?? 'Followed by'} '),
+                                      '${AppLocalizations.translate(context, key: 'prfs_followed', defaultString: 'Followed by')} '),
                               TextSpan(
                                   text: provider.friendsInCommon(context),
                                   style: const TextStyle(

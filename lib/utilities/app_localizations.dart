@@ -8,7 +8,7 @@ class AppLocalizations {
 
   AppLocalizations({required this.locale});
 
-  static AppLocalizations? of(BuildContext context) {
+  static AppLocalizations? _of(BuildContext context) {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
@@ -29,12 +29,21 @@ class AppLocalizations {
     return true;
   }
 
-  String? translate(String key) {
+  String _translate(String key, String defaultString) {
     String? translated = _localizedStrings[key];
     if (translated == null) {
       debugPrint('(AppLocalizations) Error translating $key');
+
+      return defaultString;
     }
-    return _localizedStrings[key];
+
+    return translated;
+  }
+
+  static String translate(BuildContext context,
+      {required String key, required String defaultString}) {
+    return AppLocalizations._of(context)?._translate(key, defaultString) ??
+        defaultString;
   }
 }
 

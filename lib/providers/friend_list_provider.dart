@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:befriend/models/data/data_query.dart';
-import 'package:befriend/models/data/user_manager.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
+import '../models/authentication/authentication.dart';
 import '../models/data/data_manager.dart';
 import '../models/objects/bubble.dart';
 import '../models/objects/friendship.dart';
@@ -12,16 +14,19 @@ import '../models/objects/profile.dart';
 import '../utilities/constants.dart';
 
 class FriendListProvider extends ChangeNotifier {
-  static const _pageSize = 10;
+  static const _pageSize = 8;
+  static const int _debounceTime = 600;
 
-  final PagingController<int, Friendship> _pagingController =
-      PagingController(firstPageKey: 0);
+  final PagingController<DocumentSnapshot?, Friendship> _pagingController =
+      PagingController(firstPageKey: null);
   final TextEditingController _searchController = TextEditingController();
 
-  PagingController<int, Friendship> get pagingController => _pagingController;
+  PagingController<DocumentSnapshot?, Friendship> get pagingController =>
+      _pagingController;
   TextEditingController get searchController => _searchController;
 
-  List<Friendship> _allFriends = [];
+  Timer? _debounce;
+
   String _searchQuery = '';
 
   void goToFriendProfile(
@@ -42,18 +47,8 @@ class FriendListProvider extends ChangeNotifier {
     required Bubble mainUser,
   }) {
     try {
-      // Preload initial friends into the PagingController.
-      _allFriends = mainUser.friendships;
-      _allFriends.sort((a, b) => b.strength().compareTo(a.strength()));
-      if (_allFriends.isNotEmpty) {
-        _pagingController.itemList = _allFriends;
-      }
-
       _pagingController.addPageRequestListener((pageKey) {
-        _fetchPage(pageKey, mainUser: mainUser);
-      });
-      _searchController.addListener(() {
-        _filterFriends(_searchController.text);
+        _fetchPage(pageKey);
       });
     } catch (e) {
       debugPrint('(FriendListProvider) Error in initState: $e');
@@ -65,87 +60,68 @@ class FriendListProvider extends ChangeNotifier {
     _searchController.dispose();
   }
 
-  void _filterFriends(String query) {
-    _searchQuery = query.toLowerCase();
-    List<Friendship> filteredFriends = _allFriends.where((friendship) {
-      return friendship.friend.username.toLowerCase().contains(_searchQuery);
-    }).toList();
-    _pagingController.itemList = filteredFriends;
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      notifyListeners();
+  Future<void> onSearchChanged(String? query) async {
+    if (query == null) {
+      return;
+    }
+    // Cancel any ongoing debounce timer
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+
+    // Start a new debounce timer
+    _debounce = Timer(const Duration(milliseconds: _debounceTime), () {
+      _searchQuery = query.trim();
+
+      _pagingController.refresh();
     });
   }
 
-  Future<void> _fetchPage(int pageKey, {required Bubble mainUser}) async {
+  Future<void> _fetchPage(
+    DocumentSnapshot? pageKey,
+  ) async {
     try {
-      List<Friendship> friendships = [];
+      final String currentUserId = AuthenticationManager.id();
 
-      if (mainUser.hasNonLoadedFriends()) {
-        Iterable<dynamic> nonLoadedFriends = mainUser.nonLoadedFriends();
+      Query query = Constants.usersCollection
+          .where(Constants.friendsDoc, arrayContains: currentUserId);
 
-        debugPrint(
-            '(FriendListProvider) Has non-loaded friendships: $nonLoadedFriends');
-
-        nonLoadedFriends = nonLoadedFriends.take(30);
-
-        final String id = mainUser.id;
-
-        final QuerySnapshot querySnapshot =
-            await Constants.friendshipsCollection
-                .where(Filter.or(
-                  Filter.and(
-                      Filter(Constants.user1Doc, isEqualTo: id),
-                      Filter(
-                        Constants.user2Doc,
-                        whereIn: nonLoadedFriends,
-                      )),
-                  Filter.and(
-                      Filter(Constants.user2Doc, isEqualTo: id),
-                      Filter(
-                        Constants.user1Doc,
-                        whereIn: nonLoadedFriends,
-                      )),
-                ))
-                .orderBy(Constants.levelDoc, descending: true)
-                .limit(_pageSize)
-                .get();
-
-        if (querySnapshot.docs.isNotEmpty) {
-          for (QueryDocumentSnapshot snapshot in querySnapshot.docs) {
-            String user1 = DataManager.getString(snapshot, Constants.user1Doc);
-            String user2 = DataManager.getString(snapshot, Constants.user2Doc);
-            String friendId;
-
-            if (user1 == id) {
-              friendId = user2;
-            } else {
-              friendId = user1;
-            }
-
-            final Friendship friendship =
-                await DataQuery.getFriendship(id, friendId);
-
-            debugPrint(
-                '(FriendListProvider) Adding friend ${friendship.friend.username}');
-
-            friendships.add(friendship);
-            UserManager.addFriendToMain(friendship);
-            UserManager.notify();
-          }
-        }
+      if (_searchQuery.isNotEmpty && _searchQuery != '0') {
+        query = query
+            .where(Constants.usernameDoc, isGreaterThanOrEqualTo: _searchQuery)
+            .where(Constants.usernameDoc,
+                isLessThanOrEqualTo: '$_searchQuery\uf8ff')
+            .orderBy(
+                Constants.usernameDoc); // Order by the inequality field first
       }
 
-      final List<Friendship> newItems = friendships;
+      query =
+          query.orderBy(Constants.powerDoc, descending: true).limit(_pageSize);
+
+      if (pageKey != null) {
+        query = query.startAfterDocument(pageKey);
+      }
+
+      final QuerySnapshot querySnapshot = await query.get();
+
+      final List<Friendship> newItems = [];
+
+      for (DocumentSnapshot doc in querySnapshot.docs) {
+        final ImageProvider avatar = await DataManager.getAvatar(doc);
+        final Bubble friendBubble = Bubble.fromDocs(doc, avatar);
+
+        final Friendship friendship =
+            await DataQuery.getFriendshipFromBubble(friendBubble);
+
+        newItems.add(friendship);
+        debugPrint(
+            '(FriendListProvider) Fetching friend ${friendship.friend.username}');
+      }
+
       final isLastPage = newItems.length < _pageSize;
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);
       } else {
-        final int nextPageKey = pageKey + newItems.length;
-        _pagingController.appendPage(newItems, nextPageKey);
+        _pagingController.appendPage(newItems, querySnapshot.docs.last);
       }
-
-      // Apply search filter to newly loaded data
-      _filterFriends(_searchQuery);
     } catch (error) {
       _pagingController.error = error;
       debugPrint('(FriendListProvider) Error fetching page: $error');

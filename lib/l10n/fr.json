@@ -183,7 +183,8 @@
   "lp_terms": "Conditions d'utilisation",
 
   "_comment29": "Mutual Page",
-  "mp_friends": "Amis en commun",
+  "mp_friends": "Les amis que vous avez en commun avec",
+  "mp_common": "",
 
   "_comment30": "Picture Sign Page",
   "psp_ls": "Dernière étape",
@@ -299,6 +300,7 @@
   "prfs_followed": "Suivi par",
   "prfs_since": "Depuis",
   "prfs_best": "Votre Meilleur Ami",
+  "prfs_never": "jamais",
 
   "_comment48": "Archive Settings Widget",
   "asw_archives": "Archives",
@@ -337,5 +339,9 @@
   "dhd_content": "Êtes vous sûr de vouloir effacer votre historique? Cette action ne peut pas être annulée.",
 
   "_comment58": "Likes Dialog",
-  "ld_none": "Pas de likes"
+  "ld_none": "Pas de likes",
+
+  "_comment59": "Action Button",
+  "ab_refresh": "Rafraichir",
+  "ab_load": "Charger plus"
 }

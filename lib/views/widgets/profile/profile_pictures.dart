@@ -93,7 +93,7 @@ class _ProfilePicturesState extends State<ProfilePictures> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '${AppLocalizations.of(context)?.translate('pp_need') ?? 'You need to add'} ${widget.profileUsername} ${AppLocalizations.of(context)?.translate('pp_friend') ?? 'as a friend to see their pictures.'}',
+                              '${AppLocalizations.translate(context, key: 'pp_need', defaultString: 'You need to add')} ${widget.profileUsername} ${AppLocalizations.translate(context, key: 'pp_friend', defaultString: 'as a friend to see their pictures.')}',
                               textAlign: TextAlign.center,
                               style: GoogleFonts.openSans(
                                 fontSize: 17,
@@ -102,9 +102,10 @@ class _ProfilePicturesState extends State<ProfilePictures> {
                               maxLines: 2,
                             ),
                             Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('pp_become') ??
-                                  'Take a picture with them to become friends',
+                              AppLocalizations.translate(context,
+                                  key: 'pp_become',
+                                  defaultString:
+                                      'Take a picture with them to become friends'),
                               textAlign: TextAlign.center,
                               style: GoogleFonts.openSans(
                                   fontSize: 15, color: Colors.grey),

@@ -59,18 +59,18 @@ class _LoginPageState extends State<LoginPage> {
                       Column(
                         children: [
                           AutoSizeText(
-                            AppLocalizations.of(context)
-                                    ?.translate('befriend_devise') ??
-                                "~ Expand your social circle ~",
+                            AppLocalizations.translate(context,
+                                key: 'befriend_devise',
+                                defaultString: "~ Expand your social circle ~"),
                             style: GoogleFonts.openSans(fontSize: 20.5),
                           ),
                           SizedBox(
                             height: height * _sizedBoxHeightMultiplier / 1.8,
                           ),
                           EmailFormField(
-                            labelText: AppLocalizations.of(context)
-                                    ?.translate('lp_email') ??
-                                'Enter your email',
+                            labelText: AppLocalizations.translate(context,
+                                key: 'lp_email',
+                                defaultString: 'Enter your email'),
                           ),
                           SizedBox(height: height * _sizedBoxHeightMultiplier),
                           const PasswordFormField(),
@@ -81,9 +81,10 @@ class _LoginPageState extends State<LoginPage> {
                                 onPressed: () {
                                   provider.navigateToSignUp(context);
                                 },
-                                child: AutoSizeText(AppLocalizations.of(context)
-                                        ?.translate('lp_sign') ??
-                                    'Sign up'),
+                                child: AutoSizeText(AppLocalizations.translate(
+                                    context,
+                                    key: 'lp_sign',
+                                    defaultString: 'Sign up')),
                               ),
                               const Spacer(),
                               ElevatedButton(
@@ -95,10 +96,10 @@ class _LoginPageState extends State<LoginPage> {
                                   alignment: Alignment.center,
                                   child: provider.isLoading
                                       ? const CircularProgressIndicator()
-                                      : AutoSizeText(
-                                          AppLocalizations.of(context)
-                                                  ?.translate('lp_login') ??
-                                              'Login'),
+                                      : AutoSizeText(AppLocalizations.translate(
+                                          context,
+                                          key: 'lp_login',
+                                          defaultString: 'Login')),
                                 ),
                               ),
                             ],
@@ -113,9 +114,10 @@ class _LoginPageState extends State<LoginPage> {
                               onPressed: () {
                                 provider.openForgotPasswordPage(context);
                               },
-                              child: AutoSizeText(AppLocalizations.of(context)
-                                      ?.translate('fpp_forgot') ??
-                                  'Forgot your password?'),
+                              child: AutoSizeText(AppLocalizations.translate(
+                                  context,
+                                  key: 'fpp_forgot',
+                                  defaultString: 'Forgot your password?')),
                             ),
                           ),
                         ],
@@ -129,9 +131,9 @@ class _LoginPageState extends State<LoginPage> {
                               },
                               child: AutoSizeText(
                                 textAlign: TextAlign.center,
-                                AppLocalizations.of(context)
-                                        ?.translate('lp_privacy') ??
-                                    'Privacy Policy',
+                                AppLocalizations.translate(context,
+                                    key: 'lp_privacy',
+                                    defaultString: 'Privacy Policy'),
                                 style: GoogleFonts.openSans(),
                               )),
                           Flexible(
@@ -141,9 +143,9 @@ class _LoginPageState extends State<LoginPage> {
                                 },
                                 child: AutoSizeText(
                                   textAlign: TextAlign.center,
-                                  AppLocalizations.of(context)
-                                          ?.translate('lp_terms') ??
-                                      'Terms & Conditions',
+                                  AppLocalizations.translate(context,
+                                      key: 'lp_terms',
+                                      defaultString: 'Terms & Conditions'),
                                   style: GoogleFonts.openSans(),
                                 )),
                           )

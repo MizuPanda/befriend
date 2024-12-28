@@ -14,14 +14,16 @@ class DeleteHistoryDialog {
         return StatefulBuilder(builder: (context, setState) {
           return AlertDialog(
             title: Text(
-              AppLocalizations.of(context)?.translate('dhd_title') ??
-                  'Clear search history?',
+              AppLocalizations.translate(context,
+                  key: 'dhd_title', defaultString: 'Clear search history?'),
               textAlign: TextAlign.center,
               style: GoogleFonts.openSans(fontWeight: FontWeight.bold),
             ),
             content: Text(
-              AppLocalizations.of(context)?.translate('dhd_content') ??
-                  'Are you sure you want to clear your search history? This action cannot be undone.',
+              AppLocalizations.translate(context,
+                  key: 'dhd_content',
+                  defaultString:
+                      'Are you sure you want to clear your search history? This action cannot be undone.'),
               textAlign: TextAlign.center,
               style: GoogleFonts.openSans(),
             ),
@@ -34,9 +36,8 @@ class DeleteHistoryDialog {
                         Navigator.of(dialogContext).pop(); // Close the dialog
                       },
                       child: Text(
-                        AppLocalizations.of(context)
-                                ?.translate('dialog_cancel') ??
-                            'Cancel',
+                        AppLocalizations.translate(context,
+                            key: 'dialog_cancel', defaultString: 'Cancel'),
                         style: GoogleFonts.openSans(),
                       ),
                     ),
@@ -58,9 +59,8 @@ class DeleteHistoryDialog {
                             WidgetStatePropertyAll<Color?>(Colors.red),
                       ),
                       child: Text(
-                        AppLocalizations.of(dialogContext)
-                                ?.translate('dialog_delete') ??
-                            'Delete',
+                        AppLocalizations.translate(context,
+                            key: 'dialog_delete', defaultString: 'Delete'),
                         style: GoogleFonts.openSans(),
                       ),
                     ),

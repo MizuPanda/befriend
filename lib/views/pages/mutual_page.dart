@@ -1,12 +1,14 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/providers/mutual_provider.dart';
+import 'package:befriend/views/widgets/befriend_widget.dart';
+import 'package:befriend/views/widgets/shimmers/mutual_shimmer.dart';
 import 'package:befriend/views/widgets/users/profile_photo.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/objects/bubble.dart';
 import '../../models/objects/profile.dart';
 import '../../utilities/app_localizations.dart';
 
@@ -44,15 +46,11 @@ class _MutualPageState extends State<MutualPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)?.translate('mp_friends') ??
-            'Mutual friends'),
-      ),
+      appBar: AppBar(title: const BefriendTitle()),
       body: ChangeNotifierProvider.value(
           value: _provider,
           builder: (BuildContext context, Widget? child) {
@@ -61,89 +59,55 @@ class _MutualPageState extends State<MutualPage> {
               return Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(width * 0.03),
-                    child: TextField(
-                      onChanged: provider.filterUsers,
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)
-                                ?.translate('general_word_search') ??
-                            'Search',
-                        suffixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
+                    padding: const EdgeInsets.all(8.0),
+                    child: AutoSizeText(
+                      '${AppLocalizations.translate(context, key: 'mp_friends', defaultString: "Friends you and")} '
+                      '${widget.profile.user.username}'
+                      '${AppLocalizations.translate(context, key: 'mp_common', defaultString: " have in common")}',
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      style: GoogleFonts.openSans(
+                        fontSize: 21,
                       ),
                     ),
                   ),
                   Expanded(
-                    child: provider.isSearching
-                        ? ListView.builder(
-                            itemCount: provider.length(),
-                            itemBuilder: (context, index) {
-                              final Friendship friendship =
-                                  provider.friendshipAt(index);
-                              final Bubble user = friendship.friend;
-
-                              return Padding(
-                                padding:
-                                    EdgeInsets.only(bottom: 0.008 * height),
-                                child: ListTile(
-                                  onTap: () {
-                                    provider.goToFriendProfile(context, index,
-                                        friendship, widget.profile.currentUser);
-                                  },
-                                  leading: Container(
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                            color: Theme.of(context)
-                                                .primaryColor)),
-                                    child: ProfilePhoto(
-                                      user: user,
-                                    ),
-                                  ),
-                                  title: AutoSizeText(
-                                    user.username,
-                                    maxLines: 1,
-                                  ),
-                                ),
-                              );
-                            },
-                          )
-                        : PagedListView<int, Friendship>(
-                            pagingController: provider.pagingController,
-                            builderDelegate:
-                                PagedChildBuilderDelegate<Friendship>(
-                              noItemsFoundIndicatorBuilder:
-                                  (BuildContext context) {
-                                return const Center();
-                              },
-                              itemBuilder: (context, item, index) => Padding(
-                                padding:
-                                    EdgeInsets.only(bottom: 0.008 * height),
-                                child: ListTile(
-                                  onTap: () {
-                                    provider.goToFriendProfile(context, index,
-                                        item, widget.profile.currentUser);
-                                  },
-                                  leading: Container(
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                            color: Theme.of(context)
-                                                .primaryColor)),
-                                    child: ProfilePhoto(
-                                      user: item.friend,
-                                    ),
-                                  ),
-                                  title: AutoSizeText(
-                                    item.friend.username,
-                                    maxLines: 1,
-                                  ),
-                                ),
+                    child: PagedListView<int, Friendship>(
+                      pagingController: provider.pagingController,
+                      builderDelegate: PagedChildBuilderDelegate<Friendship>(
+                        firstPageProgressIndicatorBuilder:
+                            (BuildContext context) {
+                          return const MutualShimmer();
+                        },
+                        newPageProgressIndicatorBuilder:
+                            (BuildContext context) {
+                          return const MutualShimmer();
+                        },
+                        noItemsFoundIndicatorBuilder: (BuildContext context) {
+                          return const Center();
+                        },
+                        itemBuilder: (context, item, index) => Padding(
+                          padding: EdgeInsets.only(bottom: 0.008 * height),
+                          child: ListTile(
+                            onTap: () => provider.goToFriendProfile(context,
+                                index, item, widget.profile.currentUser),
+                            leading: Container(
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: Theme.of(context).primaryColor)),
+                              child: ProfilePhoto(
+                                user: item.friend,
                               ),
                             ),
+                            title: AutoSizeText(
+                              item.friend.username,
+                              maxLines: 1,
+                            ),
                           ),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               );

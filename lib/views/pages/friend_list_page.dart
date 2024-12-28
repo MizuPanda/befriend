@@ -2,7 +2,9 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/providers/friend_list_provider.dart';
 import 'package:befriend/utilities/decorations.dart';
+import 'package:befriend/views/widgets/shimmers/friend_list_shimmer.dart';
 import 'package:befriend/views/widgets/users/profile_photo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -30,16 +32,17 @@ class _FriendsListPageState extends State<FriendsListPage> {
 
   @override
   void initState() {
-    super.initState();
     if (widget.user.hasFriends()) {
       _provider.initState(mainUser: widget.user);
     }
+    super.initState();
   }
 
   @override
   void dispose() {
-    super.dispose();
     _provider.disposeState();
+
+    super.dispose();
   }
 
   @override
@@ -54,8 +57,8 @@ class _FriendsListPageState extends State<FriendsListPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              AppLocalizations.of(context)?.translate('flp_list') ??
-                  'Friends List',
+              AppLocalizations.translate(context,
+                  key: 'flp_list', defaultString: 'Friends List'),
               style: GoogleFonts.openSans(),
             ),
             const SizedBox(
@@ -77,11 +80,12 @@ class _FriendsListPageState extends State<FriendsListPage> {
                     padding: EdgeInsets.all(width * 0.02),
                     child: TextField(
                       controller: provider.searchController,
+                      onChanged: provider.onSearchChanged,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.search),
-                        hintText: AppLocalizations.of(context)
-                                ?.translate('flp_search') ??
-                            'Search by username',
+                        hintText: AppLocalizations.translate(context,
+                            key: 'flp_search',
+                            defaultString: 'Search by username'),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25),
                         ),
@@ -90,17 +94,26 @@ class _FriendsListPageState extends State<FriendsListPage> {
                   ),
                   Expanded(
                     child: widget.user.hasFriends()
-                        ? PagedListView<int, Friendship>(
+                        ? PagedListView<DocumentSnapshot?, Friendship>(
                             pagingController: provider.pagingController,
                             builderDelegate:
                                 PagedChildBuilderDelegate<Friendship>(
                               noItemsFoundIndicatorBuilder:
                                   (BuildContext context) {
                                 return Center(
-                                  child: Text(AppLocalizations.of(context)
-                                          ?.translate('flp_no') ??
-                                      'No friends found'),
+                                  child: Text(AppLocalizations.translate(
+                                      context,
+                                      key: 'flp_no',
+                                      defaultString: 'No friends found')),
                                 );
+                              },
+                              newPageProgressIndicatorBuilder:
+                                  (BuildContext context) {
+                                return const FriendListShimmer();
+                              },
+                              firstPageProgressIndicatorBuilder:
+                                  (BuildContext context) {
+                                return const FriendListShimmer();
                               },
                               itemBuilder: (context, friendship, index) {
                                 return Padding(
@@ -143,7 +156,7 @@ class _FriendsListPageState extends State<FriendsListPage> {
                                             ),
                                             const Spacer(),
                                             AutoSizeText(
-                                              '${AppLocalizations.of(context)?.translate('flp_lvl') ?? 'LVL'}${friendship.level}',
+                                              '${AppLocalizations.translate(context, key: 'flp_lvl', defaultString: 'LVL')}${friendship.level}',
                                               style: GoogleFonts.openSans(),
                                             ),
                                           ],
@@ -163,9 +176,9 @@ class _FriendsListPageState extends State<FriendsListPage> {
                             ),
                           )
                         : Center(
-                            child: Text(AppLocalizations.of(context)
-                                    ?.translate('flp_yet') ??
-                                "You don't have friends yet."),
+                            child: Text(AppLocalizations.translate(context,
+                                key: 'flp_yet',
+                                defaultString: "You don't have friends yet.")),
                           ),
                   ),
                 ],

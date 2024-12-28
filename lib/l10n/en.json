@@ -183,7 +183,8 @@
   "lp_terms": "Terms & Conditions",
 
   "_comment29": "Mutual Page",
-  "mp_friends": "Mutual friends",
+  "mp_friends": "Friends you and",
+  "mp_common": " have in common",
 
   "_comment30": "Picture Sign Page",
   "psp_ls": "Last step",
@@ -299,6 +300,7 @@
   "prfs_followed": "Followed by",
   "prfs_since": "Since",
   "prfs_best": "Your Best Friend",
+  "prfs_never": "never",
 
   "_comment48": "Archive Settings Widget",
   "asw_archives": "Archives",
@@ -337,5 +339,9 @@
   "dhd_content": "Are you sure you want to clear your search history? This action cannot be undone.",
 
   "_comment58": "Likes Dialog",
-  "ld_none": "No likes."
+  "ld_none": "No likes.",
+
+  "_comment59": "Action Button",
+  "ab_refresh": "Refresh",
+  "ab_load": "Load more"
 }

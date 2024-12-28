@@ -32,8 +32,8 @@ class PasswordFormField extends StatelessWidget {
             obscureText: !provider.passwordVisible,
             decoration: Decorations.loginInputDecoration(
               lightMode: lightMode,
-              labelText: AppLocalizations.of(context)?.translate('lpf_enter') ??
-                  'Enter your password',
+              labelText: AppLocalizations.translate(context,
+                  key: 'lpf_enter', defaultString: 'Enter your password'),
               isWidgetFocused: provider.isPasswordFocused,
               isError: provider.isPassError,
               suffixIcon: HideIconButton(

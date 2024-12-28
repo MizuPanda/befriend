@@ -17,7 +17,7 @@ class ActionProvider extends ChangeNotifier {
   Future<void> loadMore(Home home, Function notifyParent) async {
     try {
       final List<dynamic> randomFriendsIDS =
-      home.user.nonLoadedFriends().take(_moreNumber).toList();
+          home.user.nonLoadedFriends().take(_moreNumber).toList();
 
       final List<dynamic> nonLoadedMainFriendIDS = [];
       if (!home.user.main()) {
@@ -29,7 +29,7 @@ class ActionProvider extends ChangeNotifier {
 
       for (String friendID in randomFriendsIDS) {
         Friendship friend =
-        await DataQuery.getFriendship(home.user.id, friendID);
+            await DataQuery.getFriendship(home.user.id, friendID);
 
         _loadFriend(home, friend);
 
@@ -37,7 +37,7 @@ class ActionProvider extends ChangeNotifier {
         // --> Add it to main.
         if (nonLoadedMainFriendIDS.contains(friendID) && !home.user.main()) {
           final Friendship friendship =
-          await DataQuery.getFriendshipFromBubble(friend.friend);
+              await DataQuery.getFriendshipFromBubble(friend.friend);
 
           UserManager.addFriendToMain(friendship);
           debugPrint(
@@ -45,7 +45,6 @@ class ActionProvider extends ChangeNotifier {
         }
         notifyParent();
       }
-
     } catch (e) {
       debugPrint('(HomeProvider) Error loading friends asynchronously: $e');
     }

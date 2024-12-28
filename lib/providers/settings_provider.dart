@@ -33,8 +33,9 @@ class SettingsProvider extends ChangeNotifier {
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('stp_signOut_error') ??
-                'Error signing out. Please try again.');
+            AppLocalizations.translate(context,
+                key: 'stp_signOut_error',
+                defaultString: 'Error signing out. Please try again.'));
       }
     }
   }
@@ -100,8 +101,9 @@ class SettingsProvider extends ChangeNotifier {
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('stp_tut_error') ??
-                'Error opening tutorial. Please try again.');
+            AppLocalizations.translate(context,
+                key: 'stp_tut_error',
+                defaultString: 'Error opening tutorial. Please try again.'));
       }
     }
   }
@@ -136,8 +138,10 @@ class SettingsProvider extends ChangeNotifier {
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('stp_delete_error') ??
-                'Error showing confirmation. Please try again.');
+            AppLocalizations.translate(context,
+                key: 'stp_delete_error',
+                defaultString:
+                    'Error showing confirmation. Please try again.'));
       }
     }
   }

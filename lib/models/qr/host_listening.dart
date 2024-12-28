@@ -36,9 +36,10 @@ class HostListening {
         if (context.mounted) {
           ErrorHandling.showError(
               context,
-              AppLocalizations.of(context)
-                      ?.translate('general_error_message3') ??
-                  'An error occurred. Please try again later...');
+              AppLocalizations.translate(context,
+                  key: 'general_error_message3',
+                  defaultString:
+                      'An error occurred. Please try again later...'));
         }
       },
     );
@@ -67,8 +68,9 @@ class HostListening {
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('general_error_message4') ??
-                'An unknown error occurred...');
+            AppLocalizations.translate(context,
+                key: 'general_error_message4',
+                defaultString: 'An unknown error occurred...'));
       }
     }
   }
@@ -110,8 +112,9 @@ class HostListening {
       // Optionally, show an error message to the user
       ErrorHandling.showError(
           context,
-          AppLocalizations.of(context)?.translate('general_error_message4') ??
-              'An unexpected error occurred...');
+          AppLocalizations.translate(context,
+              key: 'general_error_message4',
+              defaultString: 'An unexpected error occurred...'));
     }
   }
 

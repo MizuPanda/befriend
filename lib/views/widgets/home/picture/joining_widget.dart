@@ -46,8 +46,9 @@ class _JoiningWidgetState extends State<JoiningWidget> {
                       vertical: 8.0,
                     ),
                     child: AutoSizeText(
-                      AppLocalizations.of(context)?.translate('jw_scan') ??
-                          "Scan your friend's QR Code!",
+                      AppLocalizations.translate(context,
+                          key: 'jw_scan',
+                          defaultString: "Scan your friend's QR Code!"),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,

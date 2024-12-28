@@ -84,8 +84,8 @@ class LoginProvider extends ChangeNotifier {
     if (email == null || email.isEmpty) {
       _isEmailError = true;
       notifyListeners();
-      return AppLocalizations.of(context)?.translate('lp_ev') ??
-          'Please enter your email';
+      return AppLocalizations.translate(context,
+          key: 'lp_ev', defaultString: 'Please enter your email');
     }
     _isEmailError = false;
     notifyListeners();
@@ -96,8 +96,8 @@ class LoginProvider extends ChangeNotifier {
     if (password == null || password.isEmpty) {
       _isPassError = true;
       notifyListeners();
-      return AppLocalizations.of(context)?.translate('lp_pv') ??
-          'Please enter your password';
+      return AppLocalizations.translate(context,
+          key: 'lp_pv', defaultString: 'Please enter your password');
     }
     _isPassError = false;
     notifyListeners();

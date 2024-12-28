@@ -10,10 +10,11 @@ class EmailVerifiedDialog {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)?.translate('evd_title') ??
-            'Email Verification Required'),
-        content: Text(AppLocalizations.of(context)?.translate('evd_content') ??
-            'Please verify your email to access this feature.'),
+        title: Text(AppLocalizations.translate(context,
+            key: 'evd_title', defaultString: 'Email Verification Required')),
+        content: Text(AppLocalizations.translate(context,
+            key: 'evd_content',
+            defaultString: 'Please verify your email to access this feature.')),
         actions: [
           TextButton(
             onPressed: () async {
@@ -21,16 +22,16 @@ class EmailVerifiedDialog {
               Navigator.of(context).pop();
               await HostListening.pictureButton(context, isJoinMode);
             },
-            child: Text(AppLocalizations.of(context)?.translate('evd_child') ??
-                'Resend Email'),
+            child: Text(AppLocalizations.translate(context,
+                key: 'evd_child', defaultString: 'Resend Email')),
           ),
           TextButton(
             onPressed: () async {
               Navigator.of(context).pop();
               await HostListening.pictureButton(context, isJoinMode);
             },
-            child: Text(
-                AppLocalizations.of(context)?.translate('dialog_ok') ?? 'OK'),
+            child: Text(AppLocalizations.translate(context,
+                key: 'dialog_ok', defaultString: 'OK')),
           ),
         ],
       ),

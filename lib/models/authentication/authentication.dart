@@ -46,8 +46,10 @@ class AuthenticationManager {
       debugPrint('(AuthenticationManager) Error sending email verification');
       ErrorHandling.showError(
           context,
-          AppLocalizations.of(context)?.translate('auth_sev_error') ??
-              'There was an error sending the verification email. Please try again later.');
+          AppLocalizations.translate(context,
+              key: 'auth_sev_error',
+              defaultString:
+                  'There was an error sending the verification email. Please try again later.'));
     }
   }
 
@@ -124,8 +126,10 @@ class AuthenticationManager {
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('general_error_message') ??
-                "Something went wrong. Please try again later...");
+            AppLocalizations.translate(context,
+                key: 'general_error_message',
+                defaultString:
+                    "Something went wrong. Please try again later..."));
       }
 
       await user?.delete();
@@ -157,8 +161,10 @@ class AuthenticationManager {
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('auth_sign_error') ??
-                "Something went wrong. Please check your credentials and try again");
+            AppLocalizations.translate(context,
+                key: 'auth_sign_error',
+                defaultString:
+                    "Something went wrong. Please check your credentials and try again"));
       }
     }
   }

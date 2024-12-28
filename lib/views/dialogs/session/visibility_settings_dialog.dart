@@ -34,8 +34,8 @@ class VisibilityDialog {
           actions: [
             TextButton(
               child: Text(
-                AppLocalizations.of(context)?.translate('dialog_close') ??
-                    'Close',
+                AppLocalizations.translate(context,
+                    key: 'dialog_close', defaultString: 'Close'),
                 style: GoogleFonts.openSans(fontSize: 16),
               ),
               onPressed: () {
@@ -91,12 +91,14 @@ class _VisibilitySettingsWidgetState extends State<VisibilitySettingsWidget> {
       if (widget.isAllPublic) {
         headerIcon =
             Icon(Icons.public_rounded, color: Colors.green[900], size: 60);
-        message = AppLocalizations.of(context)?.translate('vsd_public') ??
-            'Visible to everyone';
+        message = AppLocalizations.translate(context,
+            key: 'vsd_public', defaultString: 'Visible to everyone');
       } else if (widget.isPrivate) {
         headerIcon = Icon(Icons.lock_rounded, color: Colors.red[900], size: 60);
-        message = AppLocalizations.of(context)?.translate('vsd_private') ??
-            'Visible only to you and the friends you took it with';
+        message = AppLocalizations.translate(context,
+            key: 'vsd_private',
+            defaultString:
+                'Visible only to you and the friends you took it with');
       } else {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,8 +110,10 @@ class _VisibilitySettingsWidgetState extends State<VisibilitySettingsWidget> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                AppLocalizations.of(context)?.translate('vsd_protected') ??
-                    'These friends will be able to see the picture:',
+                AppLocalizations.translate(context,
+                    key: 'vsd_protected',
+                    defaultString:
+                        'These friends will be able to see the picture:'),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.openSans(
                   fontSize: 20,
@@ -140,9 +144,9 @@ class _VisibilitySettingsWidgetState extends State<VisibilitySettingsWidget> {
                               const Center(child: CircularProgressIndicator()),
                           noItemsFoundIndicatorBuilder: (context) => Center(
                             child: Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('vsd_none') ??
-                                  'No friends found.',
+                              AppLocalizations.translate(context,
+                                  key: 'vsd_none',
+                                  defaultString: 'No friends found.'),
                               style: GoogleFonts.openSans(fontSize: 16),
                             ),
                           ),

@@ -15,8 +15,8 @@ class ConsentSettingsWidget extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context)?.translate('csw_manage') ??
-              'Manage consent',
+          AppLocalizations.translate(context,
+              key: 'csw_manage', defaultString: 'Manage consent'),
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
@@ -38,9 +38,9 @@ class ConsentSettingsWidget extends StatelessWidget {
                         SettingsTile(
                           leading: const Icon(Icons.ads_click),
                           title: Text(
-                            AppLocalizations.of(context)
-                                    ?.translate('csw_ads') ??
-                                'Ads preferences',
+                            AppLocalizations.translate(context,
+                                key: 'csw_ads',
+                                defaultString: 'Ads preferences'),
                           ),
                           onPressed: provider.reloadConsentForm,
                         ),
@@ -50,9 +50,9 @@ class ConsentSettingsWidget extends StatelessWidget {
                           color: Colors.red,
                         ),
                         title: Text(
-                          AppLocalizations.of(context)
-                                  ?.translate('csw_delete') ??
-                              'Delete your account',
+                          AppLocalizations.translate(context,
+                              key: 'csw_delete',
+                              defaultString: 'Delete your account'),
                           style: const TextStyle(color: Colors.red),
                         ),
                         onPressed: (BuildContext context) async {

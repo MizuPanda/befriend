@@ -57,8 +57,8 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                AppLocalizations.of(context)?.translate('ped_edit_profile') ??
-                    'Edit Profile',
+                AppLocalizations.translate(context,
+                    key: 'ped_edit_profile', defaultString: 'Edit Profile'),
                 style: const TextStyle(
                     fontSize: 22.0, fontWeight: FontWeight.bold),
               ),
@@ -130,9 +130,8 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                 child: _isLoading
                     ? const CircularProgressIndicator()
                     : Text(
-                        AppLocalizations.of(context)
-                                ?.translate('general_word_save') ??
-                            'Save',
+                        AppLocalizations.translate(context,
+                            key: 'general_word_save', defaultString: 'Save'),
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
@@ -146,9 +145,9 @@ class _ProfileEditDialogState extends State<ProfileEditDialog> {
                       Navigator.of(context).pop();
                     }
                   },
-                  child: Text(
-                      AppLocalizations.of(context)?.translate('ped_remove') ??
-                          'Remove your profile picture')),
+                  child: Text(AppLocalizations.translate(context,
+                      key: 'ped_remove',
+                      defaultString: 'Remove your profile picture'))),
             ],
           ),
         ),

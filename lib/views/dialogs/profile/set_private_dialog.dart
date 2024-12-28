@@ -14,13 +14,15 @@ class SetPrivateDialog {
         builder: (BuildContext dialogContext) {
           return AlertDialog(
             title: Text(
-              AppLocalizations.of(context)?.translate('spd_title') ??
-                  'Set to private',
+              AppLocalizations.translate(context,
+                  key: 'spd_title', defaultString: 'Set to private'),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             content: Text(
-                AppLocalizations.of(context)?.translate('spd_content') ??
-                    'This action cannot be undone. Only you and your friends will be able to view this picture.',
+                AppLocalizations.translate(context,
+                    key: 'spd_content',
+                    defaultString:
+                        'This action cannot be undone. Only you and your friends will be able to view this picture.'),
                 style: const TextStyle(fontSize: 16)),
             actions: [
               TextButton(
@@ -28,8 +30,8 @@ class SetPrivateDialog {
                   Navigator.of(dialogContext).pop(); // Dismiss the dialog
                 },
                 child: Text(
-                  AppLocalizations.of(context)?.translate('dialog_cancel') ??
-                      "Cancel",
+                  AppLocalizations.translate(context,
+                      key: 'dialog_cancel', defaultString: "Cancel"),
                   style: const TextStyle(fontSize: textButtonSize),
                 ),
               ),
@@ -52,9 +54,8 @@ class SetPrivateDialog {
                   }
                 },
                 child: Text(
-                    AppLocalizations.of(context)
-                            ?.translate('general_word_confirm') ??
-                        'Confirm',
+                    AppLocalizations.translate(context,
+                        key: 'general_word_confirm', defaultString: 'Confirm'),
                     style: const TextStyle(fontSize: textButtonSize)),
               ),
             ],

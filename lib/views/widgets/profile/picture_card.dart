@@ -224,10 +224,10 @@ class _PictureCardState extends State<PictureCard> {
             },
             child: Text(
               _isExpanded
-                  ? AppLocalizations.of(context)?.translate('pc_less') ??
-                      'See less'
-                  : AppLocalizations.of(context)?.translate('pc_more') ??
-                      'See more',
+                  ? AppLocalizations.translate(context,
+                      key: 'pc_less', defaultString: 'See less')
+                  : AppLocalizations.translate(context,
+                      key: 'pc_more', defaultString: 'See more'),
               style: TextStyle(
                 color: Theme.of(context).colorScheme.primary,
                 fontSize: 14,

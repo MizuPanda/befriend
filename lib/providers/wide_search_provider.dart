@@ -61,13 +61,10 @@ class WideSearchProvider extends ChangeNotifier {
 
   Future<void> _fetchPage(DocumentSnapshot? lastDocument) async {
     try {
-      final String queryString =
-          _currentQuery.toString(); // Ensure it's treated as a string
-
       Query query = Constants.usersCollection
-          .where(Constants.usernameDoc, isGreaterThanOrEqualTo: queryString)
+          .where(Constants.usernameDoc, isGreaterThanOrEqualTo: _currentQuery)
           .where(Constants.usernameDoc,
-              isLessThanOrEqualTo: '$queryString\uf8ff')
+              isLessThanOrEqualTo: '$_currentQuery\uf8ff')
           .orderBy(Constants.usernameDoc)
           .limit(10);
 

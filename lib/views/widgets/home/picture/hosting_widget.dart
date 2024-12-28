@@ -98,9 +98,10 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                                   width: (width - 130) *
                                       Constants.pictureDialogWidthMultiplier,
                                   child: AutoSizeText(
-                                    AppLocalizations.of(context)
-                                            ?.translate('hw_show') ??
-                                        'Show your friends your QR code to invite friends!',
+                                    AppLocalizations.translate(context,
+                                        key: 'hw_show',
+                                        defaultString:
+                                            'Show your friends your QR code to invite friends!'),
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.openSans(
                                         textStyle: const TextStyle(
@@ -113,9 +114,11 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                                   child: Showcase(
                                     key: provider.one,
                                     descriptionAlignment: TextAlign.center,
-                                    description: AppLocalizations.of(context)
-                                            ?.translate('hw_one') ??
-                                        "Press here to display your QR code.",
+                                    description: AppLocalizations.translate(
+                                        context,
+                                        key: 'hw_one',
+                                        defaultString:
+                                            "Press here to display your QR code."),
                                     child: IconButton(
                                       icon: const Icon(
                                           Icons.qr_code), // QR code icon
@@ -135,7 +138,7 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                                   width: (width - 130) *
                                       Constants.pictureDialogWidthMultiplier,
                                   child: AutoSizeText(
-                                    '${provider.hostUsername()} ${AppLocalizations.of(context)?.translate('hw_who') ?? 'will take a picture!'}',
+                                    '${provider.hostUsername()} ${AppLocalizations.translate(context, key: 'hw_who', defaultString: 'will take a picture!')}',
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.openSans(
                                         textStyle: const TextStyle(
@@ -155,9 +158,10 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                             padding: EdgeInsets.all(0.022 * width),
                             child: Showcase(
                               key: provider.two,
-                              description: AppLocalizations.of(context)
-                                      ?.translate('hw_two') ??
-                                  "Once all users are connected, tap 'Continue' to proceed.",
+                              description: AppLocalizations.translate(context,
+                                  key: 'hw_two',
+                                  defaultString:
+                                      "Once all users are connected, tap 'Continue' to proceed."),
                               child: TextButton(
                                 onPressed: provider.length() >= 2
                                     ? () async {
@@ -167,9 +171,9 @@ class _HostingWidgetState extends State<_HostingWidgetView> {
                                 child: provider.isLoading
                                     ? const CircularProgressIndicator()
                                     : AutoSizeText(
-                                        AppLocalizations.of(context)?.translate(
-                                                'general_word_continue') ??
-                                            'Continue',
+                                        AppLocalizations.translate(context,
+                                            key: 'general_word_continue',
+                                            defaultString: 'Continue'),
                                         style: GoogleFonts.openSans(
                                             textStyle:
                                                 const TextStyle(fontSize: 16)),

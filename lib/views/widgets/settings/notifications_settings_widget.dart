@@ -22,8 +22,8 @@ class _NotificationsSettingsWidgetState
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context)?.translate('nsw_notifications') ??
-              'Notifications',
+          AppLocalizations.translate(context,
+              key: 'nsw_notifications', defaultString: 'Notifications'),
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
@@ -64,12 +64,13 @@ class _NotificationsSettingsWidgetState
                           Icons.notifications_rounded,
                           color: Colors.grey,
                         ),
-                        title: Text(AppLocalizations.of(context)
-                                ?.translate('nsw_post') ??
-                            'New post notification'),
-                        description: Text(AppLocalizations.of(context)
-                                ?.translate('nsw_post_description') ??
-                            'X has posted a new picture. Check it out!'),
+                        title: Text(AppLocalizations.translate(context,
+                            key: 'nsw_post',
+                            defaultString: 'New post notification')),
+                        description: Text(AppLocalizations.translate(context,
+                            key: 'nsw_post_description',
+                            defaultString:
+                                'X has posted a new picture. Check it out!')),
                       ),
                       SettingsTile.switchTile(
                         onToggle: (value) async {
@@ -89,12 +90,12 @@ class _NotificationsSettingsWidgetState
                           color: Colors.grey,
                         ),
                         initialValue: user?.likeNotificationOn,
-                        title: Text(AppLocalizations.of(context)
-                                ?.translate('nsw_like') ??
-                            'New like notification'),
-                        description: Text(AppLocalizations.of(context)
-                                ?.translate('nsw_like_description') ??
-                            'X has liked your post!'),
+                        title: Text(AppLocalizations.translate(context,
+                            key: 'nsw_like',
+                            defaultString: 'New like notification')),
+                        description: Text(AppLocalizations.translate(context,
+                            key: 'nsw_like_description',
+                            defaultString: 'X has liked your post!')),
                       ),
                     ],
                   ),

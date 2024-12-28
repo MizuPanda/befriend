@@ -15,11 +15,11 @@ class UnblockDialog {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
               title: Text(
-                '${AppLocalizations.of(context)?.translate('ud_unblock') ?? 'Unblock'} $username',
+                '${AppLocalizations.translate(context, key: 'ud_unblock', defaultString: 'Unblock')} $username',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               content: Text(
-                  "${AppLocalizations.of(context)?.translate('ud_conf') ?? 'Are you sure you want to unblock'} $username?",
+                  "${AppLocalizations.translate(context, key: 'ud_conf', defaultString: 'Are you sure you want to unblock')} $username?",
                   style: const TextStyle(fontSize: 16)),
               actions: isLoading
                   ? [const CircularProgressIndicator()]
@@ -30,9 +30,8 @@ class UnblockDialog {
                               .pop(); // Dismiss the dialog
                         },
                         child: Text(
-                          AppLocalizations.of(context)
-                                  ?.translate('dialog_cancel') ??
-                              "Cancel",
+                          AppLocalizations.translate(context,
+                              key: 'dialog_cancel', defaultString: "Cancel"),
                           style: const TextStyle(fontSize: 15),
                         ),
                       ),
@@ -57,9 +56,8 @@ class UnblockDialog {
                           }
                         },
                         child: Text(
-                            AppLocalizations.of(context)
-                                    ?.translate('ud_unblock') ??
-                                'Unblock',
+                            AppLocalizations.translate(context,
+                                key: 'ud_unblock', defaultString: 'Unblock'),
                             style: const TextStyle(
                                 color: Colors.red, fontSize: 15)),
                       ),

@@ -95,9 +95,10 @@ class BlockedSettingsProvider extends ChangeNotifier {
           if (context.mounted) {
             ErrorHandling.showError(
                 context,
-                AppLocalizations.of(context)
-                        ?.translate('general_error_message7') ??
-                    'An unexpected error occurred. Please try again.');
+                AppLocalizations.translate(context,
+                    key: 'general_error_message7',
+                    defaultString:
+                        'An unexpected error occurred. Please try again.'));
           }
         }
       },

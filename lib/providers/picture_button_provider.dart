@@ -114,11 +114,11 @@ class PictureButtonProvider extends ChangeNotifier {
   String getText(BuildContext context) {
     switch (_buttonMode) {
       case ButtonMode.host:
-        return AppLocalizations.of(context)?.translate('pb_take') ??
-            'Start a Group Photo';
+        return AppLocalizations.translate(context,
+            key: 'pb_take', defaultString: 'Start a Group Photo');
       case ButtonMode.join:
-        return AppLocalizations.of(context)?.translate('pb_join') ??
-            'Join a Group Photo';
+        return AppLocalizations.translate(context,
+            key: 'pb_join', defaultString: 'Join a Group Photo');
       /*
       case ButtonMode.quick:
         return const Color.fromRGBO(82, 199, 85, 0.2);

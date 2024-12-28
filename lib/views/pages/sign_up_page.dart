@@ -65,9 +65,10 @@ class _SignUpPageState extends State<SignUpPage> {
                       Align(
                         alignment: Alignment.center,
                         child: AutoSizeText(
-                          AppLocalizations.of(context)
-                                  ?.translate('sup_welcome') ??
-                              'Welcome! Begin by creating an account',
+                          AppLocalizations.translate(context,
+                              key: 'sup_welcome',
+                              defaultString:
+                                  'Welcome! Begin by creating an account'),
                           style: GoogleFonts.openSans(
                               textStyle: const TextStyle(fontSize: 18)),
                         ),
@@ -77,9 +78,8 @@ class _SignUpPageState extends State<SignUpPage> {
                         textInputAction: TextInputAction.next,
                         textInputType: TextInputType.emailAddress,
                         iconData: Icons.email,
-                        hintText: AppLocalizations.of(context)
-                                ?.translate('sup_email') ??
-                            'Your email',
+                        hintText: AppLocalizations.translate(context,
+                            key: 'sup_email', defaultString: 'Your email'),
                         onSaved: provider.emailSaved,
                         validator: (String? val) {
                           return provider.emailValidator(val, context);
@@ -90,9 +90,9 @@ class _SignUpPageState extends State<SignUpPage> {
                         textInputType: TextInputType.text,
                         textInputAction: TextInputAction.next,
                         iconData: Icons.account_circle,
-                        hintText: AppLocalizations.of(context)
-                                ?.translate('sup_username') ??
-                            'Your username',
+                        hintText: AppLocalizations.translate(context,
+                            key: 'sup_username',
+                            defaultString: 'Your username'),
                         onSaved: provider.usernameSaved,
                         validator: (String? val) {
                           return provider.usernameValidator(val, context);
@@ -106,9 +106,10 @@ class _SignUpPageState extends State<SignUpPage> {
                         padding: EdgeInsets.only(
                             top: 0.008 * height, left: 0.033 * width),
                         child: AutoSizeText(
-                          AppLocalizations.of(context)
-                                  ?.translate('sup_birthday') ??
-                              'This information will not be displayed on your profile.',
+                          AppLocalizations.translate(context,
+                              key: 'sup_birthday',
+                              defaultString:
+                                  'This information will not be displayed on your profile.'),
                           style: GoogleFonts.openSans(
                               fontSize: 12, fontStyle: FontStyle.italic),
                         ),
@@ -118,9 +119,9 @@ class _SignUpPageState extends State<SignUpPage> {
                         textInputType: TextInputType.visiblePassword,
                         textInputAction: TextInputAction.next,
                         iconData: Icons.lock,
-                        hintText: AppLocalizations.of(context)
-                                ?.translate('sup_password') ??
-                            'Your password',
+                        hintText: AppLocalizations.translate(context,
+                            key: 'sup_password',
+                            defaultString: 'Your password'),
                         onChanged: provider.onChanged,
                         onSaved: provider.passwordSaved,
                         validator: (String? val) {
@@ -135,9 +136,9 @@ class _SignUpPageState extends State<SignUpPage> {
                         textInputType: TextInputType.visiblePassword,
                         textInputAction: TextInputAction.done,
                         iconData: Icons.lock,
-                        hintText: AppLocalizations.of(context)
-                                ?.translate('sup_repeat') ??
-                            'Repeat your password',
+                        hintText: AppLocalizations.translate(context,
+                            key: 'sup_repeat',
+                            defaultString: 'Repeat your password'),
                         onSaved: (_) {},
                         validator: (String? val) {
                           return provider.repeatValidator(val, context);
@@ -157,12 +158,12 @@ class _SignUpPageState extends State<SignUpPage> {
                                 children: [
                                   TextSpan(
                                     text:
-                                        "${AppLocalizations.of(context)?.translate('sup_checkbox') ?? 'By signing up, you consent to the'} ",
+                                        "${AppLocalizations.translate(context, key: 'sup_checkbox', defaultString: 'By signing up, you consent to the')} ",
                                   ),
                                   TextSpan(
-                                      text: AppLocalizations.of(context)
-                                              ?.translate('sup_privacy') ??
-                                          "privacy policy",
+                                      text: AppLocalizations.translate(context,
+                                          key: 'sup_privacy',
+                                          defaultString: "privacy policy"),
                                       style: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme
@@ -175,11 +176,12 @@ class _SignUpPageState extends State<SignUpPage> {
                                         }),
                                   TextSpan(
                                       text:
-                                          " ${AppLocalizations.of(context)?.translate('sup_and') ?? 'and to the'} "),
+                                          " ${AppLocalizations.translate(context, key: 'sup_and', defaultString: 'and to the')} "),
                                   TextSpan(
-                                      text: AppLocalizations.of(context)
-                                              ?.translate('sup_terms') ??
-                                          "terms and conditions",
+                                      text: AppLocalizations.translate(context,
+                                          key: 'sup_terms',
+                                          defaultString:
+                                              "terms and conditions"),
                                       style: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme

@@ -102,9 +102,8 @@ class _LikesWidgetState extends State<LikesWidget> {
                         leading: CircleAvatar(backgroundImage: user.avatar),
                         title: Text(
                           user.id == AuthenticationManager.id()
-                              ? AppLocalizations.of(context)
-                                      ?.translate('general_word_you') ??
-                                  'You'
+                              ? AppLocalizations.translate(context,
+                                  key: 'general_word_you', defaultString: 'You')
                               : user.username,
                           style: GoogleFonts.openSans(),
                         ),
@@ -115,8 +114,8 @@ class _LikesWidgetState extends State<LikesWidget> {
                           const Center(child: CircularProgressIndicator()),
                       noItemsFoundIndicatorBuilder: (context) => Center(
                         child: Text(
-                          AppLocalizations.of(context)?.translate('ld_none') ??
-                              'No likes.',
+                          AppLocalizations.translate(context,
+                              key: 'ld_none', defaultString: 'No likes.'),
                           style: GoogleFonts.openSans(fontSize: 16),
                         ),
                       ),

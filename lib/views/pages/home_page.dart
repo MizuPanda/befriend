@@ -67,20 +67,22 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       canPop: widget.home.connectedHome ? false : true,
       child: ChangeNotifierProvider.value(
         value: _provider,
-        child: Consumer<HomeProvider>(
-          builder: (BuildContext context, HomeProvider provider, Widget? child) {
-            return Scaffold(
-              key: _scaffoldKey,
-              floatingActionButtonLocation: ExpandableFab.location,
-              floatingActionButton: Padding(
-                padding: EdgeInsets.only(bottom: 0.065 * height),
-                child: ActionButton(home: widget.home, notifyParent: provider.notify,),
+        child: Consumer<HomeProvider>(builder:
+            (BuildContext context, HomeProvider provider, Widget? child) {
+          return Scaffold(
+            key: _scaffoldKey,
+            floatingActionButtonLocation: ExpandableFab.location,
+            floatingActionButton: Padding(
+              padding: EdgeInsets.only(bottom: 0.065 * height),
+              child: ActionButton(
+                home: widget.home,
+                notifyParent: provider.notify,
               ),
-              body: HomeStack(
-                  connectedHome: widget.home.connectedHome, provider: provider),
-            );
-          }
-        ),
+            ),
+            body: HomeStack(
+                connectedHome: widget.home.connectedHome, provider: provider),
+          );
+        }),
       ),
     );
   }

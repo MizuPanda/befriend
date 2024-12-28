@@ -82,9 +82,8 @@ class _SessionPageState extends State<_SessionPageView> {
                           await provider.cancelLobby(context);
                         },
                         child: AutoSizeText(
-                          AppLocalizations.of(context)
-                                  ?.translate('dialog_cancel') ??
-                              'Cancel',
+                          AppLocalizations.translate(context,
+                              key: 'dialog_cancel', defaultString: 'Cancel'),
                           maxLines: 1,
                         ),
                       ),
@@ -117,7 +116,7 @@ class _SessionPageState extends State<_SessionPageView> {
                                     top: 0.005 * height,
                                   ),
                                   child: AutoSizeText(
-                                    '${provider.hostUsername()} ${AppLocalizations.of(context)?.translate('sp_taking') ?? 'is taking a picture!'}',
+                                    '${provider.hostUsername()} ${AppLocalizations.translate(context, key: 'sp_taking', defaultString: 'is taking a picture!')}',
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.openSans(
                                         textStyle: const TextStyle(
@@ -143,14 +142,18 @@ class _SessionPageState extends State<_SessionPageView> {
                                       : null,
                                   child: Showcase(
                                     key: provider.one,
-                                    description: AppLocalizations.of(context)
-                                            ?.translate('sp_one') ??
-                                        'Hold the picture to retake.',
+                                    description: AppLocalizations.translate(
+                                        context,
+                                        key: 'sp_one',
+                                        defaultString:
+                                            'Hold the picture to retake.'),
                                     child: Showcase(
                                       key: provider.two,
-                                      description: AppLocalizations.of(context)
-                                              ?.translate('sp_two') ??
-                                          'Tap the picture to zoom.',
+                                      description: AppLocalizations.translate(
+                                          context,
+                                          key: 'sp_two',
+                                          defaultString:
+                                              'Tap the picture to zoom.'),
                                       child: Container(
                                         width: 0.7 * width, // for full width
                                         height: 0.7 * width,
@@ -204,11 +207,12 @@ class _SessionPageState extends State<_SessionPageView> {
                                                 textInputAction:
                                                     TextInputAction.done,
                                                 decoration: InputDecoration(
-                                                  hintText: AppLocalizations.of(
-                                                              context)
-                                                          ?.translate(
-                                                              'sp_caption_field') ??
-                                                      'Enter Caption',
+                                                  hintText: AppLocalizations
+                                                      .translate(context,
+                                                          key:
+                                                              'sp_caption_field',
+                                                          defaultString:
+                                                              'Enter Caption'),
                                                   border:
                                                       const OutlineInputBorder(),
                                                   focusedBorder:
@@ -257,9 +261,9 @@ class _SessionPageState extends State<_SessionPageView> {
                                 ),
                                 if (!(isSmallScreen && _isExpanded))
                                   AutoSizeText(
-                                    AppLocalizations.of(context)
-                                            ?.translate('sp_list') ??
-                                        'User list',
+                                    AppLocalizations.translate(context,
+                                        key: 'sp_list',
+                                        defaultString: 'User list'),
                                     style: GoogleFonts.openSans(
                                         textStyle:
                                             const TextStyle(fontSize: 18)),
@@ -282,10 +286,11 @@ class _SessionPageState extends State<_SessionPageView> {
                                       ),
                                       Showcase(
                                         key: provider.four,
-                                        description: AppLocalizations.of(
-                                                    context)
-                                                ?.translate('sp_four') ??
-                                            'Press to see users that will be able to see the picture.',
+                                        description: AppLocalizations.translate(
+                                            context,
+                                            key: 'sp_four',
+                                            defaultString:
+                                                'Press to see users that will be able to see the picture.'),
                                         child: Container(
                                           alignment: Alignment.centerLeft,
                                           width: 0.45 * width,
@@ -295,9 +300,11 @@ class _SessionPageState extends State<_SessionPageView> {
                                               provider.showFriendList(context);
                                             },
                                             child: AutoSizeText(
-                                                AppLocalizations.of(context)
-                                                        ?.translate('sp_who') ??
-                                                    'Who will see the picture',
+                                                AppLocalizations.translate(
+                                                    context,
+                                                    key: 'sp_who',
+                                                    defaultString:
+                                                        'Who will see the picture'),
                                                 style: GoogleFonts.openSans(
                                                     textStyle: const TextStyle(
                                                         fontSize: 14))),
@@ -308,10 +315,11 @@ class _SessionPageState extends State<_SessionPageView> {
                                       if (provider.host.main())
                                         Showcase(
                                           key: provider.five,
-                                          description: AppLocalizations.of(
-                                                      context)
-                                                  ?.translate('sp_five') ??
-                                              'Press here to publish the picture.',
+                                          description: AppLocalizations.translate(
+                                              context,
+                                              key: 'sp_five',
+                                              defaultString:
+                                                  'Press here to publish the picture.'),
                                           child: provider.isLoading
                                               ? const CircularProgressIndicator()
                                               : Container(
@@ -332,11 +340,11 @@ class _SessionPageState extends State<_SessionPageView> {
                                                               }
                                                             : null,
                                                     child: AutoSizeText(
-                                                      AppLocalizations.of(
-                                                                  context)
-                                                              ?.translate(
-                                                                  'sp_publish') ??
-                                                          'Publish the picture',
+                                                      AppLocalizations.translate(
+                                                          context,
+                                                          key: 'sp_publish',
+                                                          defaultString:
+                                                              'Publish the picture'),
                                                       textAlign:
                                                           TextAlign.center,
                                                       overflow:

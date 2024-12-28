@@ -12,7 +12,8 @@ class ArchiveSettingsWidget extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context)?.translate('asw_archives') ?? "Archives",
+          AppLocalizations.translate(context,
+              key: 'asw_archives', defaultString: "Archives"),
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),

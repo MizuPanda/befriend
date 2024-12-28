@@ -16,8 +16,8 @@ class UsernameDialog {
             return SimpleDialog(
               titleTextStyle: GoogleFonts.openSans(fontSize: 18),
               title: Text(
-                AppLocalizations.of(context)?.translate('ud_people') ??
-                    "People in this picture",
+                AppLocalizations.translate(context,
+                    key: 'ud_people', defaultString: "People in this picture"),
                 textAlign: TextAlign.center,
               ),
               children: users
@@ -27,9 +27,8 @@ class UsernameDialog {
                             backgroundImage: user.avatar,
                           ),
                           title: Text(AuthenticationManager.id() == user.id
-                              ? AppLocalizations.of(context)
-                                      ?.translate('general_word_you') ??
-                                  'You'
+                              ? AppLocalizations.translate(context,
+                                  key: 'general_word_you', defaultString: 'You')
                               : user.username),
                         ),
                       ))

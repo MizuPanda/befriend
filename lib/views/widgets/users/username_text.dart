@@ -23,8 +23,8 @@ class UsernameText extends StatelessWidget {
       children: [
         AutoSizeText(
             user.main()
-                ? AppLocalizations.of(context)?.translate('general_word_you') ??
-                    'You'
+                ? AppLocalizations.translate(context,
+                    key: 'general_word_you', defaultString: 'You')
                 : user.username,
             maxLines: 1,
             style: GoogleFonts.openSans(

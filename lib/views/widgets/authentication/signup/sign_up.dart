@@ -35,7 +35,8 @@ class SignUpButton extends StatelessWidget {
               return const CircularProgressIndicator();
             }
             return AutoSizeText(
-              AppLocalizations.of(context)?.translate('su_sign') ?? 'Sign up',
+              AppLocalizations.translate(context,
+                  key: 'su_sign', defaultString: 'Sign up'),
               style: const TextStyle(fontSize: 17),
             );
           },

@@ -31,8 +31,10 @@ class UserSlidersScreen extends StatelessWidget {
 
             return Showcase(
               key: provider.three,
-              description: AppLocalizations.of(context)?.translate('s_three') ??
-                  'Slide to select who you allow to see the picture.',
+              description: AppLocalizations.translate(context,
+                  key: 's_three',
+                  defaultString:
+                      'Slide to select who you allow to see the picture.'),
               child: ListView(
                 children: snapshot.data!.docs.map((userDocument) {
                   return UserSlider(
@@ -165,8 +167,8 @@ class _UserSliderState extends State<UserSlider> {
                       padding: EdgeInsets.only(
                           left: _horizontalPaddingMultiplier * width),
                       child: AutoSizeText(
-                        AppLocalizations.of(context)?.translate('s_public') ??
-                            'Public',
+                        AppLocalizations.translate(context,
+                            key: 's_public', defaultString: 'Public'),
                         style: GoogleFonts.openSans(
                             fontSize: 12, fontStyle: FontStyle.italic),
                       ),
@@ -176,8 +178,8 @@ class _UserSliderState extends State<UserSlider> {
                       padding: EdgeInsets.only(
                           right: _horizontalPaddingMultiplier * width),
                       child: AutoSizeText(
-                        AppLocalizations.of(context)?.translate('s_private') ??
-                            'Private',
+                        AppLocalizations.translate(context,
+                            key: 's_private', defaultString: 'Private'),
                         style: GoogleFonts.openSans(
                             fontSize: 12, fontStyle: FontStyle.italic),
                       ),

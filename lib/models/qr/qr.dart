@@ -2,7 +2,6 @@ import 'package:befriend/utilities/error_handling.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -28,8 +27,8 @@ class QR {
   ) {
     ErrorHandling.showError(
         context,
-        AppLocalizations.of(context)?.translate('qr_lobby_full') ??
-            'The lobby is full');
+        AppLocalizations.translate(context,
+            key: 'qr_lobby_full', defaultString: 'The lobby is full'));
   }
 
   static void showUserSeenToday(
@@ -39,7 +38,7 @@ class QR {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-            "${AppLocalizations.of(context)?.translate('qr_alr_seen') ?? 'You have already seen'} $username ${AppLocalizations.of(context)?.translate('qr_today') ?? 'today'}."),
+            "${AppLocalizations.translate(context, key: 'qr_alr_seen', defaultString: 'You have already seen')} $username ${AppLocalizations.translate(context, key: 'qr_today', defaultString: 'today')}."),
         duration: const Duration(seconds: 3),
       ),
     );
@@ -115,8 +114,10 @@ class QR {
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('general_error_message7') ??
-                'An unexpected error occurred. Please try again.');
+            AppLocalizations.translate(context,
+                key: 'general_error_message7',
+                defaultString:
+                    'An unexpected error occurred. Please try again.'));
       }
     }
   }

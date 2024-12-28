@@ -29,8 +29,10 @@ class PictureManager {
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('pm_mp_error') ??
-                'Failed to update your profile picture. Please try again.');
+            AppLocalizations.translate(context,
+                key: 'pm_mp_error',
+                defaultString:
+                    'Failed to update your profile picture. Please try again.'));
       }
     }
   }
@@ -48,8 +50,10 @@ class PictureManager {
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('pm_mp_error') ??
-                'Failed to update your profile picture. Please try again.');
+            AppLocalizations.translate(context,
+                key: 'pm_mp_error',
+                defaultString:
+                    'Failed to update your profile picture. Please try again.'));
       }
     }
   }
@@ -119,8 +123,9 @@ class PictureManager {
         await _requestPermission(
             Permission.camera,
             context,
-            AppLocalizations.of(context)?.translate('pm_cam_perm') ??
-                'Camera access is needed to take photos.');
+            AppLocalizations.translate(context,
+                key: 'pm_cam_perm',
+                defaultString: 'Camera access is needed to take photos.'));
       }
 
       if (source == ImageSource.gallery) {
@@ -132,8 +137,10 @@ class PictureManager {
               await _requestPermission(
                   Permission.storage,
                   context,
-                  AppLocalizations.of(context)?.translate('pm_gall_perm') ??
-                      'Photo library access is needed to select photos.');
+                  AppLocalizations.translate(context,
+                      key: 'pm_gall_perm',
+                      defaultString:
+                          'Photo library access is needed to select photos.'));
             }
           } else {
             /// use [Permissions.photos.status]
@@ -141,8 +148,10 @@ class PictureManager {
               await _requestPermission(
                   Permission.photos,
                   context,
-                  AppLocalizations.of(context)?.translate('pm_gall_perm') ??
-                      'Photo library access is needed to select photos.');
+                  AppLocalizations.translate(context,
+                      key: 'pm_gall_perm',
+                      defaultString:
+                          'Photo library access is needed to select photos.'));
             }
           }
         }
@@ -158,8 +167,8 @@ class PictureManager {
           uiSettings: [
             AndroidUiSettings(
                 toolbarTitle: context.mounted
-                    ? AppLocalizations.of(context)?.translate('pm_edit_pic') ??
-                        'Edit your picture'
+                    ? AppLocalizations.translate(context,
+                        key: 'pm_edit_pic', defaultString: 'Edit your picture')
                     : 'Edit your picture',
                 toolbarWidgetColor: Colors.black,
                 initAspectRatio: CropAspectRatioPreset.square,
@@ -170,8 +179,8 @@ class PictureManager {
                 lockAspectRatio: false),
             IOSUiSettings(
               title: context.mounted
-                  ? AppLocalizations.of(context)?.translate('pm_edit_pic') ??
-                      'Edit your picture'
+                  ? AppLocalizations.translate(context,
+                      key: 'pm_edit_pic', defaultString: 'Edit your picture')
                   : 'Edit your picture',
               aspectRatioPresets: [
                 CropAspectRatioPreset.square,

@@ -49,8 +49,8 @@ class ProfilePage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: padding, bottom: 8.0),
                     child: Text(
-                      AppLocalizations.of(context)?.translate('pp_feed') ??
-                          'My Feed',
+                      AppLocalizations.translate(context,
+                          key: 'pp_feed', defaultString: 'My Feed'),
                       style: GoogleFonts.openSans(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -115,9 +115,9 @@ class ProfilePage extends StatelessWidget {
                                       color: Colors.red), // Archive icon
                                   const SizedBox(width: _iconTextDistance),
                                   Text(
-                                    AppLocalizations.of(context)
-                                            ?.translate('pp_delete') ??
-                                        'Delete',
+                                    AppLocalizations.translate(context,
+                                        key: 'pp_delete',
+                                        defaultString: 'Delete'),
                                     style: const TextStyle(color: Colors.red),
                                   ),
                                   const SizedBox(width: _iconTextDistance * 2),
@@ -132,9 +132,8 @@ class ProfilePage extends StatelessWidget {
                                   Icons.block_rounded,
                                 ), // Info icon
                                 const SizedBox(width: _iconTextDistance),
-                                Text(AppLocalizations.of(context)
-                                        ?.translate('pp_block') ??
-                                    'Block'),
+                                Text(AppLocalizations.translate(context,
+                                    key: 'pp_block', defaultString: 'Block')),
                                 const SizedBox(width: _iconTextDistance * 2),
                               ],
                             ),
@@ -163,8 +162,8 @@ class ProfilePage extends StatelessWidget {
                   padding:
                       EdgeInsets.only(left: padding, bottom: 0.008 * height),
                   child: Text(
-                      AppLocalizations.of(context)?.translate('pp_pictures') ??
-                          'Pictures',
+                      AppLocalizations.translate(context,
+                          key: 'pp_pictures', defaultString: 'Pictures'),
                       style: GoogleFonts.openSans(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,

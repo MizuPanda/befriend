@@ -10,14 +10,13 @@ class PermissionDeniedDialog {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(AppLocalizations.of(context)?.translate('pdd_required') ??
-              'Permission Required'),
+          title: Text(AppLocalizations.translate(context,
+              key: 'pdd_required', defaultString: 'Permission Required')),
           content: Text(rationale),
           actions: [
             TextButton(
-              child: Text(
-                  AppLocalizations.of(context)?.translate('dialog_proceed') ??
-                      'Proceed'),
+              child: Text(AppLocalizations.translate(context,
+                  key: 'dialog_proceed', defaultString: 'Proceed')),
               onPressed: () {
                 Navigator.of(context).pop();
                 openAppSettings();

@@ -1,4 +1,3 @@
-
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/objects/friendship.dart';
 import 'package:befriend/utilities/constants.dart';
@@ -60,22 +59,22 @@ class Bubble {
     double size = 60 + pwr * 11 / 3;
 
     Bubble bubble = Bubble._(
-        id: docs.id,
-        username: DataManager.getString(docs, Constants.usernameDoc),
-        power: pwr,
-        birthYear: DataManager.getNumber(docs, Constants.birthYearDoc).toInt(),
-        size: size,
-        avatarUrl: DataManager.getString(docs, Constants.avatarDoc),
-        lastSeenUsersMap:
-            DataManager.getDateTimeMap(docs, Constants.lastSeenUsersMapDoc),
-        friendIDs: DataManager.getList(docs, Constants.friendsDoc),
-        blockedUsers: DataManager.getList(docs, Constants.blockedUsersDoc),
-        postNotificationOn:
-            DataManager.getBoolean(docs, Constants.postNotificationOnDoc),
-        likeNotificationOn:
-            DataManager.getBoolean(docs, Constants.likeNotificationOnDoc),
-        languageCode: DataManager.getString(docs, Constants.languageDoc),
-        avatar: avatar,
+      id: docs.id,
+      username: DataManager.getString(docs, Constants.usernameDoc),
+      power: pwr,
+      birthYear: DataManager.getNumber(docs, Constants.birthYearDoc).toInt(),
+      size: size,
+      avatarUrl: DataManager.getString(docs, Constants.avatarDoc),
+      lastSeenUsersMap:
+          DataManager.getDateTimeMap(docs, Constants.lastSeenUsersMapDoc),
+      friendIDs: DataManager.getList(docs, Constants.friendsDoc),
+      blockedUsers: DataManager.getList(docs, Constants.blockedUsersDoc),
+      postNotificationOn:
+          DataManager.getBoolean(docs, Constants.postNotificationOnDoc),
+      likeNotificationOn:
+          DataManager.getBoolean(docs, Constants.likeNotificationOnDoc),
+      languageCode: DataManager.getString(docs, Constants.languageDoc),
+      avatar: avatar,
     );
 
     return bubble;

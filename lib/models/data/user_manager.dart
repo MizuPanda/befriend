@@ -124,8 +124,10 @@ class UserManager {
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('general_error_message2') ??
-                'An unexpected error happened. Please try again later...');
+            AppLocalizations.translate(context,
+                key: 'general_error_message2',
+                defaultString:
+                    'An unexpected error happened. Please try again later...'));
       }
     }
   }

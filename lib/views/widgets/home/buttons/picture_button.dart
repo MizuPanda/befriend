@@ -52,9 +52,10 @@ class _PictureButtonState extends State<PictureButton> {
 
                     return Showcase(
                       key: widget.three,
-                      description: AppLocalizations.of(context)
-                              ?.translate('pb_three') ??
-                          'Swipe here to switch between Host and Join mode.',
+                      description: AppLocalizations.translate(context,
+                          key: 'pb_three',
+                          defaultString:
+                              'Swipe here to switch between Host and Join mode.'),
                       child: Container(
                         width: width,
                         height: 0.054 * height,

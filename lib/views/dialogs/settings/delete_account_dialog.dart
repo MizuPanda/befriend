@@ -14,22 +14,23 @@ class DeleteAccountDialog {
           fontSize: 16,
           color: Theme.of(context).primaryColor,
           fontWeight: FontWeight.bold),
-      title: Text(AppLocalizations.of(context)?.translate('dad_da') ??
-          'Delete Account'),
-      content: Text(AppLocalizations.of(context)?.translate('dad_conf') ??
-          'Are you sure you want to delete your account? This action cannot be undone.'),
+      title: Text(AppLocalizations.translate(context,
+          key: 'dad_da', defaultString: 'Delete Account')),
+      content: Text(AppLocalizations.translate(context,
+          key: 'dad_conf',
+          defaultString:
+              'Are you sure you want to delete your account? This action cannot be undone.')),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: Text(
-              AppLocalizations.of(context)?.translate('dialog_cancel') ??
-                  'Cancel'),
+          child: Text(AppLocalizations.translate(context,
+              key: 'dialog_cancel', defaultString: 'Cancel')),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(true),
           child: Text(
-              AppLocalizations.of(context)?.translate('dialog_delete') ??
-                  'Delete',
+              AppLocalizations.translate(context,
+                  key: 'dialog_delete', defaultString: 'Delete'),
               style: const TextStyle(color: Colors.red)),
         ),
       ],

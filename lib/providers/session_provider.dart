@@ -467,8 +467,9 @@ class SessionProvider extends ChangeNotifier {
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('sp_publish_error') ??
-                'Error publishing picture. Please try again.');
+            AppLocalizations.translate(context,
+                key: 'sp_publish_error',
+                defaultString: 'Error publishing picture. Please try again.'));
       }
     }
   }

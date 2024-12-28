@@ -14,7 +14,8 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context)?.translate('sp_settings') ?? 'Settings',
+          AppLocalizations.translate(context,
+              key: 'sp_settings', defaultString: 'Settings'),
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
@@ -35,8 +36,8 @@ class SettingsPage extends StatelessWidget {
                     sections: [
                       SettingsSection(
                         title: Text(
-                          AppLocalizations.of(context)?.translate('sp_data') ??
-                              'Your Data',
+                          AppLocalizations.translate(context,
+                              key: 'sp_data', defaultString: 'Your Data'),
                         ),
                         tiles: [
                           SettingsTile.navigation(
@@ -44,9 +45,9 @@ class SettingsPage extends StatelessWidget {
                                 ? Icons.archive_rounded
                                 : Icons.archive_outlined),
                             title: Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('sp_archived') ??
-                                  'Archived pictures',
+                              AppLocalizations.translate(context,
+                                  key: 'sp_archived',
+                                  defaultString: 'Archived pictures'),
                             ),
                             onPressed: provider.goToArchiveSettings,
                           ),
@@ -55,9 +56,9 @@ class SettingsPage extends StatelessWidget {
                                 ? Icons.block_rounded
                                 : Icons.block_outlined),
                             title: Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('sp_blocked') ??
-                                  'Blocked accounts',
+                              AppLocalizations.translate(context,
+                                  key: 'sp_blocked',
+                                  defaultString: 'Blocked accounts'),
                             ),
                             onPressed: provider.goToBlockedSettings,
                           ),
@@ -66,9 +67,9 @@ class SettingsPage extends StatelessWidget {
                                 ? Icons.refresh_rounded
                                 : Icons.refresh_outlined),
                             title: Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('sp_refresh') ??
-                                  'Refresh home page',
+                              AppLocalizations.translate(context,
+                                  key: 'sp_refresh',
+                                  defaultString: 'Refresh home page'),
                             ),
                             onPressed: provider.refreshHomePage,
                           ),
@@ -76,8 +77,9 @@ class SettingsPage extends StatelessWidget {
                       ),
                       SettingsSection(
                         title: Text(
-                          AppLocalizations.of(context)?.translate('sp_pc') ??
-                              'Privacy and confidentiality',
+                          AppLocalizations.translate(context,
+                              key: 'sp_pc',
+                              defaultString: 'Privacy and confidentiality'),
                         ),
                         tiles: [
                           SettingsTile(
@@ -85,9 +87,9 @@ class SettingsPage extends StatelessWidget {
                                 ? Icons.privacy_tip_rounded
                                 : Icons.privacy_tip_outlined),
                             title: Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('sp_policy') ??
-                                  'Privacy Policy',
+                              AppLocalizations.translate(context,
+                                  key: 'sp_policy',
+                                  defaultString: 'Privacy Policy'),
                             ),
                             onPressed: provider.openPrivacyPolicy,
                           ),
@@ -96,13 +98,15 @@ class SettingsPage extends StatelessWidget {
                                 ? Icons.lock_rounded
                                 : Icons.lock_outline_rounded),
                             title: Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('sp_consent') ??
-                                  'Manage consent',
+                              AppLocalizations.translate(context,
+                                  key: 'sp_consent',
+                                  defaultString: 'Manage consent'),
                             ),
-                            description: Text(AppLocalizations.of(context)
-                                    ?.translate('sp_preferences') ??
-                                'Ads preferences, account deletion'),
+                            description: Text(AppLocalizations.translate(
+                                context,
+                                key: 'sp_preferences',
+                                defaultString:
+                                    'Ads preferences, account deletion')),
                             onPressed: provider.goToConsentSettings,
                           ),
                           SettingsTile.navigation(
@@ -110,9 +114,9 @@ class SettingsPage extends StatelessWidget {
                                 ? Icons.notifications_rounded
                                 : Icons.notifications_outlined),
                             title: Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('sp_notifications') ??
-                                  'Notifications',
+                              AppLocalizations.translate(context,
+                                  key: 'sp_notifications',
+                                  defaultString: 'Notifications'),
                             ),
                             onPressed: provider.goToNotificationsSettings,
                           ),
@@ -120,9 +124,9 @@ class SettingsPage extends StatelessWidget {
                       ),
                       SettingsSection(
                         title: Text(
-                          AppLocalizations.of(context)
-                                  ?.translate('sp_appearance') ??
-                              'Appearance',
+                          AppLocalizations.translate(context,
+                              key: 'sp_appearance',
+                              defaultString: 'Appearance'),
                         ),
                         tiles: [
                           SettingsTile(
@@ -130,9 +134,8 @@ class SettingsPage extends StatelessWidget {
                                 ? Icons.dark_mode_rounded
                                 : Icons.dark_mode_outlined),
                             title: Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('sp_theme') ??
-                                  'Theme',
+                              AppLocalizations.translate(context,
+                                  key: 'sp_theme', defaultString: 'Theme'),
                             ),
                             trailing: Consumer(builder: (BuildContext context,
                                 MaterialProvider materialProvider,
@@ -160,19 +163,22 @@ class SettingsPage extends StatelessWidget {
                                 itemBuilder: (BuildContext context) => [
                                   PopupMenuItem(
                                       value: ThemeMode.light,
-                                      child: Text(AppLocalizations.of(context)
-                                              ?.translate('sp_light') ??
-                                          'Light')),
+                                      child: Text(AppLocalizations.translate(
+                                          context,
+                                          key: 'sp_light',
+                                          defaultString: 'Light'))),
                                   PopupMenuItem(
                                       value: ThemeMode.dark,
-                                      child: Text(AppLocalizations.of(context)
-                                              ?.translate('sp_dark') ??
-                                          'Dark')),
+                                      child: Text(AppLocalizations.translate(
+                                          context,
+                                          key: 'sp_dark',
+                                          defaultString: 'Dark'))),
                                   PopupMenuItem(
                                       value: ThemeMode.system,
-                                      child: Text(AppLocalizations.of(context)
-                                              ?.translate('sp_default') ??
-                                          'System Default')),
+                                      child: Text(AppLocalizations.translate(
+                                          context,
+                                          key: 'sp_default',
+                                          defaultString: 'System Default'))),
                                 ],
                               );
                             }),
@@ -181,8 +187,8 @@ class SettingsPage extends StatelessWidget {
                       ),
                       SettingsSection(
                         title: Text(
-                          AppLocalizations.of(context)?.translate('sp_misc') ??
-                              'Misc',
+                          AppLocalizations.translate(context,
+                              key: 'sp_misc', defaultString: 'Misc'),
                         ),
                         tiles: [
                           SettingsTile(
@@ -190,9 +196,9 @@ class SettingsPage extends StatelessWidget {
                                 ? Icons.description_rounded
                                 : Icons.description_outlined),
                             title: Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('sp_terms') ??
-                                  'Terms and Conditions',
+                              AppLocalizations.translate(context,
+                                  key: 'sp_terms',
+                                  defaultString: 'Terms and Conditions'),
                             ),
                             onPressed: provider.openTermsAndConditions,
                           ),
@@ -200,8 +206,8 @@ class SettingsPage extends StatelessWidget {
                       ),
                       SettingsSection(
                         title: Text(
-                          AppLocalizations.of(context)?.translate('sp_help') ??
-                              'Help',
+                          AppLocalizations.translate(context,
+                              key: 'sp_help', defaultString: 'Help'),
                         ),
                         tiles: [
                           SettingsTile(
@@ -209,9 +215,9 @@ class SettingsPage extends StatelessWidget {
                                 ? Icons.help_rounded
                                 : Icons.help_outline_rounded),
                             title: Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('sp_how') ??
-                                  'How to use Befriend',
+                              AppLocalizations.translate(context,
+                                  key: 'sp_how',
+                                  defaultString: 'How to use Befriend'),
                             ),
                             onPressed: provider.openTutorial,
                           ),
@@ -220,9 +226,8 @@ class SettingsPage extends StatelessWidget {
                                 ? Icons.contact_support_rounded
                                 : Icons.contact_support_outlined),
                             title: Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('sp_contact') ??
-                                  'Contact',
+                              AppLocalizations.translate(context,
+                                  key: 'sp_contact', defaultString: 'Contact'),
                             ),
                             onPressed: provider.openContact,
                           ),
@@ -230,15 +235,14 @@ class SettingsPage extends StatelessWidget {
                       ),
                       SettingsSection(
                         title: Text(
-                          AppLocalizations.of(context)?.translate('sp_login') ??
-                              'Login',
+                          AppLocalizations.translate(context,
+                              key: 'sp_login', defaultString: 'Login'),
                         ),
                         tiles: [
                           SettingsTile(
                             title: Text(
-                              AppLocalizations.of(context)
-                                      ?.translate('sp_logout') ??
-                                  'Log out',
+                              AppLocalizations.translate(context,
+                                  key: 'sp_logout', defaultString: 'Log out'),
                               style: const TextStyle(color: Colors.red),
                             ),
                             onPressed: provider.signOut,

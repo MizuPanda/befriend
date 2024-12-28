@@ -42,8 +42,10 @@ class BubbleGroupWidget extends StatelessWidget {
             child: Showcase(
               key: provider.two,
               descriptionAlignment: TextAlign.center,
-              description: AppLocalizations.of(context)?.translate('bg_two') ??
-                  "Meet your friends in real life and take a picture together to add them to your friend list",
+              description: AppLocalizations.translate(context,
+                  key: 'bg_two',
+                  defaultString:
+                      "Meet your friends in real life and take a picture together to add them to your friend list"),
               child: ShakeableBubble(
                 specificHome: provider.home,
               ),

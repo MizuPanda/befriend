@@ -37,8 +37,8 @@ class ConsentManager {
 
       await _showConsentDialog(context,
           fileAddress: address,
-          dialogName: AppLocalizations.of(context)?.translate('cm_tc') ??
-              'Terms & Conditions');
+          dialogName: AppLocalizations.translate(context,
+              key: 'cm_tc', defaultString: 'Terms & Conditions'));
     } catch (e) {
       debugPrint(
           '(ConsentManager): Error displaying terms and conditions dialog: $e');
@@ -46,8 +46,10 @@ class ConsentManager {
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('cm_terms_error') ??
-                'Failed to display the terms and conditions. Please try again.');
+            AppLocalizations.translate(context,
+                key: 'cm_terms_error',
+                defaultString:
+                    'Failed to display the terms and conditions. Please try again.'));
       }
     }
   }
@@ -63,16 +65,18 @@ class ConsentManager {
 
       await _showConsentDialog(context,
           fileAddress: address,
-          dialogName: AppLocalizations.of(context)?.translate('cm_pp') ??
-              'Privacy Policy');
+          dialogName: AppLocalizations.translate(context,
+              key: 'cm_pp', defaultString: 'Privacy Policy'));
     } catch (e) {
       debugPrint('(ConsentManager): Error displaying privacy dialog: $e');
       // Provide user feedback or log error
       if (context.mounted) {
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('cm_privacy_error') ??
-                'Failed to display the privacy policy. Please try again.');
+            AppLocalizations.translate(context,
+                key: 'cm_privacy_error',
+                defaultString:
+                    'Failed to display the privacy policy. Please try again.'));
       }
     }
   }
@@ -130,8 +134,10 @@ class ConsentManager {
         // Consider adding retry logic or a user notification here
         ErrorHandling.showError(
             context,
-            AppLocalizations.of(context)?.translate('cm_form_error') ??
-                "Failed to update consent information. Please try again.");
+            AppLocalizations.translate(context,
+                key: 'cm_form_error',
+                defaultString:
+                    "Failed to update consent information. Please try again."));
       },
     );
   }
