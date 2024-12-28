@@ -140,20 +140,17 @@ class UserManager {
     _home = null;
   }
 
-  static Future<ImageProvider> refreshAvatar(File file) async {
+  static void refreshAvatar(File? file, String avatarUrl) {
     try {
-      if (_instance != null) {
-        _instance!.avatar = Image.file(file).image;
-        return _instance!.avatar;
+      if (file != null) {
+        _instance?.avatar = Image.file(file).image;
       } else {
-        debugPrint('(UserManager): Error refreshing avatar: _instance is null');
-        return Image.asset(Constants.defaultPictureAddress)
-            .image; // Default image if _instance is null
+        _instance?.avatar = Image.asset(Constants.defaultPictureAddress).image;
       }
+
+      _instance?.avatarUrl = avatarUrl;
     } catch (e) {
       debugPrint('(UserManager): Error refreshing avatar: ${e.toString()}');
-      return Image.asset(Constants.defaultPictureAddress)
-          .image; // Default image on error
     }
   }
 
@@ -179,5 +176,14 @@ class UserManager {
 
   static void removeBlockedUser(String id) {
     _instance?.blockedUsers.remove(id);
+  }
+
+  static void updateUsername(String username) {
+    _instance?.username = username;
+  }
+
+  static void updateBio(String bio) {
+    _instance?.bio = bio;
+    debugPrint('(UserManager) Bio = ${_instance?.bio}');
   }
 }

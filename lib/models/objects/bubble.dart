@@ -8,12 +8,13 @@ import '../authentication/authentication.dart';
 
 class Bubble {
   final String id;
-  final String username;
-  final String avatarUrl;
+  String username;
+  String avatarUrl;
   final int power;
   ImageProvider avatar;
   final int birthYear;
   String languageCode;
+  String bio;
 
   List<dynamic> blockedUsers;
 
@@ -48,6 +49,7 @@ class Bubble {
     required this.postNotificationOn,
     required this.likeNotificationOn,
     required this.languageCode,
+    required this.bio,
   });
 
   factory Bubble.fromDocs(
@@ -74,6 +76,7 @@ class Bubble {
       likeNotificationOn:
           DataManager.getBoolean(docs, Constants.likeNotificationOnDoc),
       languageCode: DataManager.getString(docs, Constants.languageDoc),
+      bio: DataManager.getString(docs, Constants.bioDoc),
       avatar: avatar,
     );
 

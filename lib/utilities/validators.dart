@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'app_localizations.dart';
 
 class Validators {
+  static const int maxBioLength = 50;
+
   static double strength(String password) {
     return PasswordStrength.getPasswordStrength(password);
   }
@@ -73,5 +75,13 @@ class Validators {
         : AppLocalizations.translate(context,
             key: 'val_repeat_incorrect',
             defaultString: 'This password does not match with the first one.');
+  }
+
+  static String? bioValidator(String? bio, BuildContext context) {
+    if (bio != null && bio.length > maxBioLength) {
+      return AppLocalizations.translate(context,
+          key: 'val_bio_length', defaultString: "This bio is too lengthy.");
+    }
+    return null;
   }
 }

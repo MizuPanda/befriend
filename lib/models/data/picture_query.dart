@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:befriend/models/data/data_query.dart';
+import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/host.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -8,6 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart' as path;
+
+import '../objects/bubble.dart';
 
 class PictureQuery {
   static Reference _hostSessionRef(Host host) {
@@ -42,13 +45,15 @@ class PictureQuery {
     });
   }
 
-  static Future<void> removeProfilePicture(String downloadUrl) async {
+  static Future<void> removeProfilePicture() async {
     try {
+      final Bubble currentUser = await UserManager.getInstance();
+
       // Update the document to remove the avatar reference
       await DataQuery.updateDocument(Constants.avatarDoc, '');
 
       // Decode the URL to get the file path
-      final String decodedUrl = Uri.decodeFull(downloadUrl);
+      final String decodedUrl = Uri.decodeFull(currentUser.avatarUrl);
       final RegExp regex = RegExp(r'/o/(.*)\?alt=media');
       final RegExpMatch? match = regex.firstMatch(decodedUrl);
 

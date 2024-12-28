@@ -115,6 +115,7 @@
   "val_password_weak": "Votre mot de passe n'est pas assez fort.",
   "val_repeat_empty": "Veuillez répéter votre mot de passe.",
   "val_repeat_incorrect": "Ce mot de passe ne correspond pas.",
+  "val_bio_length": "Cette bio est trop longue.",
 
   "_comment14": "Email Verification Dialog" ,
   "evd_title": "Vérification de l'email requise",
@@ -127,13 +128,9 @@
   "dpd_note": "Remarque : vous pouvez supprimer cette photo car elle a été prise avec votre appareil. Veuillez archiver la photo si vous souhaitez seulement l'enlever de votre profil.",
 
   "_comment16": "Picture Choice Dialog",
-  "pcd_choice": "Faites un choix!",
+  "pcd_choice": "Sélectionner une option",
   "pcd_gallery": "Gallerie",
   "pcd_camera": "Caméra",
-
-  "_comment17": "Profile Edit Dialog",
-  "ped_edit_profile": "Modifier le profil",
-  "ped_remove": "Enlever la photo de profil",
 
   "_comment18": "Report Dialog",
   "rp_report": "Signaler",
@@ -343,5 +340,12 @@
 
   "_comment59": "Action Button",
   "ab_refresh": "Rafraichir",
-  "ab_load": "Charger plus"
+  "ab_load": "Charger plus",
+
+  "_comment60": "Edit Profile Page",
+  "epp_edit": "Modifier le profile",
+  "epp_avatar": "Modifier l'avatar",
+  "epp_remove": "Supprimer l'avatar",
+  "epp_username": "Nom d'utilisateur",
+  "epp_bio": "Bio"
 }

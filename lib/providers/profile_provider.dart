@@ -1,14 +1,15 @@
 import 'package:befriend/models/data/user_manager.dart';
+import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/error_handling.dart';
 import 'package:befriend/views/dialogs/profile/friend_action_dialog.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../models/objects/bubble.dart';
 import '../models/data/picture_manager.dart';
 import '../models/objects/profile.dart';
 import '../utilities/app_localizations.dart';
-import '../views/dialogs/profile/profile_edit_dialog.dart';
 
 class ProfileProvider extends ChangeNotifier {
   final FirebaseFunctions _functions = FirebaseFunctions.instance;
@@ -147,30 +148,11 @@ class ProfileProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> changeProfilePicture(
-      BuildContext context, Bubble bubble, Function notifyParent) async {
-    try {
-      await PictureManager.takeProfilePicture(context, (String? url) {
-        _imageUrl = url;
-      });
-      if (context.mounted) {
-        await _loadPictureChange(context, _imageUrl, bubble, notifyParent);
-      }
-    } catch (e) {
-      debugPrint('(ProfileProvider) Error changing profile picture: $e');
-      if (context.mounted) {
-        ErrorHandling.showError(
-            context,
-            AppLocalizations.translate(context,
-                key: 'pp_cpf_error',
-                defaultString:
-                    'Error changing profile picture. Please try again.'));
-      }
-    }
-  }
-
   void showEditProfileDialog(
       BuildContext context, Bubble bubble, Function notifyParent) {
+    GoRouter.of(context).push(Constants.editProfileAddress);
+
+    /*
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -183,6 +165,7 @@ class ProfileProvider extends ChangeNotifier {
         );
       },
     );
+     */
   }
 
   Future<void> _loadPictureChange(BuildContext context, String? imageUrl,
@@ -196,7 +179,10 @@ class ProfileProvider extends ChangeNotifier {
     } else {
       try {
         debugPrint('(ProfileProvider) Changing avatar...');
-        await PictureManager.changeMainPicture(context, _imageUrl!, bubble);
+        await PictureManager.changeMainPicture(
+          context,
+          _imageUrl!,
+        );
         notifyListeners();
         notifyParent();
       } catch (e) {

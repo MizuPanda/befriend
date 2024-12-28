@@ -115,6 +115,7 @@
   "val_password_weak": "This password is not strong enough.",
   "val_repeat_empty": "Please repeat your password.",
   "val_repeat_incorrect": "This password does not match with the first one.",
+  "val_bio_length": "This username is too lengthy.",
 
   "_comment14": "Email Verification Dialog" ,
   "evd_title": "Email Verification Required",
@@ -127,13 +128,9 @@
   "dpd_note": "Note: You are able to delete this picture because it was taken with your device. Please archive the picture if you only want to hide it from your profile.",
 
   "_comment16": "Picture Choice Dialog",
-  "pcd_choice": "Make a choice!",
+  "pcd_choice": "Select an option",
   "pcd_gallery": "Gallery",
   "pcd_camera": "Camera",
-
-  "_comment17": "Profile Edit Dialog",
-  "ped_edit_profile": "Edit Profile",
-  "ped_remove": "Remove your profile picture",
 
   "_comment18": "Report Dialog",
   "rp_report": "Report",
@@ -343,5 +340,12 @@
 
   "_comment59": "Action Button",
   "ab_refresh": "Refresh",
-  "ab_load": "Load more"
+  "ab_load": "Load more",
+
+  "_comment60": "Edit Profile Page",
+  "epp_edit": "Edit Profile",
+  "epp_avatar": "Edit avatar",
+  "epp_remove": "Remove avatar",
+  "epp_username": "Username",
+  "epp_bio": "Bio"
 }

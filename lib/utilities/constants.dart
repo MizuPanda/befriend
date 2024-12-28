@@ -22,6 +22,7 @@ class Constants {
   static const String postNotificationOnDoc = 'postNotificationOn';
   static const String likeNotificationOnDoc = 'likeNotificationOn';
   static const String languageDoc = 'language';
+  static const String bioDoc = 'bio';
   //FRIENDSHIPS
   static const String progressDoc = 'progress';
   static const String levelDoc = 'level';
@@ -135,4 +136,5 @@ class Constants {
   static const String friendListAddress = '/${MyRouter.friendList}';
   static const String settingsAddress = '/${MyRouter.settings}';
   static const String wideSearchAddress = '/${MyRouter.wideSearch}';
+  static const String editProfileAddress = '/${MyRouter.editProfile}';
 }

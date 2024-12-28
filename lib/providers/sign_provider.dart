@@ -3,7 +3,6 @@ import 'package:befriend/models/authentication/date_manager.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/error_handling.dart';
 import 'package:befriend/utilities/validators.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -154,21 +153,6 @@ class SignProvider extends ChangeNotifier {
 
   //#endregion
 
-  Future<bool> _checkUsernameAvailability(String username) async {
-    final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable(
-      'checkUsernameAvailability',
-    );
-
-    try {
-      final result = await callable.call({'username': username});
-      final isUsernameAvailable = result.data['isUsernameAvailable'] as bool;
-      return isUsernameAvailable;
-    } catch (error) {
-      debugPrint('(SignProvider) Error checking username availability: $error');
-      return false;
-    }
-  }
-
   void changedDependencies(BuildContext context) {
     _navigator = Navigator.of(context);
   }
@@ -228,7 +212,8 @@ class SignProvider extends ChangeNotifier {
       _formKey.currentState!.save();
 
       if (_formKey.currentState!.validate()) {
-        bool usernameAvailable = await _checkUsernameAvailability(_username!);
+        bool usernameAvailable =
+            await AuthenticationManager.checkUsernameAvailability(_username!);
         if (!usernameAvailable) {
           _error = Constants.usernameError;
           _formKey.currentState!.validate();

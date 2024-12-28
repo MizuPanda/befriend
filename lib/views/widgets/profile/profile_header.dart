@@ -40,12 +40,28 @@ class ProfileHeader extends StatelessWidget {
               }),
               SizedBox(width: 16 / 448 * width),
               Expanded(
-                child: AutoSizeText(
-                  '@${profile.user.username}',
-                  style: GoogleFonts.openSans(
-                      fontSize: 20.0, fontWeight: FontWeight.bold),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AutoSizeText(
+                        profile.user.username,
+                        style: GoogleFonts.openSans(
+                            fontSize: 20.0, fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      AutoSizeText(
+                        profile.user.bio,
+                        style: GoogleFonts.openSans(
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

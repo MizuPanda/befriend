@@ -19,11 +19,10 @@ class PictureManager {
   static const int _sessionQuality = 25;
   static const int _profilePictureQuality = 10;
 
-  static Future<void> removeMainPicture(
-      BuildContext context, Bubble bubble) async {
+  static Future<void> removeMainPicture(BuildContext context) async {
     try {
-      await PictureQuery.removeProfilePicture(bubble.avatarUrl);
-      bubble.avatar = Image.asset(Constants.defaultPictureAddress).image;
+      await PictureQuery.removeProfilePicture();
+      UserManager.refreshAvatar(null, '');
     } catch (e) {
       debugPrint('(PictureManager): Error removing main picture: $e');
       if (context.mounted) {
@@ -38,12 +37,12 @@ class PictureManager {
   }
 
   static Future<void> changeMainPicture(
-      BuildContext context, String path, Bubble bubble) async {
+      BuildContext context, String path) async {
     try {
       File file = File(path);
       String? downloadUrl = await PictureQuery.uploadAvatar(file);
       if (downloadUrl != null) {
-        bubble.avatar = await UserManager.refreshAvatar(file);
+        UserManager.refreshAvatar(file, downloadUrl);
       }
     } catch (e) {
       debugPrint('(PictureManager): Error changing main picture: $e');

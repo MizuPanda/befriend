@@ -12,7 +12,7 @@ class PictureChoiceDialog {
         builder: (BuildContext dialogContext) {
           return AlertDialog(
             title: Text(AppLocalizations.translate(context,
-                key: 'pcd_choice', defaultString: 'Make a choice!')),
+                key: 'pcd_choice', defaultString: 'Choose an option')),
             content: SingleChildScrollView(
               child: ListBody(
                 children: [

@@ -1,5 +1,6 @@
 import 'package:befriend/models/objects/bubble.dart';
 import 'package:befriend/models/objects/profile.dart';
+import 'package:befriend/views/pages/edit_profile_page.dart';
 import 'package:befriend/views/pages/forgot_pass_page.dart';
 import 'package:befriend/views/pages/friend_list_page.dart';
 import 'package:befriend/views/pages/home_page.dart';
@@ -30,6 +31,7 @@ class MyRouter {
   static const String friendList = 'friendList';
   static const String settings = 'settings';
   static const String wideSearch = 'wiseSearch';
+  static const String editProfile = 'editProfile';
 
   static final GoRouter router = GoRouter(
     routes: <RouteBase>[
@@ -115,6 +117,11 @@ class MyRouter {
                 path: wideSearch,
                 builder: (BuildContext context, GoRouterState state) {
                   return const WideSearchPage();
+                }),
+            GoRoute(
+                path: editProfile,
+                builder: (BuildContext context, GoRouterState state) {
+                  return const EditProfilePage();
                 }),
           ]),
     ],

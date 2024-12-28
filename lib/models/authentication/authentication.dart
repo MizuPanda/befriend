@@ -3,6 +3,7 @@ import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/error_handling.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -108,6 +109,7 @@ class AuthenticationManager {
       Constants.likeNotificationOnDoc: true,
       Constants.postNotificationOnDoc: true,
       Constants.languageDoc: languageCode,
+      Constants.bioDoc: '',
     };
 
     try {
@@ -166,6 +168,21 @@ class AuthenticationManager {
                 defaultString:
                     "Something went wrong. Please check your credentials and try again"));
       }
+    }
+  }
+
+  static Future<bool> checkUsernameAvailability(String username) async {
+    final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable(
+      'checkUsernameAvailability',
+    );
+
+    try {
+      final result = await callable.call({'username': username});
+      final isUsernameAvailable = result.data['isUsernameAvailable'] as bool;
+      return isUsernameAvailable;
+    } catch (error) {
+      debugPrint('(SignProvider) Error checking username availability: $error');
+      return false;
     }
   }
 }
