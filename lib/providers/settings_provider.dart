@@ -92,7 +92,7 @@ class SettingsProvider extends ChangeNotifier {
       home.activeTutorial();
 
       if (context.mounted) {
-        GoRouter.of(context).go(Constants.homepageAddress, extra: home);
+        GoRouter.of(context).push(Constants.homepageAddress, extra: home);
       }
 
       FirebaseAnalytics.instance.logTutorialBegin();

@@ -217,7 +217,7 @@
   "sp_pc": "Confidentialité",
   "sp_policy": "Politique de confidentialité",
   "sp_consent": "Gérer les paramètres de confidentialité",
-  "sp_preferences": "Préférences publicitaires, suppression du compte",
+  "sp_preferences": "Préférences publicitaires, etc.",
   "sp_notifications": "Notifications",
   "sp_appearance": "Apparence",
   "sp_theme": "Thème",
@@ -229,7 +229,6 @@
   "sp_help": "Aide",
   "sp_how": "Comment utiliser Befriend",
   "sp_contact": "Contact",
-  "sp_login": "Connexion",
   "sp_logout": "Se déconnecter",
 
   "_comment34": "Sign Up Page",

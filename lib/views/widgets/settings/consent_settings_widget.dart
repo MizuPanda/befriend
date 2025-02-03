@@ -44,21 +44,6 @@ class ConsentSettingsWidget extends StatelessWidget {
                           ),
                           onPressed: provider.reloadConsentForm,
                         ),
-                      SettingsTile(
-                        leading: const Icon(
-                          Icons.delete_forever_outlined,
-                          color: Colors.red,
-                        ),
-                        title: Text(
-                          AppLocalizations.translate(context,
-                              key: 'csw_delete',
-                              defaultString: 'Delete your account'),
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                        onPressed: (BuildContext context) async {
-                          await provider.showDeleteAccountConfirmation(context);
-                        },
-                      ),
                     ],
                   ),
                 ],

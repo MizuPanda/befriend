@@ -78,53 +78,6 @@ class SettingsPage extends StatelessWidget {
                       SettingsSection(
                         title: Text(
                           AppLocalizations.translate(context,
-                              key: 'sp_pc',
-                              defaultString: 'Privacy and confidentiality'),
-                        ),
-                        tiles: [
-                          SettingsTile(
-                            leading: Icon(lightMode
-                                ? Icons.privacy_tip_rounded
-                                : Icons.privacy_tip_outlined),
-                            title: Text(
-                              AppLocalizations.translate(context,
-                                  key: 'sp_policy',
-                                  defaultString: 'Privacy Policy'),
-                            ),
-                            onPressed: provider.openPrivacyPolicy,
-                          ),
-                          SettingsTile.navigation(
-                            leading: Icon(lightMode
-                                ? Icons.lock_rounded
-                                : Icons.lock_outline_rounded),
-                            title: Text(
-                              AppLocalizations.translate(context,
-                                  key: 'sp_consent',
-                                  defaultString: 'Manage consent'),
-                            ),
-                            description: Text(AppLocalizations.translate(
-                                context,
-                                key: 'sp_preferences',
-                                defaultString:
-                                    'Ads preferences, account deletion')),
-                            onPressed: provider.goToConsentSettings,
-                          ),
-                          SettingsTile.navigation(
-                            leading: Icon(lightMode
-                                ? Icons.notifications_rounded
-                                : Icons.notifications_outlined),
-                            title: Text(
-                              AppLocalizations.translate(context,
-                                  key: 'sp_notifications',
-                                  defaultString: 'Notifications'),
-                            ),
-                            onPressed: provider.goToNotificationsSettings,
-                          ),
-                        ],
-                      ),
-                      SettingsSection(
-                        title: Text(
-                          AppLocalizations.translate(context,
                               key: 'sp_appearance',
                               defaultString: 'Appearance'),
                         ),
@@ -236,7 +189,69 @@ class SettingsPage extends StatelessWidget {
                       SettingsSection(
                         title: Text(
                           AppLocalizations.translate(context,
-                              key: 'sp_login', defaultString: 'Login'),
+                              key: 'sp_pc',
+                              defaultString: 'Privacy and confidentiality'),
+                        ),
+                        tiles: [
+                          SettingsTile(
+                            leading: Icon(lightMode
+                                ? Icons.privacy_tip_rounded
+                                : Icons.privacy_tip_outlined),
+                            title: Text(
+                              AppLocalizations.translate(context,
+                                  key: 'sp_policy',
+                                  defaultString: 'Privacy Policy'),
+                            ),
+                            onPressed: provider.openPrivacyPolicy,
+                          ),
+                          SettingsTile.navigation(
+                            leading: Icon(lightMode
+                                ? Icons.lock_rounded
+                                : Icons.lock_outline_rounded),
+                            title: Text(
+                              AppLocalizations.translate(context,
+                                  key: 'sp_consent',
+                                  defaultString: 'Manage consent'),
+                            ),
+                            description: Text(AppLocalizations.translate(
+                                context,
+                                key: 'sp_preferences',
+                                defaultString:
+                                'Ads preferences, etc.')),
+                            onPressed: provider.goToConsentSettings,
+                          ),
+                          SettingsTile.navigation(
+                            leading: Icon(lightMode
+                                ? Icons.notifications_rounded
+                                : Icons.notifications_outlined),
+                            title: Text(
+                              AppLocalizations.translate(context,
+                                  key: 'sp_notifications',
+                                  defaultString: 'Notifications'),
+                            ),
+                            onPressed: provider.goToNotificationsSettings,
+                          ),
+                          SettingsTile(
+                            leading: const Icon(
+                              Icons.delete_forever_outlined,
+                              color: Colors.red,
+                            ),
+                            title: Text(
+                              AppLocalizations.translate(context,
+                                  key: 'csw_delete',
+                                  defaultString: 'Delete your account'),
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                            onPressed: (BuildContext context) async {
+                              await provider.showDeleteAccountConfirmation(context);
+                            },
+                          ),
+                        ],
+                      ),
+                      SettingsSection(
+                        title: Text(
+                          AppLocalizations.translate(context,
+                              key: 'sp_logout', defaultString: 'Logout'),
                         ),
                         tiles: [
                           SettingsTile(
