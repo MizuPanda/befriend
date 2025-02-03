@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:befriend/models/authentication/consent_manager.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/utilities/constants.dart';
@@ -10,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../utilities/app_localizations.dart';
+import '../data/picture_query.dart';
 import '../objects/home.dart';
 
 class AuthenticationManager {
@@ -63,6 +66,7 @@ class AuthenticationManager {
       String password,
       String username,
       int birthYear,
+      String? avatarPath,
       BuildContext context) async {
     String? errorCode;
 
@@ -73,7 +77,8 @@ class AuthenticationManager {
       User? user = userCredential.user;
       if (user != null) {
         if (context.mounted) {
-          await _registerUserData(username, birthYear, user, context);
+          await _registerUserData(
+              username, birthYear, user, avatarPath, context);
         }
         debugPrint(
             "(AuthenticationManager) Successfully created user: ${user.uid}");
@@ -91,36 +96,50 @@ class AuthenticationManager {
   /// Registers the user data in the database.
   /// The name and username are stored in the database.
   /// The counter is incremented by 1 and stored in the database.
-  static Future<void> _registerUserData(
-      String username, int birthYear, User? user, BuildContext context) async {
+  static Future<void> _registerUserData(String username, int birthYear,
+      User? user, String? imagePath, BuildContext context) async {
     final String languageCode = Localizations.localeOf(context).languageCode;
 
-    final userInfo = <String, dynamic>{
-      Constants.usernameDoc: username,
-      Constants.avatarDoc: '',
-      Constants.friendsDoc: List.empty(),
-      Constants.powerDoc: 0,
-      Constants.birthYearDoc: birthYear,
-      Constants.hostingDoc: List.empty(),
-      Constants.sliderDoc: 0,
-      Constants.hostingFriendshipsDoc: {},
-      'consent': {'given': true, 'when': FieldValue.serverTimestamp()},
-      Constants.blockedUsersDoc: [],
-      Constants.likeNotificationOnDoc: true,
-      Constants.postNotificationOnDoc: true,
-      Constants.languageDoc: languageCode,
-      Constants.bioDoc: '',
-    };
-
     try {
+      String downloadUrl = '';
+
+      if (imagePath != null) {
+        downloadUrl =
+            await PictureQuery.uploadProfilePicture(File(imagePath)) ?? '';
+      }
+
+      final userInfo = <String, dynamic>{
+        Constants.usernameDoc: username,
+        Constants.avatarDoc: downloadUrl,
+        Constants.friendsDoc: List.empty(),
+        Constants.powerDoc: 0,
+        Constants.birthYearDoc: birthYear,
+        Constants.hostingDoc: List.empty(),
+        Constants.sliderDoc: 0,
+        Constants.hostingFriendshipsDoc: {},
+        'consent': {'given': true, 'when': FieldValue.serverTimestamp()},
+        Constants.blockedUsersDoc: [],
+        Constants.likeNotificationOnDoc: true,
+        Constants.postNotificationOnDoc: true,
+        Constants.languageDoc: languageCode,
+        Constants.bioDoc: '',
+        Constants.streakDoc: 0,
+        Constants.lastInteractionDoc: FieldValue.serverTimestamp(),
+      };
+
       await Constants.usersCollection.doc(user!.uid).set(userInfo);
       await user.sendEmailVerification();
       ConsentManager.setTagForChildrenAds(birthYear);
       if (context.mounted) {
-        GoRouter.of(context).pushReplacement(Constants.pictureAddress);
-      }
+        Home user = await UserManager.userHome();
+        user.activeTutorial();
 
-      debugPrint("Successfully added the data to user: $username");
+        if (context.mounted) {
+          GoRouter.of(context).go(Constants.homepageAddress, extra: user);
+        }
+      }
+      debugPrint(
+          "(AuthenticationManager) Successfully added the data to user: $username");
     } on FirebaseException catch (error) {
       // If registration data fails to save, delete the user
       debugPrint('(AuthenticationManager) A Firebase error occurred: $error');

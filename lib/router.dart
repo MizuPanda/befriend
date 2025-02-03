@@ -6,7 +6,6 @@ import 'package:befriend/views/pages/friend_list_page.dart';
 import 'package:befriend/views/pages/home_page.dart';
 import 'package:befriend/views/pages/login_page.dart';
 import 'package:befriend/views/pages/mutual_page.dart';
-import 'package:befriend/views/pages/picture_sign_page.dart';
 import 'package:befriend/views/pages/profile_page.dart';
 import 'package:befriend/views/pages/settings_page.dart';
 import 'package:befriend/views/pages/sign_up_page.dart';
@@ -25,7 +24,6 @@ class MyRouter {
   static const String login = 'login';
   static const String signup = 'signup';
   static const String forgot = 'forgot';
-  static const String picture = 'picture';
   static const String session = 'session';
   static const String mutual = 'mutual';
   static const String friendList = 'friendList';
@@ -76,12 +74,6 @@ class MyRouter {
               path: forgot,
               builder: (BuildContext context, GoRouterState state) {
                 return const ForgotPasswordPage();
-              },
-            ),
-            GoRoute(
-              path: picture,
-              builder: (BuildContext context, GoRouterState state) {
-                return const PictureSignPage();
               },
             ),
             GoRoute(

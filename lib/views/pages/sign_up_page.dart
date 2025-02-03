@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:befriend/models/authentication/consent_manager.dart';
 import 'package:befriend/providers/sign_provider.dart';
+import 'package:befriend/views/widgets/authentication/signup/profile_picture_widget.dart';
 import 'package:befriend/views/widgets/befriend_widget.dart';
 import 'package:befriend/views/widgets/authentication/signup/birthday_picker.dart';
 import 'package:befriend/views/widgets/authentication/signup/strength_indicator.dart';
@@ -69,11 +70,14 @@ class _SignUpPageState extends State<SignUpPage> {
                               key: 'sup_welcome',
                               defaultString:
                                   'Welcome! Begin by creating an account'),
+                          textAlign: TextAlign.center,
                           style: GoogleFonts.openSans(
                               textStyle: const TextStyle(fontSize: 18)),
                         ),
                       ),
                       SizedBox(height: 0.020 * height),
+                      const ProfilePictureWidget(),
+                      SizedBox(height: 0.010 * height),
                       IconTextField(
                         textInputAction: TextInputAction.next,
                         textInputType: TextInputType.emailAddress,

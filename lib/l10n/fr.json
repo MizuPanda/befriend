@@ -66,11 +66,6 @@
   "_comment7": "Picture Card Provider",
   "pcp_others": "et autres",
 
-  "_comment8": "Picture Sign Provider",
-  "psp_retrieve_error": "Erreur lors de la récupération de l'image. Veuillez réessayer.",
-  "psd_upload_error": "Erreur lors du téléchargement de l'avatar. Veuillez réessayer.",
-  "psp_skip_error": "Erreur lors de la navigation vers l'accueil. Veuillez réessayer.",
-
   "_comment9": "Profile Provider",
   "pp_df_title": "Supprimer l'ami",
   "pp_df_description": "Êtes-vous sûr de vouloir supprimer cet ami ? Cette action ne peut être annulée.",
@@ -104,6 +99,7 @@
   "snp_password_weak": "Votre mot de passe est trop faible.",
   "snp_age_req": "Vous devez avoir au moins 13 ans pour créer un compte.",
   "snp_cons_req": "Veuillez accepter la politique de confidentialité et les conditions d'utilisation pour poursuivre l'inscription.",
+  "snp_retrieve_error": "Erreur lors de la récupération de l'image. Veuillez réessayer.",
 
   "_comment13": "Validators",
   "val_email": "Veuillez saisir un courriel.",
@@ -182,12 +178,6 @@
   "_comment29": "Mutual Page",
   "mp_friends": "Les amis que vous avez en commun avec",
   "mp_common": "",
-
-  "_comment30": "Picture Sign Page",
-  "psp_ls": "Dernière étape",
-  "psp_almost": "Presque fini!",
-  "psp_add": "Ajoutez une photo pour personnaliser votre profil.",
-  "psp_capture": "Prendre une photo",
 
   "_comment31": "Profile Page",
   "pp_feed": "Mon Fil",
@@ -347,5 +337,9 @@
   "epp_avatar": "Modifier l'avatar",
   "epp_remove": "Supprimer l'avatar",
   "epp_username": "Nom d'utilisateur",
-  "epp_bio": "Bio"
+  "epp_bio": "Bio",
+
+  "_comment61": "Profile Picture Widget",
+  "ppw_capture": "Prendre une photo",
+  "ppw_remove": "Supprimer la photo"
 }

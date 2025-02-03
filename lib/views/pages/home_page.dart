@@ -45,7 +45,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _provider.initServices(_scaffoldKey);
     _provider.logAnalytics();
 
-    debugPrint("(HomePage) Should show tutorial? ${_provider.home.showTutorial} ");
+    debugPrint(
+        "(HomePage) Should show tutorial? ${_provider.home.showTutorial} ");
     if (_provider.home.showTutorial) {
       debugPrint('(HomePage) Showing Tutorial');
       _provider.initShowcase(context);

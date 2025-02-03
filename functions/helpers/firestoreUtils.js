@@ -156,7 +156,7 @@ async function updateFriendships(sessionUsers, timestamp) {
              level: admin.firestore.FieldValue.increment(1),
              lastInteraction: timestamp,
              streak: isFromYesterday? admin.firestore.FieldValue.increment(1) :
-                                     (isFromToday? friendshipStreak : 1),
+                                     (isFromToday? (friendshipStreak != 0? friendshipStreak : 1) : 1),
            });
 
            await Promise.all([
@@ -172,7 +172,7 @@ async function updateFriendships(sessionUsers, timestamp) {
               progress: progress,
               lastInteraction: timestamp,
               streak: isFromYesterday? admin.firestore.FieldValue.increment(1) :
-                                      (isFromToday? friendshipStreak : 1),
+                                      (isFromToday? (friendshipStreak != 0? friendshipStreak : 1) : 1),
             });
         }
       } else {
@@ -283,7 +283,7 @@ async function setUserData(sessionUsers, hostId, timestamp) {
           caption: "",
           lastInteraction: timestamp,
           streak: isFromYesterday? admin.firestore.FieldValue.increment(1) :
-                (isFromToday? userStreak : 1),
+                (isFromToday? (userStreak != 0? userStreak : 1) : 1),
         });
 
         await deleteTemporaryPictures(hostId);

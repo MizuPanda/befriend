@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:befriend/models/data/picture_query.dart';
 import 'package:befriend/models/data/user_manager.dart';
-import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/error_handling.dart';
 import 'package:befriend/views/dialogs/permission_denied_dialog.dart';
 import 'package:befriend/views/dialogs/profile/picture_choice_dialog.dart';
@@ -13,7 +12,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../utilities/app_localizations.dart';
-import '../objects/bubble.dart';
 
 class PictureManager {
   static const int _sessionQuality = 25;

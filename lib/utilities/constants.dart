@@ -132,7 +132,6 @@ class Constants {
   static const String loginAddress = '/${MyRouter.login}';
   static const String signupAddress = '/${MyRouter.signup}';
   static const String forgotAddress = '/${MyRouter.forgot}';
-  static const String pictureAddress = '/${MyRouter.picture}';
   static const String sessionAddress = '/${MyRouter.session}';
   static const String mutualAddress = '/${MyRouter.mutual}';
   static const String friendListAddress = '/${MyRouter.friendList}';

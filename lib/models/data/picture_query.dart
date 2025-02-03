@@ -73,7 +73,7 @@ class PictureQuery {
 
   static Future<String?> uploadAvatar(File imageFile) async {
     try {
-      String? downloadUrl = await _uploadProfilePicture(imageFile);
+      String? downloadUrl = await uploadProfilePicture(imageFile);
       if (downloadUrl != null) {
         await DataQuery.updateDocument(Constants.avatarDoc, downloadUrl);
         debugPrint('(PictureQuery): Avatar updated');
@@ -127,7 +127,7 @@ class PictureQuery {
     }
   }
 
-  static Future<String?> _uploadProfilePicture(File imageFile) async {
+  static Future<String?> uploadProfilePicture(File imageFile) async {
     try {
       // Get current user's UID
       User? user = FirebaseAuth.instance.currentUser;

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:befriend/models/authentication/authentication.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/error_handling.dart';
@@ -5,6 +7,7 @@ import 'package:befriend/utilities/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../models/data/picture_manager.dart';
 import '../utilities/app_localizations.dart';
 import '../utilities/date_manager.dart';
 import '../utilities/password_strength.dart';
@@ -38,6 +41,47 @@ class SignProvider extends ChangeNotifier {
   DateTime _date = DateTime(2022, 05, 09);
 
   DateTime get date => _date;
+
+  String? _imagePath;
+
+  bool imageNull() {
+    return _imagePath == null;
+  }
+
+  ImageProvider image() {
+    return Image.file(File(_imagePath!)).image;
+  }
+
+  Future<void> retrieveImage(BuildContext context) async {
+    try {
+      await PictureManager.takeProfilePicture(
+        context,
+        (String? url) {
+          _imagePath = url;
+        },
+      );
+      notifyListeners();
+    } catch (e) {
+      debugPrint('(SignProvider) Error retrieving image: $e');
+      if (context.mounted) {
+        ErrorHandling.showError(
+            context,
+            AppLocalizations.translate(context,
+                key: 'snp_retrieve_error',
+                defaultString: 'Error retrieving image. Please try again.'));
+      }
+    }
+  }
+
+  Future<void> removeImage() async {
+    try {
+      await File(_imagePath!).delete();
+      _imagePath = null;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('(SignProvider) Error deleting picture');
+    }
+  }
 
   double strength() {
     return PasswordStrength.getPasswordStrength(_password);
@@ -220,7 +264,12 @@ class SignProvider extends ChangeNotifier {
         } else {
           if (context.mounted) {
             _error = await AuthenticationManager.createUserWithEmailAndPassword(
-                _email!, _password!, _username!, _date.year, context);
+                _email!,
+                _password!,
+                _username!,
+                _date.year,
+                _imagePath,
+                context);
           }
           if (_error != null) {
             _formKey.currentState!.validate();

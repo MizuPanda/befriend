@@ -216,8 +216,7 @@ class SettingsPage extends StatelessWidget {
                             description: Text(AppLocalizations.translate(
                                 context,
                                 key: 'sp_preferences',
-                                defaultString:
-                                'Ads preferences, etc.')),
+                                defaultString: 'Ads preferences, etc.')),
                             onPressed: provider.goToConsentSettings,
                           ),
                           SettingsTile.navigation(
@@ -243,7 +242,8 @@ class SettingsPage extends StatelessWidget {
                               style: const TextStyle(color: Colors.red),
                             ),
                             onPressed: (BuildContext context) async {
-                              await provider.showDeleteAccountConfirmation(context);
+                              await provider
+                                  .showDeleteAccountConfirmation(context);
                             },
                           ),
                         ],

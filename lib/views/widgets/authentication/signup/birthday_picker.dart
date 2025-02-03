@@ -47,26 +47,28 @@ class _BirthdayPickerState extends State<BirthdayPicker> {
                   style: TextStyle(
                       fontSize: 18, color: Theme.of(context).hintColor),
                 ),
-                CupertinoButton(
-                  // Display a CupertinoDatePicker in date picker mode.
-                  onPressed: () => _showDialog(
-                    CupertinoDatePicker(
-                      initialDateTime: provider.date,
-                      mode: CupertinoDatePickerMode.date,
-                      use24hFormat: true,
-                      // This shows day of week alongside day of month
-                      showDayOfWeek: true,
-                      // This is called when the user changes the date.
-                      onDateTimeChanged: provider.onDateTimeChanged,
+                Expanded(
+                  child: CupertinoButton(
+                    // Display a CupertinoDatePicker in date picker mode.
+                    onPressed: () => _showDialog(
+                      CupertinoDatePicker(
+                        initialDateTime: provider.date,
+                        mode: CupertinoDatePickerMode.date,
+                        use24hFormat: true,
+                        // This shows day of week alongside day of month
+                        showDayOfWeek: true,
+                        // This is called when the user changes the date.
+                        onDateTimeChanged: provider.onDateTimeChanged,
+                      ),
                     ),
-                  ),
-                  // In this example, the date is formatted manually. You can
-                  // use the intl package to format the value based on the
-                  // user's locale settings.
-                  child: AutoSizeText(
-                    provider.dateText(context),
-                    style: const TextStyle(
-                      fontSize: 20.0,
+                    // In this example, the date is formatted manually. You can
+                    // use the intl package to format the value based on the
+                    // user's locale settings.
+                    child: AutoSizeText(
+                      provider.dateText(context),
+                      style: const TextStyle(
+                        fontSize: 20.0,
+                      ),
                     ),
                   ),
                 ),
