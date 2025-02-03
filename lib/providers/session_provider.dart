@@ -447,8 +447,6 @@ class SessionProvider extends ChangeNotifier {
         sessionUsers: sessionUsers,
         caption: caption(),
         host: host,
-        userMap: idToBubbleMap
-            .map((id, userBubble) => MapEntry(id, userBubble.username)),
         usersAllowed: usersAllowed,
         metadata: metadata,
         isPublic: host.isPublic(),

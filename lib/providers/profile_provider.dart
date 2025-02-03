@@ -7,17 +7,40 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/objects/bubble.dart';
-import '../models/data/picture_manager.dart';
 import '../models/objects/profile.dart';
 import '../utilities/app_localizations.dart';
+import '../utilities/date_manager.dart';
 
 class ProfileProvider extends ChangeNotifier {
   final FirebaseFunctions _functions = FirebaseFunctions.instance;
 
-  String? _imageUrl;
   final Profile profile;
 
   ProfileProvider({required this.profile});
+
+  Future<void> resetStreak(BuildContext context) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        if (profile.friendship != null) {
+          if (profile.friendship!.streak != 0 &&
+              DateManager.isBeforeYesterday(
+                  profile.friendship!.lastInteraction)) {
+            await Constants.friendshipsCollection
+                .doc(profile.friendship!.friendshipID)
+                .update({
+              Constants.streakDoc: 0,
+            });
+
+            profile.friendship?.streak = 0;
+            notifyListeners();
+            debugPrint('(ProfileProvider) Resetting streak to 0');
+          }
+        }
+      } catch (e) {
+        debugPrint("(ProfileProvider) Error resetting streak= $e");
+      }
+    });
+  }
 
   Future<void> onSelectMenu(int? selection, BuildContext context) async {
     switch (selection) {
@@ -151,51 +174,22 @@ class ProfileProvider extends ChangeNotifier {
   void showEditProfileDialog(
       BuildContext context, Bubble bubble, Function notifyParent) {
     GoRouter.of(context).push(Constants.editProfileAddress);
-
-    /*
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ProfileEditDialog(
-          bubble: bubble,
-          notifyParent: () {
-            notifyListeners();
-            notifyParent();
-          },
-        );
-      },
-    );
-     */
   }
 
-  Future<void> _loadPictureChange(BuildContext context, String? imageUrl,
-      Bubble bubble, Function notifyParent) async {
-    if (_imageUrl == null) {
-      ErrorHandling.showError(
-          context,
-          AppLocalizations.translate(context,
-              key: 'pp_load_cancel',
-              defaultString: 'Picture change cancelled.'));
+  Color streakColor() {
+    int streak =
+        profile.user.main() ? profile.user.streak : profile.friendship!.streak;
+
+    return streak == 0
+        ? Colors.grey
+        : (profile.user.main() ? Colors.blue : Colors.orange);
+  }
+
+  String streakText(BuildContext context) {
+    if (profile.user.main()) {
+      return '${profile.user.streak} ${profile.user.streak == 1 ? AppLocalizations.translate(context, key: 'prfs_day', defaultString: "day") : AppLocalizations.translate(context, key: 'prfs_days', defaultString: "days")}';
     } else {
-      try {
-        debugPrint('(ProfileProvider) Changing avatar...');
-        await PictureManager.changeMainPicture(
-          context,
-          _imageUrl!,
-        );
-        notifyListeners();
-        notifyParent();
-      } catch (e) {
-        debugPrint('(ProfileProvider) Error loading picture change: $e');
-        if (context.mounted) {
-          ErrorHandling.showError(
-              context,
-              AppLocalizations.translate(context,
-                  key: 'pp_load_error',
-                  defaultString:
-                      'Error loading picture change. Please try again.'));
-        }
-      }
+      return '${profile.friendship!.streak} ${profile.friendship!.streak == 1 ? AppLocalizations.translate(context, key: 'prfs_day', defaultString: "day") : AppLocalizations.translate(context, key: 'prfs_days', defaultString: "days")}';
     }
   }
 }

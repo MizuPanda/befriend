@@ -10,7 +10,7 @@ import '../widgets/profile/profile_header.dart';
 import '../widgets/profile/profile_pictures.dart';
 import '../widgets/profile/profile_state.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   final Profile profile;
 
   const ProfilePage({super.key, required this.profile});
@@ -19,16 +19,30 @@ class ProfilePage extends StatelessWidget {
   static const double _iconTextDistance = 5.0;
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  late final ProfileProvider _provider =
+      ProfileProvider(profile: widget.profile);
+
+  @override
+  void initState() {
+    _provider.resetStreak(context);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ProfileProvider(profile: profile),
+    return ChangeNotifierProvider.value(
+      value: _provider,
       builder: (BuildContext context, Widget? child) {
         final double height = MediaQuery.of(context).size.height;
 
-        if (profile.user.main()) {
+        if (widget.profile.user.main()) {
           return DefaultTabController(
             length: 2, // Number of tabs
-            initialIndex: profile.initialIndex,
+            initialIndex: widget.profile.initialIndex,
             child: Scaffold(
               appBar: AppBar(
                 title: const BefriendTitle(),
@@ -38,16 +52,20 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(
-                        top: padding, left: padding, right: padding),
-                    child: ProfileHeader(profile: profile),
+                        top: ProfilePage.padding,
+                        left: ProfilePage.padding,
+                        right: ProfilePage.padding),
+                    child: ProfileHeader(profile: widget.profile),
                   ),
                   SizedBox(height: 0.016 * height),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: padding),
-                    child: ProfileState(profile: profile),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: ProfilePage.padding),
+                    child: ProfileState(profile: widget.profile),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: padding, bottom: 8.0),
+                    padding: const EdgeInsets.only(
+                        left: ProfilePage.padding, bottom: 8.0),
                     child: Text(
                       AppLocalizations.translate(context,
                           key: 'pp_feed', defaultString: 'My Feed'),
@@ -73,15 +91,15 @@ class ProfilePage extends StatelessWidget {
                     child: TabBarView(
                       children: [
                         ProfilePictures(
-                          profileUsername: profile.user.username,
-                          userID: profile.user.id,
+                          profileUsername: widget.profile.user.username,
+                          userID: widget.profile.user.id,
                           showArchived: false,
                           showOnlyMe: true,
                           isLocked: false,
                         ),
                         ProfilePictures(
-                          profileUsername: profile.user.username,
-                          userID: profile.user.id,
+                          profileUsername: widget.profile.user.username,
+                          userID: widget.profile.user.id,
                           showArchived: false,
                           showOnlyMe: false,
                           isLocked: false,
@@ -106,21 +124,23 @@ class ProfilePage extends StatelessWidget {
                       await provider.onSelectMenu(selection, context);
                     },
                     itemBuilder: (BuildContext context) => [
-                          if (!profile.isLocked)
+                          if (!widget.profile.isLocked)
                             PopupMenuItem<int>(
                               value: 0,
                               child: Row(
                                 children: [
                                   const Icon(Icons.delete_outline_rounded,
                                       color: Colors.red), // Archive icon
-                                  const SizedBox(width: _iconTextDistance),
+                                  const SizedBox(
+                                      width: ProfilePage._iconTextDistance),
                                   Text(
                                     AppLocalizations.translate(context,
                                         key: 'pp_delete',
                                         defaultString: 'Delete'),
                                     style: const TextStyle(color: Colors.red),
                                   ),
-                                  const SizedBox(width: _iconTextDistance * 2),
+                                  const SizedBox(
+                                      width: ProfilePage._iconTextDistance * 2),
                                 ],
                               ),
                             ),
@@ -131,10 +151,12 @@ class ProfilePage extends StatelessWidget {
                                 const Icon(
                                   Icons.block_rounded,
                                 ), // Info icon
-                                const SizedBox(width: _iconTextDistance),
+                                const SizedBox(
+                                    width: ProfilePage._iconTextDistance),
                                 Text(AppLocalizations.translate(context,
                                     key: 'pp_block', defaultString: 'Block')),
-                                const SizedBox(width: _iconTextDistance * 2),
+                                const SizedBox(
+                                    width: ProfilePage._iconTextDistance * 2),
                               ],
                             ),
                           ),
@@ -146,21 +168,24 @@ class ProfilePage extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(
-                      top: padding, left: padding, right: padding),
+                      top: ProfilePage.padding,
+                      left: ProfilePage.padding,
+                      right: ProfilePage.padding),
                   child: ProfileHeader(
-                    profile: profile,
+                    profile: widget.profile,
                   ),
                 ),
                 SizedBox(height: 0.016 * height),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: padding),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: ProfilePage.padding),
                   child: ProfileState(
-                    profile: profile,
+                    profile: widget.profile,
                   ),
                 ),
                 Padding(
-                  padding:
-                      EdgeInsets.only(left: padding, bottom: 0.008 * height),
+                  padding: EdgeInsets.only(
+                      left: ProfilePage.padding, bottom: 0.008 * height),
                   child: Text(
                       AppLocalizations.translate(context,
                           key: 'pp_pictures', defaultString: 'Pictures'),
@@ -171,11 +196,11 @@ class ProfilePage extends StatelessWidget {
                 ),
                 Expanded(
                   child: ProfilePictures(
-                    profileUsername: profile.user.username,
-                    userID: profile.user.id,
+                    profileUsername: widget.profile.user.username,
+                    userID: widget.profile.user.id,
                     showArchived: false,
                     showOnlyMe: false,
-                    isLocked: profile.isLocked,
+                    isLocked: widget.profile.isLocked,
                   ),
                 ),
               ],

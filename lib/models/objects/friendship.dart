@@ -14,6 +14,8 @@ class Friendship extends FriendshipProgress {
     required super.level,
     required super.progress,
     required super.created,
+    required super.streak,
+    required super.lastInteraction,
     required this.friend,
   });
 
@@ -30,6 +32,8 @@ class Friendship extends FriendshipProgress {
       level: friendshipProgress.level,
       progress: friendshipProgress.progress,
       created: friendshipProgress.created,
+      streak: friendshipProgress.streak,
+      lastInteraction: friendshipProgress.lastInteraction,
       friend: friendBubble,
     );
   }
@@ -45,6 +49,8 @@ class Friendship extends FriendshipProgress {
       index = 1;
     }
 
+    final DateTime now = DateTime.now();
+
     return Friendship._(
         index: index,
         user1: ids.first,
@@ -52,7 +58,9 @@ class Friendship extends FriendshipProgress {
         friendshipID: ids.first + ids.last,
         level: 0,
         progress: 0,
-        created: DateTime.now(),
+        created: now,
+        streak: 0,
+        lastInteraction: now,
         friend: friendBubble);
   }
 

@@ -50,6 +50,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       _provider.home.deactivateTutorial();
     }
     _provider.initLanguage(context);
+    _provider.resetStreak(context);
     _provider.loadFriendsAsync();
   }
 

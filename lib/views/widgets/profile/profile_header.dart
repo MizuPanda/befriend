@@ -81,6 +81,23 @@ class ProfileHeader extends StatelessWidget {
                 ),
               ),
             ),
+          if (profile.user.main() ||
+              (profile.friendship != null && !profile.isLocked))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Icon(
+                  Icons.local_fire_department_rounded,
+                  color: provider.streakColor(),
+                ),
+                AutoSizeText(
+                  provider.streakText(context),
+                  style: GoogleFonts.openSans(
+                      fontWeight: FontWeight.bold,
+                      color: provider.streakColor()),
+                )
+              ],
+            )
         ],
       );
     });

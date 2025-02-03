@@ -29,6 +29,7 @@ class ProfileState extends StatelessWidget {
       return Column(
         children: [
           Row(
+            mainAxisSize: MainAxisSize.max,
             children: [
               Padding(
                 padding: EdgeInsets.only(left: 8.0 / 448 * width),
@@ -57,17 +58,18 @@ class ProfileState extends StatelessWidget {
                 )
             ],
           ),
-          if (!profile.user.main())
+          if (!profile.user.main() && profile.friendship != null)
             Padding(
               padding: EdgeInsets.only(left: 8.0 / 448 * width),
-              child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: AutoSizeText(
-                    '${AppLocalizations.translate(context, key: 'prfs_since', defaultString: 'Since')} ${profile.friendship != null ? timeago.format(profile.friendship!.created) : AppLocalizations.translate(context, key: 'prfs_never', defaultString: 'never')}',
-                    textAlign: TextAlign.start,
-                    style: GoogleFonts.openSans(
-                        textStyle: const TextStyle(fontSize: 18)),
-                  )),
+              child: SizedBox(
+                width: double.infinity,
+                child: AutoSizeText(
+                  '${AppLocalizations.translate(context, key: 'prfs_since', defaultString: 'Since')} ${timeago.format(profile.friendship!.created)}',
+                  textAlign: TextAlign.start,
+                  style: GoogleFonts.openSans(
+                      textStyle: const TextStyle(fontSize: 18)),
+                ),
+              ),
             ),
           if (!profile.user.main())
             Column(

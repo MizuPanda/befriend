@@ -166,6 +166,10 @@ class UserManager {
     _instance?.languageCode = value;
   }
 
+  static void setStreak(int value) {
+    _instance?.streak = value;
+  }
+
   static String getBestFriendID() {
     return _instance?.bestFriendID ?? '';
   }

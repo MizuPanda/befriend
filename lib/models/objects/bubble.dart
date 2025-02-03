@@ -15,6 +15,8 @@ class Bubble {
   final int birthYear;
   String languageCode;
   String bio;
+  int streak;
+  DateTime lastInteraction;
 
   List<dynamic> blockedUsers;
 
@@ -35,22 +37,23 @@ class Bubble {
 
   Function notify = () {};
 
-  Bubble._({
-    required this.id,
-    required this.username,
-    required this.power,
-    required this.birthYear,
-    required this.size,
-    required this.avatar,
-    required this.avatarUrl,
-    required this.lastSeenUsersMap,
-    required this.friendIDs,
-    required this.blockedUsers,
-    required this.postNotificationOn,
-    required this.likeNotificationOn,
-    required this.languageCode,
-    required this.bio,
-  });
+  Bubble._(
+      {required this.id,
+      required this.username,
+      required this.power,
+      required this.birthYear,
+      required this.size,
+      required this.avatar,
+      required this.avatarUrl,
+      required this.lastSeenUsersMap,
+      required this.friendIDs,
+      required this.blockedUsers,
+      required this.postNotificationOn,
+      required this.likeNotificationOn,
+      required this.languageCode,
+      required this.bio,
+      required this.streak,
+      required this.lastInteraction});
 
   factory Bubble.fromDocs(
     DocumentSnapshot docs,
@@ -77,6 +80,9 @@ class Bubble {
           DataManager.getBoolean(docs, Constants.likeNotificationOnDoc),
       languageCode: DataManager.getString(docs, Constants.languageDoc),
       bio: DataManager.getString(docs, Constants.bioDoc),
+      streak: DataManager.getNumber(docs, Constants.streakDoc).toInt(),
+      lastInteraction:
+          DataManager.getDateTime(docs, Constants.lastInteractionDoc),
       avatar: avatar,
     );
 

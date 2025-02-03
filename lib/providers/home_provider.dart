@@ -1,6 +1,7 @@
 import 'package:befriend/models/data/data_manager.dart';
 import 'package:befriend/models/data/user_manager.dart';
 import 'package:befriend/models/objects/profile.dart';
+import 'package:befriend/utilities/date_manager.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
@@ -67,61 +68,6 @@ class HomeProvider extends ChangeNotifier {
   void clearSearch() {
     _searchEditingController.clear();
     notifyListeners();
-  }
-
-  Future<void> search(String username, BuildContext context) async {
-    // Check if the username is present in the loaded friendships.
-    //    If yes -> animateToFriend
-    //    If no  -> get the user data from Firestore. If does not exist or is part of either blocked, don't do nothing
-    //       Check if searchId is present in friendsIds
-    //          If yes -> Add the friend to the profile and animateToFriend
-    username = username.trim();
-
-    try {
-      final Iterable<String> loadedUsernames =
-          home.user.friendships.map((friendship) => friendship.friend.username);
-
-      if (loadedUsernames.contains(username)) {
-        debugPrint('(HomeProvider) $username is loaded');
-        final Friendship friendship = home.user.friendships
-            .firstWhere((f) => f.friend.username == username);
-        final Bubble searchedBubble = friendship.friend;
-        animateToFriend(context, dx: searchedBubble.x, dy: searchedBubble.y);
-      } else {
-        final QuerySnapshot result = await Constants.usersCollection
-            .where(Constants.usernameDoc, isEqualTo: username)
-            .limit(1)
-            .get();
-
-        final List<DocumentSnapshot> documents = result.docs;
-
-        if (documents.isNotEmpty) {
-          final DocumentSnapshot snapshot = documents.first;
-
-          final ImageProvider avatar = await DataManager.getAvatar(snapshot);
-          final Bubble searchedBubble =
-              Bubble.fromDocs(documents.first, avatar);
-
-          final Bubble mainUser = await UserManager.getInstance();
-
-          if (mainUser.friendIDs.contains(searchedBubble.id)) {
-            debugPrint('(HomeProvider) $username is non loaded friend');
-
-            final Friendship friendship =
-                await DataQuery.getFriendshipFromBubble(searchedBubble);
-
-            UserManager.addFriendToList(friendship);
-            UserManager.notify();
-            if (context.mounted) {
-              animateToFriend(context,
-                  dx: searchedBubble.x, dy: searchedBubble.y);
-            }
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('(HomeProvider) Error searching for $username: $e');
-    }
   }
 
   Future<void> goToFriendProfile(BuildContext context, Profile profile) async {
@@ -319,6 +265,23 @@ class HomeProvider extends ChangeNotifier {
         }
       } catch (e) {
         debugPrint("(HomeProvider) Error updating language= $e");
+      }
+    });
+  }
+
+  Future<void> resetStreak(BuildContext context) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        if (home.user.main()) {
+          if (home.user.streak != 0 &&
+              DateManager.isBeforeYesterday(home.user.lastInteraction)) {
+            await DataQuery.updateDocument(Constants.streakDoc, 0);
+            UserManager.setStreak(0);
+            debugPrint('(HomeProvider) Resetting streak to 0');
+          }
+        }
+      } catch (e) {
+        debugPrint("(HomeProvider) Error resetting streak= $e");
       }
     });
   }

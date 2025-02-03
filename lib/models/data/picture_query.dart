@@ -24,7 +24,6 @@ class PictureQuery {
     required List<String> sessionUsers,
     required String caption,
     required Host host,
-    required Map<String, String> userMap,
     required List<String> usersAllowed,
     required Map<String, String> metadata,
     required bool isPublic,
@@ -38,7 +37,6 @@ class PictureQuery {
       'caption': caption,
       'hostId': host.host.id,
       'imageUrl': host.imageUrl!,
-      'userMap': userMap,
       'usersAllowed': usersAllowed,
       'metadata': metadata,
       'isPublic': isPublic
@@ -98,7 +96,7 @@ class PictureQuery {
       }
       return downloadUrl;
     } catch (e) {
-      debugPrint('(PictureQuery): Error uploading temporary picture: $e');
+      debugPrint('(PictureQuery) Error uploading temporary picture: $e');
       rethrow;
     }
   }

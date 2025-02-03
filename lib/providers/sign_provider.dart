@@ -1,5 +1,4 @@
 import 'package:befriend/models/authentication/authentication.dart';
-import 'package:befriend/models/authentication/date_manager.dart';
 import 'package:befriend/utilities/constants.dart';
 import 'package:befriend/utilities/error_handling.dart';
 import 'package:befriend/utilities/validators.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../utilities/app_localizations.dart';
+import '../utilities/date_manager.dart';
 import '../utilities/password_strength.dart';
 
 class SignProvider extends ChangeNotifier {

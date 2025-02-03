@@ -23,6 +23,8 @@ class Constants {
   static const String likeNotificationOnDoc = 'likeNotificationOn';
   static const String languageDoc = 'language';
   static const String bioDoc = 'bio';
+  static const String streakDoc = 'streak';
+  static const String lastInteractionDoc = 'lastInteraction';
   //FRIENDSHIPS
   static const String progressDoc = 'progress';
   static const String levelDoc = 'level';

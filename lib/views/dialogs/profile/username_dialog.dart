@@ -19,6 +19,8 @@ class UsernameDialog {
                 AppLocalizations.translate(context,
                     key: 'ud_people', defaultString: "People in this picture"),
                 textAlign: TextAlign.center,
+                style:
+                    GoogleFonts.openSans(color: Theme.of(context).primaryColor),
               ),
               children: users
                   .map((user) => SimpleDialogOption(

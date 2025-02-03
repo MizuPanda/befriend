@@ -297,7 +297,8 @@
   "prfs_followed": "Followed by",
   "prfs_since": "Since",
   "prfs_best": "Your Best Friend",
-  "prfs_never": "never",
+  "prfs_day": "day",
+  "prfs_days": "days",
 
   "_comment48": "Archive Settings Widget",
   "asw_archives": "Archives",

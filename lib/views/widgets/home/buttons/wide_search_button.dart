@@ -20,7 +20,7 @@ class WideSearchButton extends StatelessWidget {
               provider.pushToWideSearch(context);
             },
             icon: Icon(
-              Icons.language_rounded,
+              Icons.search_rounded,
               size: 0.078 * width,
             ));
       }),

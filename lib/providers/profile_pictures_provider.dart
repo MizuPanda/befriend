@@ -135,9 +135,7 @@ class ProfilePicturesProvider extends ChangeNotifier {
         final String hostId =
             DataManager.getString(snapshot, Constants.hostIdDoc);
         final String hostUsername = await DataQuery.getUsername(hostId);
-
         final Picture picture = Picture.fromDocument(snapshot, hostUsername);
-
         pictures.add(picture);
       }
 
